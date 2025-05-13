@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: ads
+  datasource:
+    url: ${DBMS_CONNECTION}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    username: ${DBMS_USER}
+    password: ${DBMS_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+
+server:
+  port: 8080
+
+#Local Variable
+app:
+  base:
+    url: ${BASE_URL}
+
