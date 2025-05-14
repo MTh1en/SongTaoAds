@@ -9,12 +9,11 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients
 public class AdsApplication {
 
-	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.configure()
-				.load();
-		dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
+    public static void main(String[] args) {
+        Dotenv dotenv = Dotenv.configure().load();
+        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
 
-		SpringApplication.run(AdsApplication.class, args);
-	}
+        SpringApplication.run(AdsApplication.class, args);
+    }
 
 }

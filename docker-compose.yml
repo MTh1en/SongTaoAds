@@ -1,0 +1,21 @@
+name: SongTaoAds
+services:
+  redis:
+    image: bitnami/redis:8.0.1
+    container_name: redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+
+volumes:
+  redis-data:
+
+networks:
+  app-network:
+    driver: bridge
