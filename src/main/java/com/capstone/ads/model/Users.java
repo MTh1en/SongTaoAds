@@ -34,7 +34,7 @@ public class Users {
 
     @Column(unique = true, columnDefinition = "VARCHAR(MAX)")
     String avatar;
-    Boolean isActive = false;
+    Boolean isActive;
 
     @CreationTimestamp
     Timestamp createAt;
@@ -42,6 +42,5 @@ public class Users {
     Timestamp updateAt;
 
     @ManyToOne
-    @JoinColumn()
-    private Role roleId;
+    private Role role;
 }

@@ -18,9 +18,6 @@ import java.util.List;
 @Entity
 public class Role {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
-
     @Column(unique = true, nullable = false)
     String name;
 
@@ -32,6 +29,6 @@ public class Role {
     @UpdateTimestamp
     Timestamp updatedAt;
 
-    @OneToMany(mappedBy = "roleId")
+    @OneToMany(mappedBy = "role")
     List<Users> users;
 }
