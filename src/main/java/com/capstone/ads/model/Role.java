@@ -21,7 +21,6 @@ public class Role {
     @Column(unique = true, nullable = false)
     String name;
 
-    @Column(columnDefinition = "NVARCHAR(255)")
     String description;
 
     @CreationTimestamp

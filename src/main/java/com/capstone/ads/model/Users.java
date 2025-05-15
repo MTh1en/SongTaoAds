@@ -20,7 +20,7 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.UUID)
     @OrderBy
     String id;
-    @Column(nullable = false, columnDefinition = "NVARCHAR(255)")
+    @Column(nullable = false)
     String fullName;
 
     @Column(nullable = false, unique = true)
@@ -32,7 +32,7 @@ public class Users {
     @Column(nullable = false)
     String password;
 
-    @Column(unique = true, columnDefinition = "VARCHAR(MAX)")
+    @Column(unique = true, length = 512)
     String avatar;
     Boolean isActive;
 

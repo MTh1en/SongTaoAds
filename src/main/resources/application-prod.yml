@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 30000
+  data:
+    redis:
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 16
+          min-idle: 2

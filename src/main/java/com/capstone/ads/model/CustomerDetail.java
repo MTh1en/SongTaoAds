@@ -24,13 +24,9 @@ public class CustomerDetail implements Serializable {
     @Column(nullable = false, unique = true)
     String logoUrl;
 
-    @Column(nullable = false, columnDefinition = "NVARCHAR(255)")
+    @Column(nullable = false)
     String companyName;
-
-    @Column(columnDefinition = "NVARCHAR(255)")
     String tagLine;
-
-    @Column(columnDefinition = "NVARCHAR(255)")
     String contactInfo;
 
     @OneToOne(fetch = FetchType.LAZY)
