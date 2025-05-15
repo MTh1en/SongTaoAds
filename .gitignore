@@ -33,4 +33,5 @@ build/
 
 ### Enviroment Variable ###
 .env
+.env.prod
 .mvn
