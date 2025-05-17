@@ -1,0 +1,77 @@
+name: Song Tao Ads pipeline
+
+on:
+  push:
+    branches:
+      - ci-cd
+    paths:
+      - src
+      - docker-compose.yml
+      - Dockerfile
+      - .github/workflows/pipeline-songtaoads.yml
+  pull_request:
+    branches:
+      - ci-cd
+    paths:
+      - src
+      - docker-compose.yml
+      - Dockerfile
+      - .github/workflows/pipeline-songtaoads.yml
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    name: Compile Project
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'oracle'
+
+      - name: Running Unit Test
+        run: |
+          ./mvnw clean compile
+  unit-tests:
+    runs-on: ubuntu-latest
+    name: Unit test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'oracle'
+
+      - name: Running Unit Test
+        run: |
+          ./mvnw clean test
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    needs:
+      - compile
+      - unit-tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'oracle'
+
+      - name: Running Unit Test
+        run: |
+          mvn clean compile
