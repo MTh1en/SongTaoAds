@@ -1,0 +1,86 @@
+name: Song Tao Ads Pipeline
+
+on:
+  push:
+    branches:
+      - ci-cd
+    paths:
+      - src/**
+      - docker-compose.yml
+      - Dockerfile
+      - .github/workflows/pipeline-songtaoads.yml
+  pull_request:
+    branches:
+      - ci-cd
+    paths:
+      - src/**
+      - docker-compose.yml
+      - Dockerfile
+      - .github/workflows/pipeline-songtaoads.yml
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    name: Compile Project
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'oracle'
+
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
+      - name: Compile project
+        run: ./mvnw clean compile
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    name: Unit Tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'oracle'
+
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
+      - name: Run unit tests
+        run: ./mvnw clean test
+
+  build:
+    runs-on: ubuntu-latest
+    name: Build Project
+    needs:
+      - compile
+      - unit-tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'oracle'
+
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
+      - name: Build project
+        run: ./mvnw clean package
