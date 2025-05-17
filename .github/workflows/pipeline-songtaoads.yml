@@ -1,11 +1,11 @@
-name: Song Tao Ads pipeline
+name: Song Tao Ads Pipeline
 
 on:
   push:
     branches:
       - ci-cd
     paths:
-      - src
+      - src/**
       - docker-compose.yml
       - Dockerfile
       - .github/workflows/pipeline-songtaoads.yml
@@ -13,10 +13,11 @@ on:
     branches:
       - ci-cd
     paths:
-      - src
+      - src/**
       - docker-compose.yml
       - Dockerfile
       - .github/workflows/pipeline-songtaoads.yml
+
 jobs:
   compile:
     runs-on: ubuntu-latest
@@ -30,15 +31,18 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21
+          java-version: '21'
           distribution: 'oracle'
 
-      - name: Running Unit Test
-        run: |
-          ./mvnw clean compile
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
+      - name: Compile project
+        run: ./mvnw clean compile
+
   unit-tests:
     runs-on: ubuntu-latest
-    name: Unit test
+    name: Unit Tests
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -48,15 +52,18 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21
+          java-version: '21'
           distribution: 'oracle'
 
-      - name: Running Unit Test
-        run: |
-          ./mvnw clean test
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
+      - name: Run unit tests
+        run: ./mvnw clean test
+
   build:
     runs-on: ubuntu-latest
-    name: Build
+    name: Build Project
     needs:
       - compile
       - unit-tests
@@ -69,9 +76,11 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 21
+          java-version: '21'
           distribution: 'oracle'
 
-      - name: Running Unit Test
-        run: |
-          mvn clean compile
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
+      - name: Build project
+        run: ./mvnw clean package
