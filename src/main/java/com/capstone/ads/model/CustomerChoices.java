@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,18 +16,25 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class Role {
+public class CustomerChoices {
     @Id
-    @Column(unique = true, nullable = false)
-    String name;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
 
-    String description;
+    Double totalAmount;
 
     @CreationTimestamp
     LocalDateTime createdAt;
     @UpdateTimestamp
     LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "role")
-    List<Users> users;
+    @ManyToOne
+    Users users;
+    @ManyToOne
+    ProductType productType;
+    @OneToMany(mappedBy = "customerChoices")
+    List<CustomerChoicesDetails> customerChoicesDetails;
+
+    @OneToMany(mappedBy = "customerChoices")
+    List<CustomerChoicesSize> customerChoicesSizes;
 }
