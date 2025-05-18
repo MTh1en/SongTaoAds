@@ -14,6 +14,12 @@ public enum ErrorCode {
     ACCESS_DENIED("Access denied", HttpStatus.FORBIDDEN),
     ROLE_NOT_FOUND("Role not found", HttpStatus.NOT_FOUND),
     INVALID_TOKEN("Invalid token", HttpStatus.UNAUTHORIZED),
+
+    //PRODUCT TYPE
+    PRODUCT_TYPE_NOT_FOUND("Product type not found", HttpStatus.NOT_FOUND),
+
+    //SIZE
+    SIZE_NOT_FOUND("Size not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
