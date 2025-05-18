@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface AttributesRepository extends JpaRepository<Attributes, String> {
     List<Attributes> findByProductType_Id(String id);
+
 }
