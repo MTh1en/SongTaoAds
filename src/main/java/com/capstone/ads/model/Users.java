@@ -6,7 +6,8 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -37,10 +38,16 @@ public class Users {
     Boolean isActive;
 
     @CreationTimestamp
-    Timestamp createAt;
+    LocalDateTime createAt;
     @UpdateTimestamp
-    Timestamp updateAt;
+    LocalDateTime updateAt;
 
     @ManyToOne
     private Role role;
+
+    @OneToMany(mappedBy = "users")
+    List<Orders> orders;
+
+    @OneToMany(mappedBy = "users")
+    List<CustomerChoices> customerChoices;
 }

@@ -3,11 +3,9 @@ package com.capstone.ads.model;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,4 +29,7 @@ public class CustomerDetail implements Serializable {
 
     @OneToOne(fetch = FetchType.LAZY)
     Users users;
+
+    @OneToMany(mappedBy = "customerDetail")
+    List<AIDesigns> aiDesigns;
 }
