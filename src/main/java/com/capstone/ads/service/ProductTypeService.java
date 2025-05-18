@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface ProductTypeService {
     ProductTypeDTO create(ProductTypeCreateRequest request);
-    ProductTypeDTO update(String id, ProductTypeUpdateRequest request);
-    ProductTypeDTO findById(String id);
+    ProductTypeDTO update(String productTypeId, ProductTypeUpdateRequest request);
+    ProductTypeDTO findById(String productTypeId);
     List<ProductTypeDTO> findAll();
-    void delete(String id);
+    void delete(String productTypeId);
 }

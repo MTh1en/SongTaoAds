@@ -19,47 +19,47 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ProductTypeServiceImpl implements ProductTypeService {
-    private final ProductTypeRepository repository;
-    private final ProductTypeMapper mapper;
+    private final ProductTypeRepository productTypeRepository;
+    private final ProductTypeMapper productTypeMapper;
 
     @Override
     @Transactional
     public ProductTypeDTO create(ProductTypeCreateRequest request) {
-        ProductType productType = mapper.toEntity(request);
-        productType = repository.save(productType);
-        return mapper.toDTO(productType);
+        ProductType productType = productTypeMapper.toEntity(request);
+        productType = productTypeRepository.save(productType);
+        return productTypeMapper.toDTO(productType);
     }
 
     @Override
     @Transactional
     public ProductTypeDTO update(String id, ProductTypeUpdateRequest request) {
-        ProductType productType = repository.findById(id)
+        ProductType productType = productTypeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
-        mapper.updateEntityFromRequest(request, productType);
-        productType = repository.save(productType);
-        return mapper.toDTO(productType);
+        productTypeMapper.updateEntityFromRequest(request, productType);
+        productType = productTypeRepository.save(productType);
+        return productTypeMapper.toDTO(productType);
     }
 
     @Override
     public ProductTypeDTO findById(String id) {
-        ProductType productType = repository.findById(id)
+        ProductType productType = productTypeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
-        return mapper.toDTO(productType);
+        return productTypeMapper.toDTO(productType);
     }
 
     @Override
     public List<ProductTypeDTO> findAll() {
-        return repository.findAll().stream()
-                .map(mapper::toDTO)
+        return productTypeRepository.findAll().stream()
+                .map(productTypeMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public void delete(String id) {
-        if (!repository.existsById(id)) {
+        if (!productTypeRepository.existsById(id)) {
             throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
         }
-        repository.deleteById(id);
+        productTypeRepository.deleteById(id);
     }
 }

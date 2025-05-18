@@ -1,6 +1,7 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
+import com.capstone.ads.dto.attribute.AttributesDTO;
 import com.capstone.ads.dto.producttype.ProductTypeCreateRequest;
 import com.capstone.ads.dto.producttype.ProductTypeDTO;
 import com.capstone.ads.dto.producttype.ProductTypeUpdateRequest;
@@ -22,15 +23,15 @@ public class ProductTypeController {
         return ApiResponseBuilder.buildSuccessResponse("Create product type successful", service.create(request));
     }
 
-    @PutMapping("/{id}")
-    public ApiResponse<ProductTypeDTO> update(@PathVariable("id") String id,
+    @PutMapping("/{productTypeId}")
+    public ApiResponse<ProductTypeDTO> update(@PathVariable String productTypeId,
                                               @RequestBody ProductTypeUpdateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Update product type successful", service.update(id, request));
+        return ApiResponseBuilder.buildSuccessResponse("Update product type successful", service.update(productTypeId, request));
     }
 
-    @GetMapping("/{id}")
-    public ApiResponse<ProductTypeDTO> getById(@PathVariable String id) {
-        return ApiResponseBuilder.buildSuccessResponse("Product Type by Id", service.findById(id));
+    @GetMapping("/{productTypeId}")
+    public ApiResponse<ProductTypeDTO> getById(@PathVariable String productTypeId) {
+        return ApiResponseBuilder.buildSuccessResponse("Product Type by Id", service.findById(productTypeId));
     }
 
     @GetMapping

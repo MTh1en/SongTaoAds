@@ -19,47 +19,47 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class SizeServiceImpl implements SizeService {
-    private final SizeRepository repository;
-    private final SizeMapper mapper;
+    private final SizeRepository sizeRepository;
+    private final SizeMapper sizeMapper;
 
     @Override
     @Transactional
     public SizeDTO create(SizeCreateRequest request) {
-        Size size = mapper.toEntity(request);
-        size = repository.save(size);
-        return mapper.toDTO(size);
+        Size size = sizeMapper.toEntity(request);
+        size = sizeRepository.save(size);
+        return sizeMapper.toDTO(size);
     }
 
     @Override
     @Transactional
     public SizeDTO update(String id, SizeUpdateRequest request) {
-        Size size = repository.findById(id)
+        Size size = sizeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.SIZE_NOT_FOUND));
-        mapper.updateEntityFromRequest(request, size);
-        size = repository.save(size);
-        return mapper.toDTO(size);
+        sizeMapper.updateEntityFromRequest(request, size);
+        size = sizeRepository.save(size);
+        return sizeMapper.toDTO(size);
     }
 
     @Override
     public SizeDTO findById(String id) {
-        Size size = repository.findById(id)
+        Size size = sizeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.SIZE_NOT_FOUND));
-        return mapper.toDTO(size);
+        return sizeMapper.toDTO(size);
     }
 
     @Override
     public List<SizeDTO> findAll() {
-        return repository.findAll().stream()
-                .map(mapper::toDTO)
+        return sizeRepository.findAll().stream()
+                .map(sizeMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public void delete(String id) {
-        if (!repository.existsById(id)) {
+        if (!sizeRepository.existsById(id)) {
             throw new AppException(ErrorCode.SIZE_NOT_FOUND);
         }
-        repository.deleteById(id);
+        sizeRepository.deleteById(id);
     }
 }

@@ -20,6 +20,9 @@ public enum ErrorCode {
 
     //SIZE
     SIZE_NOT_FOUND("Size not found", HttpStatus.NOT_FOUND),
+
+    //ATTRIBUTE
+    ATTRIBUTE_NOT_FOUND("Attribute not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
