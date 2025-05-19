@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
 
   app:
-    image: mthien1212/ads:${APP_VERSION}
+    image: hiruzenn/ads:${APP_VERSION}  #mthien2212
     container_name: songtao-ads
     build:
       context: .

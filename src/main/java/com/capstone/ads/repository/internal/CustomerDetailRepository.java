@@ -4,4 +4,5 @@ import com.capstone.ads.model.CustomerDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CustomerDetailRepository extends JpaRepository<CustomerDetail, String> {
+    boolean existsByLogoUrl(String logoUrl);
 }
