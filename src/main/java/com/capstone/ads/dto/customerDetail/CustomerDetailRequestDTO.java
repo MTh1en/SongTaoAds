@@ -1,0 +1,18 @@
+package com.capstone.ads.dto.customerDetail;
+
+import com.capstone.ads.model.Users;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class CustomerDetailRequestDTO {
+     String logoUrl;
+     String companyName;
+     String tagLine;
+     String contactInfo;
+     String userId;
+}

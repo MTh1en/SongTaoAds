@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-
+@Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,4 +35,6 @@ public class Payments {
 
     @ManyToOne
     Orders orders;
+    @Column
+    private String payOsPaymentLinkId;
 }
