@@ -1,6 +1,5 @@
 package com.capstone.ads.dto.producttype;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;

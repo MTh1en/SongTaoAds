@@ -20,8 +20,8 @@ public class CustomerChoices {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-
     Double totalAmount;
+    Boolean isFinal;
 
     @CreationTimestamp
     LocalDateTime createdAt;

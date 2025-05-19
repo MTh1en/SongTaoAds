@@ -14,7 +14,7 @@ public enum ErrorCode {
     ACCESS_DENIED("Access denied", HttpStatus.FORBIDDEN),
     ROLE_NOT_FOUND("Role not found", HttpStatus.NOT_FOUND),
     INVALID_TOKEN("Invalid token", HttpStatus.UNAUTHORIZED),
-
+    INVALID_PRINCIPAL("Invalid principal", HttpStatus.UNAUTHORIZED),
     //PRODUCT TYPE
     PRODUCT_TYPE_NOT_FOUND("Product type not found", HttpStatus.NOT_FOUND),
 
@@ -23,6 +23,13 @@ public enum ErrorCode {
 
     //ATTRIBUTE
     ATTRIBUTE_NOT_FOUND("Attribute not found", HttpStatus.NOT_FOUND),
+
+    //ATTRIBUTE VALUE
+    ATTRIBUTE_VALUE_NOT_FOUND("Attribute value not found", HttpStatus.NOT_FOUND),
+
+    //CUSTOMER CHOICES
+    CUSTOMER_CHOICES_NOT_FOUND("Customer choices not found", HttpStatus.NOT_FOUND),
+    CUSTOMER_CHOICES_IS_COMPLETED("Customer choices is completed", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
