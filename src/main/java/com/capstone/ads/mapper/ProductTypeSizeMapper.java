@@ -10,7 +10,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ProductTypeSizeMapper {
     @Mapping(target = "productTypeId", source = "productType.id")
-    @Mapping(target = "sizeId", source = "size.id")
     ProductTypeSizeDTO toDTO(ProductTypeSize productTypeSize);
 
     @Mapping(target = "productType", expression = "java(mapProductType(productTypeId))")

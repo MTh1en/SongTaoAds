@@ -12,7 +12,7 @@ import vn.payos.type.CheckoutResponseData;
 import vn.payos.type.PaymentLinkData;
 
 @RestController
-@RequestMapping("/api/v1/payments")
+@RequestMapping("/api/payments")
 @RequiredArgsConstructor
 public class PaymentController {
 
