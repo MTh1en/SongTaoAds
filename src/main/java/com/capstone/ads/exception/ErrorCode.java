@@ -18,6 +18,9 @@ public enum ErrorCode {
     //PRODUCT TYPE
     PRODUCT_TYPE_NOT_FOUND("Product type not found", HttpStatus.NOT_FOUND),
 
+    //PRODUCT TYPE SIZE
+    PRODUCT_TYPE_SIZE_NOT_FOUND("Product type size not found", HttpStatus.NOT_FOUND),
+
     //SIZE
     SIZE_NOT_FOUND("Size not found", HttpStatus.NOT_FOUND),
 
