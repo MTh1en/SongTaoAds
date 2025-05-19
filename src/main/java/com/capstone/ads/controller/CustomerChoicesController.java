@@ -20,28 +20,28 @@ public class CustomerChoicesController {
     @PostMapping("/product-types/{productTypeId}/customer-choices")
     public ApiResponse<CustomerChoicesDTO> create(@PathVariable String productTypeId,
                                                   @RequestBody CustomerChoicesCreateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Create attribute successful", service.create(productTypeId, request));
+        return ApiResponseBuilder.buildSuccessResponse("Create customer choices successful", service.create(productTypeId, request));
     }
 
     @PutMapping("/customer-choices/{customerChoicesId}")
     public ApiResponse<CustomerChoicesDTO> update(@PathVariable String customerChoicesId,
                                                   @RequestBody CustomerChoicesUpdateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Update attribute successful", service.update(customerChoicesId, request));
+        return ApiResponseBuilder.buildSuccessResponse("Update customer choices successful", service.update(customerChoicesId, request));
     }
 
     @GetMapping("/customer-choices/{customerChoicesId}")
     public ApiResponse<CustomerChoicesDTO> getById(@PathVariable String customerChoicesId) {
-        return ApiResponseBuilder.buildSuccessResponse("attribute by Id", service.findById(customerChoicesId));
+        return ApiResponseBuilder.buildSuccessResponse("customer choices by Id", service.findById(customerChoicesId));
     }
 
     @GetMapping("/customers/{customerId}/customer-choices")
     public ApiResponse<List<CustomerChoicesDTO>> getNewestByCustomer(@PathVariable String customerId) {
-        return ApiResponseBuilder.buildSuccessResponse("Find all attribute by product type", service.findNewestByUserId(customerId));
+        return ApiResponseBuilder.buildSuccessResponse("Find all customer choices by product type", service.findNewestByUserId(customerId));
     }
 
     @DeleteMapping("/customer-choices/{customerChoicesId}")
     public ApiResponse<Void> delete(@PathVariable String customerChoicesId) {
         service.delete(customerChoicesId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete attribute successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Delete customer choices successful", null);
     }
 }

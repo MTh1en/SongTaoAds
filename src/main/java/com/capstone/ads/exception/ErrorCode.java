@@ -30,6 +30,9 @@ public enum ErrorCode {
     //CUSTOMER CHOICES
     CUSTOMER_CHOICES_NOT_FOUND("Customer choices not found", HttpStatus.NOT_FOUND),
     CUSTOMER_CHOICES_IS_COMPLETED("Customer choices is completed", HttpStatus.BAD_REQUEST),
+
+    //CUSTOMER_CHOICES_SIZE
+    CUSTOMER_CHOICES_SIZE_NOT_FOUND("Customer choices size not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
