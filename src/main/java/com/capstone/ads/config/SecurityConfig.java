@@ -26,11 +26,6 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
-            "/api/v1/auth/**",
-            "/api/v1/orders/**",
-            "/api/v1/payments/**",
-            "/api/v1/users/**",
-            "/api/v1/customer-details/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/api/**"
