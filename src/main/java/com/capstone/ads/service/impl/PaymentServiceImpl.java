@@ -40,11 +40,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${payos.checksum-key}")
     private String CHECKSUM_KEY;
 
-    @Value("${payos.create-paymenturl}")
-    private String CREATE_PAYMENT_URL;
 
-    @Value("${payos.check-paymenturl}")
-    private String CHECK_PAYMENT_URL;
 
     @Value("${payos.return-url}")
     private String RETURN_URL;
