@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
     AuthService authService;
 
