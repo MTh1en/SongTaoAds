@@ -1,7 +1,6 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.customerchoice.CustomerChoicesCreateRequest;
 import com.capstone.ads.dto.customerchoice.CustomerChoicesDTO;
 import com.capstone.ads.dto.customerchoice.CustomerChoicesUpdateRequest;
 import com.capstone.ads.service.CustomerChoicesService;
@@ -17,16 +16,14 @@ import java.util.List;
 public class CustomerChoicesController {
     private final CustomerChoicesService service;
 
-    @PostMapping("/product-types/{productTypeId}/customer-choices")
-    public ApiResponse<CustomerChoicesDTO> create(@PathVariable String productTypeId,
-                                                  @RequestBody CustomerChoicesCreateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Create customer choices successful", service.create(productTypeId, request));
+    @PostMapping("/customers/{customerId}/product-types/{productTypeId}")
+    public ApiResponse<CustomerChoicesDTO> create(@PathVariable String customerId, @PathVariable String productTypeId) {
+        return ApiResponseBuilder.buildSuccessResponse("Create customer choices successful", service.create(customerId, productTypeId));
     }
 
-    @PutMapping("/customer-choices/{customerChoicesId}")
-    public ApiResponse<CustomerChoicesDTO> update(@PathVariable String customerChoicesId,
-                                                  @RequestBody CustomerChoicesUpdateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Update customer choices successful", service.update(customerChoicesId, request));
+    @PutMapping("/customers/{customerId}/product-types/{productTypeId}")
+    public ApiResponse<CustomerChoicesDTO> update(@PathVariable String customerId, @PathVariable String productTypeId) {
+        return ApiResponseBuilder.buildSuccessResponse("Finish customer choices successful", service.finish(customerId, productTypeId));
     }
 
     @GetMapping("/customer-choices/{customerChoicesId}")

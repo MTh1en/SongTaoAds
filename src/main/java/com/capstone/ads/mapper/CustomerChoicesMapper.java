@@ -1,6 +1,5 @@
 package com.capstone.ads.mapper;
 
-import com.capstone.ads.dto.customerchoice.CustomerChoicesCreateRequest;
 import com.capstone.ads.dto.customerchoice.CustomerChoicesDTO;
 import com.capstone.ads.dto.customerchoice.CustomerChoicesUpdateRequest;
 import com.capstone.ads.model.CustomerChoices;
@@ -18,9 +17,7 @@ public interface CustomerChoicesMapper {
 
     @Mapping(target = "users", expression = "java(mapUsers(userId))")
     @Mapping(target = "productType", expression = "java(mapProductType(productTypeId))")
-    CustomerChoices toEntity(CustomerChoicesCreateRequest request, String userId, String productTypeId);
-
-    void updateEntityFromRequest(CustomerChoicesUpdateRequest request, @MappingTarget CustomerChoices customerChoices);
+    CustomerChoices toEntity(String userId, String productTypeId);
 
     default Users mapUsers(String userId) {
         if (userId == null) return null;

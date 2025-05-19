@@ -1,15 +1,13 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.customerchoice.CustomerChoicesCreateRequest;
 import com.capstone.ads.dto.customerchoice.CustomerChoicesDTO;
-import com.capstone.ads.dto.customerchoice.CustomerChoicesUpdateRequest;
 
 import java.util.List;
 
 public interface CustomerChoicesService {
-    CustomerChoicesDTO create(String productTypeId, CustomerChoicesCreateRequest request);
+    CustomerChoicesDTO create(String customerId, String productTypeId);
 
-    CustomerChoicesDTO update(String customerChoiceId, CustomerChoicesUpdateRequest request);
+    CustomerChoicesDTO finish(String customerId, String productTypeId);
 
     CustomerChoicesDTO findById(String customerChoiceId);
 

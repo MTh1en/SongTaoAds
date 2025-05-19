@@ -1,6 +1,5 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.dto.customerchoice.CustomerChoicesCreateRequest;
 import com.capstone.ads.dto.customerchoice.CustomerChoicesDTO;
 import com.capstone.ads.dto.customerchoice.CustomerChoicesUpdateRequest;
 import com.capstone.ads.exception.AppException;
@@ -11,7 +10,6 @@ import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.repository.internal.ProductTypeRepository;
 import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.service.CustomerChoicesService;
-import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,27 +24,26 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
     private final UsersRepository usersRepository;
     private final ProductTypeRepository productTypeRepository;
     private final CustomerChoicesMapper customerChoicesMapper;
-    private final SecurityContextUtils securityContextUtils;
 
     @Override
     @Transactional
-    public CustomerChoicesDTO create(String productTypeId, CustomerChoicesCreateRequest request) {
-        var user = securityContextUtils.getCurrentUser();
-        productTypeRepository.findById(productTypeId)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
+    public CustomerChoicesDTO create(String customerId, String productTypeId) {
+        if (!usersRepository.existsById(customerId)) throw new AppException(ErrorCode.USER_NOT_FOUND);
+        if (!productTypeRepository.existsById(productTypeId)) throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
 
-        CustomerChoices customerChoices = customerChoicesMapper.toEntity(request, user.getId(), productTypeId);
+        CustomerChoices customerChoices = customerChoicesMapper.toEntity(customerId, productTypeId);
+        customerChoices.setTotalAmount(0.0);
+        customerChoices.setIsFinal(false);
         customerChoices = customerChoicesRepository.save(customerChoices);
         return customerChoicesMapper.toDTO(customerChoices);
     }
 
     @Override
     @Transactional
-    public CustomerChoicesDTO update(String customerChoiceId, CustomerChoicesUpdateRequest request) {
-        CustomerChoices customerChoices = customerChoicesRepository.findById(customerChoiceId)
+    public CustomerChoicesDTO finish(String customerId, String productTypeId) {
+        var customerChoices = customerChoicesRepository.findFirstByProductType_IdAndUsers_IdOrderByUpdatedAtDesc(productTypeId, customerId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
-        if(customerChoices.getIsFinal()) throw new AppException(ErrorCode.CUSTOMER_CHOICES_IS_COMPLETED);
-        customerChoicesMapper.updateEntityFromRequest(request, customerChoices);
+        customerChoices.setIsFinal(true);
         customerChoices = customerChoicesRepository.save(customerChoices);
         return customerChoicesMapper.toDTO(customerChoices);
     }
