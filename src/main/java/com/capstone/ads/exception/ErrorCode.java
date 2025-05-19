@@ -33,6 +33,9 @@ public enum ErrorCode {
 
     //CUSTOMER_CHOICES_SIZE
     CUSTOMER_CHOICES_SIZE_NOT_FOUND("Customer choices size not found", HttpStatus.NOT_FOUND),
+
+    //CUSTOMER_CHOICES_DETAIL
+    CUSTOMER_CHOICES_DETAIL_NOT_FOUND("Customer choices detail not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
