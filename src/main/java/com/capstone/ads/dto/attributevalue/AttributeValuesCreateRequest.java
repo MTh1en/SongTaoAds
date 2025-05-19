@@ -1,0 +1,23 @@
+package com.capstone.ads.dto.attributevalue;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class AttributeValuesCreateRequest {
+    @Size(min = 6, message = "Attribute Value Name must be at least 6 characters")
+    String name;
+    @NotBlank(message = "Attribute Value Unit is Required")
+    String unit;
+    Double materialPrice;
+    @Positive(message = "Unit Price must be greater than 0")
+    Double unitPrice;
+    Boolean isAvailable;
+}

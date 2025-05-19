@@ -33,6 +33,7 @@ public class SecurityConfig {
             "/api/v1/customer-details/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
+            "/api/**"
     };
     private final CustomJwtDecoder customJwtDecoder;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
