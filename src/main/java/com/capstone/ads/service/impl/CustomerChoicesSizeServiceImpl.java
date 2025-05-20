@@ -9,6 +9,7 @@ import com.capstone.ads.mapper.CustomerChoicesSizeMapper;
 import com.capstone.ads.model.CustomerChoicesSize;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.repository.internal.CustomerChoicesSizeRepository;
+import com.capstone.ads.repository.internal.ProductTypeSizeRepository;
 import com.capstone.ads.repository.internal.SizeRepository;
 import com.capstone.ads.service.CustomerChoicesSizeService;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +25,20 @@ public class CustomerChoicesSizeServiceImpl implements CustomerChoicesSizeServic
     private final CustomerChoicesSizeRepository customerChoicesSizeRepository;
     private final CustomerChoicesRepository customerChoicesRepository;
     private final SizeRepository sizeRepository;
+    private final ProductTypeSizeRepository productTypeSizeRepository;
     private final CustomerChoicesSizeMapper customerChoicesSizeMapper;
 
     @Override
     @Transactional
     public CustomerChoicesSizeDTO create(String customerChoicesId, String sizeId, CustomerChoicesSizeCreateRequest request) {
-        if (!customerChoicesRepository.existsById(customerChoicesId))
-            throw new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND);
+        var customerChoice = customerChoicesRepository.findById(customerChoicesId)
+                .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
 
         if (!sizeRepository.existsById(sizeId))
             throw new AppException(ErrorCode.SIZE_NOT_FOUND);
 
+        if (!productTypeSizeRepository.existsByProductType_IdAndSize_Id(customerChoice.getProductType().getId(), sizeId))
+            throw new AppException(ErrorCode.SIZE_NOT_BELONG_PRODUCT_TYPE);
         CustomerChoicesSize customerChoicesSize = customerChoicesSizeMapper.toEntity(request, customerChoicesId, sizeId);
         customerChoicesSize = customerChoicesSizeRepository.save(customerChoicesSize);
         return customerChoicesSizeMapper.toDTO(customerChoicesSize); // createdAt and updatedAt may be null in response

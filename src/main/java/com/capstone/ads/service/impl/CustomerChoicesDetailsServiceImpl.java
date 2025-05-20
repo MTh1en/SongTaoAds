@@ -10,13 +10,16 @@ import com.capstone.ads.repository.internal.CustomerChoicesDetailsRepository;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.service.CustomerChoicesDetailsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetailsService {
     private final CustomerChoicesDetailsRepository customerChoicesDetailsRepository;
     private final CustomerChoicesRepository customerChoicesRepository;
@@ -24,6 +27,7 @@ public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetails
     private final CustomerChoicesDetailsMapper customerChoicesDetailsMapper;
 
     @Override
+    @Transactional
     public CustomerChoicesDetailsDTO create(String customerChoicesId, String attributeValueId) {
         if (!customerChoicesRepository.existsById(customerChoicesId))
             throw new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND);
@@ -53,6 +57,7 @@ public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetails
     }
 
     @Override
+    @Transactional
     public void delete(String id) {
         if (!customerChoicesDetailsRepository.existsById(id)) {
             throw new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND);
