@@ -1,19 +1,20 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.order.OrderConfirmDTO;
-import com.capstone.ads.dto.order.OrderCreateDTO;
+import com.capstone.ads.dto.order.OrderConfirmRequest;
+import com.capstone.ads.dto.order.OrderCreateRequest;
 import com.capstone.ads.dto.order.OrderDTO;
-import com.capstone.ads.dto.order.OrderUpdateDTO;
+import com.capstone.ads.dto.order.OrderUpdateRequest;
 
 import java.util.List;
 
 public interface OrderService {
 
-    OrderDTO createOrder(OrderCreateDTO createDTO);
+    OrderDTO createOrder(OrderCreateRequest createDTO);
     OrderDTO getOrderById(String id);
     List<OrderDTO> getAllOrders();
-    OrderDTO updateOrder(String id, OrderUpdateDTO updateDTO);
+    OrderDTO updateOrder(String id, OrderUpdateRequest updateDTO);
     void deleteOrder(String id);
-    OrderDTO confirmOrder(String id, OrderConfirmDTO confirmDTO);
+    OrderDTO confirmOrder(String id, OrderConfirmRequest confirmDTO);
     void UpdateOrderStatus(String id, String status);
+    OrderDTO getOrderByUserId(String id);
 }

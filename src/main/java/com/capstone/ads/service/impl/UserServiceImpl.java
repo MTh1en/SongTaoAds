@@ -1,7 +1,7 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.dto.user.UserDTO;
-import com.capstone.ads.dto.user.UserRequestDTO;
+import com.capstone.ads.dto.user.UserRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.UsersMapper;
@@ -13,10 +13,7 @@ import com.capstone.ads.repository.internal.RoleRepository;
 import com.capstone.ads.service.UserService;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,11 +26,11 @@ public class UserServiceImpl implements UserService {
     private final UsersRepository usersRepository;
     private final RoleRepository roleRepository;
     private final UsersMapper usersMapper;
-    private  PasswordEncoder passwordEncoder;
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
     private final SecurityContextUtils securityContextUtils;
 
     @Override
-    public UserDTO createUser(UserRequestDTO request) {
+    public UserDTO createUser(UserRequest request) {
         // Validate uniqueness
         if (usersRepository.existsByEmail(request.getEmail())) {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
@@ -68,9 +65,8 @@ public class UserServiceImpl implements UserService {
                 .map(usersMapper::toDTO)
                 .collect(Collectors.toList());
     }
-
     @Override
-    public UserDTO updateUser(String id, UserRequestDTO request) {
+    public UserDTO updateUser(String id, UserRequest request) {
         Users user = usersRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
@@ -86,21 +82,18 @@ public class UserServiceImpl implements UserService {
         Role role = roleRepository.findByName(request.getRoleName())
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
-        // Update fields
-        user.setFullName(request.getFullName());
-        user.setEmail(request.getEmail());
-        user.setPhone(request.getPhone());
+        // Use MapStruct to update entity fields
+        usersMapper.updateEntityFromDTO(request, user);
+
+        // Manually handle password and role
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-        user.setAvatar(request.getAvatar());
-        user.setIsActive(request.getIsActive());
         user.setRole(role);
 
-        user = usersRepository.save(user);
-        return usersMapper.toDTO(user);
+        Users updatedUser = usersRepository.save(user);
+        return usersMapper.toDTO(updatedUser);
     }
-
     @Override
     public void deleteUser(String id) {
         if (!usersRepository.existsById(id)) {

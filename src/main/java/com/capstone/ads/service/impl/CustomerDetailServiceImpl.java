@@ -1,7 +1,7 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.dto.customerDetail.CustomerDetailDTO;
-import com.capstone.ads.dto.customerDetail.CustomerDetailRequestDTO;
+import com.capstone.ads.dto.customerDetail.CustomerDetailRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerDetailMapper;
@@ -25,7 +25,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
     private final CustomerDetailMapper customerDetailMapper;
 
     @Override
-    public CustomerDetailDTO createCustomerDetail(CustomerDetailRequestDTO request) {
+    public CustomerDetailDTO createCustomerDetail(CustomerDetailRequest request) {
         if (customerDetailRepository.existsByLogoUrl(request.getLogoUrl())) {
             throw new AppException(ErrorCode.LOGO_URL_ALREADY_EXISTS);
         }
@@ -46,6 +46,12 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
         return customerDetailMapper.toDTO(customerDetail);
     }
+    @Override
+    public CustomerDetailDTO getCustomerDetailByUserId(String id) {
+        CustomerDetail customerDetail = customerDetailRepository.getCustomerDetailByUserId(id)
+                .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
+        return customerDetailMapper.toDTO(customerDetail);
+    }
 
     @Override
     public List<CustomerDetailDTO> getAllCustomerDetails() {
@@ -55,7 +61,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
     }
 
     @Override
-    public CustomerDetailDTO updateCustomerDetail(String id, CustomerDetailRequestDTO request) {
+    public CustomerDetailDTO updateCustomerDetail(String id, CustomerDetailRequest request) {
         CustomerDetail customerDetail = customerDetailRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
 
@@ -66,13 +72,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
 
         Users user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-
-        customerDetail.setLogoUrl(request.getLogoUrl());
-        customerDetail.setCompanyName(request.getCompanyName());
-        customerDetail.setTagLine(request.getTagLine());
-        customerDetail.setContactInfo(request.getContactInfo());
-        customerDetail.setUsers(user);
-
+        customerDetailMapper.updateEntityFromDTO(request, customerDetail);
         customerDetail = customerDetailRepository.save(customerDetail);
         return customerDetailMapper.toDTO(customerDetail);
     }
