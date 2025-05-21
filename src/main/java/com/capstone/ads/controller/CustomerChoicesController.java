@@ -2,13 +2,10 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.customerchoice.CustomerChoicesDTO;
-import com.capstone.ads.dto.customerchoice.CustomerChoicesUpdateRequest;
 import com.capstone.ads.service.CustomerChoicesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -32,7 +29,7 @@ public class CustomerChoicesController {
     }
 
     @GetMapping("/customers/{customerId}/customer-choices")
-    public ApiResponse<List<CustomerChoicesDTO>> getNewestByCustomer(@PathVariable String customerId) {
+    public ApiResponse<CustomerChoicesDTO> getNewestByCustomer(@PathVariable String customerId) {
         return ApiResponseBuilder.buildSuccessResponse("Find all customer choices by product type", service.findNewestByUserId(customerId));
     }
 

@@ -47,7 +47,4 @@ public class Users {
 
     @OneToMany(mappedBy = "users")
     List<Orders> orders;
-
-    @OneToMany(mappedBy = "users")
-    List<CustomerChoices> customerChoices;
 }

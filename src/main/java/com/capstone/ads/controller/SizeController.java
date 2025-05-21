@@ -22,15 +22,15 @@ public class SizeController {
         return ApiResponseBuilder.buildSuccessResponse("Create size successful", service.create(request));
     }
 
-    @PutMapping("/{id}")
-    public ApiResponse<SizeDTO> update(@PathVariable String id,
+    @PutMapping("/{sizeId}")
+    public ApiResponse<SizeDTO> update(@PathVariable String sizeId,
                                           @RequestBody SizeUpdateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Update size successful", service.update(id, request));
+        return ApiResponseBuilder.buildSuccessResponse("Update size successful", service.update(sizeId, request));
     }
 
-    @GetMapping("/{id}")
-    public ApiResponse<SizeDTO> getById(@PathVariable String id) {
-        return ApiResponseBuilder.buildSuccessResponse("size by Id", service.findById(id));
+    @GetMapping("/{sizeId}")
+    public ApiResponse<SizeDTO> getById(@PathVariable String sizeId) {
+        return ApiResponseBuilder.buildSuccessResponse("size by Id", service.findById(sizeId));
     }
 
     @GetMapping
@@ -38,9 +38,9 @@ public class SizeController {
         return ApiResponseBuilder.buildSuccessResponse("Find all size", service.findAll());
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable String id) {
-        service.delete(id);
+    @DeleteMapping("/{sizeId}")
+    public ApiResponse<Void> delete(@PathVariable String sizeId) {
+        service.delete(sizeId);
         return ApiResponseBuilder.buildSuccessResponse("Delete size successful", null);
     }
 }

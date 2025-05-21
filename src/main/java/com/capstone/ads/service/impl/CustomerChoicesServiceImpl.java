@@ -1,7 +1,6 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.dto.customerchoice.CustomerChoicesDTO;
-import com.capstone.ads.dto.customerchoice.CustomerChoicesUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerChoicesMapper;
@@ -13,9 +12,6 @@ import com.capstone.ads.service.CustomerChoicesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -56,13 +52,13 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
     }
 
     @Override
-    public List<CustomerChoicesDTO> findNewestByUserId(String userId) {
+    public CustomerChoicesDTO findNewestByUserId(String userId) {
         usersRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        return customerChoicesRepository.findByUsers_IdOrderByUpdatedAtDesc(userId).stream()
-                .map(customerChoicesMapper::toDTO)
-                .collect(Collectors.toList());
+        var customerChoicesDetail = customerChoicesRepository.findByUsers_IdOrderByUpdatedAtDesc(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
+        return customerChoicesMapper.toDTO(customerChoicesDetail);
     }
 
     @Override

@@ -37,7 +37,7 @@ public class CustomerChoicesSizeServiceImpl implements CustomerChoicesSizeServic
             throw new AppException(ErrorCode.SIZE_NOT_FOUND);
         if (!productTypeSizeRepository.existsByProductType_IdAndSize_Id(customerChoice.getProductType().getId(), sizeId))
             throw new AppException(ErrorCode.SIZE_NOT_BELONG_PRODUCT_TYPE);
-        if (!customerChoicesSizeRepository.existsByCustomerChoices_IdAndSize_Id(customerChoicesId, sizeId))
+        if (customerChoicesSizeRepository.existsByCustomerChoices_IdAndSize_Id(customerChoicesId, sizeId))
             throw new AppException(ErrorCode.CUSTOMER_CHOICE_SIZE_EXISTED);
 
         CustomerChoicesSize customerChoicesSize = customerChoicesSizeMapper.toEntity(request, customerChoicesId, sizeId);

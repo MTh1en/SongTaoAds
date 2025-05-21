@@ -11,7 +11,7 @@ public interface CustomerChoicesService {
 
     CustomerChoicesDTO findById(String customerChoiceId);
 
-    List<CustomerChoicesDTO> findNewestByUserId(String userId);
+    CustomerChoicesDTO findNewestByUserId(String userId);
 
     void delete(String id);
 }
