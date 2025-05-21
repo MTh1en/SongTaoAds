@@ -7,26 +7,24 @@ import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import vn.payos.type.CheckoutResponseData;
-import vn.payos.type.PaymentLinkData;
 
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
 public class PaymentController {
-
     private final PaymentService paymentService;
 
     @PostMapping("/deposit")
-    public ApiResponse<CheckoutResponseData> createPaymentDepositAmout(@RequestBody CreatePaymentRequest request) throws Exception {
+    public ApiResponse<CheckoutResponseData> createPaymentDepositAmount(@RequestBody CreatePaymentRequest request) throws Exception {
         CheckoutResponseData response = paymentService.createDepositPaymentLink(request);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
+
     @PostMapping("/remaining")
     public ApiResponse<CheckoutResponseData> createPaymentRemainingAmount(@RequestBody CreatePaymentRequest request) throws Exception {
         CheckoutResponseData response = paymentService.createRemainingPaymentLink(request);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
-
 
     @GetMapping("/callback")
     public ApiResponse<String> payOsCallback(

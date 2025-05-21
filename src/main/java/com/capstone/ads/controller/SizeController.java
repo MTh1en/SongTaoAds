@@ -6,6 +6,7 @@ import com.capstone.ads.dto.size.SizeDTO;
 import com.capstone.ads.dto.size.SizeUpdateRequest;
 import com.capstone.ads.service.SizeService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,12 +19,12 @@ public class SizeController {
     private final SizeService service;
 
     @PostMapping
-    public ApiResponse<SizeDTO> create(@RequestBody SizeCreateRequest request) {
+    public ApiResponse<SizeDTO> create(@Valid @RequestBody SizeCreateRequest request) {
         return ApiResponseBuilder.buildSuccessResponse("Create size successful", service.create(request));
     }
 
     @PutMapping("/{sizeId}")
-    public ApiResponse<SizeDTO> update(@PathVariable String sizeId,
+    public ApiResponse<SizeDTO> update(@Valid @PathVariable String sizeId,
                                           @RequestBody SizeUpdateRequest request) {
         return ApiResponseBuilder.buildSuccessResponse("Update size successful", service.update(sizeId, request));
     }

@@ -1,7 +1,6 @@
 package com.capstone.ads.repository.internal;
 
 import com.capstone.ads.model.CustomerDetail;
-import com.capstone.ads.model.Orders;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

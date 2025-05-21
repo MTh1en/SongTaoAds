@@ -40,8 +40,8 @@ public class ProductTypeController {
     }
 
     @DeleteMapping("/{productTypeId}")
-    public ApiResponse<Void> delete(@PathVariable String id) {
-        service.delete(id);
+    public ApiResponse<Void> delete(@PathVariable String productTypeId) {
+        service.delete(productTypeId);
         return ApiResponseBuilder.buildSuccessResponse("Delete product type successful", null);
     }
 }
