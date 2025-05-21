@@ -8,7 +8,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface CustomerDetailRepository extends JpaRepository<CustomerDetail, String> {
+    @Query("select c from CustomerDetail c where c.users.id = ?1")
+    Optional<CustomerDetail> findByUsers_Id(String id);
+
     boolean existsByLogoUrl(String logoUrl);
-    @Query("SELECT o FROM CustomerDetail o WHERE o.id = :userId")
-    Optional<CustomerDetail> getCustomerDetailByUserId(@Param("userId") String userId);
+
 }
