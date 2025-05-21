@@ -22,5 +22,5 @@ public interface OrderService {
 
     void UpdateOrderStatus(String id, String status);
 
-    OrderDTO getOrderByUserId(String id);
+    List<OrderDTO> getOrderByUserId(String id);
 }
