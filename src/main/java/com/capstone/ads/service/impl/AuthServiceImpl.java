@@ -117,10 +117,11 @@ public class AuthServiceImpl implements AuthService {
     private void clearCookies(HttpServletResponse response) {
         ResponseCookie refreshCookie = ResponseCookie.from(TokenNaming.REFRESH_TOKEN, "")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .path("/")
+                .sameSite("Lax")
                 .maxAge(0)
-                .sameSite("Strict")
+                .domain("localhost")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
@@ -129,11 +130,13 @@ public class AuthServiceImpl implements AuthService {
     private void setRefreshTokenCookie(String refreshToken, HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from(TokenNaming.REFRESH_TOKEN, refreshToken)
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .path("/")
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .maxAge(REFRESH_TOKEN_TTL)
+                .domain("localhost")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
+
 }
