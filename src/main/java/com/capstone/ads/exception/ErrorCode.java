@@ -15,6 +15,30 @@ public enum ErrorCode {
     ROLE_NOT_FOUND("Role not found", HttpStatus.NOT_FOUND),
     INVALID_TOKEN("Invalid token", HttpStatus.UNAUTHORIZED),
     INVALID_PRINCIPAL("Invalid principal", HttpStatus.UNAUTHORIZED),
+    //PRODUCT TYPE
+    PRODUCT_TYPE_NOT_FOUND("Product type not found", HttpStatus.NOT_FOUND),
+
+    //PRODUCT TYPE SIZE
+    PRODUCT_TYPE_SIZE_NOT_FOUND("Product type size not found", HttpStatus.NOT_FOUND),
+
+    //SIZE
+    SIZE_NOT_FOUND("Size not found", HttpStatus.NOT_FOUND),
+
+    //ATTRIBUTE
+    ATTRIBUTE_NOT_FOUND("Attribute not found", HttpStatus.NOT_FOUND),
+
+    //ATTRIBUTE VALUE
+    ATTRIBUTE_VALUE_NOT_FOUND("Attribute value not found", HttpStatus.NOT_FOUND),
+
+    //CUSTOMER CHOICES
+    CUSTOMER_CHOICES_NOT_FOUND("Customer choices not found", HttpStatus.NOT_FOUND),
+    CUSTOMER_CHOICES_IS_COMPLETED("Customer choices is completed", HttpStatus.BAD_REQUEST),
+
+    //CUSTOMER_CHOICES_SIZE
+    CUSTOMER_CHOICES_SIZE_NOT_FOUND("Customer choices size not found", HttpStatus.NOT_FOUND),
+
+    //CUSTOMER_CHOICES_DETAIL
+    CUSTOMER_CHOICES_DETAIL_NOT_FOUND("Customer choices detail not found", HttpStatus.NOT_FOUND),
     //AI_DESIGN
     AI_DESIGN_NOT_FOUND("AI Design not found", HttpStatus.NOT_FOUND),
     AI_DESIGN_ALREADY_USED("AI Design is already associated with another order", HttpStatus.BAD_REQUEST),

@@ -26,13 +26,16 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
+
             "/api/auth/**",
             "/api/orders/**",
             "/api/payments/**",
             "/api/users/**",
             "/api/customer-details/**",
+
             "/swagger-ui/**",
             "/v3/api-docs/**",
+            "/api/**"
     };
     private final CustomJwtDecoder customJwtDecoder;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
