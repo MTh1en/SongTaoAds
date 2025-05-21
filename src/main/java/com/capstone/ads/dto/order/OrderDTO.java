@@ -14,16 +14,17 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDTO {
-     private String orderId; // Renamed from id
-     private Double totalAmount;
-     private Double depositAmount;
-     private Double remainingAmount;
-     private String note;
-     private Boolean isCustomDesign;
-     private Timestamp deliveryDate;
-     private List<String> histories;
-     private OrderStatus status;
-     private LocalDateTime orderDate;
-     private UserDTO user; // Renamed from userId
-     private String aiDesignId;
+      String orderId; // Renamed from id
+      Double totalAmount;
+      Double depositAmount;
+      Double remainingAmount;
+      String address;
+      String note;
+      Boolean isCustomDesign;
+      Timestamp deliveryDate;
+      List<String> histories;
+      OrderStatus status;
+      LocalDateTime orderDate;
+      UserDTO user; // Renamed from userId
+      String aiDesignId;
 }

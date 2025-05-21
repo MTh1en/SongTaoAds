@@ -13,6 +13,7 @@ public class OrderUpdateRequest {
      Double totalAmount;
      Double depositAmount;
      Double remainingAmount;
+     String address;
      String note;
      Boolean isCustomDesign;
      Timestamp deliveryDate;
