@@ -33,6 +33,10 @@ public class OrderController {
     public ApiResponse<OrderDTO> getById(@PathVariable String orderId) {
         return ApiResponseBuilder.buildSuccessResponse("Order by Id", orderService.getOrderById(orderId));
     }
+    @GetMapping("/users/{userId}/orders")
+    public ApiResponse<List<OrderDTO>> getByUserId(@PathVariable String userId) {
+        return ApiResponseBuilder.buildSuccessResponse("Order by user: ", orderService.getOrderByUserId(userId));
+    }
 
     @GetMapping("/orders")
     public ApiResponse<List<OrderDTO>> getAll() {

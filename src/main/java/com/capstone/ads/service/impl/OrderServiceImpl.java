@@ -15,6 +15,7 @@ import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.query.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -64,10 +65,11 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toDTO(orders);
     }
     @Override
-    public OrderDTO getOrderByUserId(String id) {
-        Orders orders = orderRepository.getOrderByUserId(id)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
-        return orderMapper.toDTO(orders);
+    public List<OrderDTO> getOrderByUserId(String id) {
+        return orderRepository.findByUsers_Id(id)
+                .stream()
+                .map(orderMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
