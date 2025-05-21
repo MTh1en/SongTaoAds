@@ -29,7 +29,7 @@ public class Orders {
     LocalDateTime orderDate;
 
     Timestamp deliveryDate;
-
+    String address;
     Double totalAmount;
     Double depositAmount;
     Double remainingAmount;
