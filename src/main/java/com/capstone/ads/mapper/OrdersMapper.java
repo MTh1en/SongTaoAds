@@ -15,12 +15,13 @@ public interface OrdersMapper {
     @Mapping(target = "users", ignore = true)
     @Mapping(target = "aiDesigns", ignore = true)
     @Mapping(target = "payments", ignore = true)
-
+    @Mapping(target = "orderDate", ignore = true)
     Orders toEntity(OrderCreateRequest request);
 
     @Mapping(source = "id", target = "orderId")
     @Mapping(source = "users", target = "user")
     @Mapping(source = "aiDesigns.id", target = "aiDesignId")
+    @Mapping(source = "orderDate", target = "orderDate")
     OrderDTO toDTO(Orders order);
 
     @Mapping(target = "id", ignore = true)

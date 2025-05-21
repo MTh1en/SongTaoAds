@@ -23,6 +23,7 @@ public class OrderDTO {
      private Timestamp deliveryDate;
      private List<String> histories;
      private OrderStatus status;
+     private LocalDateTime orderDate;
      private UserDTO user; // Renamed from userId
      private String aiDesignId;
 }
