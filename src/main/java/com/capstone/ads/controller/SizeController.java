@@ -6,6 +6,7 @@ import com.capstone.ads.dto.size.SizeDTO;
 import com.capstone.ads.dto.size.SizeUpdateRequest;
 import com.capstone.ads.service.SizeService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,19 +19,19 @@ public class SizeController {
     private final SizeService service;
 
     @PostMapping
-    public ApiResponse<SizeDTO> create(@RequestBody SizeCreateRequest request) {
+    public ApiResponse<SizeDTO> create(@Valid @RequestBody SizeCreateRequest request) {
         return ApiResponseBuilder.buildSuccessResponse("Create size successful", service.create(request));
     }
 
-    @PutMapping("/{id}")
-    public ApiResponse<SizeDTO> update(@PathVariable String id,
+    @PutMapping("/{sizeId}")
+    public ApiResponse<SizeDTO> update(@Valid @PathVariable String sizeId,
                                           @RequestBody SizeUpdateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Update size successful", service.update(id, request));
+        return ApiResponseBuilder.buildSuccessResponse("Update size successful", service.update(sizeId, request));
     }
 
-    @GetMapping("/{id}")
-    public ApiResponse<SizeDTO> getById(@PathVariable String id) {
-        return ApiResponseBuilder.buildSuccessResponse("size by Id", service.findById(id));
+    @GetMapping("/{sizeId}")
+    public ApiResponse<SizeDTO> getById(@PathVariable String sizeId) {
+        return ApiResponseBuilder.buildSuccessResponse("size by Id", service.findById(sizeId));
     }
 
     @GetMapping
@@ -38,9 +39,9 @@ public class SizeController {
         return ApiResponseBuilder.buildSuccessResponse("Find all size", service.findAll());
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable String id) {
-        service.delete(id);
+    @DeleteMapping("/{sizeId}")
+    public ApiResponse<Void> delete(@PathVariable String sizeId) {
+        service.delete(sizeId);
         return ApiResponseBuilder.buildSuccessResponse("Delete size successful", null);
     }
 }

@@ -19,7 +19,7 @@ public class CustomerDetailController {
     private final CustomerDetailService customerDetailService;
 
     @PostMapping("/customer-details")
-    public ApiResponse<CustomerDetailDTO> create(@RequestBody CustomerDetailRequest request) {
+    public ApiResponse<CustomerDetailDTO> create(@Valid @RequestBody CustomerDetailRequest request) {
         return ApiResponseBuilder.buildSuccessResponse(
                 "Create customer detail successful",
                 customerDetailService.createCustomerDetail(request)
@@ -51,10 +51,8 @@ public class CustomerDetailController {
     }
 
     @PutMapping("/customer-details/{customerDetailId}")
-    public ApiResponse<CustomerDetailDTO> update(
-            @PathVariable("customerDetailId") String customerDetailId,
-            @RequestBody @Valid CustomerDetailRequest request
-    ) {
+    public ApiResponse<CustomerDetailDTO> update(@Valid @PathVariable("customerDetailId") String customerDetailId,
+                                                 @RequestBody CustomerDetailRequest request) {
         return ApiResponseBuilder.buildSuccessResponse(
                 "Update customer detail successful",
                 customerDetailService.updateCustomerDetail(customerDetailId, request)

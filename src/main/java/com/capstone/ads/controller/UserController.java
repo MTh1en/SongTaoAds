@@ -5,6 +5,7 @@ import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.dto.user.UserRequest;
 import com.capstone.ads.service.UserService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class UserController {
     private final UserService usersService;
 
     @PostMapping("/users")
-    public ApiResponse<UserDTO> createUser(@RequestBody UserRequest request) {
+    public ApiResponse<UserDTO> createUser(@Valid @RequestBody UserRequest request) {
         UserDTO response = usersService.createUser(request);
         return ApiResponseBuilder.buildSuccessResponse("User created successfully", response);
     }
@@ -37,7 +38,7 @@ public class UserController {
     }
 
     @PutMapping("/users/{userId}")
-    public ApiResponse<UserDTO> updateUser(@PathVariable String userId, @RequestBody UserRequest request) {
+    public ApiResponse<UserDTO> updateUser(@Valid @PathVariable String userId, @RequestBody UserRequest request) {
         UserDTO response = usersService.updateUser(userId, request);
         return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
     }

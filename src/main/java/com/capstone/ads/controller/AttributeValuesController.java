@@ -6,6 +6,7 @@ import com.capstone.ads.dto.attributevalue.AttributeValuesDTO;
 import com.capstone.ads.dto.attributevalue.AttributeValuesUpdateRequest;
 import com.capstone.ads.service.AttributeValuesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,14 +19,13 @@ public class AttributeValuesController {
     private final AttributeValuesService service;
 
     @PostMapping("/attributes/{attributeId}/attribute-values")
-    public ApiResponse<AttributeValuesDTO> create(
-            @PathVariable String attributeId,
-            @RequestBody AttributeValuesCreateRequest request) {
+    public ApiResponse<AttributeValuesDTO> create(@Valid @PathVariable String attributeId,
+                                                  @RequestBody AttributeValuesCreateRequest request) {
         return ApiResponseBuilder.buildSuccessResponse("Create attribute value successful", service.create(attributeId, request));
     }
 
     @PutMapping("/attribute-values/{attributeValueId}")
-    public ApiResponse<AttributeValuesDTO> update(@PathVariable String attributeValueId,
+    public ApiResponse<AttributeValuesDTO> update(@Valid @PathVariable String attributeValueId,
                                                   @RequestBody AttributeValuesUpdateRequest request) {
         return ApiResponseBuilder.buildSuccessResponse("Update attribute value successful", service.update(attributeValueId, request));
     }

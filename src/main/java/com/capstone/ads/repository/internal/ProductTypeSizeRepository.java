@@ -8,4 +8,5 @@ import java.util.List;
 public interface ProductTypeSizeRepository extends JpaRepository<ProductTypeSize, String> {
     List<ProductTypeSize> findByProductType_Id(String id);
 
+    boolean existsByProductType_IdAndSize_Id(String productTypeId, String sizeId);
 }

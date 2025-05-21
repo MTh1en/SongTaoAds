@@ -60,6 +60,16 @@ public enum ErrorCode {
     //CUSTOMER_DETAIL
     LOGO_URL_ALREADY_EXISTS("Logo URL already exists", HttpStatus.BAD_REQUEST),
     CUSTOMER_DETAIL_NOT_FOUND("Customer detail not found", HttpStatus.NOT_FOUND),
+    INVALID_FORMULA("Invalid formula", HttpStatus.BAD_REQUEST),
+    CALCULATION_FAILED("Calculation failed", HttpStatus.BAD_REQUEST),
+    SIZE_NOT_BELONG_PRODUCT_TYPE("Size not belong to product type", HttpStatus.BAD_REQUEST),
+    UNIT_PRICE_NOT_FOUND("Unit price not enough", HttpStatus.BAD_REQUEST),
+    MISSING_SIZE_VALUE("Missing value for size value", HttpStatus.BAD_REQUEST),
+    INVALID_VARIABLE_VALUE("Invalid variable value for size value", HttpStatus.BAD_REQUEST),
+
+    ATTRIBUTE_NOT_BELONG_CUSTOMER_CHOICE_DETAIL("Attribute not belong to customer choice detail", HttpStatus.BAD_REQUEST),
+    ATTRIBUTE_EXISTED_IN_CUSTOMER_CHOICES_DETAIL("Attribute existed in Customer choices detail", HttpStatus.BAD_REQUEST),
+    CUSTOMER_CHOICE_SIZE_EXISTED("Customer choice size already existed", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

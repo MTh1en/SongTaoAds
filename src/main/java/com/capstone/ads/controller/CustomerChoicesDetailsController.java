@@ -20,6 +20,12 @@ public class CustomerChoicesDetailsController {
         return ApiResponseBuilder.buildSuccessResponse("Create customer choices detail successful", service.create(customerChoiceId, attributeValueId));
     }
 
+    @PutMapping("/customer-choices-details/{customerChoiceDetailId}/attribute-values/{attributeValueId}")
+    public ApiResponse<CustomerChoicesDetailsDTO> updateAttributeValue(@PathVariable String customerChoiceDetailId,
+                                                                       @PathVariable String attributeValueId) {
+        return ApiResponseBuilder.buildSuccessResponse("Update customer choices size successful", service.updateAttributeValue(customerChoiceDetailId, attributeValueId));
+    }
+
     @GetMapping("/customer-choice-details/{customerChoiceDetailId}")
     public ApiResponse<CustomerChoicesDetailsDTO> getById(@PathVariable String customerChoiceDetailId) {
         return ApiResponseBuilder.buildSuccessResponse("customer choices detail by Id", service.findById(customerChoiceDetailId));

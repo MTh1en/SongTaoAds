@@ -6,6 +6,7 @@ import com.capstone.ads.dto.attribute.AttributesDTO;
 import com.capstone.ads.dto.attribute.AttributesUpdateRequest;
 import com.capstone.ads.service.AttributesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,14 +20,14 @@ public class AttributesController {
     private final AttributesService service;
 
     @PostMapping("product-types/{productTypeId}/attributes")
-    public ApiResponse<AttributesDTO> create(@PathVariable String productTypeId,
+    public ApiResponse<AttributesDTO> create(@Valid @PathVariable String productTypeId,
                                              @RequestBody AttributesCreateRequest request) {
         return ApiResponseBuilder.buildSuccessResponse("Create attribute successful", service.create(productTypeId, request));
     }
 
     @PutMapping("/attributes/{attributeId}")
-    public ApiResponse<AttributesDTO> update(@PathVariable String attributeId,
-                                                @RequestBody AttributesUpdateRequest request) {
+    public ApiResponse<AttributesDTO> update(@Valid @PathVariable String attributeId,
+                                             @RequestBody AttributesUpdateRequest request) {
         return ApiResponseBuilder.buildSuccessResponse("Update attribute successful", service.update(attributeId, request));
     }
 

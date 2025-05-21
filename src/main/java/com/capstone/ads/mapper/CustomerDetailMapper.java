@@ -10,15 +10,14 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface CustomerDetailMapper {
-    CustomerDetailMapper INSTANCE = Mappers.getMapper(CustomerDetailMapper.class);
-
     @Mapping(source = "users.id", target = "userId")
     CustomerDetailDTO toDTO(CustomerDetail customerDetail);
 
     @Mapping(source = "userId", target = "users.id")
     CustomerDetail toEntity(CustomerDetailRequest request);
+
     @Mapping(source = "userId", target = "users.id")
-    @Mapping(target = "users", ignore = true) // Ignore users field during update
+    @Mapping(target = "users", ignore = true)
     void updateEntityFromDTO(CustomerDetailRequest request, @MappingTarget CustomerDetail customerDetail);
 
 }

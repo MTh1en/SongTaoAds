@@ -12,7 +12,6 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface UsersMapper {
     Users register(RegisterRequest registerRequest);
-    UsersMapper INSTANCE = Mappers.getMapper(UsersMapper.class);
 
     @Mapping(source = "role.name", target = "roleName")
     UserDTO toDTO(Users users);

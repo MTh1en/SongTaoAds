@@ -39,9 +39,9 @@ public class ProductTypeController {
         return ApiResponseBuilder.buildSuccessResponse("Find all product type", service.findAll());
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable String id) {
-        service.delete(id);
+    @DeleteMapping("/{productTypeId}")
+    public ApiResponse<Void> delete(@PathVariable String productTypeId) {
+        service.delete(productTypeId);
         return ApiResponseBuilder.buildSuccessResponse("Delete product type successful", null);
     }
 }

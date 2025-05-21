@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CustomerDetailServiceImpl implements CustomerDetailService {
-
     private final CustomerDetailRepository customerDetailRepository;
     private final UsersRepository userRepository;
     private final CustomerDetailMapper customerDetailMapper;
@@ -46,6 +45,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
         return customerDetailMapper.toDTO(customerDetail);
     }
+
     @Override
     public CustomerDetailDTO getCustomerDetailByUserId(String id) {
         CustomerDetail customerDetail = customerDetailRepository.getCustomerDetailByUserId(id)

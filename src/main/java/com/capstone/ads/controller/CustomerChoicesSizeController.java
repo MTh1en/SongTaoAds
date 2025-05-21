@@ -6,6 +6,7 @@ import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeDTO;
 import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeUpdateRequest;
 import com.capstone.ads.service.CustomerChoicesSizeService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,17 +19,16 @@ public class CustomerChoicesSizeController {
     private final CustomerChoicesSizeService service;
 
     @PostMapping("/customer-choices/{customerChoicesId}/sizes/{sizeId}")
-    public ApiResponse<CustomerChoicesSizeDTO> create(@PathVariable String customerChoicesId,
+    public ApiResponse<CustomerChoicesSizeDTO> create(@Valid @PathVariable String customerChoicesId,
                                                       @PathVariable String sizeId,
                                                       @RequestBody CustomerChoicesSizeCreateRequest request) {
         return ApiResponseBuilder.buildSuccessResponse("Create customer choices size successful", service.create(customerChoicesId, sizeId, request));
     }
 
-    @PutMapping("/customer-choices/{customerChoicesId}/sizes/{sizeId}")
-    public ApiResponse<CustomerChoicesSizeDTO> update(@PathVariable String customerChoicesId,
-                                                      @PathVariable String sizeId,
+    @PutMapping("/customer-choices-sizes/{customerChoiceSizeId}")
+    public ApiResponse<CustomerChoicesSizeDTO> update(@Valid @PathVariable String customerChoiceSizeId,
                                                       @RequestBody CustomerChoicesSizeUpdateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Update customer choices size successful", service.update(customerChoicesId, sizeId, request));
+        return ApiResponseBuilder.buildSuccessResponse("Update customer choices size successful", service.update(customerChoiceSizeId, request));
     }
 
     @GetMapping("/customer-choice-values/{customerChoiceSizeId}")

@@ -11,6 +11,7 @@ import com.capstone.ads.repository.internal.SizeRepository;
 import com.capstone.ads.service.ProductTypeSizeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ public class ProductTypeSizeServiceImpl implements ProductTypeSizeService {
     private final ProductTypeSizeMapper productTypeSizeMapper;
 
     @Override
+    @Transactional
     public ProductTypeSizeDTO create(String productTypeId, String sizeId) {
         if (!productTypeRepository.existsById(productTypeId)) throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
         if (!sizeRepository.existsById(sizeId)) throw new AppException(ErrorCode.SIZE_NOT_FOUND);
@@ -33,6 +35,7 @@ public class ProductTypeSizeServiceImpl implements ProductTypeSizeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProductTypeSizeDTO> getAllByProductTypeId(String productTypeId) {
         return productTypeSizeRepository.findByProductType_Id(productTypeId).stream()
                 .map(productTypeSizeMapper::toDTO)
@@ -40,6 +43,7 @@ public class ProductTypeSizeServiceImpl implements ProductTypeSizeService {
     }
 
     @Override
+    @Transactional
     public void delete(String productTypeSizeId) {
         if(!productTypeSizeRepository.existsById(productTypeSizeId)) throw new AppException(ErrorCode.PRODUCT_TYPE_SIZE_NOT_FOUND);
         productTypeSizeRepository.deleteById(productTypeSizeId);
