@@ -27,14 +27,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class OrderServiceImpl implements OrderService {
-    @Autowired
-    private UsersRepository usersRepository;
 
-    @Autowired
-    private OrdersRepository orderRepository;
-
-    @Autowired
-    private OrdersMapper orderMapper;
+    private final UsersRepository usersRepository;
+    private final OrdersRepository orderRepository;
+    private final OrdersMapper orderMapper;
 
     @Override
     public OrderDTO createOrder(OrderCreateDTO createDTO) {

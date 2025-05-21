@@ -12,10 +12,10 @@ import java.util.List;
 public class OrderUpdateDTO {
      Double totalAmount;
      Double depositAmount;
-    Double remainingAmount;
-    String note;
+     Double remainingAmount;
+     String note;
      Boolean isCustomDesign;
      Timestamp deliveryDate;
-    List<String> histories;
+     List<String> histories;
      OrderStatus status;
 }
