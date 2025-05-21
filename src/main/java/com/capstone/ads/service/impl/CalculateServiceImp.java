@@ -6,6 +6,7 @@ import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.CustomerChoicesDetailsRepository;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.service.CalculateService;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.expression.Expression;
@@ -28,23 +29,26 @@ public class CalculateServiceImp implements CalculateService {
     private final ExpressionParser parser = new SpelExpressionParser();
     private final CustomerChoicesDetailsRepository customerChoicesDetailsRepository;
     private final CustomerChoicesRepository customerChoicesRepository;
+    private final EntityManager entityManager;
 
     @Override
     @Transactional
-    public void calculateSubtotal(String customerChoicesDetailId) {
+    public Double calculateSubtotal(String customerChoicesDetailId) {
         CustomerChoicesDetails details = getValidatedCustomerChoicesDetails(customerChoicesDetailId);
         Attributes attribute = details.getAttributeValues().getAttributes();
         Map<String, Double> variables = prepareVariablesForSubtotal(details);
         Double subtotal = calculateWithFormula(attribute.getCalculateFormula(), variables);
-        log.info("Calculated subtotal: {}", subtotal);
-        details.setSubTotal(subtotal);
-        customerChoicesDetailsRepository.save(details);
+        return subtotal;
+//        log.info("Calculated subtotal: {}", subtotal);
+//        details.setSubTotal(subtotal);
+//        customerChoicesDetailsRepository.save(details);
     }
 
     @Override
     @Transactional
-    public void calculateTotal(String customerChoicesId) {
+    public Double calculateTotal(String customerChoicesId) {
         CustomerChoices customerChoices = getValidatedCustomerChoices(customerChoicesId);
+        entityManager.refresh(customerChoices);
         ProductType productType = customerChoices.getProductType();
         String totalFormula = productType.getCalculateFormula().trim();
 
@@ -61,6 +65,7 @@ public class CalculateServiceImp implements CalculateService {
         customerChoices.setTotalAmount(total);
         customerChoicesRepository.save(customerChoices);
         log.info("Calculated total for customerChoicesId {}: {}", customerChoicesId, total);
+        return total;
     }
 
     // Khởi tạo biến với giá trị mặc định 0.0 từ ProductType attributes
@@ -155,9 +160,9 @@ public class CalculateServiceImp implements CalculateService {
         if (customerChoices.getProductType() == null || customerChoices.getProductType().getCalculateFormula() == null) {
             throw new AppException(ErrorCode.INVALID_FORMULA);
         }
-        if (customerChoices.getCustomerChoicesDetails() == null || customerChoices.getCustomerChoicesDetails().isEmpty()) {
-            throw new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND);
-        }
+//        if (customerChoices.getCustomerChoicesDetails() == null || customerChoices.getCustomerChoicesDetails().isEmpty()) {
+//            throw new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND);
+//        }
         if (customerChoices.getCustomerChoicesSizes() == null || customerChoices.getCustomerChoicesSizes().isEmpty()) {
             throw new AppException(ErrorCode.PRODUCT_TYPE_SIZE_NOT_FOUND);
         }
