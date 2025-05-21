@@ -24,11 +24,10 @@ public class CustomerChoicesSizeController {
         return ApiResponseBuilder.buildSuccessResponse("Create customer choices size successful", service.create(customerChoicesId, sizeId, request));
     }
 
-    @PutMapping("/customer-choices/{customerChoicesId}/sizes/{sizeId}")
-    public ApiResponse<CustomerChoicesSizeDTO> update(@PathVariable String customerChoicesId,
-                                                      @PathVariable String sizeId,
+    @PutMapping("/customer-choices-sizes/{customerChoiceSizeId}")
+    public ApiResponse<CustomerChoicesSizeDTO> update(@PathVariable String customerChoiceSizeId,
                                                       @RequestBody CustomerChoicesSizeUpdateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Update customer choices size successful", service.update(customerChoicesId, sizeId, request));
+        return ApiResponseBuilder.buildSuccessResponse("Update customer choices size successful", service.update(customerChoiceSizeId, request));
     }
 
     @GetMapping("/customer-choice-values/{customerChoiceSizeId}")

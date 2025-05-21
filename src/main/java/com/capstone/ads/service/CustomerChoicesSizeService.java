@@ -9,7 +9,7 @@ import java.util.List;
 public interface CustomerChoicesSizeService {
     CustomerChoicesSizeDTO create(String customerChoicesId, String sizeId, CustomerChoicesSizeCreateRequest request);
 
-    CustomerChoicesSizeDTO update(String customerChoiceSizeId, String sizeId, CustomerChoicesSizeUpdateRequest request);
+    CustomerChoicesSizeDTO update(String customerChoiceSizeId, CustomerChoicesSizeUpdateRequest request);
 
     CustomerChoicesSizeDTO findById(String customerChoiceSizeId);
 

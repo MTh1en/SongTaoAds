@@ -69,6 +69,7 @@ public enum ErrorCode {
 
     ATTRIBUTE_NOT_BELONG_CUSTOMER_CHOICE_DETAIL("Attribute not belong to customer choice detail", HttpStatus.BAD_REQUEST),
     ATTRIBUTE_EXISTED_IN_CUSTOMER_CHOICES_DETAIL("Attribute existed in Customer choices detail", HttpStatus.BAD_REQUEST),
+    CUSTOMER_CHOICE_SIZE_EXISTED("Customer choice size already existed", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

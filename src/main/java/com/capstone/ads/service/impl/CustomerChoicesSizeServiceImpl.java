@@ -33,31 +33,26 @@ public class CustomerChoicesSizeServiceImpl implements CustomerChoicesSizeServic
     public CustomerChoicesSizeDTO create(String customerChoicesId, String sizeId, CustomerChoicesSizeCreateRequest request) {
         var customerChoice = customerChoicesRepository.findById(customerChoicesId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
-
         if (!sizeRepository.existsById(sizeId))
             throw new AppException(ErrorCode.SIZE_NOT_FOUND);
-
         if (!productTypeSizeRepository.existsByProductType_IdAndSize_Id(customerChoice.getProductType().getId(), sizeId))
             throw new AppException(ErrorCode.SIZE_NOT_BELONG_PRODUCT_TYPE);
+        if (!customerChoicesSizeRepository.existsByCustomerChoices_IdAndSize_Id(customerChoicesId, sizeId))
+            throw new AppException(ErrorCode.CUSTOMER_CHOICE_SIZE_EXISTED);
+
         CustomerChoicesSize customerChoicesSize = customerChoicesSizeMapper.toEntity(request, customerChoicesId, sizeId);
         customerChoicesSize = customerChoicesSizeRepository.save(customerChoicesSize);
-        return customerChoicesSizeMapper.toDTO(customerChoicesSize); // createdAt and updatedAt may be null in response
+        return customerChoicesSizeMapper.toDTO(customerChoicesSize);
     }
 
     @Override
     @Transactional
-    public CustomerChoicesSizeDTO update(String customerChoicesId, String sizeId, CustomerChoicesSizeUpdateRequest request) {
-        if (!customerChoicesRepository.existsById(customerChoicesId))
-            throw new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND);
-
-        if (!sizeRepository.existsById(sizeId))
-            throw new AppException(ErrorCode.SIZE_NOT_FOUND);
-
-        var customerChoicesSize = customerChoicesSizeRepository.findByCustomerChoices_IdAndSize_Id(customerChoicesId, sizeId)
+    public CustomerChoicesSizeDTO update(String customerChoiceSizeId, CustomerChoicesSizeUpdateRequest request) {
+        var customerChoicesSize = customerChoicesSizeRepository.findById(customerChoiceSizeId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_SIZE_NOT_FOUND));
         customerChoicesSizeMapper.updateEntityFromRequest(request, customerChoicesSize);
         customerChoicesSize = customerChoicesSizeRepository.save(customerChoicesSize);
-        return customerChoicesSizeMapper.toDTO(customerChoicesSize); // updatedAt may be null in response
+        return customerChoicesSizeMapper.toDTO(customerChoicesSize);
     }
 
     @Override
