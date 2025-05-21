@@ -9,13 +9,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderUpdateDTO {
+public class OrderUpdateRequest {
      Double totalAmount;
      Double depositAmount;
-    Double remainingAmount;
-    String note;
+     Double remainingAmount;
+     String note;
      Boolean isCustomDesign;
      Timestamp deliveryDate;
-    List<String> histories;
+     List<String> histories;
      OrderStatus status;
 }

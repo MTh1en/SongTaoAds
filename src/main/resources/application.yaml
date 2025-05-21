@@ -38,11 +38,11 @@ app:
     refresh-token-ttl: ${TOKEN_TOKEN_TTL}
 
 payos:
-  client-id: ${CLIENT_ID}
-  api-key: ${API_KEY}
-  checksum-key: ${CHECKSUM_KEY}
-  return-url: http://localhost:8080/api/v1/orders/payment-success
-  cancel-url: http://localhost:8080/api/v1/orders/payment-cancel
+  CLIENT_ID: ${CLIENT_ID}
+  API_KEY: ${API_KEY}
+  CHECKSUM_KEY: ${CHECKSUM_KEY}
+  return-url: http://localhost:8080/api/orders/payment-success
+  cancel-url: http://localhost:8080/api/orders/payment-cancel
 
 
 

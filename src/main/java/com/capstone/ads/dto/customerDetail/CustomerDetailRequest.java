@@ -1,6 +1,5 @@
 package com.capstone.ads.dto.customerDetail;
 
-import com.capstone.ads.model.Users;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CustomerDetailRequestDTO {
+public class CustomerDetailRequest {
      String logoUrl;
      String companyName;
      String tagLine;

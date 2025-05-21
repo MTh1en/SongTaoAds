@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.order;
 
+import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.model.enums.OrderStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -13,15 +14,15 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDTO {
-     String id;
-     Double totalAmount;
-     Double depositAmount;
-     Double remainingAmount;
-     String note;
-     Boolean isCustomDesign;
-     Timestamp deliveryDate;
-     List<String> histories;
-     OrderStatus status;
-     String userId;
-     String aiDesignId;
+     private String orderId; // Renamed from id
+     private Double totalAmount;
+     private Double depositAmount;
+     private Double remainingAmount;
+     private String note;
+     private Boolean isCustomDesign;
+     private Timestamp deliveryDate;
+     private List<String> histories;
+     private OrderStatus status;
+     private UserDTO user; // Renamed from userId
+     private String aiDesignId;
 }

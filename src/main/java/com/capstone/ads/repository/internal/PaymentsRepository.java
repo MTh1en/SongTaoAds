@@ -11,4 +11,8 @@ import java.util.Optional;
 public interface PaymentsRepository extends JpaRepository<Payments, String> {
     @Query("SELECT p FROM Payments p WHERE p.orders.id = :ordersId")
     Optional<Payments> findOrdersId(@Param("ordersId") String ordersId);
+
+    @Query("SELECT p FROM Payments p WHERE p.payOsPaymentLinkId = :PayOsPaymentLinkId ")
+    Optional<Payments> findByPayOsPaymentLinkId(@Param("PayOsPaymentLinkId") String PayOsPaymentLinkId);
+
 }

@@ -1,9 +1,9 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.dto.order.OrderConfirmDTO;
-import com.capstone.ads.dto.order.OrderCreateDTO;
+import com.capstone.ads.dto.order.OrderConfirmRequest;
+import com.capstone.ads.dto.order.OrderCreateRequest;
 import com.capstone.ads.dto.order.OrderDTO;
-import com.capstone.ads.dto.order.OrderUpdateDTO;
+import com.capstone.ads.dto.order.OrderUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.OrdersMapper;
@@ -15,7 +15,6 @@ import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,17 +26,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class OrderServiceImpl implements OrderService {
-    @Autowired
-    private UsersRepository usersRepository;
 
-    @Autowired
-    private OrdersRepository orderRepository;
-
-    @Autowired
-    private OrdersMapper orderMapper;
+    private final UsersRepository usersRepository;
+    private final OrdersRepository orderRepository;
+    private final OrdersMapper orderMapper;
 
     @Override
-    public OrderDTO createOrder(OrderCreateDTO createDTO) {
+    public OrderDTO createOrder(OrderCreateRequest createDTO) {
         Users user = usersRepository.findById(createDTO.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 //        if (createDTO.getAiDesignId() != null) {
@@ -54,6 +49,7 @@ public class OrderServiceImpl implements OrderService {
 //        }
         Orders orders = orderMapper.toEntity(createDTO);
         orders.setStatus(OrderStatus.PENDING);
+        orders.setUsers(user);
         orders.setDepositAmount(orders.getTotalAmount()*0.3);
         orders.setRemainingAmount(orders.getTotalAmount()*0.7);
         orders.setDeliveryDate(null);
@@ -82,7 +78,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO updateOrder(String id, OrderUpdateDTO updateDTO) {
+    public OrderDTO updateOrder(String id, OrderUpdateRequest updateDTO) {
         Orders orders = orderRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
         orderMapper.updateEntityFromDTO(updateDTO, orders);
@@ -98,7 +94,7 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.deleteById(id);
     }
     @Override
-    public OrderDTO confirmOrder(String id, OrderConfirmDTO confirmDTO) {
+    public OrderDTO confirmOrder(String id, OrderConfirmRequest confirmDTO) {
         Orders orders = orderRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
