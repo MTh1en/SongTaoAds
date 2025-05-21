@@ -25,8 +25,8 @@ public class UserController {
     }
 
     @GetMapping("/users/{userId}")
-    public ApiResponse<UserDTO> getUserById(@PathVariable String id) {
-        UserDTO response = usersService.getUserById(id);
+    public ApiResponse<UserDTO> getUserById(@PathVariable String userId) {
+        UserDTO response = usersService.getUserById(userId);
         return ApiResponseBuilder.buildSuccessResponse("User retrieved successfully", response);
     }
 
@@ -37,14 +37,14 @@ public class UserController {
     }
 
     @PutMapping("/users/{userId}")
-    public ApiResponse<UserDTO> updateUser(@PathVariable String id, @RequestBody UserRequest request) {
-        UserDTO response = usersService.updateUser(id, request);
+    public ApiResponse<UserDTO> updateUser(@PathVariable String userId, @RequestBody UserRequest request) {
+        UserDTO response = usersService.updateUser(userId, request);
         return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
     }
 
     @DeleteMapping("/users/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
-        usersService.deleteUser(id);
+    public ResponseEntity<Void> deleteUser(@PathVariable String userId) {
+        usersService.deleteUser(userId);
         return ResponseEntity.ok().build();
     }
     @GetMapping("/users/profile")

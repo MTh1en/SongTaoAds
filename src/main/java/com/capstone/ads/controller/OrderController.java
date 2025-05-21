@@ -25,13 +25,13 @@ public class OrderController {
     }
 
     @PutMapping("/orders/{orderId}")
-    public ApiResponse<OrderDTO> update(@PathVariable("id") String id, @RequestBody OrderUpdateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Update order successful", orderService.updateOrder(id, request));
+    public ApiResponse<OrderDTO> update(@PathVariable String orderId, @RequestBody OrderUpdateRequest request) {
+        return ApiResponseBuilder.buildSuccessResponse("Update order successful", orderService.updateOrder(orderId, request));
     }
 
     @GetMapping("/orders/{orderId}")
-    public ApiResponse<OrderDTO> getById(@PathVariable String id) {
-        return ApiResponseBuilder.buildSuccessResponse("Order by Id", orderService.getOrderById(id));
+    public ApiResponse<OrderDTO> getById(@PathVariable String orderId) {
+        return ApiResponseBuilder.buildSuccessResponse("Order by Id", orderService.getOrderById(orderId));
     }
 
     @GetMapping("/orders")
@@ -40,12 +40,12 @@ public class OrderController {
     }
 
     @DeleteMapping("/orders/{orderId}")
-    public ApiResponse<Void> delete(@PathVariable String id) {
-        orderService.deleteOrder(id);
+    public ApiResponse<Void> delete(@PathVariable String orderId) {
+        orderService.deleteOrder(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Delete order successful", null);
     }
     @PostMapping("/orders/{orderId}/confirm")
-    public ApiResponse<OrderDTO> confirm(@PathVariable String id, @RequestBody OrderConfirmRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Confirm order successful", orderService.confirmOrder(id, request));
+    public ApiResponse<OrderDTO> confirm(@PathVariable String orderId, @RequestBody OrderConfirmRequest request) {
+        return ApiResponseBuilder.buildSuccessResponse("Confirm order successful", orderService.confirmOrder(orderId, request));
     }
 }
