@@ -9,6 +9,6 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderConfirmDTO {
+public class OrderConfirmRequest {
     private Timestamp deliveryDate;
 }

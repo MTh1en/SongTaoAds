@@ -1,7 +1,7 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.dto.customerDetail.CustomerDetailDTO;
-import com.capstone.ads.dto.customerDetail.CustomerDetailRequestDTO;
+import com.capstone.ads.dto.customerDetail.CustomerDetailRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerDetailMapper;
@@ -25,7 +25,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
     private final CustomerDetailMapper customerDetailMapper;
 
     @Override
-    public CustomerDetailDTO createCustomerDetail(CustomerDetailRequestDTO request) {
+    public CustomerDetailDTO createCustomerDetail(CustomerDetailRequest request) {
         if (customerDetailRepository.existsByLogoUrl(request.getLogoUrl())) {
             throw new AppException(ErrorCode.LOGO_URL_ALREADY_EXISTS);
         }
@@ -61,7 +61,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
     }
 
     @Override
-    public CustomerDetailDTO updateCustomerDetail(String id, CustomerDetailRequestDTO request) {
+    public CustomerDetailDTO updateCustomerDetail(String id, CustomerDetailRequest request) {
         CustomerDetail customerDetail = customerDetailRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
 

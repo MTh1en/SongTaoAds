@@ -1,18 +1,13 @@
 package com.capstone.ads.dto.order;
-
-
-import com.capstone.ads.model.enums.OrderStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.sql.Timestamp;
 import java.util.List;
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderCreateDTO {
+public class OrderCreateRequest {
          String id;
          Double totalAmount;
          String note;
