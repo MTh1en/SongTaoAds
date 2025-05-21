@@ -13,13 +13,12 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderCreateDTO {
-        private Double totalAmount;
-        private Double depositAmount;
-        private Double remainingAmount;
-        private String note;
-        private Boolean isCustomDesign;
-        private List<String> histories;
-        private String userId; // Changed from Long to String
-        private String aiDesignId; // Changed from Long to String
+        String id;
+         Double totalAmount;
+         String note;
+         Boolean isCustomDesign;
+         List<String> histories;
+         String userId; // Changed from Long to String
+         String aiDesignId; // Changed from Long to String
 }
 

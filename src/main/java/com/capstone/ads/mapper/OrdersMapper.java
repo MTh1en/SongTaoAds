@@ -17,7 +17,7 @@ public interface OrdersMapper {
     OrderDTO toDTO(Orders orders);
 
     @Mapping(source = "userId", target = "users.id")
-    @Mapping(source = "aiDesignId", target = "aiDesigns.id")
+    @Mapping( target = "aiDesigns", ignore = true)
     Orders toEntity(OrderCreateDTO createDTO);
 
     @Mapping(target = "id", ignore = true)

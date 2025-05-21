@@ -18,19 +18,24 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    @PostMapping("/create")
-    public ApiResponse<CheckoutResponseData> createPayment(@RequestBody CreatePaymentRequestDTO request) throws Exception {
-        CheckoutResponseData response = paymentService.createPaymentLink(request);
+    @PostMapping("/deposit")
+    public ApiResponse<CheckoutResponseData> createPaymentDepositAmout(@RequestBody CreatePaymentRequestDTO request) throws Exception {
+        CheckoutResponseData response = paymentService.createDepositPaymentLink(request);
+        return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
+    }
+    @PostMapping("/remaining")
+    public ApiResponse<CheckoutResponseData> createPaymentRemainingAmount(@RequestBody CreatePaymentRequestDTO request) throws Exception {
+        CheckoutResponseData response = paymentService.createRemainingPaymentLink(request);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
-    @GetMapping("/check/{orderId}")
+    @GetMapping("/{orderId}/check")
     public ApiResponse<PaymentLinkData> checkPaymentStatus(@PathVariable String orderId) throws Exception {
         PaymentLinkData paymentLinkData = paymentService.checkPaymentStatus(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment status checked", paymentLinkData);
     }
 
-    @PostMapping("/cancel/{orderId}")
+    @PostMapping("/{orderId}/cancel")
     public ResponseEntity<Void> cancelPayment(@PathVariable String orderId) throws Exception {
         paymentService.cancelPaymentLink(orderId);
         paymentService.cancelPayment(orderId);

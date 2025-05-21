@@ -1,5 +1,4 @@
 package com.capstone.ads.service.impl;
-
 import com.capstone.ads.dto.payment.CreatePaymentRequestDTO;
 import com.capstone.ads.dto.payment.CreatePaymentResponseDTO;
 import com.capstone.ads.exception.AppException;
@@ -23,13 +22,16 @@ import vn.payos.type.*;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
     private static final Logger logger = LoggerFactory.getLogger(PaymentServiceImpl.class);
+    private static final double DEPOSIT_PERCENTAGE = 0.3;
+    private static final double REMAINING_PERCENTAGE = 0.7;
 
     @Value("${payos.client-id}")
     private String CLIENT_ID;
@@ -40,37 +42,51 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${payos.checksum-key}")
     private String CHECKSUM_KEY;
 
-
-
     @Value("${payos.return-url}")
     private String RETURN_URL;
 
     @Value("${payos.cancel-url}")
     private String CANCEL_URL;
 
-    private final Random random = new SecureRandom();
-
+    private final SecureRandom random = new SecureRandom();
     private final PaymentsRepository paymentRepository;
     private final OrdersRepository orderRepository;
     private final OrderService orderService;
 
     @Override
-    public CheckoutResponseData createPaymentLink(CreatePaymentRequestDTO request) throws Exception {
-        logger.info("Creating payment link for user: {}", request.getOrderId());
+    public CheckoutResponseData createDepositPaymentLink(CreatePaymentRequestDTO request) throws Exception {
+        logger.info("Creating payment link for deposit (30%) for order: {}", request.getOrderId());
 
         PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
 
-        String orderCode = String.valueOf(Math.abs(random.nextLong() % 10_000_000_000L));
+        // Generate a unique order code
+        String orderCode = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
 
         Orders order = orderRepository.findById(request.getOrderId())
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
+        if (order.getTotalAmount() == null || order.getUsers() == null) {
+            logger.error("Invalid order data: totalAmount or users is null for order {}", request.getOrderId());
+            throw new AppException(ErrorCode.ORDER_NOT_FOUND);
+        }
+
+        // Calculate deposit (30% of totalAmount) using double
+        double totalAmount = order.getTotalAmount();
+        if (totalAmount <= 0) {
+            logger.error("Invalid totalAmount for order {}: {}", request.getOrderId(), totalAmount);
+            throw new AppException(ErrorCode.ORDER_NOT_FOUND);
+        }
+        double depositAmount = Math.round(totalAmount * DEPOSIT_PERCENTAGE * 100.0) / 100.0;
+        order.setDepositAmount(depositAmount);
+
+        // Create ItemData
         ItemData itemData = ItemData.builder()
-                .name("Order of - " + order.getUsers().getFullName())
-                .price((int)order.getTotalAmount().longValue())
+                .name("Deposit for Order of - " + order.getUsers().getFullName())
+                .price((int) depositAmount) // Convert to int for ItemData.price
                 .quantity(1)
                 .build();
 
+        // Create PaymentData
         PaymentData paymentData = PaymentData.builder()
                 .orderCode(Long.parseLong(orderCode))
                 .amount(itemData.getPrice())
@@ -80,32 +96,113 @@ public class PaymentServiceImpl implements PaymentService {
                 .item(itemData)
                 .build();
 
+        // Create and save Payment entity
         Payments payment = Payments.builder()
-                .totalAmount(order.getTotalAmount())
+                .totalAmount(depositAmount)
                 .paymentMethod(PaymentMethod.PAYOS)
-                .paymentStatus(PaymentStatus.PENDING)
+                .paymentStatus(PaymentStatus.PENDING_DEPOSITED)
                 .paymentDate(LocalDateTime.now())
-                .isDeposit(false)
+                .isDeposit(true)
                 .orders(order)
                 .build();
         payment = paymentRepository.save(payment);
 
+        // Update order's payments list
         if (order.getPayments() == null) {
-            order.setPayments(new java.util.ArrayList<>());
+            order.setPayments(new ArrayList<>());
         }
         order.getPayments().add(payment);
         orderRepository.save(order);
 
+        // Create payment link
         CheckoutResponseData response = payOS.createPaymentLink(paymentData);
 
         // Update payment with PayOS transaction ID
         payment.setPayOsPaymentLinkId(response.getPaymentLinkId());
         paymentRepository.save(payment);
 
-        logger.info("Created payment link for order {}: payOsPaymentLinkId={}, paymentUrl={}",
+        logger.info("Created deposit payment link for order {}: payOsPaymentLinkId={}, paymentUrl={}",
                 order.getId(), response.getPaymentLinkId(), response.getCheckoutUrl());
 
-        return response; // Return the CheckoutResponseData directly
+        return response;
+    }
+
+    @Override
+    public CheckoutResponseData createRemainingPaymentLink(CreatePaymentRequestDTO request) throws Exception {
+        logger.info("Creating payment link for remaining amount (70%) for order: {}", request.getOrderId());
+
+        PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
+
+        // Generate a unique order code
+        String orderCode = UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+
+        Orders order = orderRepository.findById(request.getOrderId())
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (order.getTotalAmount() == null || order.getUsers() == null) {
+            logger.error("Invalid order data: totalAmount or users is null for order {}", request.getOrderId());
+            throw new AppException(ErrorCode.ORDER_NOT_FOUND);
+        }
+        // Check if order status is DEPOSITED
+        if (order.getStatus() != OrderStatus.DEPOSITED) {
+            logger.error("Order {} is not in DEPOSITED status, current status: {}", request.getOrderId(), order.getStatus());
+            throw new AppException(ErrorCode.INVALID_ORDER_STATUS);
+        }
+
+        // Calculate remaining amount (70% of totalAmount) using double
+        double totalAmount = order.getTotalAmount();
+        if (totalAmount <= 0) {
+            logger.error("Invalid totalAmount for order {}: {}", request.getOrderId(), totalAmount);
+                throw new AppException(ErrorCode.ORDER_NOT_FOUND);
+        }
+        double remainingAmount = Math.round(totalAmount * REMAINING_PERCENTAGE * 100.0) / 100.0;
+
+        // Create ItemData
+        ItemData itemData = ItemData.builder()
+                .name("Remaining Payment for Order of - " + order.getUsers().getFullName())
+                .price((int) remainingAmount) // Convert to int for ItemData.price
+                .quantity(1)
+                .build();
+
+        // Create PaymentData
+        PaymentData paymentData = PaymentData.builder()
+                .orderCode(Long.parseLong(orderCode))
+                .amount(itemData.getPrice())
+                .description(request.getDescription())
+                .returnUrl(RETURN_URL)
+                .cancelUrl(CANCEL_URL + "/" + orderCode)
+                .item(itemData)
+                .build();
+
+        // Create and save Payment entity
+        Payments payment = Payments.builder()
+                .totalAmount(remainingAmount)
+                .paymentMethod(PaymentMethod.PAYOS)
+                .paymentStatus(PaymentStatus.PENDING_REMAINDING)
+                .paymentDate(LocalDateTime.now())
+                .isDeposit(false)
+                .orders(order)
+                .build();
+        payment = paymentRepository.save(payment);
+
+        // Update order's payments list
+        if (order.getPayments() == null) {
+            order.setPayments(new ArrayList<>());
+        }
+        order.getPayments().add(payment);
+        orderRepository.save(order);
+
+        // Create payment link
+        CheckoutResponseData response = payOS.createPaymentLink(paymentData);
+
+        // Update payment with PayOS transaction ID
+        payment.setPayOsPaymentLinkId(response.getPaymentLinkId());
+        paymentRepository.save(payment);
+
+        logger.info("Created remaining payment link for order {}: payOsPaymentLinkId={}, paymentUrl={}",
+                order.getId(), response.getPaymentLinkId(), response.getCheckoutUrl());
+
+        return response;
     }
 
     @Override
@@ -115,7 +212,7 @@ public class PaymentServiceImpl implements PaymentService {
         PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
-        Payments payment = paymentRepository.findByIdAndOrdersId(orderId, orderId)
+        Payments payment = paymentRepository.findOrdersId(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
 
         // Check payment status with PayOS
@@ -135,14 +232,27 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
         logger.info("Updated payment status for order {}: {}", orderId, paymentStatus);
 
-        if ("SUCCESS".equals(status)) {
-            orderService.UpdateOrderStatus(order.getId(), OrderStatus.DEPOSITED.name());
-            logger.info("Order {} status updated to PAID due to successful payment", orderId);
-        } else if ("FAILED".equals(status) || "CANCELLED".equals(status)) {
-            orderService.UpdateOrderStatus(order.getId(), OrderStatus.CANCELLED.name());
-            logger.info("Order {} status updated to CANCELLED due to payment status: {}", orderId, status);
-        } else {
-            logger.warn("Unexpected payment status for order {}: {}. No order status update performed.", orderId, status);
+        // Update order status based on payment status
+        switch (status) {
+            case "PAID":
+                if (payment.getIsDeposit()) {
+                    orderService.UpdateOrderStatus(order.getId(), OrderStatus.DEPOSITED.name());
+                    logger.info("Order {} status updated to DEPOSITED due to successful deposit payment", orderId);
+                } else {
+                    orderService.UpdateOrderStatus(order.getId(), OrderStatus.COMPLETED.name());
+                    logger.info("Order {} status updated to PAID due to successful remaining payment", orderId);
+                }
+                break;
+            case "CANCELLED":
+            case "EXPIRED":
+                orderService.UpdateOrderStatus(order.getId(), OrderStatus.CANCELLED.name());
+                logger.info("Order {} status updated to CANCELLED due to payment status: {}", orderId, status);
+                break;
+            case "PENDING":
+                logger.info("Payment for order {} is still PENDING. No order status update performed.", orderId);
+                break;
+            default:
+                logger.warn("Unexpected payment status for order {}: {}. No order status update performed.", orderId, status);
         }
 
         return paymentLinkData;
@@ -155,9 +265,14 @@ public class PaymentServiceImpl implements PaymentService {
         PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
-        Payments payment = paymentRepository.findByIdAndOrdersId(orderId, orderId)
+        Payments payment = paymentRepository.findOrdersId(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+
         PaymentLinkData canceledPayment = payOS.cancelPaymentLink(Long.parseLong(payment.getPayOsPaymentLinkId()), "Order cancelled");
+
+        payment.setPaymentStatus(PaymentStatus.CANCELLED);
+        paymentRepository.save(payment);
+        orderService.UpdateOrderStatus(order.getId(), OrderStatus.CANCELLED.name());
 
         logger.info("Payment link canceled for order {}: payOsPaymentLinkId={}", orderId, payment.getPayOsPaymentLinkId());
         return canceledPayment;
@@ -167,7 +282,7 @@ public class PaymentServiceImpl implements PaymentService {
     public void cancelPayment(String orderId) {
         logger.info("Canceling payment for order: {}", orderId);
 
-        Payments payment = paymentRepository.findById(orderId)
+        Payments payment = paymentRepository.findOrdersId(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
         payment.setPaymentStatus(PaymentStatus.CANCELLED);
         paymentRepository.save(payment);

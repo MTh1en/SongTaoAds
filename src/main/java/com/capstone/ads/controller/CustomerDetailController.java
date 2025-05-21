@@ -5,6 +5,7 @@ import com.capstone.ads.dto.customerDetail.CustomerDetailDTO;
 import com.capstone.ads.dto.customerDetail.CustomerDetailRequestDTO;
 import com.capstone.ads.service.CustomerDetailService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,33 +19,39 @@ public class CustomerDetailController {
 
     private final CustomerDetailService customerDetailService;
 
-    @PostMapping("/create")
-    public ApiResponse<CustomerDetailDTO> createCustomerDetail(@RequestBody CustomerDetailRequestDTO request) {
-        CustomerDetailDTO response = customerDetailService.createCustomerDetail(request);
-        return ApiResponseBuilder.buildSuccessResponse("CustomerDetail created successfully", response);
+    @PostMapping
+    public ResponseEntity<CustomerDetailDTO> createCustomerDetail(@Valid @RequestBody CustomerDetailRequestDTO request) {
+        CustomerDetailDTO customerDetailDTO = customerDetailService.createCustomerDetail(request);
+        return ResponseEntity.status(201).body(customerDetailDTO);
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<CustomerDetailDTO> getCustomerDetailById(@PathVariable String id) {
-        CustomerDetailDTO response = customerDetailService.getCustomerDetailById(id);
-        return ApiResponseBuilder.buildSuccessResponse("CustomerDetail retrieved successfully", response);
+    public ResponseEntity<CustomerDetailDTO> getCustomerDetailById(@PathVariable String id) {
+        CustomerDetailDTO customerDetailDTO = customerDetailService.getCustomerDetailById(id);
+        return ResponseEntity.ok(customerDetailDTO);
     }
 
-    @GetMapping("/getAll")
-    public ApiResponse<List<CustomerDetailDTO>> getAllCustomerDetails() {
-        List<CustomerDetailDTO> response = customerDetailService.getAllCustomerDetails();
-        return ApiResponseBuilder.buildSuccessResponse("CustomerDetails retrieved successfully", response);
+    @GetMapping("/{userId}/user")
+    public ResponseEntity<CustomerDetailDTO> getCustomerDetailByUserId(@PathVariable String userId) {
+        CustomerDetailDTO customerDetailDTO = customerDetailService.getCustomerDetailByUserId(userId);
+        return ResponseEntity.ok(customerDetailDTO);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CustomerDetailDTO>> getAllCustomerDetails() {
+        List<CustomerDetailDTO> customerDetails = customerDetailService.getAllCustomerDetails();
+        return ResponseEntity.ok(customerDetails);
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<CustomerDetailDTO> updateCustomerDetail(@PathVariable String id, @RequestBody CustomerDetailRequestDTO request) {
-        CustomerDetailDTO response = customerDetailService.updateCustomerDetail(id, request);
-        return ApiResponseBuilder.buildSuccessResponse("CustomerDetail updated successfully", response);
+    public ResponseEntity<CustomerDetailDTO> updateCustomerDetail(@PathVariable String id, @Valid @RequestBody CustomerDetailRequestDTO request) {
+        CustomerDetailDTO customerDetailDTO = customerDetailService.updateCustomerDetail(id, request);
+        return ResponseEntity.ok(customerDetailDTO);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomerDetail(@PathVariable String id) {
         customerDetailService.deleteCustomerDetail(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

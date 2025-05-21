@@ -16,4 +16,5 @@ public interface OrderService {
     void deleteOrder(String id);
     OrderDTO confirmOrder(String id, OrderConfirmDTO confirmDTO);
     void UpdateOrderStatus(String id, String status);
+    OrderDTO getOrderByUserId(String id);
 }

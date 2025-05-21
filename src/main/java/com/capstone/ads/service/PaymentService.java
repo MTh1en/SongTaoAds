@@ -7,8 +7,9 @@ import vn.payos.type.CheckoutResponseData;
 import vn.payos.type.PaymentLinkData;
 
 public interface PaymentService {
-    CheckoutResponseData createPaymentLink(CreatePaymentRequestDTO request) throws Exception;
+    CheckoutResponseData createDepositPaymentLink(CreatePaymentRequestDTO request) throws Exception;
     PaymentLinkData checkPaymentStatus(String orderId) throws Exception;
     PaymentLinkData cancelPaymentLink(String orderId) throws Exception;
+     CheckoutResponseData createRemainingPaymentLink(CreatePaymentRequestDTO request) throws Exception;
     void cancelPayment(String orderId);
 }
