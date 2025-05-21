@@ -36,7 +36,6 @@ public class SecurityContextUtils {
         }
 
         // 3. Query database
-        log.info("Fetching user with email: {}", email);
         return usersRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     log.error("User not found in DB: {}", email);
