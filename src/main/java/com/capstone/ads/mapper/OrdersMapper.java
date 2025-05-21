@@ -12,13 +12,16 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface OrdersMapper {
 
-    @Mapping(source = "users.id", target = "userId")
-    @Mapping(source = "aiDesigns.id", target = "aiDesignId")
-    OrderDTO toDTO(Orders orders);
+    @Mapping(target = "users", ignore = true)
+    @Mapping(target = "aiDesigns", ignore = true)
+    @Mapping(target = "payments", ignore = true)
 
-    @Mapping(source = "userId", target = "users.id")
-    @Mapping( target = "aiDesigns", ignore = true)
-    Orders toEntity(OrderCreateDTO createDTO);
+    Orders toEntity(OrderCreateDTO request);
+
+    @Mapping(source = "id", target = "orderId")
+    @Mapping(source = "users", target = "user")
+    @Mapping(source = "aiDesigns.id", target = "aiDesignId")
+    OrderDTO toDTO(Orders order);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "orderDate", ignore = true)

@@ -50,6 +50,7 @@ public class OrderServiceImpl implements OrderService {
 //        }
         Orders orders = orderMapper.toEntity(createDTO);
         orders.setStatus(OrderStatus.PENDING);
+        orders.setUsers(user);
         orders.setDepositAmount(orders.getTotalAmount()*0.3);
         orders.setRemainingAmount(orders.getTotalAmount()*0.7);
         orders.setDeliveryDate(null);
