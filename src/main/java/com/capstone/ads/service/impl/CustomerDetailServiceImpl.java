@@ -46,6 +46,12 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
         return customerDetailMapper.toDTO(customerDetail);
     }
+    @Override
+    public CustomerDetailDTO getCustomerDetailByUserId(String id) {
+        CustomerDetail customerDetail = customerDetailRepository.getCustomerDetailByUserId(id)
+                .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
+        return customerDetailMapper.toDTO(customerDetail);
+    }
 
     @Override
     public List<CustomerDetailDTO> getAllCustomerDetails() {
@@ -66,13 +72,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
 
         Users user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-
-        customerDetail.setLogoUrl(request.getLogoUrl());
-        customerDetail.setCompanyName(request.getCompanyName());
-        customerDetail.setTagLine(request.getTagLine());
-        customerDetail.setContactInfo(request.getContactInfo());
-        customerDetail.setUsers(user);
-
+        customerDetailMapper.updateEntityFromDTO(request, customerDetail);
         customerDetail = customerDetailRepository.save(customerDetail);
         return customerDetailMapper.toDTO(customerDetail);
     }

@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,7 @@ public class UserServiceImpl implements UserService {
     private final UsersRepository usersRepository;
     private final RoleRepository roleRepository;
     private final UsersMapper usersMapper;
-    private  PasswordEncoder passwordEncoder;
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
     private final SecurityContextUtils securityContextUtils;
 
     @Override

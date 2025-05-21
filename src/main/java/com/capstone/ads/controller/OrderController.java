@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/orders")
+@RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -45,7 +45,7 @@ public class OrderController {
         orderService.deleteOrder(id);
         return ApiResponseBuilder.buildSuccessResponse("Delete order successful", null);
     }
-    @PostMapping("/confirm/{id}")
+    @PostMapping("/{orderId}/confirm")
     public ApiResponse<OrderDTO> confirm(@PathVariable String id, @RequestBody OrderConfirmDTO request) {
         return ApiResponseBuilder.buildSuccessResponse("Confirm order successful", orderService.confirmOrder(id, request));
     }

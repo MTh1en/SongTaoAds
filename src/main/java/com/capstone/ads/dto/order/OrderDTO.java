@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDTO {
+     String id;
      Double totalAmount;
      Double depositAmount;
      Double remainingAmount;
