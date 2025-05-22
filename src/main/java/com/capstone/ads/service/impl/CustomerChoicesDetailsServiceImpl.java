@@ -41,7 +41,7 @@ public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetails
         var attributeValues = attributeValuesRepository.findById(attributeValueId)
                 .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND));
         validateDuplicatedAttribute(customerChoices, attributeValues);
-
+        validateAttributeNotBelongsToProductType(customerChoices, attributeValues);
         var customerChoicesDetails = CustomerChoicesDetails.builder()
                 .customerChoices(customerChoices)
                 .attributeValues(attributeValues)
@@ -107,6 +107,15 @@ public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetails
                 );
         if (isDuplicated) {
             throw new AppException(ErrorCode.ATTRIBUTE_EXISTED_IN_CUSTOMER_CHOICES_DETAIL);
+        }
+    }
+
+    private void validateAttributeNotBelongsToProductType(CustomerChoices customerChoices, AttributeValues attributeValues) {
+        boolean isBelong = customerChoices.getProductType().getAttributes().stream().anyMatch(detail ->
+                detail.getId().equals(attributeValues.getAttributes().getId())
+        );
+        if (!isBelong) {
+            throw new AppException(ErrorCode.ATTRIBUTE_NOT_BELONG_PRODUCT_TYPE);
         }
     }
 

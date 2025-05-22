@@ -48,7 +48,6 @@ public class CalculateServiceImp implements CalculateService {
     @Transactional
     public Double calculateTotal(String customerChoicesId) {
         CustomerChoices customerChoices = getValidatedCustomerChoices(customerChoicesId);
-        entityManager.refresh(customerChoices);
         ProductType productType = customerChoices.getProductType();
         String totalFormula = productType.getCalculateFormula().trim();
 

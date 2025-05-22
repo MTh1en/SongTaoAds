@@ -19,7 +19,6 @@ public class Payments {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-
     Double totalAmount;
 
     @Enumerated(EnumType.STRING)
@@ -35,6 +34,4 @@ public class Payments {
 
     @ManyToOne
     Orders orders;
-    @Column
-    private String payOsPaymentLinkId;
 }

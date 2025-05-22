@@ -63,6 +63,7 @@ public enum ErrorCode {
     INVALID_FORMULA("Invalid formula", HttpStatus.BAD_REQUEST),
     CALCULATION_FAILED("Calculation failed", HttpStatus.BAD_REQUEST),
     SIZE_NOT_BELONG_PRODUCT_TYPE("Size not belong to product type", HttpStatus.BAD_REQUEST),
+    ATTRIBUTE_NOT_BELONG_PRODUCT_TYPE("Attribute not belong to product type", HttpStatus.BAD_REQUEST),
     UNIT_PRICE_NOT_FOUND("Unit price not enough", HttpStatus.BAD_REQUEST),
     MISSING_SIZE_VALUE("Missing value for size value", HttpStatus.BAD_REQUEST),
     INVALID_VARIABLE_VALUE("Invalid variable value for size value", HttpStatus.BAD_REQUEST),

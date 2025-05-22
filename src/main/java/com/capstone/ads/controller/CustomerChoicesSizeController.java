@@ -31,7 +31,7 @@ public class CustomerChoicesSizeController {
         return ApiResponseBuilder.buildSuccessResponse("Update customer choices size successful", service.update(customerChoiceSizeId, request));
     }
 
-    @GetMapping("/customer-choice-values/{customerChoiceSizeId}")
+    @GetMapping("/customer-choice-sizes/{customerChoiceSizeId}")
     public ApiResponse<CustomerChoicesSizeDTO> getById(@PathVariable String customerChoiceSizeId) {
         return ApiResponseBuilder.buildSuccessResponse("customer choices size by Id", service.findById(customerChoiceSizeId));
     }
@@ -41,7 +41,7 @@ public class CustomerChoicesSizeController {
         return ApiResponseBuilder.buildSuccessResponse("Find all customer choices size by customer choices", service.findAllByCustomerChoicesId(customerChoicesId));
     }
 
-    @DeleteMapping("/customer-choice-values/{customerChoiceSizeId}")
+    @DeleteMapping("/customer-choice-sizes/{customerChoiceSizeId}")
     public ApiResponse<Void> delete(@PathVariable String customerChoiceSizeId) {
         service.delete(customerChoiceSizeId);
         return ApiResponseBuilder.buildSuccessResponse("Delete customer choices size successful", null);
