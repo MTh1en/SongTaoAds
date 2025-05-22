@@ -104,7 +104,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .paymentDate(LocalDateTime.now())
                 .isDeposit(true)
                 .orders(order)
-                .payOsPaymentLinkId(String.valueOf(orderCode)) // Store numeric orderCode as string
+               // .payOsPaymentLinkId(String.valueOf(orderCode)) // Store numeric orderCode as string
                 .build();
         payment = paymentRepository.save(payment);
 
@@ -119,7 +119,7 @@ public class PaymentServiceImpl implements PaymentService {
         CheckoutResponseData response = payOS.createPaymentLink(paymentData);
 
         // Update payment with PayOS transaction ID
-        payment.setPayOsPaymentLinkId(response.getPaymentLinkId());
+       // payment.setPayOsPaymentLinkId(response.getPaymentLinkId());
         paymentRepository.save(payment);
 
         log.info("Created deposit payment link for order {}: payOsPaymentLinkId={}, paymentUrl={}",
@@ -184,22 +184,17 @@ public class PaymentServiceImpl implements PaymentService {
                 .paymentDate(LocalDateTime.now())
                 .isDeposit(false)
                 .orders(order)
-                .payOsPaymentLinkId(String.valueOf(orderCode)) // Store numeric orderCode as string
+              //  .payOsPaymentLinkId(String.valueOf(orderCode)) // Store numeric orderCode as string
                 .build();
         payment = paymentRepository.save(payment);
 
-        // Update order's payments list
-        if (order.getPayments() == null) {
-            order.setPayments(new ArrayList<>());
-        }
-        order.getPayments().add(payment);
-        orderRepository.save(order);
+
 
         // Create payment link
         CheckoutResponseData response = payOS.createPaymentLink(paymentData);
 
         // Update payment with PayOS transaction ID
-        payment.setPayOsPaymentLinkId(response.getPaymentLinkId());
+      //  payment.setPayOsPaymentLinkId(response.getPaymentLinkId());
         paymentRepository.save(payment);
 
         log.info("Created remaining payment link for order {}: payOsPaymentLinkId={}, paymentUrl={}",
@@ -208,33 +203,33 @@ public class PaymentServiceImpl implements PaymentService {
         return response;
     }
 
-    @Override
-    public void handlePayOsCallback(String payOsPaymentLinkId, String payOsStatus) {
-        Payments payment = paymentRepository.findByPayOsPaymentLinkId(payOsPaymentLinkId)
-                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
-
-        PaymentStatus paymentStatus;
-        try {
-            paymentStatus = PaymentStatus.valueOf(payOsStatus.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            log.error("Invalid payment status in callback: {}", payOsStatus);
-            throw new AppException(ErrorCode.INVALID_STATUS_PAYMENT);
-        }
-
-        payment.setPaymentStatus(paymentStatus);
-        paymentRepository.save(payment);
-
-        Orders order = payment.getOrders();
-        if (paymentStatus == PaymentStatus.SUCCESS) {
-            if (payment.getIsDeposit()) {
-                orderService.UpdateOrderStatus(order.getId(), OrderStatus.DEPOSITED.name());
-            } else {
-                orderService.UpdateOrderStatus(order.getId(), OrderStatus.COMPLETED.name());
-            }
-        } else if (paymentStatus == PaymentStatus.CANCELLED || paymentStatus == PaymentStatus.EXPIRED) {
-            orderService.UpdateOrderStatus(order.getId(), OrderStatus.CANCELLED.name());
-        }
-    }
-
+//    @Override
+//    public void handlePayOsCallback(String payOsPaymentLinkId, String payOsStatus) {
+//        Payments payment = paymentRepository.findByPayOsPaymentLinkId(payOsPaymentLinkId)
+//                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+//
+//        PaymentStatus paymentStatus;
+//        try {
+//            paymentStatus = PaymentStatus.valueOf(payOsStatus.toUpperCase());
+//        } catch (IllegalArgumentException e) {
+//            log.error("Invalid payment status in callback: {}", payOsStatus);
+//            throw new AppException(ErrorCode.INVALID_STATUS_PAYMENT);
+//        }
+//
+//        payment.setPaymentStatus(paymentStatus);
+//        paymentRepository.save(payment);
+//
+//        Orders order = payment.getOrders();
+//        if (paymentStatus == PaymentStatus.SUCCESS) {
+//            if (payment.getIsDeposit()) {
+//                orderService.UpdateOrderStatus(order.getId(), OrderStatus.DEPOSITED.name());
+//            } else {
+//                orderService.UpdateOrderStatus(order.getId(), OrderStatus.COMPLETED.name());
+//            }
+//        } else if (paymentStatus == PaymentStatus.CANCELLED || paymentStatus == PaymentStatus.EXPIRED) {
+//            orderService.UpdateOrderStatus(order.getId(), OrderStatus.CANCELLED.name());
+//        }
+//    }
+//
 
 }

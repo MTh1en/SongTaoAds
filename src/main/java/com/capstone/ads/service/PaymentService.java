@@ -9,5 +9,5 @@ public interface PaymentService {
 
     CheckoutResponseData createRemainingPaymentLink(CreatePaymentRequest request) throws Exception;
 
-    void handlePayOsCallback(String payOsPaymentLinkId, String payOsStatus);
+   // void handlePayOsCallback(String payOsPaymentLinkId, String payOsStatus);
 }

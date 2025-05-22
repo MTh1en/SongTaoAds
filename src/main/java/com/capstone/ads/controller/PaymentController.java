@@ -26,16 +26,16 @@ public class PaymentController {
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
-    @GetMapping("/callback")
-    public ApiResponse<String> payOsCallback(
-            @RequestParam String paymentLinkId,
-            @RequestParam String paymentStatus) {
-        try {
-            paymentService.handlePayOsCallback(paymentLinkId, paymentStatus);
-            return ApiResponseBuilder.buildSuccessResponse("Callback processed successfully", null);
-        } catch (Exception e) {
-            // Return an ApiResponse indicating failure
-            return ApiResponseBuilder.buildSuccessResponse("Error processing callback: " + e.getMessage(), null);
-        }
-    }
+//    @GetMapping("/callback")
+//    public ApiResponse<String> payOsCallback(
+//            @RequestParam String paymentLinkId,
+//            @RequestParam String paymentStatus) {
+//        try {
+//            paymentService.handlePayOsCallback(paymentLinkId, paymentStatus);
+//            return ApiResponseBuilder.buildSuccessResponse("Callback processed successfully", null);
+//        } catch (Exception e) {
+//            // Return an ApiResponse indicating failure
+//            return ApiResponseBuilder.buildSuccessResponse("Error processing callback: " + e.getMessage(), null);
+//        }
+//    }
 }

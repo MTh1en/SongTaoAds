@@ -35,6 +35,6 @@ public class Payments {
 
     @ManyToOne
     Orders orders;
-    @Column
-    private String payOsPaymentLinkId;
+//    @Column
+//    private String payOsPaymentLinkId;
 }
