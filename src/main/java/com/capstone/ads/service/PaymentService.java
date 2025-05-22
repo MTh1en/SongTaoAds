@@ -2,6 +2,7 @@ package com.capstone.ads.service;
 
 import com.capstone.ads.dto.payment.CreatePaymentRequest;
 
+import com.capstone.ads.model.enums.PaymentStatus;
 import vn.payos.type.CheckoutResponseData;
 
 public interface PaymentService {
@@ -9,5 +10,5 @@ public interface PaymentService {
 
     CheckoutResponseData createRemainingPaymentLink(CreatePaymentRequest request) throws Exception;
 
-   // void handlePayOsCallback(String payOsPaymentLinkId, String payOsStatus);
+    void handlePayOsCallback(String orderId);
 }

@@ -1,8 +1,6 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.order.OrderConfirmRequest;
-import com.capstone.ads.dto.order.OrderCreateRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateRequest;
 import com.capstone.ads.service.OrderService;
@@ -19,9 +17,9 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @PostMapping("/orders")
-    public ApiResponse<OrderDTO> create(@RequestBody OrderCreateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Create order successful", orderService.createOrder(request));
+    @PostMapping("customer-choices/{customerChoiceId}/orders")
+    public ApiResponse<OrderDTO> create(@PathVariable String customerChoiceId) {
+        return ApiResponseBuilder.buildSuccessResponse("Create order successful", orderService.createOrder(customerChoiceId));
     }
 
     @PutMapping("/orders/{orderId}")
@@ -33,6 +31,7 @@ public class OrderController {
     public ApiResponse<OrderDTO> getById(@PathVariable String orderId) {
         return ApiResponseBuilder.buildSuccessResponse("Order by Id", orderService.getOrderById(orderId));
     }
+
     @GetMapping("/users/{userId}/orders")
     public ApiResponse<List<OrderDTO>> getByUserId(@PathVariable String userId) {
         return ApiResponseBuilder.buildSuccessResponse("Order by user: ", orderService.getOrderByUserId(userId));
@@ -47,9 +46,5 @@ public class OrderController {
     public ApiResponse<Void> delete(@PathVariable String orderId) {
         orderService.deleteOrder(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Delete order successful", null);
-    }
-    @PostMapping("/orders/{orderId}/confirm")
-    public ApiResponse<OrderDTO> confirm(@PathVariable String orderId, @RequestBody OrderConfirmRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Confirm order successful", orderService.confirmOrder(orderId, request));
     }
 }
