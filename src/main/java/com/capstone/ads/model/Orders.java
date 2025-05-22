@@ -1,6 +1,7 @@
 package com.capstone.ads.model;
 
 import com.capstone.ads.model.enums.OrderStatus;
+import com.capstone.ads.model.json.OrderHistory;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -40,7 +41,8 @@ public class Orders {
     LocalDateTime updateDate;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<String> histories;
+    @Column(columnDefinition = "jsonb")
+    OrderHistory histories;
 
     @Enumerated(EnumType.STRING)
     OrderStatus status;
