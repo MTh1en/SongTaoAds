@@ -110,8 +110,7 @@ jobs:
           file: Dockerfile
           push: true
           platforms: linux/amd64
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ads:${{ steps.extract_version.outputs.VERSION }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/ads:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ads:${{ steps.extract_version.outputs.VERSION }},${{ secrets.DOCKERHUB_USERNAME }}/ads:latest
           build-args: |
             PROFILE=prod
             APP_VERSION=${{ steps.extract_version.outputs.VERSION }}
