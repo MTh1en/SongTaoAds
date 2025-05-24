@@ -119,7 +119,7 @@ public class AuthServiceImpl implements AuthService {
                 .httpOnly(true)
                 .secure(false)  // Bật secure khi dùng HTTPS
                 .path("/")
-                .sameSite("None")  // Bắt buộc khi FE/BE khác domain
+                .sameSite("Lax")  // Bắt buộc khi FE/BE khác domain
                 .maxAge(REFRESH_TOKEN_TTL)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -130,7 +130,7 @@ public class AuthServiceImpl implements AuthService {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .sameSite("None")
+                .sameSite("Lax")
                 .maxAge(0)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
