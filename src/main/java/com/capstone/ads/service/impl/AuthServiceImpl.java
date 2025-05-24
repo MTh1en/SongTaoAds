@@ -114,29 +114,25 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
+    private void setRefreshTokenCookie(String refreshToken, HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from(TokenNaming.REFRESH_TOKEN, refreshToken)
+                .httpOnly(true)
+                .secure(false)  // Bật secure khi dùng HTTPS
+                .path("/")
+                .sameSite("None")  // Bắt buộc khi FE/BE khác domain
+                .maxAge(REFRESH_TOKEN_TTL)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
     private void clearCookies(HttpServletResponse response) {
         ResponseCookie refreshCookie = ResponseCookie.from(TokenNaming.REFRESH_TOKEN, "")
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .sameSite("Lax")
+                .sameSite("None")
                 .maxAge(0)
-                .domain("localhost")
                 .build();
-
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
-
-    private void setRefreshTokenCookie(String refreshToken, HttpServletResponse response) {
-        ResponseCookie cookie = ResponseCookie.from(TokenNaming.REFRESH_TOKEN, refreshToken)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .sameSite("Lax")
-                .maxAge(REFRESH_TOKEN_TTL)
-                .domain("localhost")
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-    }
-
 }
