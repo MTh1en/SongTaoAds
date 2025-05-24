@@ -7,9 +7,14 @@ import java.util.List;
 
 public interface UserService {
     UserDTO createUser(UserRequest request);
+
     UserDTO getUserById(String id);
+
     List<UserDTO> getAllUsers();
+
     UserDTO updateUser(String id, UserRequest request);
+
     void deleteUser(String id);
+
     UserDTO getProfile();
 }
