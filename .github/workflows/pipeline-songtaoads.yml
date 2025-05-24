@@ -34,11 +34,8 @@ jobs:
           java-version: '21'
           distribution: 'oracle'
 
-      - name: Make mvnw executable
-        run: chmod +x ./mvnw
-
       - name: Compile project
-        run: ./mvnw clean compile
+        run: mvn clean compile
 
   unit-tests:
     runs-on: ubuntu-latest
@@ -55,11 +52,8 @@ jobs:
           java-version: '21'
           distribution: 'oracle'
 
-      - name: Make mvnw executable
-        run: chmod +x ./mvnw
-
       - name: Run unit tests
-        run: ./mvnw clean test
+        run: mvn clean test
 
   build:
     runs-on: ubuntu-latest
@@ -79,8 +73,45 @@ jobs:
           java-version: '21'
           distribution: 'oracle'
 
-      - name: Make mvnw executable
-        run: chmod +x ./mvnw
-
       - name: Build project
-        run: ./mvnw clean package
+        run: mvn clean package
+
+  build-image:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'oracle'
+
+      - name: Extract project version
+        id: extract_version
+        run: |
+          echo "VERSION=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & Push to DockerHub
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ads:${{ steps.extract_version.outputs.VERSION }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/ads:latest
+          build-args: |
+            PROFILE=prod
+            APP_VERSION=${{ steps.extract_version.outputs.VERSION }}

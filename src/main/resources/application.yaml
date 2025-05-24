@@ -35,7 +35,7 @@ app:
   jwt:
     signature: ${JWT_SIGNATURE}
     access-token-ttl: ${ACCESS_TOKEN_TTL}
-    refresh-token-ttl: ${TOKEN_TOKEN_TTL}
+    refresh-token-ttl: ${REFRESH_TOKEN_TTL}
 
 payos:
   CLIENT_ID: ${CLIENT_ID}
