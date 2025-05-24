@@ -114,3 +114,29 @@ jobs:
           build-args: |
             PROFILE=prod
             APP_VERSION=${{ steps.extract_version.outputs.VERSION }}
+
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: [ build-image ]
+    steps:
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to EC2 via SSH
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
+            cd /home/ubuntu/songtaoads
+            docker-compose pull
+            docker-compose down
+            docker-compose up -d
+            docker image prune -f
+          EOF
