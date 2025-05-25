@@ -16,13 +16,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.payos.PayOS;
-import vn.payos.type.CheckoutResponseData;
-import vn.payos.type.ItemData;
-import vn.payos.type.PaymentData;
+import vn.payos.type.*;
 
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +48,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public CheckoutResponseData createDepositPaymentLink(CreatePaymentRequest request) throws Exception {
         Orders order = validateOrder(request.getOrderId());
-        double depositAmount = calculateAmount(order.getTotalAmount(), PaymentPolicy.DEPOSIT_PERCENTAGE);
+        Integer depositAmount = calculateAmount(order.getTotalAmount(), PaymentPolicy.DEPOSIT_PERCENTAGE);
         order.setDepositAmount(depositAmount);
         return createPaymentLink(request, order, depositAmount, true);
     }
@@ -62,7 +60,7 @@ public class PaymentServiceImpl implements PaymentService {
             log.error("Order {} is not in DEPOSITED status, current status: {}", request.getOrderId(), order.getStatus());
             throw new AppException(ErrorCode.INVALID_ORDER_STATUS);
         }
-        double remainingAmount = calculateAmount(order.getTotalAmount(), PaymentPolicy.REMAINING_PERCENTAGE);
+        Integer remainingAmount = calculateAmount(order.getTotalAmount(), PaymentPolicy.REMAINING_PERCENTAGE);
         return createPaymentLink(request, order, remainingAmount, false);
     }
 
@@ -81,6 +79,26 @@ public class PaymentServiceImpl implements PaymentService {
         orderRepository.save(orders);
     }
 
+    @Override
+    public WebhookData verifyPaymentWebhookData(Webhook Webhook) throws Exception {
+        PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
+        return payOS.verifyPaymentWebhookData(Webhook);
+    }
+
+    @Override
+    @Transactional
+    public void updateOrderStatusByWebhookData(WebhookData webhookData) {
+        Payments payment = paymentRepository.findByCode(webhookData.getOrderCode())
+                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+        if (webhookData.getCode().equals("00")) {
+            payment.setStatus(PaymentStatus.SUCCESS);
+        } else {
+            payment.setStatus(PaymentStatus.FAILED);
+        }
+        paymentRepository.saveAndFlush(payment);
+        updateOrderStatus(payment);
+    }
+
     private Orders validateOrder(String orderId) {
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
@@ -91,40 +109,38 @@ public class PaymentServiceImpl implements PaymentService {
         return order;
     }
 
-    private double calculateAmount(double totalAmount, double percentage) {
-        return Math.round(totalAmount * percentage * 100.0) / 100.0;
+    private Integer calculateAmount(Integer totalAmount, Integer percentage) {
+        return totalAmount * percentage / 100;
     }
 
-    private CheckoutResponseData createPaymentLink(CreatePaymentRequest request, Orders order, double amount,
-                                                   boolean isDeposit) throws Exception {
+    private CheckoutResponseData createPaymentLink(CreatePaymentRequest request, Orders order, Integer amount, boolean isDeposit) throws Exception {
         PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
-        long orderCode = generateOrderCode();
-        int amountInVnd = (int) Math.round(amount);
+        long paymentCode = generateOrderCode();
 
         // Create ItemData
         ItemData itemData = ItemData.builder()
                 .name(String.format("%s Payment for Order of - %s",
                         isDeposit ? "Deposit" : "Remaining", order.getUsers().getFullName()))
-                .price(amountInVnd)
+                .price(amount)
                 .quantity(1)
                 .build();
 
         // Create PaymentData
         PaymentData paymentData = PaymentData.builder()
-                .orderCode(orderCode)
-                .amount(amountInVnd)
+                .orderCode(paymentCode)
+                .amount(amount)
                 .description(request.getDescription())
                 .returnUrl(RETURN_URL)
-                .cancelUrl(CANCEL_URL + "/" + orderCode)
+                .cancelUrl(CANCEL_URL + "/" + paymentCode)
                 .item(itemData)
                 .build();
 
         // Create and save Payment entity
         Payments payment = Payments.builder()
+                .code(paymentCode)
                 .totalAmount(amount)
-                .paymentMethod(PaymentMethod.PAYOS)
-                .paymentStatus(PaymentStatus.SUCCESS)
-                .paymentDate(LocalDateTime.now())
+                .method(PaymentMethod.PAYOS)
+                .status(PaymentStatus.PENDING)
                 .isDeposit(isDeposit)
                 .orders(order)
                 .build();
@@ -145,12 +161,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     private void updateOrderStatus(Payments payment) {
         Orders order = payment.getOrders();
-        PaymentStatus paymentStatus = payment.getPaymentStatus();
+        PaymentStatus paymentStatus = payment.getStatus();
 
         if (paymentStatus == PaymentStatus.SUCCESS) {
             order.setStatus(payment.getIsDeposit() ? OrderStatus.DEPOSITED : OrderStatus.COMPLETED);
-        } else if (paymentStatus == PaymentStatus.CANCELLED || paymentStatus == PaymentStatus.EXPIRED) {
-            order.setStatus(OrderStatus.CANCELLED);
         }
         orderRepository.save(order);
     }

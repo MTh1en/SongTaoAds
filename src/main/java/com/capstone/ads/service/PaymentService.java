@@ -3,6 +3,8 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.payment.CreatePaymentRequest;
 
 import vn.payos.type.CheckoutResponseData;
+import vn.payos.type.Webhook;
+import vn.payos.type.WebhookData;
 
 public interface PaymentService {
     CheckoutResponseData createDepositPaymentLink(CreatePaymentRequest request) throws Exception;
@@ -10,4 +12,8 @@ public interface PaymentService {
     CheckoutResponseData createRemainingPaymentLink(CreatePaymentRequest request) throws Exception;
 
     void handlePayOsCallback(String orderId);
+
+    WebhookData verifyPaymentWebhookData(Webhook Webhook) throws Exception;
+
+    void updateOrderStatusByWebhookData(WebhookData webhookData);
 }
