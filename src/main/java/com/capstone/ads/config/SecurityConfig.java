@@ -26,12 +26,6 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
-
-            "/api/auth/**",
-            "/api/orders/**",
-            "/api/payments/**",
-            "/api/users/**",
-            "/api/customer-details/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/api/**"
@@ -65,7 +59,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:5173","https://songtaoads.online"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:5173", "https://songtaoads.online", "https://api-app.payos.vn", "*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "X-XSRF-TOKEN", "Content-Type"));
         configuration.setAllowCredentials(true); // Quan trọng khi dùng cookie
