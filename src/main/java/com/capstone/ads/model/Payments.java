@@ -6,8 +6,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,16 +21,18 @@ public class Payments {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    Double totalAmount;
-
+    Integer totalAmount;
+    Long code;
     @Enumerated(EnumType.STRING)
-    PaymentMethod paymentMethod;
+    PaymentMethod method;
 
     @CreationTimestamp
-    LocalDateTime paymentDate;
+    LocalDateTime createAt;
+    @UpdateTimestamp
+    LocalDateTime updateAt;
 
     @Enumerated(EnumType.STRING)
-    PaymentStatus paymentStatus;
+    PaymentStatus status;
 
     Boolean isDeposit;
 
