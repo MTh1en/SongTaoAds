@@ -99,6 +99,12 @@ public class PaymentServiceImpl implements PaymentService {
         updateOrderStatus(payment);
     }
 
+    @Override
+    public String confirmWebhookUrl(String webhookUrl) throws Exception {
+        PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
+        return payOS.confirmWebhook(webhookUrl);
+    }
+
     private Orders validateOrder(String orderId) {
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));

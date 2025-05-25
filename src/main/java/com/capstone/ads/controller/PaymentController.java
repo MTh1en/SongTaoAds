@@ -34,10 +34,16 @@ public class PaymentController {
         return ApiResponseBuilder.buildSuccessResponse("Callback processed successfully", null);
     }
 
-    @PostMapping("/payments/handle-webhook")
-    public ApiResponse<String> handleWebHook(@RequestBody Webhook webhookBody) throws Exception {
-        WebhookData webhookData = paymentService.verifyPaymentWebhookData(webhookBody);
+    @PostMapping("/webhook/handle-webhook")
+    public ApiResponse<String> handleWebHook(@RequestBody Webhook webhook) throws Exception {
+        WebhookData webhookData = paymentService.verifyPaymentWebhookData(webhook);
         paymentService.updateOrderStatusByWebhookData(webhookData);
         return ApiResponseBuilder.buildSuccessResponse("Handle callback successfully", null);
+    }
+
+    @PostMapping("/webhook/confirm-webhook-url")
+    public ApiResponse<String> registerWebhookUrl(@RequestBody String webhookUrl) throws Exception {
+        String result = paymentService.confirmWebhookUrl(webhookUrl);
+        return ApiResponseBuilder.buildSuccessResponse("Register WebhookUrl successfully", result);
     }
 }
