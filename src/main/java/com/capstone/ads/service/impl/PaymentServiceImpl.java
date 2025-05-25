@@ -48,7 +48,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public CheckoutResponseData createDepositPaymentLink(CreatePaymentRequest request) throws Exception {
         Orders order = validateOrder(request.getOrderId());
-        Integer depositAmount = calculateAmount(order.getTotalAmount(), PaymentPolicy.DEPOSIT_PERCENTAGE);
+        Double depositAmount = calculateAmount(order.getTotalAmount(), PaymentPolicy.DEPOSIT_PERCENTAGE);
         order.setDepositAmount(depositAmount);
         return createPaymentLink(request, order, depositAmount, true);
     }
@@ -60,7 +60,7 @@ public class PaymentServiceImpl implements PaymentService {
             log.error("Order {} is not in DEPOSITED status, current status: {}", request.getOrderId(), order.getStatus());
             throw new AppException(ErrorCode.INVALID_ORDER_STATUS);
         }
-        Integer remainingAmount = calculateAmount(order.getTotalAmount(), PaymentPolicy.REMAINING_PERCENTAGE);
+        Double remainingAmount = calculateAmount(order.getTotalAmount(), PaymentPolicy.REMAINING_PERCENTAGE);
         return createPaymentLink(request, order, remainingAmount, false);
     }
 
@@ -109,26 +109,29 @@ public class PaymentServiceImpl implements PaymentService {
         return order;
     }
 
-    private Integer calculateAmount(Integer totalAmount, Integer percentage) {
-        return totalAmount * percentage / 100;
+    private Double calculateAmount(Double totalAmount, Double percentage) {
+        return totalAmount * percentage;
     }
 
-    private CheckoutResponseData createPaymentLink(CreatePaymentRequest request, Orders order, Integer amount, boolean isDeposit) throws Exception {
+    private CheckoutResponseData createPaymentLink(CreatePaymentRequest request, Orders order, Double amount, boolean isDeposit) throws Exception {
         PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
         long paymentCode = generateOrderCode();
+
+        long rounded = Math.round(amount);
+        Integer payOsAmount = Math.toIntExact(rounded);
 
         // Create ItemData
         ItemData itemData = ItemData.builder()
                 .name(String.format("%s Payment for Order of - %s",
                         isDeposit ? "Deposit" : "Remaining", order.getUsers().getFullName()))
-                .price(amount)
+                .price(payOsAmount)
                 .quantity(1)
                 .build();
 
         // Create PaymentData
         PaymentData paymentData = PaymentData.builder()
                 .orderCode(paymentCode)
-                .amount(amount)
+                .amount(payOsAmount)
                 .description(request.getDescription())
                 .returnUrl(RETURN_URL)
                 .cancelUrl(CANCEL_URL + "/" + paymentCode)
@@ -138,7 +141,7 @@ public class PaymentServiceImpl implements PaymentService {
         // Create and save Payment entity
         Payments payment = Payments.builder()
                 .code(paymentCode)
-                .totalAmount(amount)
+                .totalAmount(payOsAmount)
                 .method(PaymentMethod.PAYOS)
                 .status(PaymentStatus.PENDING)
                 .isDeposit(isDeposit)
