@@ -1,0 +1,208 @@
+/* Reset và Font */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Hiệu ứng ánh sáng nền */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    z-index: -1;
+}
+
+/* Container */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+}
+
+/* Success Card */
+.success-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    padding: 50px;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    animation: slideUp 0.8s ease-out;
+    border: 2px solid #28a745;
+}
+
+/* Hiệu ứng slide-up khi trang load */
+@keyframes slideUp {
+    0% {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Biểu tượng thành công */
+.icon-success {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.icon-success i {
+    font-size: 80px;
+    color: #28a745;
+    animation: pulse 1.5s infinite;
+}
+
+/* Hiệu ứng glow cho biểu tượng */
+.icon-success::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(40, 167, 69, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: glow 2s infinite;
+}
+
+@keyframes glow {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.4;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+}
+
+/* Hiệu ứng pulse cho biểu tượng */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Tiêu đề */
+h1 {
+    color: #28a745;
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Đoạn văn */
+p {
+    color: #444;
+    font-size: 18px;
+    margin-bottom: 30px;
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+/* Nút quay lại */
+.btn-home {
+    display: inline-block;
+    padding: 14px 35px;
+    background: linear-gradient(90deg, #28a745 0%, #34c759 100%);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-home:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(40, 167, 69, 0.6);
+    background: linear-gradient(90deg, #34c759 0%, #28a745 100%);
+}
+
+/* Hiệu ứng ánh sáng trên nút */
+.btn-home::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: 0.5s;
+}
+
+.btn-home:hover::before {
+    left: 100%;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .success-card {
+        padding: 30px;
+    }
+
+    h1 {
+        font-size: 24px;
+        letter-spacing: 1px;
+    }
+
+    p {
+        font-size: 15px;
+        margin-bottom: 20px;
+    }
+
+    .btn-home {
+        padding: 12px 30px;
+        font-size: 16px;
+    }
+
+    .icon-success i {
+        font-size: 60px;
+    }
+
+    .icon-success::before {
+        width: 80px;
+        height: 80px;
+    }
+}

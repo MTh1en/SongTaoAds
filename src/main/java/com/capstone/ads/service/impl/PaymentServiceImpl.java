@@ -35,11 +35,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Value("${payos.CHECKSUM_KEY}")
     private String CHECKSUM_KEY;
 
-    @Value("${payos.return-url}")
-    private String RETURN_URL;
-
-    @Value("${payos.cancel-url}")
-    private String CANCEL_URL;
+    @Value("${app.base.url}")
+    private String BASE_URL;
 
     private final SecureRandom random = new SecureRandom();
     private final PaymentsRepository paymentRepository;
@@ -49,7 +46,6 @@ public class PaymentServiceImpl implements PaymentService {
     public CheckoutResponseData createDepositPaymentLink(CreatePaymentRequest request) throws Exception {
         Orders order = validateOrder(request.getOrderId());
         Double depositAmount = calculateAmount(order.getTotalAmount(), PaymentPolicy.DEPOSIT_PERCENTAGE);
-        order.setDepositAmount(depositAmount);
         return createPaymentLink(request, order, depositAmount, true);
     }
 
@@ -105,6 +101,15 @@ public class PaymentServiceImpl implements PaymentService {
         return payOS.confirmWebhook(webhookUrl);
     }
 
+    @Override
+    @Transactional
+    public void cancelPayment(Long paymentCode) {
+        Payments payments = paymentRepository.findByCode(paymentCode)
+                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+        payments.setStatus(PaymentStatus.CANCELLED);
+        paymentRepository.save(payments);
+    }
+
     private Orders validateOrder(String orderId) {
         Orders order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
@@ -139,8 +144,8 @@ public class PaymentServiceImpl implements PaymentService {
                 .orderCode(paymentCode)
                 .amount(payOsAmount)
                 .description(request.getDescription())
-                .returnUrl(RETURN_URL)
-                .cancelUrl(CANCEL_URL + "/" + paymentCode)
+                .returnUrl(BASE_URL + "/api/payments/success")
+                .cancelUrl(BASE_URL + "/api/payments/fail/" + paymentCode)
                 .item(itemData)
                 .build();
 
@@ -170,10 +175,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     private void updateOrderStatus(Payments payment) {
         Orders order = payment.getOrders();
-        PaymentStatus paymentStatus = payment.getStatus();
-
-        if (paymentStatus == PaymentStatus.SUCCESS) {
-            order.setStatus(payment.getIsDeposit() ? OrderStatus.DEPOSITED : OrderStatus.COMPLETED);
+        if (payment.getStatus().equals(PaymentStatus.SUCCESS)) {
+            if (payment.getIsDeposit()) {
+                order.setStatus(OrderStatus.DEPOSITED);
+                order.setDepositAmount(payment.getTotalAmount().doubleValue());
+            } else {
+                order.setStatus(OrderStatus.COMPLETED);
+                order.setRemainingAmount(payment.getTotalAmount().doubleValue());
+            }
         }
         orderRepository.save(order);
     }
