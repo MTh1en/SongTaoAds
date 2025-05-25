@@ -16,4 +16,6 @@ public interface PaymentService {
     WebhookData verifyPaymentWebhookData(Webhook Webhook) throws Exception;
 
     void updateOrderStatusByWebhookData(WebhookData webhookData);
+
+    String confirmWebhookUrl(String webhookUrl) throws Exception;
 }

@@ -40,4 +40,10 @@ public class PaymentController {
         paymentService.updateOrderStatusByWebhookData(webhookData);
         return ApiResponseBuilder.buildSuccessResponse("Handle callback successfully", null);
     }
+
+    @PostMapping("/payments/confirm-webhook-url")
+    public ApiResponse<String> registerWebhookUrl(@RequestBody String webhookUrl) throws Exception {
+        String result = paymentService.confirmWebhookUrl(webhookUrl);
+        return ApiResponseBuilder.buildSuccessResponse("Register WebhookUrl successfully", result);
+    }
 }
