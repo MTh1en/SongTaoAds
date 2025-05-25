@@ -6,6 +6,7 @@ import com.capstone.ads.service.PaymentService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import vn.payos.type.CheckoutResponseData;
 import vn.payos.type.Webhook;
 import vn.payos.type.WebhookData;
@@ -45,5 +46,17 @@ public class PaymentController {
     public ApiResponse<String> registerWebhookUrl(@RequestBody String webhookUrl) throws Exception {
         String result = paymentService.confirmWebhookUrl(webhookUrl);
         return ApiResponseBuilder.buildSuccessResponse("Register WebhookUrl successfully", result);
+    }
+
+    //Template Engine
+    @GetMapping("/payments/success")
+    public ModelAndView checkoutSuccess() {
+        return new ModelAndView("PaymentSuccess");
+    }
+
+    @GetMapping("/payments/fail/{paymentCode}")
+    public ModelAndView checkoutFail(@PathVariable Long paymentCode) {
+        paymentService.cancelPayment(paymentCode);
+        return new ModelAndView("PaymentFailure");
     }
 }

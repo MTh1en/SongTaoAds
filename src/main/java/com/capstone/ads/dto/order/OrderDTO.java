@@ -17,9 +17,9 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDTO {
     String id; // Renamed from id
-    Integer totalAmount;
-    Integer depositAmount;
-    Integer remainingAmount;
+    Double totalAmount;
+    Double depositAmount;
+    Double remainingAmount;
     String address;
     String note;
     Boolean isCustomDesign;

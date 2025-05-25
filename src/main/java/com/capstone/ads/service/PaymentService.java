@@ -18,4 +18,6 @@ public interface PaymentService {
     void updateOrderStatusByWebhookData(WebhookData webhookData);
 
     String confirmWebhookUrl(String webhookUrl) throws Exception;
+
+    void cancelPayment(Long paymentCode);
 }
