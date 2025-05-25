@@ -31,9 +31,9 @@ public class Orders {
 
     Timestamp deliveryDate;
     String address;
-    Integer totalAmount;
-    Integer depositAmount;
-    Integer remainingAmount;
+    Double totalAmount;
+    Double depositAmount;
+    Double remainingAmount;
     String note;
     Boolean isCustomDesign;
 
