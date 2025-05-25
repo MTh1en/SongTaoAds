@@ -42,12 +42,12 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                                .jwt(jwt -> jwt
-                                        .decoder(customJwtDecoder)
-                                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                                )
-                                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                        //.accessDeniedHandler(jwtAccessDeniedHandler)
+                        .jwt(jwt -> jwt
+                                .decoder(customJwtDecoder)
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
                 );
 
         return http.build();

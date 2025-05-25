@@ -37,7 +37,7 @@ public class PaymentController {
     @PostMapping("/webhook/handle-webhook")
     public ApiResponse<String> handleWebHook(@RequestBody Webhook webhook) throws Exception {
         WebhookData webhookData = paymentService.verifyPaymentWebhookData(webhook);
-        //paymentService.updateOrderStatusByWebhookData(webhookData);
+        paymentService.updateOrderStatusByWebhookData(webhookData);
         return ApiResponseBuilder.buildSuccessResponse("Handle callback successfully", null);
     }
 
