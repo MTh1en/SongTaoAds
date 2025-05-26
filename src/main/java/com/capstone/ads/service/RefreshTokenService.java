@@ -1,7 +1,5 @@
 package com.capstone.ads.service;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-
 public interface RefreshTokenService {
 
     String generateRefreshToken();

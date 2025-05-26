@@ -8,8 +8,12 @@ import java.util.List;
 
 public interface SizeService {
     SizeDTO create(SizeCreateRequest request);
+
     SizeDTO update(String id, SizeUpdateRequest request);
+
     SizeDTO findById(String id);
+
     List<SizeDTO> findAll();
+
     void delete(String id);
 }
