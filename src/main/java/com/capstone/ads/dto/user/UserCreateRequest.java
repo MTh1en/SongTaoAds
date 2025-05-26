@@ -3,20 +3,17 @@ package com.capstone.ads.dto.user;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserDTO {
-    String id;
+public class UserCreateRequest {
     String fullName;
     String email;
     String phone;
+    String password;
     String avatar;
     Boolean isActive;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    String roleName;
 }
