@@ -5,7 +5,6 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -14,12 +13,11 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.progress.LoggingTransferListener;
 
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,43 +37,45 @@ public class S3RepositoryImpl implements S3Repository {
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     @Override
-    public List<String> uploadFiles(String bucketName, List<MultipartFile> files) {
-        List<CompletableFuture<String>> futures = files.stream()
-                .map(file -> uploadFileWithRetry(bucketName, file))
-                .toList();
+    public List<String> uploadFiles(String bucketName, List<byte[]> fileContents, List<String> keys, List<String> contentTypes) {
+        if (fileContents.size() != keys.size() || fileContents.size() != contentTypes.size()) {
+            throw new IllegalArgumentException("Number of file contents, keys, and content types must match");
+        }
 
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(
-                futures.toArray(new CompletableFuture[0])
-        );
+        List<CompletableFuture<String>> futures = new ArrayList<>();
+        for (int i = 0; i < fileContents.size(); i++) {
+            futures.add(uploadFileWithRetry(bucketName, fileContents.get(i), keys.get(i), contentTypes.get(i)));
+        }
 
-        return allFutures.thenApply(v -> futures.stream()
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        return futures.stream()
                 .map(CompletableFuture::join)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList())
-        ).join();
+                .collect(Collectors.toList());
     }
 
-    private CompletableFuture<String> uploadFileWithRetry(String bucketName, MultipartFile file) {
+
+    private CompletableFuture<String> uploadFileWithRetry(String bucketName, byte[] fileContent, String key, String contentType) {
         return CompletableFuture.supplyAsync(() -> {
             int attempt = 0;
             while (attempt < MAX_RETRY_ATTEMPTS) {
                 try {
-                    String key = generateUniqueKey(file.getOriginalFilename());
-                    PutObjectRequest putObjectRequest = buildPutRequest(bucketName, key, file);
+                    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(key)
+                            .contentType(contentType != null ? contentType : "application/octet-stream") // Sử dụng contentType, fallback nếu null
+                            .build();
 
-                    s3AsyncClient.putObject(putObjectRequest,
-                            AsyncRequestBody.fromInputStream(
-                                    file.getInputStream(),
-                                    file.getSize(),
-                                    executorService
-                            )
+                    s3AsyncClient.putObject(
+                            putObjectRequest,
+                            AsyncRequestBody.fromBytes(fileContent)
                     ).join();
 
                     return key;
-                } catch (IOException e) {
+                } catch (Exception e) {
                     attempt++;
                     if (attempt == MAX_RETRY_ATTEMPTS) {
-                        log.error("Failed to upload file after {} attempts: {}", attempt, file.getOriginalFilename(), e);
+                        log.error("Failed to upload file with key {} after {} attempts", key, attempt, e);
                         return null;
                     }
                     try {
@@ -92,9 +92,10 @@ public class S3RepositoryImpl implements S3Repository {
     }
 
     @Override
-    public String uploadSingleFile(String bucketName, MultipartFile file) {
-        return uploadFileWithRetry(bucketName, file).join();
+    public String uploadSingleFile(String bucketName, byte[] fileContent, String key, String contentType) {
+        return uploadFileWithRetry(bucketName, fileContent, key, contentType).join();
     }
+
 
     @Override
     public void downloadFile(String bucketName, String key, String destinationPath) {
@@ -124,18 +125,6 @@ public class S3RepositoryImpl implements S3Repository {
             log.error("Failed to generate presigned URL for key: {}", key, e);
             throw new RuntimeException("Failed to generate presigned URL", e);
         }
-    }
-
-    private String generateUniqueKey(String originalFilename) {
-        return UUID.randomUUID() + "-" + originalFilename;
-    }
-
-    private PutObjectRequest buildPutRequest(String bucketName, String key, MultipartFile file) {
-        return PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .contentType(file.getContentType())
-                .build();
     }
 
     @PreDestroy

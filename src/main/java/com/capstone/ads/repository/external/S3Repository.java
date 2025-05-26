@@ -1,14 +1,11 @@
 package com.capstone.ads.repository.external;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.util.List;
 
 public interface S3Repository {
-    List<String> uploadFiles(String bucketName, List<MultipartFile> files) throws IOException;
+    List<String> uploadFiles(String bucketName, List<byte[]> fileContents, List<String> keys, List<String> contentTypes);
 
-    String uploadSingleFile(String bucketName, MultipartFile file); // Đổi return type thành String để trả về key
+    String uploadSingleFile(String bucketName, byte[] fileContent, String key, String contentType);
 
     void downloadFile(String bucketName, String key, String destinationPath);
 

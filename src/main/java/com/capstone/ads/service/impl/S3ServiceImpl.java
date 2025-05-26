@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,12 +22,30 @@ public class S3ServiceImpl implements S3Service {
     private String bucketName;
 
     @Override
-    public List<String> uploadFiles(List<MultipartFile> files) throws IOException {
+    public List<String> uploadFiles(List<MultipartFile> files) {
         if (files == null || files.isEmpty()) {
             throw new IllegalArgumentException("Files list cannot be null or empty");
         }
 
-        return s3Repository.uploadFiles(bucketName, files);
+        // Chuyển MultipartFile thành byte[] và tạo keys
+        List<byte[]> fileContents = files.stream()
+                .map(file -> {
+                    try {
+                        return file.getBytes();
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to read file: " + file.getOriginalFilename(), e);
+                    }
+                })
+                .toList();
+
+        List<String> keys = files.stream()
+                .map(file -> generateUniqueKey(file.getOriginalFilename()))
+                .toList();
+
+        List<String> contentTypes = files.stream()
+                .map(MultipartFile::getContentType)
+                .toList();
+        return s3Repository.uploadFiles(bucketName, fileContents, keys, contentTypes);
     }
 
     @Override
@@ -35,7 +54,14 @@ public class S3ServiceImpl implements S3Service {
             throw new IllegalArgumentException("File cannot be null or empty");
         }
 
-        return s3Repository.uploadSingleFile(bucketName, file);
+        try {
+            byte[] fileContent = file.getBytes();
+            String key = generateUniqueKey(file.getOriginalFilename());
+            String contentType = file.getContentType();
+            return s3Repository.uploadSingleFile(bucketName, fileContent, key, contentType);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read file: " + file.getOriginalFilename(), e);
+        }
     }
 
     @Override
@@ -57,6 +83,10 @@ public class S3ServiceImpl implements S3Service {
         }
 
         return s3Repository.generatePresignedUrl(bucketName, key, durationInMinutes);
+    }
+
+    private String generateUniqueKey(String fileName) {
+        return UUID.randomUUID() + "-" + fileName;
     }
 
     private void validateKey(String key) {
