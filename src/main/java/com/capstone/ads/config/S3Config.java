@@ -9,7 +9,6 @@ import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.transfer.s3.S3TransferManager;
 
 @Configuration
 public class S3Config {
@@ -31,13 +30,6 @@ public class S3Config {
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .region(Region.of(region))
                 .multipartEnabled(true) // Bật multipart cho hiệu suất
-                .build();
-    }
-
-    @Bean
-    public S3TransferManager s3TransferManager(S3AsyncClient s3AsyncClient) {
-        return S3TransferManager.builder()
-                .s3Client(s3AsyncClient)
                 .build();
     }
 

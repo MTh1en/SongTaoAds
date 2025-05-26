@@ -1,5 +1,7 @@
 package com.capstone.ads.repository.external;
 
+import com.capstone.ads.dto.file.FileData;
+
 import java.util.List;
 
 public interface S3Repository {
@@ -7,7 +9,7 @@ public interface S3Repository {
 
     String uploadSingleFile(String bucketName, byte[] fileContent, String key, String contentType);
 
-    void downloadFile(String bucketName, String key, String destinationPath);
+    FileData downloadFile(String bucketName, String key);
 
     String generatePresignedUrl(String bucketName, String key, int durationInMinutes);
 }

@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.dto.file.FileData;
 import com.capstone.ads.repository.external.S3Repository;
 import com.capstone.ads.service.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -65,9 +66,9 @@ public class S3ServiceImpl implements S3Service {
     }
 
     @Override
-    public void downloadFile(String key, String destinationPath) {
-        validateKeyAndPath(key, destinationPath);
-        s3Repository.downloadFile(bucketName, key, destinationPath);
+    public FileData downloadFile(String key) {
+        validateKey(key);
+        return s3Repository.downloadFile(bucketName, key);
     }
 
     @Override

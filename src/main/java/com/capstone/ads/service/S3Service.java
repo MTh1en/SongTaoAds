@@ -1,5 +1,6 @@
 package com.capstone.ads.service;
 
+import com.capstone.ads.dto.file.FileData;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -10,7 +11,7 @@ public interface S3Service {
 
     String uploadSingleFile(MultipartFile file);
 
-    void downloadFile(String key, String destinationPath);
+    FileData downloadFile(String key);
 
     String getPresignedUrl(String key);
 

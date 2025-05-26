@@ -1,7 +1,9 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.file.FileData;
 import com.capstone.ads.service.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +30,12 @@ public class S3Controller {
         return new ResponseEntity<>(key, HttpStatus.OK);
     }
 
-    @GetMapping("/download/{key}")
-    public ResponseEntity<String> downloadFile(@PathVariable String key, @RequestParam String destinationPath) {
-        s3Service.downloadFile(key, destinationPath);
-        return new ResponseEntity<>("File downloaded to " + destinationPath, HttpStatus.OK);
+    @GetMapping("/image/{key}")
+    public ResponseEntity<byte[]> getImage(@PathVariable String key) {
+        FileData fileData = s3Service.downloadFile(key);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, fileData.getContentType())
+                .body(fileData.getContent());
     }
 
     @GetMapping("/presigned-url/{key}")

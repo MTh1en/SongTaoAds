@@ -1,19 +1,20 @@
 package com.capstone.ads.repository.external.impl;
 
+import com.capstone.ads.dto.file.FileData;
 import com.capstone.ads.repository.external.S3Repository;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
-import software.amazon.awssdk.transfer.s3.S3TransferManager;
-import software.amazon.awssdk.transfer.s3.progress.LoggingTransferListener;
 
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,6 @@ public class S3RepositoryImpl implements S3Repository {
     private static final Duration RETRY_DELAY = Duration.ofMillis(500);
 
     private final S3AsyncClient s3AsyncClient;
-    private final S3TransferManager transferManager;
     private final S3Presigner s3Presigner;
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
@@ -98,16 +98,21 @@ public class S3RepositoryImpl implements S3Repository {
 
 
     @Override
-    public void downloadFile(String bucketName, String key, String destinationPath) {
+    public FileData downloadFile(String bucketName, String key) {
         try {
-            transferManager.downloadFile(d -> d
-                            .getObjectRequest(req -> req.bucket(bucketName).key(key))
-                            .destination(Paths.get(destinationPath))
-                            .addTransferListener(LoggingTransferListener.create()))
-                    .completionFuture()
-                    .join();
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
+
+            ResponseBytes<GetObjectResponse> responseBytes =
+                    s3AsyncClient.getObject(getObjectRequest, software.amazon.awssdk.core.async.AsyncResponseTransformer.toBytes()).join();
+
+            byte[] content = responseBytes.asByteArray();
+            String contentType = responseBytes.response().contentType();
+            return new FileData(content, contentType != null ? contentType : "application/octet-stream");
         } catch (Exception e) {
-            log.error("Failed to download file with key: {} to path: {}", key, destinationPath, e);
+            log.error("Failed to download file with key: {}", key, e);
             throw new RuntimeException("Download failed", e);
         }
     }
