@@ -100,9 +100,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(String refreshToken, HttpServletResponse response) {
         if (StringUtils.isEmpty(refreshToken)) {
-            log.warn("No refresh token provided for logout");
-            clearCookies(response);
-            return;
+            throw new AppException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
         var email = refreshTokenService.getEmail(refreshToken);
         refreshTokenService.revokeToken(email);
@@ -117,9 +115,9 @@ public class AuthServiceImpl implements AuthService {
     private void setRefreshTokenCookie(String refreshToken, HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from(TokenNaming.REFRESH_TOKEN, refreshToken)
                 .httpOnly(true)
-                .secure(false)  // Bật secure khi dùng HTTPS
+                .secure(true) // Bật Secure để hoạt động với SameSite=None
                 .path("/")
-                .sameSite("Lax")  // Bắt buộc khi FE/BE khác domain
+                .sameSite("None") // Cho phép cross-origin
                 .maxAge(REFRESH_TOKEN_TTL)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -128,10 +126,10 @@ public class AuthServiceImpl implements AuthService {
     private void clearCookies(HttpServletResponse response) {
         ResponseCookie refreshCookie = ResponseCookie.from(TokenNaming.REFRESH_TOKEN, "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(true) // Đảm bảo Secure=true khi xóa
                 .path("/")
-                .sameSite("Lax")
-                .maxAge(0)
+                .sameSite("None") // Phải khớp với cookie đã tạo
+                .maxAge(0) // Xóa cookie
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
