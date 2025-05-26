@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -123,8 +124,10 @@ public class UserServiceImpl implements UserService {
 
     private UserDTO convertUserToDTO(Users user) {
         var userResponse = usersMapper.toDTO(user);
-        var avatarImageDownloadFromS3 = s3Repository.generatePresignedUrl(bucketName, user.getAvatar(), 30);
-        userResponse.setAvatar(avatarImageDownloadFromS3);
+        if (!Objects.isNull(userResponse.getAvatar())) {
+            var avatarImageDownloadFromS3 = s3Repository.generatePresignedUrl(bucketName, user.getAvatar(), 30);
+            userResponse.setAvatar(avatarImageDownloadFromS3);
+        }
         return userResponse;
     }
 
