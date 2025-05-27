@@ -4,7 +4,7 @@ import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeCreateRequest;
 import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeDTO;
 import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeUpdateRequest;
-import com.capstone.ads.service.CustomerChoicesSizeService;
+import com.capstone.ads.service.CustomerChoiceSizesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class CustomerChoiceSizeController {
-    private final CustomerChoicesSizeService service;
+    private final CustomerChoiceSizesService service;
 
     @PostMapping("/customer-choices/{customerChoicesId}/sizes/{sizeId}")
     public ApiResponse<CustomerChoicesSizeDTO> create(@Valid @PathVariable String customerChoicesId,

@@ -2,7 +2,7 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.producttypesize.ProductTypeSizeDTO;
-import com.capstone.ads.service.ProductTypeSizeService;
+import com.capstone.ads.service.ProductTypeSizesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class ProductTypeSizeController {
-    private final ProductTypeSizeService service;
+    private final ProductTypeSizesService service;
 
     @PostMapping("/product-types/{productTypeId}/sizes/{sizeId}")
     public ApiResponse<ProductTypeSizeDTO> create(@PathVariable String productTypeId, @PathVariable String sizeId) {

@@ -2,7 +2,7 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.customerchoicedetail.CustomerChoicesDetailsDTO;
-import com.capstone.ads.service.CustomerChoicesDetailsService;
+import com.capstone.ads.service.CustomerChoiceDetailsService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class CustomerChoiceDetailsController {
-    private final CustomerChoicesDetailsService service;
+    private final CustomerChoiceDetailsService service;
 
     @PostMapping("/customer-choices/{customerChoiceId}/attribute-values/{attributeValueId}")
     public ApiResponse<CustomerChoicesDetailsDTO> create(@PathVariable String customerChoiceId, @PathVariable String attributeValueId) {

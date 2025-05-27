@@ -4,7 +4,7 @@ import com.capstone.ads.dto.producttypesize.ProductTypeSizeDTO;
 
 import java.util.List;
 
-public interface ProductTypeSizeService {
+public interface ProductTypeSizesService {
     ProductTypeSizeDTO create(String productTypeId, String sizeId);
 
     List<ProductTypeSizeDTO> getAllByProductTypeId(String productTypeId);

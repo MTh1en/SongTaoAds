@@ -4,7 +4,7 @@ import com.capstone.ads.dto.customerchoicedetail.CustomerChoicesDetailsDTO;
 
 import java.util.List;
 
-public interface CustomerChoicesDetailsService {
+public interface CustomerChoiceDetailsService {
     CustomerChoicesDetailsDTO create(String customerChoicesId, String attributeValueId);
 
     CustomerChoicesDetailsDTO updateAttributeValue(String customerChoiceDetailId, String attributeValueId);

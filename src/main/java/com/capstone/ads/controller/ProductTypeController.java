@@ -4,7 +4,7 @@ import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.producttype.ProductTypeCreateRequest;
 import com.capstone.ads.dto.producttype.ProductTypeDTO;
 import com.capstone.ads.dto.producttype.ProductTypeUpdateRequest;
-import com.capstone.ads.service.ProductTypeService;
+import com.capstone.ads.service.ProductTypesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api/product-types")
 @RequiredArgsConstructor
 public class ProductTypeController {
-    private final ProductTypeService service;
+    private final ProductTypesService service;
 
     @PostMapping
     public ApiResponse<ProductTypeDTO> createProductType(@RequestBody ProductTypeCreateRequest request) {

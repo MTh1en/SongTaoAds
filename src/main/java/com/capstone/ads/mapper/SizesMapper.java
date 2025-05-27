@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
-public interface SizeMapper {
+public interface SizesMapper {
     SizeDTO toDTO(Sizes sizes);
 
     Sizes toEntity(SizeCreateRequest request);

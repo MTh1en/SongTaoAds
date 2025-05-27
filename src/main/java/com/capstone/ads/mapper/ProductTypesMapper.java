@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
-public interface ProductTypeMapper {
+public interface ProductTypesMapper {
     ProductTypeDTO toDTO(ProductTypes productTypes);
 
     ProductTypes toEntity(ProductTypeCreateRequest request);

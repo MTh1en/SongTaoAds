@@ -5,12 +5,12 @@ import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeDTO;
 import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
-import com.capstone.ads.mapper.CustomerChoicesSizeMapper;
+import com.capstone.ads.mapper.CustomerChoiceSizesMapper;
 import com.capstone.ads.model.CustomerChoiceSizes;
 import com.capstone.ads.model.CustomerChoices;
 import com.capstone.ads.repository.internal.*;
 import com.capstone.ads.service.CalculateService;
-import com.capstone.ads.service.CustomerChoicesSizeService;
+import com.capstone.ads.service.CustomerChoiceSizesService;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +23,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CustomerChoicesSizeServiceImpl implements CustomerChoicesSizeService {
-    private final CustomerChoicesSizeRepository customerChoicesSizeRepository;
-    final CustomerChoicesDetailsRepository customerChoicesDetailsRepository;
+public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesService {
+    private final CustomerChoiceSizesRepository customerChoiceSizesRepository;
+    final CustomerChoiceDetailsRepository customerChoiceDetailsRepository;
     private final CustomerChoicesRepository customerChoicesRepository;
-    private final SizeRepository sizeRepository;
-    private final ProductTypeSizeRepository productTypeSizeRepository;
-    private final CustomerChoicesSizeMapper customerChoicesSizeMapper;
+    private final SizesRepository sizesRepository;
+    private final ProductTypeSizesRepository productTypeSizesRepository;
+    private final CustomerChoiceSizesMapper customerChoiceSizesMapper;
     private final CalculateService calculateService;
     private final EntityManager entityManager;
 
@@ -38,36 +38,36 @@ public class CustomerChoicesSizeServiceImpl implements CustomerChoicesSizeServic
     public CustomerChoicesSizeDTO create(String customerChoicesId, String sizeId, CustomerChoicesSizeCreateRequest request) {
         var customerChoice = customerChoicesRepository.findById(customerChoicesId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
-        if (!sizeRepository.existsById(sizeId))
+        if (!sizesRepository.existsById(sizeId))
             throw new AppException(ErrorCode.SIZE_NOT_FOUND);
-        if (!productTypeSizeRepository.existsByProductTypes_IdAndSizes_Id(customerChoice.getProductTypes().getId(), sizeId))
+        if (!productTypeSizesRepository.existsByProductTypes_IdAndSizes_Id(customerChoice.getProductTypes().getId(), sizeId))
             throw new AppException(ErrorCode.SIZE_NOT_BELONG_PRODUCT_TYPE);
-        if (customerChoicesSizeRepository.existsByCustomerChoices_IdAndSizes_Id(customerChoicesId, sizeId))
+        if (customerChoiceSizesRepository.existsByCustomerChoices_IdAndSizes_Id(customerChoicesId, sizeId))
             throw new AppException(ErrorCode.CUSTOMER_CHOICE_SIZE_EXISTED);
 
-        CustomerChoiceSizes customerChoiceSizes = customerChoicesSizeMapper.toEntity(request, customerChoicesId, sizeId);
-        customerChoiceSizes = customerChoicesSizeRepository.save(customerChoiceSizes);
-        return customerChoicesSizeMapper.toDTO(customerChoiceSizes);
+        CustomerChoiceSizes customerChoiceSizes = customerChoiceSizesMapper.toEntity(request, customerChoicesId, sizeId);
+        customerChoiceSizes = customerChoiceSizesRepository.save(customerChoiceSizes);
+        return customerChoiceSizesMapper.toDTO(customerChoiceSizes);
     }
 
     @Override
     @Transactional
     public CustomerChoicesSizeDTO update(String customerChoiceSizeId, CustomerChoicesSizeUpdateRequest request) {
-        var customerChoicesSize = customerChoicesSizeRepository.findById(customerChoiceSizeId)
+        var customerChoicesSize = customerChoiceSizesRepository.findById(customerChoiceSizeId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_SIZE_NOT_FOUND));
-        customerChoicesSizeMapper.updateEntityFromRequest(request, customerChoicesSize);
-        customerChoicesSize = customerChoicesSizeRepository.save(customerChoicesSize);
+        customerChoiceSizesMapper.updateEntityFromRequest(request, customerChoicesSize);
+        customerChoicesSize = customerChoiceSizesRepository.save(customerChoicesSize);
 
         CustomerChoices customerChoices = customerChoicesSize.getCustomerChoices();
         updateAllSubtotalsAndTotal(customerChoices);
-        return customerChoicesSizeMapper.toDTO(customerChoicesSize);
+        return customerChoiceSizesMapper.toDTO(customerChoicesSize);
     }
 
     @Override
     public CustomerChoicesSizeDTO findById(String id) {
-        CustomerChoiceSizes customerChoiceSizes = customerChoicesSizeRepository.findById(id)
+        CustomerChoiceSizes customerChoiceSizes = customerChoiceSizesRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_SIZE_NOT_FOUND));
-        return customerChoicesSizeMapper.toDTO(customerChoiceSizes);
+        return customerChoiceSizesMapper.toDTO(customerChoiceSizes);
     }
 
     @Override
@@ -75,25 +75,25 @@ public class CustomerChoicesSizeServiceImpl implements CustomerChoicesSizeServic
         if (!customerChoicesRepository.existsById(customerChoicesId))
             throw new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND);
 
-        return customerChoicesSizeRepository.findByCustomerChoices_Id(customerChoicesId).stream()
-                .map(customerChoicesSizeMapper::toDTO)
+        return customerChoiceSizesRepository.findByCustomerChoices_Id(customerChoicesId).stream()
+                .map(customerChoiceSizesMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public void delete(String id) {
-        if (!customerChoicesSizeRepository.existsById(id)) {
+        if (!customerChoiceSizesRepository.existsById(id)) {
             throw new AppException(ErrorCode.CUSTOMER_CHOICES_SIZE_NOT_FOUND);
         }
-        customerChoicesSizeRepository.deleteById(id);
+        customerChoiceSizesRepository.deleteById(id);
     }
 
     private void updateAllSubtotalsAndTotal(CustomerChoices customerChoices) {
         // 1. Cập nhật tất cả subtotal
         customerChoices.getCustomerChoiceDetails().forEach(detail -> {
             detail.setSubTotal(calculateService.calculateSubtotal(detail.getId()));
-            customerChoicesDetailsRepository.save(detail);
+            customerChoiceDetailsRepository.save(detail);
         });
 
         // 2. Flush để đảm bảo tất cả thay đổi được ghi xuống DB

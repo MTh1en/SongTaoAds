@@ -74,6 +74,8 @@ public enum ErrorCode {
 
     //FILE PROCESSING
     FILE_PROCESSING_FAILED("File processing failed", HttpStatus.INTERNAL_SERVER_ERROR),
+
+    DESIGN_TEMPLATE_NOT_FOUND("Design template not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

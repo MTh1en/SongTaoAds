@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface CustomerChoicesSizeRepository extends JpaRepository<CustomerChoiceSizes, String> {
+public interface CustomerChoiceSizesRepository extends JpaRepository<CustomerChoiceSizes, String> {
     boolean existsByCustomerChoices_IdAndSizes_Id(String customerChoiceId, String sizeId);
 
     List<CustomerChoiceSizes> findByCustomerChoices_Id(String id);
