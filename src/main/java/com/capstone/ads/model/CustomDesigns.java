@@ -1,5 +1,6 @@
 package com.capstone.ads.model;
 
+import com.capstone.ads.model.enums.CustomDesignStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -7,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -16,26 +16,23 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class ProductType {
+public class CustomDesigns {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String name;
+
     String image;
-    String calculateFormula;
-    Boolean isAvailable;
+    String customerNote;
+    String designerDescription;
 
     @CreationTimestamp
     LocalDateTime createAt;
     @UpdateTimestamp
     LocalDateTime updateAt;
 
-    @OneToMany(mappedBy = "productType")
-    List<Attributes> attributes;
+    @Enumerated(EnumType.STRING)
+    CustomDesignStatus status;
 
-    @OneToMany(mappedBy = "productType")
-    List<CustomerChoices> customerChoices;
-
-    @OneToMany(mappedBy = "productType")
-    List<ProductTypeSize> productTypeSizes;
+    @ManyToOne
+    CustomDesignRequests customDesignRequests;
 }

@@ -1,32 +1,32 @@
 package com.capstone.ads.mapper;
 
 import com.capstone.ads.dto.producttypesize.ProductTypeSizeDTO;
-import com.capstone.ads.model.ProductType;
-import com.capstone.ads.model.ProductTypeSize;
-import com.capstone.ads.model.Size;
+import com.capstone.ads.model.ProductTypeSizes;
+import com.capstone.ads.model.ProductTypes;
+import com.capstone.ads.model.Sizes;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface ProductTypeSizeMapper {
-    @Mapping(target = "productTypeId", source = "productType.id")
-    ProductTypeSizeDTO toDTO(ProductTypeSize productTypeSize);
+    @Mapping(target = "productTypeId", source = "productTypes.id")
+    ProductTypeSizeDTO toDTO(ProductTypeSizes productTypeSizes);
 
-    @Mapping(target = "productType", expression = "java(mapProductType(productTypeId))")
-    @Mapping(target = "size", expression = "java(mapSize(sizeId))")
-    ProductTypeSize toEntity(String productTypeId, String sizeId);
+    @Mapping(target = "productTypes", expression = "java(mapProductType(productTypeId))")
+    @Mapping(target = "sizes", expression = "java(mapSize(sizeId))")
+    ProductTypeSizes toEntity(String productTypeId, String sizeId);
 
-    default ProductType mapProductType(String productTypeId) {
+    default ProductTypes mapProductType(String productTypeId) {
         if (productTypeId == null) return null;
-        ProductType productType = new ProductType();
-        productType.setId(productTypeId);
-        return productType;
+        ProductTypes productTypes = new ProductTypes();
+        productTypes.setId(productTypeId);
+        return productTypes;
     }
 
-    default Size mapSize(String sizeId) {
+    default Sizes mapSize(String sizeId) {
         if (sizeId == null) return null;
-        Size size = new Size();
-        size.setId(sizeId);
-        return size;
+        Sizes sizes = new Sizes();
+        sizes.setId(sizeId);
+        return sizes;
     }
 }

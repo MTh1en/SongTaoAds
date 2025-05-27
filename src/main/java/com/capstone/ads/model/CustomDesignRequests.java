@@ -1,6 +1,6 @@
 package com.capstone.ads.model;
 
-import com.capstone.ads.model.enums.OrderStatus;
+import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.model.json.CustomerChoiceHistories;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,7 +10,6 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,40 +20,28 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class Orders {
+public class CustomDesignRequests {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-
-    @CreationTimestamp
-    LocalDateTime orderDate;
-
-    Timestamp deliveryDate;
-    String address;
-    Double totalAmount;
-    Double depositAmount;
-    Double remainingAmount;
-    String note;
-
-    @UpdateTimestamp
-    LocalDateTime updateDate;
+    String requirements;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     CustomerChoiceHistories customerChoiceHistories;
 
+    @CreationTimestamp
+    LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    LocalDateTime updatedAt;
+
     @Enumerated(EnumType.STRING)
-    OrderStatus status;
+    CustomDesignRequestStatus status;
+
+    @OneToMany(mappedBy = "customDesignRequests")
+    List<CustomDesigns> customDesigns;
 
     @ManyToOne
-    Users users;
-
-    @OneToMany(mappedBy = "orders")
-    List<Payments> payments;
-
-    @OneToOne
-    AIDesigns aiDesigns;
-
-    @OneToOne
-    CustomDesigns customDesigns;
+    CustomerDetail customerDetail;
 }

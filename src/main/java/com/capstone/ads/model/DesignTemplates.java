@@ -15,19 +15,27 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class CustomerChoicesSize {
+public class DesignTemplates {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    Double sizeValue;
+
+    String name;
+    String description;
+    String image;
+    String negativePrompt;
+    Integer width;
+    Integer height;
+    Boolean isAvailable;
+
     @CreationTimestamp
     LocalDateTime createdAt;
     @UpdateTimestamp
     LocalDateTime updatedAt;
 
     @ManyToOne
-    CustomerChoices customerChoices;
+    Users users;
 
     @ManyToOne
-    Size size;
+    ProductTypes productTypes;
 }

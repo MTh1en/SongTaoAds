@@ -7,7 +7,7 @@ import com.capstone.ads.dto.producttype.ProductTypeUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ProductTypeMapper;
-import com.capstone.ads.model.ProductType;
+import com.capstone.ads.model.ProductTypes;
 import com.capstone.ads.repository.external.S3Repository;
 import com.capstone.ads.repository.internal.ProductTypeRepository;
 import com.capstone.ads.service.ProductTypeService;
@@ -34,24 +34,24 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     @Override
     @Transactional
     public ProductTypeDTO createProductTypeService(ProductTypeCreateRequest request) {
-        ProductType productType = productTypeMapper.toEntity(request);
-        productType = productTypeRepository.save(productType);
-        return productTypeMapper.toDTO(productType);
+        ProductTypes productTypes = productTypeMapper.toEntity(request);
+        productTypes = productTypeRepository.save(productTypes);
+        return productTypeMapper.toDTO(productTypes);
     }
 
     @Override
     @Transactional
     public ProductTypeDTO updateInformation(String productTypeId, ProductTypeUpdateRequest request) {
-        ProductType productType = getProductTypeByIdAndAvailable(productTypeId);
-        productTypeMapper.updateEntityFromRequest(request, productType);
-        productType = productTypeRepository.save(productType);
-        return productTypeMapper.toDTO(productType);
+        ProductTypes productTypes = getProductTypeByIdAndAvailable(productTypeId);
+        productTypeMapper.updateEntityFromRequest(request, productTypes);
+        productTypes = productTypeRepository.save(productTypes);
+        return productTypeMapper.toDTO(productTypes);
     }
 
     @Override
     public ProductTypeDTO findProductTypeByProductTypeId(String productTypeId) {
-        ProductType productType = getProductTypeByIdAndAvailable(productTypeId);
-        return convertProductTypeToProductTypeDTOWithImageUrl(productType);
+        ProductTypes productTypes = getProductTypeByIdAndAvailable(productTypeId);
+        return convertProductTypeToProductTypeDTOWithImageUrl(productTypes);
     }
 
     @Override
@@ -73,30 +73,30 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     @Override
     @Transactional
     public ProductTypeDTO uploadProductTypeImage(String productTypeId, MultipartFile file) {
-        ProductType productType = getProductTypeByIdAndAvailable(productTypeId);
+        ProductTypes productTypes = getProductTypeByIdAndAvailable(productTypeId);
 
         String productTypeKey = generateProductTypeImageKey(productTypeId);
 
         s3Repository.uploadSingleFile(bucketName, file, productTypeKey);
-        productType.setImage(productTypeKey);
-        productTypeRepository.save(productType);
+        productTypes.setImage(productTypeKey);
+        productTypeRepository.save(productTypes);
 
-        return productTypeMapper.toDTO(productType);
+        return productTypeMapper.toDTO(productTypes);
     }
 
     private String generateProductTypeImageKey(String productTypeId) {
         return String.format("product-type/%s/%s", productTypeId, UUID.randomUUID());
     }
 
-    private ProductType getProductTypeByIdAndAvailable(String productTypeId) {
+    private ProductTypes getProductTypeByIdAndAvailable(String productTypeId) {
         return productTypeRepository.findByIdAndIsAvailable(productTypeId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
     }
 
-    private ProductTypeDTO convertProductTypeToProductTypeDTOWithImageUrl(ProductType productType) {
-        var productTypeDTOResponse = productTypeMapper.toDTO(productType);
+    private ProductTypeDTO convertProductTypeToProductTypeDTOWithImageUrl(ProductTypes productTypes) {
+        var productTypeDTOResponse = productTypeMapper.toDTO(productTypes);
 
-        var productTypeImage = s3Repository.generatePresignedUrl(bucketName, productType.getImage(), S3ImageDuration.PRODUCT_TYPE_IMAGE_DURATION);
+        var productTypeImage = s3Repository.generatePresignedUrl(bucketName, productTypes.getImage(), S3ImageDuration.PRODUCT_TYPE_IMAGE_DURATION);
         productTypeDTOResponse.setImage(productTypeImage);
 
         return productTypeDTOResponse;

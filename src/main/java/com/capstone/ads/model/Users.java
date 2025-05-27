@@ -43,8 +43,11 @@ public class Users {
     LocalDateTime updateAt;
 
     @ManyToOne
-    private Role role;
+    private Roles roles;
 
     @OneToMany(mappedBy = "users")
     List<Orders> orders;
+
+    @OneToMany(mappedBy = "users")
+    List<DesignTemplates> designTemplates;
 }

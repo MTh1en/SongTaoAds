@@ -32,4 +32,7 @@ public class CustomerDetail implements Serializable {
 
     @OneToMany(mappedBy = "customerDetail")
     List<AIDesigns> aiDesigns;
+
+    @OneToMany(mappedBy = "customerDetail")
+    List<CustomDesignRequests> customDesignRequests;
 }

@@ -37,7 +37,7 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
     @Override
     @Transactional
     public CustomerChoicesDTO finish(String customerId, String productTypeId) {
-        var customerChoices = customerChoicesRepository.findFirstByProductType_IdAndUsers_IdOrderByUpdatedAtDesc(productTypeId, customerId)
+        var customerChoices = customerChoicesRepository.findByProductTypes_IdAndUsers_Id(productTypeId, customerId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
         customerChoices.setIsFinal(true);
         customerChoices = customerChoicesRepository.save(customerChoices);

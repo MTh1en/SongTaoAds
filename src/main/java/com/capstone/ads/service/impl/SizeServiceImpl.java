@@ -6,7 +6,7 @@ import com.capstone.ads.dto.size.SizeUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.SizeMapper;
-import com.capstone.ads.model.Size;
+import com.capstone.ads.model.Sizes;
 import com.capstone.ads.repository.internal.SizeRepository;
 import com.capstone.ads.service.SizeService;
 import lombok.RequiredArgsConstructor;
@@ -25,26 +25,26 @@ public class SizeServiceImpl implements SizeService {
     @Override
     @Transactional
     public SizeDTO create(SizeCreateRequest request) {
-        Size size = sizeMapper.toEntity(request);
-        size = sizeRepository.save(size);
-        return sizeMapper.toDTO(size);
+        Sizes sizes = sizeMapper.toEntity(request);
+        sizes = sizeRepository.save(sizes);
+        return sizeMapper.toDTO(sizes);
     }
 
     @Override
     @Transactional
     public SizeDTO update(String id, SizeUpdateRequest request) {
-        Size size = sizeRepository.findById(id)
+        Sizes sizes = sizeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.SIZE_NOT_FOUND));
-        sizeMapper.updateEntityFromRequest(request, size);
-        size = sizeRepository.save(size);
-        return sizeMapper.toDTO(size);
+        sizeMapper.updateEntityFromRequest(request, sizes);
+        sizes = sizeRepository.save(sizes);
+        return sizeMapper.toDTO(sizes);
     }
 
     @Override
     public SizeDTO findById(String id) {
-        Size size = sizeRepository.findById(id)
+        Sizes sizes = sizeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.SIZE_NOT_FOUND));
-        return sizeMapper.toDTO(size);
+        return sizeMapper.toDTO(sizes);
     }
 
     @Override

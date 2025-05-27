@@ -6,8 +6,8 @@ import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerChoicesSizeMapper;
+import com.capstone.ads.model.CustomerChoiceSizes;
 import com.capstone.ads.model.CustomerChoices;
-import com.capstone.ads.model.CustomerChoicesSize;
 import com.capstone.ads.repository.internal.*;
 import com.capstone.ads.service.CalculateService;
 import com.capstone.ads.service.CustomerChoicesSizeService;
@@ -40,14 +40,14 @@ public class CustomerChoicesSizeServiceImpl implements CustomerChoicesSizeServic
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
         if (!sizeRepository.existsById(sizeId))
             throw new AppException(ErrorCode.SIZE_NOT_FOUND);
-        if (!productTypeSizeRepository.existsByProductType_IdAndSize_Id(customerChoice.getProductType().getId(), sizeId))
+        if (!productTypeSizeRepository.existsByProductTypes_IdAndSizes_Id(customerChoice.getProductTypes().getId(), sizeId))
             throw new AppException(ErrorCode.SIZE_NOT_BELONG_PRODUCT_TYPE);
-        if (customerChoicesSizeRepository.existsByCustomerChoices_IdAndSize_Id(customerChoicesId, sizeId))
+        if (customerChoicesSizeRepository.existsByCustomerChoices_IdAndSizes_Id(customerChoicesId, sizeId))
             throw new AppException(ErrorCode.CUSTOMER_CHOICE_SIZE_EXISTED);
 
-        CustomerChoicesSize customerChoicesSize = customerChoicesSizeMapper.toEntity(request, customerChoicesId, sizeId);
-        customerChoicesSize = customerChoicesSizeRepository.save(customerChoicesSize);
-        return customerChoicesSizeMapper.toDTO(customerChoicesSize);
+        CustomerChoiceSizes customerChoiceSizes = customerChoicesSizeMapper.toEntity(request, customerChoicesId, sizeId);
+        customerChoiceSizes = customerChoicesSizeRepository.save(customerChoiceSizes);
+        return customerChoicesSizeMapper.toDTO(customerChoiceSizes);
     }
 
     @Override
@@ -65,9 +65,9 @@ public class CustomerChoicesSizeServiceImpl implements CustomerChoicesSizeServic
 
     @Override
     public CustomerChoicesSizeDTO findById(String id) {
-        CustomerChoicesSize customerChoicesSize = customerChoicesSizeRepository.findById(id)
+        CustomerChoiceSizes customerChoiceSizes = customerChoicesSizeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_SIZE_NOT_FOUND));
-        return customerChoicesSizeMapper.toDTO(customerChoicesSize);
+        return customerChoicesSizeMapper.toDTO(customerChoiceSizes);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class CustomerChoicesSizeServiceImpl implements CustomerChoicesSizeServic
 
     private void updateAllSubtotalsAndTotal(CustomerChoices customerChoices) {
         // 1. Cập nhật tất cả subtotal
-        customerChoices.getCustomerChoicesDetails().forEach(detail -> {
+        customerChoices.getCustomerChoiceDetails().forEach(detail -> {
             detail.setSubTotal(calculateService.calculateSubtotal(detail.getId()));
             customerChoicesDetailsRepository.save(detail);
         });
