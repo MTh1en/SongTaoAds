@@ -21,6 +21,7 @@ public class ProductType {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String name;
+    String image;
     String calculateFormula;
     Boolean isAvailable;
 
