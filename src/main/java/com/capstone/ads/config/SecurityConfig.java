@@ -71,7 +71,8 @@ public class SecurityConfig {
         defaultConfig.setAllowedOrigins(Arrays.asList(
                 "http://localhost:8080",
                 "http://localhost:5173",
-                "https://songtaoads.online"
+                "https://songtaoads.online",
+                "https://songtaoads.io.vn"
         ));
         defaultConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         defaultConfig.setAllowedHeaders(Arrays.asList("Authorization", "X-XSRF-TOKEN", "Content-Type"));

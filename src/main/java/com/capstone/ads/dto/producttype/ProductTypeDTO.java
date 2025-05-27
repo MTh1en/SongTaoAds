@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductTypeDTO {
     String id;
+    String image;
     String name;
     String calculateFormula;
     Boolean isAvailable;

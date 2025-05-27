@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateUserProfile(String userId, UserProfileUpdateRequest request) {
         Users user = findUserByIdAndActive(userId);
 
-        // Use MapStruct to update entity fields
+        // Use MapStruct to updateInformation entity fields
         usersMapper.updateUserUpdateRequestToEntity(request, user);
 
         Users updatedUser = usersRepository.save(user);
@@ -99,10 +99,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDTO uploadUserAvatar(String userId, MultipartFile file) throws IOException {
+    public UserDTO uploadUserAvatar(String userId, MultipartFile file) {
         Users user = findUserByIdAndActive(userId);
         String avatarName = generateAvatarName(user.getId());
-        s3Repository.uploadSingleFile(bucketName, file.getBytes(), avatarName, file.getContentType());
+        s3Repository.uploadSingleFile(bucketName, file, avatarName);
         user.setAvatar(avatarName);
         usersRepository.save(user);
         return usersMapper.toDTO(user);
