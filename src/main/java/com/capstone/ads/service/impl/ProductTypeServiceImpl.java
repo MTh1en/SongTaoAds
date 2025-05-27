@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,7 +33,7 @@ public class ProductTypeServiceImpl implements ProductTypeService {
 
     @Override
     @Transactional
-    public ProductTypeDTO create(ProductTypeCreateRequest request) {
+    public ProductTypeDTO createProductTypeService(ProductTypeCreateRequest request) {
         ProductType productType = productTypeMapper.toEntity(request);
         productType = productTypeRepository.save(productType);
         return productTypeMapper.toDTO(productType);
@@ -42,7 +41,7 @@ public class ProductTypeServiceImpl implements ProductTypeService {
 
     @Override
     @Transactional
-    public ProductTypeDTO update(String productTypeId, ProductTypeUpdateRequest request) {
+    public ProductTypeDTO updateInformation(String productTypeId, ProductTypeUpdateRequest request) {
         ProductType productType = getProductTypeByIdAndAvailable(productTypeId);
         productTypeMapper.updateEntityFromRequest(request, productType);
         productType = productTypeRepository.save(productType);
@@ -50,13 +49,13 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     }
 
     @Override
-    public ProductTypeDTO findById(String productTypeId) {
+    public ProductTypeDTO findProductTypeByProductTypeId(String productTypeId) {
         ProductType productType = getProductTypeByIdAndAvailable(productTypeId);
         return convertProductTypeToProductTypeDTOWithImageUrl(productType);
     }
 
     @Override
-    public List<ProductTypeDTO> findAll() {
+    public List<ProductTypeDTO> findAllProductType() {
         return productTypeRepository.findAll().stream()
                 .map(productTypeMapper::toDTO)
                 .collect(Collectors.toList());
@@ -64,7 +63,7 @@ public class ProductTypeServiceImpl implements ProductTypeService {
 
     @Override
     @Transactional
-    public void delete(String id) {
+    public void forceDeleteProductType(String id) {
         if (!productTypeRepository.existsById(id)) {
             throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
         }
@@ -72,13 +71,13 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     }
 
     @Override
+    @Transactional
     public ProductTypeDTO uploadProductTypeImage(String productTypeId, MultipartFile file) {
         ProductType productType = getProductTypeByIdAndAvailable(productTypeId);
 
         String productTypeKey = generateProductTypeImageKey(productTypeId);
-        byte[] fileBytes = convertMultipartFileToByteArray(file);
 
-        s3Repository.uploadSingleFile(bucketName, fileBytes, productTypeKey, file.getContentType());
+        s3Repository.uploadSingleFile(bucketName, file, productTypeKey);
         productType.setImage(productTypeKey);
         productTypeRepository.save(productType);
 
@@ -102,12 +101,4 @@ public class ProductTypeServiceImpl implements ProductTypeService {
 
         return productTypeDTOResponse;
     }
-
-    private byte[] convertMultipartFileToByteArray(MultipartFile file) {
-        try {
-            return file.getBytes();
-        } catch (IOException ex) {
-            throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
-        }
-    }   
 }
