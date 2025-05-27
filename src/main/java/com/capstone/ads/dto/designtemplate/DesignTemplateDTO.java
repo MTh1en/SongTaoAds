@@ -1,6 +1,5 @@
-package com.capstone.ads.dto.producttypesize;
+package com.capstone.ads.dto.designtemplate;
 
-import com.capstone.ads.dto.size.SizeDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,10 +10,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductTypeSizeDTO {
+public class DesignTemplateDTO {
     String id;
+    String name;
+    String description;
+    String image;
+    String negativePrompt;
+    Integer width;
+    Integer height;
+    Boolean isAvailable;
     LocalDateTime createAt;
     LocalDateTime updateAt;
+    String userId;
     String productTypeId;
-    SizeDTO sizes;
 }

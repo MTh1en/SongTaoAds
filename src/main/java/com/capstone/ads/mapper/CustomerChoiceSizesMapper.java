@@ -11,7 +11,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
-public interface CustomerChoicesSizeMapper {
+public interface CustomerChoiceSizesMapper {
     @Mapping(target = "customerChoicesId", source = "customerChoices.id")
     @Mapping(target = "sizeId", source = "sizes.id")
     CustomerChoicesSizeDTO toDTO(CustomerChoiceSizes customerChoiceSizes);

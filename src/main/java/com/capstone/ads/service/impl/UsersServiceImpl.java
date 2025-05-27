@@ -11,7 +11,7 @@ import com.capstone.ads.model.Roles;
 import com.capstone.ads.model.Users;
 import com.capstone.ads.repository.external.S3Repository;
 import com.capstone.ads.repository.internal.UsersRepository;
-import com.capstone.ads.repository.internal.RoleRepository;
+import com.capstone.ads.repository.internal.RolesRepository;
 
 import com.capstone.ads.service.UserService;
 import com.capstone.ads.utils.SecurityContextUtils;
@@ -29,12 +29,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UsersServiceImpl implements UserService {
     @Value("${aws.bucket.name}")
     private String bucketName;
 
     private final UsersRepository usersRepository;
-    private final RoleRepository roleRepository;
+    private final RolesRepository rolesRepository;
     private final UsersMapper usersMapper;
     private final SecurityContextUtils securityContextUtils;
     private final S3Repository s3Repository;
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDTO createUser(UserCreateRequest request) {
         // Validate role
-        Roles roles = roleRepository.findByName(request.getRoleName())
+        Roles roles = rolesRepository.findByName(request.getRoleName())
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
         // Map DTO to entity

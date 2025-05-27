@@ -6,7 +6,7 @@ import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeUpdateRequest;
 
 import java.util.List;
 
-public interface CustomerChoicesSizeService {
+public interface CustomerChoiceSizesService {
     CustomerChoicesSizeDTO create(String customerChoicesId, String sizeId, CustomerChoicesSizeCreateRequest request);
 
     CustomerChoicesSizeDTO update(String customerChoiceSizeId, CustomerChoicesSizeUpdateRequest request);

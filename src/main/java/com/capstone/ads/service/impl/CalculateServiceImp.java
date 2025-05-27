@@ -3,7 +3,7 @@ package com.capstone.ads.service.impl;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.model.*;
-import com.capstone.ads.repository.internal.CustomerChoicesDetailsRepository;
+import com.capstone.ads.repository.internal.CustomerChoiceDetailsRepository;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.service.CalculateService;
 import jakarta.persistence.EntityManager;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CalculateServiceImp implements CalculateService {
     private final ExpressionParser parser = new SpelExpressionParser();
-    private final CustomerChoicesDetailsRepository customerChoicesDetailsRepository;
+    private final CustomerChoiceDetailsRepository customerChoiceDetailsRepository;
     private final CustomerChoicesRepository customerChoicesRepository;
     private final EntityManager entityManager;
 
@@ -142,7 +142,7 @@ public class CalculateServiceImp implements CalculateService {
 
     // Xác thực CustomerChoicesDetails
     private CustomerChoiceDetails getValidatedCustomerChoicesDetails(String customerChoicesDetailId) {
-        CustomerChoiceDetails details = customerChoicesDetailsRepository.findById(customerChoicesDetailId)
+        CustomerChoiceDetails details = customerChoiceDetailsRepository.findById(customerChoicesDetailId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND));
 
         if (details.getAttributeValues() == null || details.getAttributeValues().getAttributes() == null) {

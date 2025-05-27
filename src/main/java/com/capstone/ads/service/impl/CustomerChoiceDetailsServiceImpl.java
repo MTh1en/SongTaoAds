@@ -3,15 +3,15 @@ package com.capstone.ads.service.impl;
 import com.capstone.ads.dto.customerchoicedetail.CustomerChoicesDetailsDTO;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
-import com.capstone.ads.mapper.CustomerChoicesDetailsMapper;
+import com.capstone.ads.mapper.CustomerChoiceDetailsMapper;
 import com.capstone.ads.model.AttributeValues;
 import com.capstone.ads.model.CustomerChoiceDetails;
 import com.capstone.ads.model.CustomerChoices;
 import com.capstone.ads.repository.internal.AttributeValuesRepository;
-import com.capstone.ads.repository.internal.CustomerChoicesDetailsRepository;
+import com.capstone.ads.repository.internal.CustomerChoiceDetailsRepository;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.service.CalculateService;
-import com.capstone.ads.service.CustomerChoicesDetailsService;
+import com.capstone.ads.service.CustomerChoiceDetailsService;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,11 +25,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetailsService {
-    private final CustomerChoicesDetailsRepository customerChoicesDetailsRepository;
+public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsService {
+    private final CustomerChoiceDetailsRepository customerChoiceDetailsRepository;
     private final CustomerChoicesRepository customerChoicesRepository;
     private final AttributeValuesRepository attributeValuesRepository;
-    private final CustomerChoicesDetailsMapper customerChoicesDetailsMapper;
+    private final CustomerChoiceDetailsMapper customerChoiceDetailsMapper;
     private final CalculateService calculateService;
     private final EntityManager entityManager;
 
@@ -46,15 +46,15 @@ public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetails
                 .customerChoices(customerChoices)
                 .attributeValues(attributeValues)
                 .build();
-        customerChoicesDetails = customerChoicesDetailsRepository.save(customerChoicesDetails);
+        customerChoicesDetails = customerChoiceDetailsRepository.save(customerChoicesDetails);
         updateSubtotalAndTotal(customerChoicesDetails);
-        return customerChoicesDetailsMapper.toDTO(customerChoicesDetails);
+        return customerChoiceDetailsMapper.toDTO(customerChoicesDetails);
     }
 
     @Override
     @Transactional
     public CustomerChoicesDetailsDTO updateAttributeValue(String customerChoiceDetailId, String attributeValueId) {
-        var customerChoicesDetails = customerChoicesDetailsRepository.findById(customerChoiceDetailId)
+        var customerChoicesDetails = customerChoiceDetailsRepository.findById(customerChoiceDetailId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND));
         var attributeValue = attributeValuesRepository.findById(attributeValueId)
                 .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND));
@@ -62,35 +62,35 @@ public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetails
         validateAttributeBelongsToSameAttributeType(customerChoicesDetails.getAttributeValues(), attributeValue);
 
         customerChoicesDetails.setAttributeValues(attributeValue);
-        customerChoicesDetails = customerChoicesDetailsRepository.save(customerChoicesDetails);
+        customerChoicesDetails = customerChoiceDetailsRepository.save(customerChoicesDetails);
 
         updateSubtotalAndTotal(customerChoicesDetails);
-        return customerChoicesDetailsMapper.toDTO(customerChoicesDetails);
+        return customerChoiceDetailsMapper.toDTO(customerChoicesDetails);
     }
 
     @Override
     public CustomerChoicesDetailsDTO findById(String id) {
-        CustomerChoiceDetails customerChoiceDetails = customerChoicesDetailsRepository.findById(id)
+        CustomerChoiceDetails customerChoiceDetails = customerChoiceDetailsRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND));
-        return customerChoicesDetailsMapper.toDTO(customerChoiceDetails);
+        return customerChoiceDetailsMapper.toDTO(customerChoiceDetails);
     }
 
     @Override
     public List<CustomerChoicesDetailsDTO> findAllByCustomerChoicesId(String customerChoicesId) {
         if (!customerChoicesRepository.existsById(customerChoicesId))
             throw new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND);
-        return customerChoicesDetailsRepository.findByCustomerChoices_IdOrderByCreatedAtAsc(customerChoicesId).stream()
-                .map(customerChoicesDetailsMapper::toDTO)
+        return customerChoiceDetailsRepository.findByCustomerChoices_IdOrderByCreatedAtAsc(customerChoicesId).stream()
+                .map(customerChoiceDetailsMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public void delete(String id) {
-        if (!customerChoicesDetailsRepository.existsById(id)) {
+        if (!customerChoiceDetailsRepository.existsById(id)) {
             throw new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND);
         }
-        customerChoicesDetailsRepository.deleteById(id);
+        customerChoiceDetailsRepository.deleteById(id);
     }
 
     private void validateAttributeBelongsToSameAttributeType(AttributeValues currentValue, AttributeValues newValue) {
@@ -127,7 +127,7 @@ public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetails
 
         // 2. Tính và cập nhật subtotal
         customerChoiceDetails.setSubTotal(calculateService.calculateSubtotal(customerChoiceDetails.getId()));
-        customerChoiceDetails = customerChoicesDetailsRepository.saveAndFlush(customerChoiceDetails);
+        customerChoiceDetails = customerChoiceDetailsRepository.saveAndFlush(customerChoiceDetails);
 
         // 3. Refresh toàn bộ đồ thị đối tượng liên quan
         entityManager.refresh(customerChoiceDetails); // Refresh chính details
@@ -139,7 +139,7 @@ public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetails
 
         // 5. Cập nhật total
         customerChoiceDetails.getCustomerChoices().setTotalAmount(total);
-        customerChoicesDetailsRepository.saveAndFlush(customerChoiceDetails);
+        customerChoiceDetailsRepository.saveAndFlush(customerChoiceDetails);
 
         log.info("Updated total for customerChoices {}: {}", customerChoicesId, total);
     }

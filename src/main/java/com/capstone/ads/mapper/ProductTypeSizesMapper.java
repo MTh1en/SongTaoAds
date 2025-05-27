@@ -8,7 +8,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
-public interface ProductTypeSizeMapper {
+public interface ProductTypeSizesMapper {
     @Mapping(target = "productTypeId", source = "productTypes.id")
     ProductTypeSizeDTO toDTO(ProductTypeSizes productTypeSizes);
 

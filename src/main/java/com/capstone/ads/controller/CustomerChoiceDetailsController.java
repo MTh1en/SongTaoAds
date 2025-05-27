@@ -2,7 +2,7 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.customerchoicedetail.CustomerChoicesDetailsDTO;
-import com.capstone.ads.service.CustomerChoicesDetailsService;
+import com.capstone.ads.service.CustomerChoiceDetailsService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,15 +12,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class CustomerChoicesDetailsController {
-    private final CustomerChoicesDetailsService service;
+public class CustomerChoiceDetailsController {
+    private final CustomerChoiceDetailsService service;
 
     @PostMapping("/customer-choices/{customerChoiceId}/attribute-values/{attributeValueId}")
     public ApiResponse<CustomerChoicesDetailsDTO> create(@PathVariable String customerChoiceId, @PathVariable String attributeValueId) {
         return ApiResponseBuilder.buildSuccessResponse("Create customer choices detail successful", service.create(customerChoiceId, attributeValueId));
     }
 
-    @PutMapping("/customer-choices-details/{customerChoiceDetailId}/attribute-values/{attributeValueId}")
+    @PutMapping("/customer-choice-details/{customerChoiceDetailId}/attribute-values/{attributeValueId}")
     public ApiResponse<CustomerChoicesDetailsDTO> updateAttributeValue(@PathVariable String customerChoiceDetailId,
                                                                        @PathVariable String attributeValueId) {
         return ApiResponseBuilder.buildSuccessResponse("Update customer choices size successful", service.updateAttributeValue(customerChoiceDetailId, attributeValueId));

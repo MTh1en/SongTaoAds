@@ -6,7 +6,7 @@ import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerChoicesMapper;
 import com.capstone.ads.model.CustomerChoices;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
-import com.capstone.ads.repository.internal.ProductTypeRepository;
+import com.capstone.ads.repository.internal.ProductTypesRepository;
 import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.service.CustomerChoicesService;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerChoicesServiceImpl implements CustomerChoicesService {
     private final CustomerChoicesRepository customerChoicesRepository;
     private final UsersRepository usersRepository;
-    private final ProductTypeRepository productTypeRepository;
+    private final ProductTypesRepository productTypesRepository;
     private final CustomerChoicesMapper customerChoicesMapper;
 
     @Override
     @Transactional
     public CustomerChoicesDTO create(String customerId, String productTypeId) {
         if (!usersRepository.existsById(customerId)) throw new AppException(ErrorCode.USER_NOT_FOUND);
-        if (!productTypeRepository.existsById(productTypeId)) throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
+        if (!productTypesRepository.existsById(productTypeId)) throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
 
         CustomerChoices customerChoices = customerChoicesMapper.toEntity(customerId, productTypeId);
         customerChoices.setTotalAmount(0.0);
