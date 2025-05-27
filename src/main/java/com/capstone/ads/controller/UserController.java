@@ -2,14 +2,18 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.user.UserDTO;
-import com.capstone.ads.dto.user.UserRequest;
+import com.capstone.ads.dto.user.UserCreateRequest;
+import com.capstone.ads.dto.user.UserProfileUpdateRequest;
 import com.capstone.ads.service.UserService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -20,7 +24,7 @@ public class UserController {
     private final UserService usersService;
 
     @PostMapping("/users")
-    public ApiResponse<UserDTO> createUser(@Valid @RequestBody UserRequest request) {
+    public ApiResponse<UserDTO> createUser(@Valid @RequestBody UserCreateRequest request) {
         UserDTO response = usersService.createUser(request);
         return ApiResponseBuilder.buildSuccessResponse("User created successfully", response);
     }
@@ -37,9 +41,16 @@ public class UserController {
         return ApiResponseBuilder.buildSuccessResponse("Users retrieved successfully", response);
     }
 
-    @PutMapping("/users/{userId}")
-    public ApiResponse<UserDTO> updateUser(@Valid @PathVariable String userId, @RequestBody UserRequest request) {
-        UserDTO response = usersService.updateUser(userId, request);
+    @PutMapping("/users/{userId}/profile")
+    public ApiResponse<UserDTO> updateUserProfile(@Valid @PathVariable String userId, @RequestBody UserProfileUpdateRequest request) {
+        UserDTO response = usersService.updateUserProfile(userId, request);
+        return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
+    }
+
+    @PutMapping(value = "/user/{userId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<UserDTO> updateUserAvatar(@PathVariable String userId,
+                                                 @RequestParam("avatar") MultipartFile avatar) throws IOException {
+        var response = usersService.uploadUserAvatar(userId, avatar);
         return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
     }
 
@@ -48,9 +59,10 @@ public class UserController {
         usersService.deleteUser(userId);
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/users/profile")
     public ApiResponse<UserDTO> getProfile() {
-        UserDTO response = usersService.getProfile();
+        UserDTO response = usersService.getCurrentUserProfile();
         return ApiResponseBuilder.buildSuccessResponse("Profile retrieved successfully", response);
     }
 }

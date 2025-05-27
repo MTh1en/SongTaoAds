@@ -25,6 +25,11 @@ spring:
           max-active: 8
           max-idle: 8
           min-idle: 0
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 50MB
+      file-size-threshold: 1B
 
 server:
   port: 8080
@@ -41,7 +46,10 @@ payos:
   CLIENT_ID: ${CLIENT_ID}
   API_KEY: ${API_KEY}
   CHECKSUM_KEY: ${CHECKSUM_KEY}
-
+aws:
+  region: ap-southeast-1
+  bucket:
+    name: songtaoads
 
 
 
