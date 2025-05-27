@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class CustomerChoicesDetailsController {
+public class CustomerChoiceDetailsController {
     private final CustomerChoicesDetailsService service;
 
     @PostMapping("/customer-choices/{customerChoiceId}/attribute-values/{attributeValueId}")
@@ -20,7 +20,7 @@ public class CustomerChoicesDetailsController {
         return ApiResponseBuilder.buildSuccessResponse("Create customer choices detail successful", service.create(customerChoiceId, attributeValueId));
     }
 
-    @PutMapping("/customer-choices-details/{customerChoiceDetailId}/attribute-values/{attributeValueId}")
+    @PutMapping("/customer-choice-details/{customerChoiceDetailId}/attribute-values/{attributeValueId}")
     public ApiResponse<CustomerChoicesDetailsDTO> updateAttributeValue(@PathVariable String customerChoiceDetailId,
                                                                        @PathVariable String attributeValueId) {
         return ApiResponseBuilder.buildSuccessResponse("Update customer choices size successful", service.updateAttributeValue(customerChoiceDetailId, attributeValueId));

@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class CustomerChoicesSizeController {
+public class CustomerChoiceSizeController {
     private final CustomerChoicesSizeService service;
 
     @PostMapping("/customer-choices/{customerChoicesId}/sizes/{sizeId}")
@@ -25,7 +25,7 @@ public class CustomerChoicesSizeController {
         return ApiResponseBuilder.buildSuccessResponse("Create customer choices size successful", service.create(customerChoicesId, sizeId, request));
     }
 
-    @PutMapping("/customer-choices-sizes/{customerChoiceSizeId}")
+    @PutMapping("/customer-choice-sizes/{customerChoiceSizeId}")
     public ApiResponse<CustomerChoicesSizeDTO> update(@Valid @PathVariable String customerChoiceSizeId,
                                                       @RequestBody CustomerChoicesSizeUpdateRequest request) {
         return ApiResponseBuilder.buildSuccessResponse("Update customer choices size successful", service.update(customerChoiceSizeId, request));

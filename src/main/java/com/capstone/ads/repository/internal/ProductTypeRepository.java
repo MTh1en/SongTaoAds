@@ -7,5 +7,4 @@ import java.util.Optional;
 
 public interface ProductTypeRepository extends JpaRepository<ProductTypes, String> {
     Optional<ProductTypes> findByIdAndIsAvailable(String id, Boolean isAvailable);
-
 }

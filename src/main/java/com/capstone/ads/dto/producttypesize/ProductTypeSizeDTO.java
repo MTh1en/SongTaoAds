@@ -16,5 +16,5 @@ public class ProductTypeSizeDTO {
     LocalDateTime createAt;
     LocalDateTime updateAt;
     String productTypeId;
-    SizeDTO size;
+    SizeDTO sizes;
 }
