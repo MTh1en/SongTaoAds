@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageDuration;
 import com.capstone.ads.dto.user.ChangePasswordRequest;
 import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.dto.user.UserCreateRequest;
@@ -93,7 +94,7 @@ public class UsersServiceImpl implements UserService {
     @Override
     public UserDTO getCurrentUserProfile() {
         Users user = securityContextUtils.getCurrentUser();
-        return convertUserToDTO(user);
+        return convertUserToDTOWithAvatarIsPresignedURL(user);
     }
 
     @Override
@@ -121,10 +122,10 @@ public class UsersServiceImpl implements UserService {
         return String.format("avatar/%s/%s", userId, UUID.randomUUID());
     }
 
-    private UserDTO convertUserToDTO(Users user) {
+    private UserDTO convertUserToDTOWithAvatarIsPresignedURL(Users user) {
         var userResponse = usersMapper.toDTO(user);
         if (!Objects.isNull(userResponse.getAvatar())) {
-            var avatarImageDownloadFromS3 = s3Repository.generatePresignedUrl(bucketName, user.getAvatar(), 30);
+            var avatarImageDownloadFromS3 = s3Repository.generatePresignedUrl(bucketName, user.getAvatar(), S3ImageDuration.AVATAR_IMAGE_DURATION);
             userResponse.setAvatar(avatarImageDownloadFromS3);
         }
         return userResponse;
