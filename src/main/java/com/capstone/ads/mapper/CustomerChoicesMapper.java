@@ -1,22 +1,20 @@
 package com.capstone.ads.mapper;
 
 import com.capstone.ads.dto.customerchoice.CustomerChoicesDTO;
-import com.capstone.ads.dto.customerchoice.CustomerChoicesUpdateRequest;
 import com.capstone.ads.model.CustomerChoices;
-import com.capstone.ads.model.ProductType;
+import com.capstone.ads.model.ProductTypes;
 import com.capstone.ads.model.Users;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface CustomerChoicesMapper {
     @Mapping(target = "userId", source = "users.id")
-    @Mapping(target = "productTypeId", source = "productType.id")
+    @Mapping(target = "productTypeId", source = "productTypes.id")
     CustomerChoicesDTO toDTO(CustomerChoices customerChoices);
 
     @Mapping(target = "users", expression = "java(mapUsers(userId))")
-    @Mapping(target = "productType", expression = "java(mapProductType(productTypeId))")
+    @Mapping(target = "productTypes", expression = "java(mapProductType(productTypeId))")
     CustomerChoices toEntity(String userId, String productTypeId);
 
     default Users mapUsers(String userId) {
@@ -26,10 +24,10 @@ public interface CustomerChoicesMapper {
         return users;
     }
 
-    default ProductType mapProductType(String productTypeId) {
+    default ProductTypes mapProductType(String productTypeId) {
         if (productTypeId == null) return null;
-        ProductType productType = new ProductType();
-        productType.setId(productTypeId);
-        return productType;
+        ProductTypes productTypes = new ProductTypes();
+        productTypes.setId(productTypeId);
+        return productTypes;
     }
 }

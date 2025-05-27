@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductTypeSizeDTO {
-    private String id;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
-    private String productTypeId;
-    private SizeDTO size;
+    String id;
+    LocalDateTime createAt;
+    LocalDateTime updateAt;
+    String productTypeId;
+    SizeDTO size;
 }

@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,20 +16,18 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class CustomerChoicesDetails {
+public class Roles {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
-    Double subTotal;
+    @Column(unique = true, nullable = false)
+    String name;
+
+    String description;
 
     @CreationTimestamp
     LocalDateTime createdAt;
     @UpdateTimestamp
     LocalDateTime updatedAt;
 
-    @ManyToOne
-    CustomerChoices customerChoices;
-
-    @ManyToOne
-    AttributeValues attributeValues;
+    @OneToMany(mappedBy = "roles")
+    List<Users> users;
 }

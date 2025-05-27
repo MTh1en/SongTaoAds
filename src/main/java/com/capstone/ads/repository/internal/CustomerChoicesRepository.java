@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface CustomerChoicesRepository extends JpaRepository<CustomerChoices, String> {
     Optional<CustomerChoices> findByUsers_IdOrderByUpdatedAtDesc(String id);
 
-    Optional<CustomerChoices> findFirstByProductType_IdAndUsers_IdOrderByUpdatedAtDesc(String productTypeId, String userId);
+    Optional<CustomerChoices> findByProductTypes_IdAndUsers_Id(String productTypeId, String userId);
 }

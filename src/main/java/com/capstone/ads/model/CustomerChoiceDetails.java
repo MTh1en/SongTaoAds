@@ -7,7 +7,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -16,20 +15,20 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class Size {
+public class CustomerChoiceDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String name;
-    String description;
+    Double subTotal;
+
     @CreationTimestamp
     LocalDateTime createdAt;
     @UpdateTimestamp
     LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "size")
-    List<CustomerChoicesSize> customerChoicesSizes;
+    @ManyToOne
+    CustomerChoices customerChoices;
 
-    @OneToMany(mappedBy = "size")
-    List<ProductTypeSize> productTypeSizes;
+    @ManyToOne
+    AttributeValues attributeValues;
 }

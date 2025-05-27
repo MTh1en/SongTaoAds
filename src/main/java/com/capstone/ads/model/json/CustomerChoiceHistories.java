@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderHistory {
+public class CustomerChoiceHistories {
     String productTypeName;
     String calculateFormula;
     Double totalAmount;

@@ -7,7 +7,7 @@ import com.capstone.ads.dto.user.UserProfileUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.UsersMapper;
-import com.capstone.ads.model.Role;
+import com.capstone.ads.model.Roles;
 import com.capstone.ads.model.Users;
 import com.capstone.ads.repository.external.S3Repository;
 import com.capstone.ads.repository.internal.UsersRepository;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -46,13 +45,13 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDTO createUser(UserCreateRequest request) {
         // Validate role
-        Role role = roleRepository.findByName(request.getRoleName())
+        Roles roles = roleRepository.findByName(request.getRoleName())
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
         // Map DTO to entity
         Users user = usersMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword())); // Encode password
-        user.setRole(role);
+        user.setRoles(roles);
 
         user = usersRepository.save(user);
         return usersMapper.toDTO(user);

@@ -31,7 +31,7 @@ public class Attributes {
     LocalDateTime updateAt;
 
     @ManyToOne
-    ProductType productType;
+    ProductTypes productTypes;
 
     @OneToMany(mappedBy = "attributes")
     List<AttributeValues> attributeValues;

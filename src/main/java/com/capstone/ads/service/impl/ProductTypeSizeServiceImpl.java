@@ -4,7 +4,7 @@ import com.capstone.ads.dto.producttypesize.ProductTypeSizeDTO;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ProductTypeSizeMapper;
-import com.capstone.ads.model.ProductTypeSize;
+import com.capstone.ads.model.ProductTypeSizes;
 import com.capstone.ads.repository.internal.ProductTypeRepository;
 import com.capstone.ads.repository.internal.ProductTypeSizeRepository;
 import com.capstone.ads.repository.internal.SizeRepository;
@@ -29,15 +29,15 @@ public class ProductTypeSizeServiceImpl implements ProductTypeSizeService {
     public ProductTypeSizeDTO create(String productTypeId, String sizeId) {
         if (!productTypeRepository.existsById(productTypeId)) throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
         if (!sizeRepository.existsById(sizeId)) throw new AppException(ErrorCode.SIZE_NOT_FOUND);
-        ProductTypeSize productTypeSize = productTypeSizeMapper.toEntity(productTypeId, sizeId);
-        productTypeSize = productTypeSizeRepository.save(productTypeSize);
-        return productTypeSizeMapper.toDTO(productTypeSize);
+        ProductTypeSizes productTypeSizes = productTypeSizeMapper.toEntity(productTypeId, sizeId);
+        productTypeSizes = productTypeSizeRepository.save(productTypeSizes);
+        return productTypeSizeMapper.toDTO(productTypeSizes);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProductTypeSizeDTO> getAllByProductTypeId(String productTypeId) {
-        return productTypeSizeRepository.findByProductType_Id(productTypeId).stream()
+        return productTypeSizeRepository.findByProductTypes_Id(productTypeId).stream()
                 .map(productTypeSizeMapper::toDTO)
                 .collect(Collectors.toList());
     }

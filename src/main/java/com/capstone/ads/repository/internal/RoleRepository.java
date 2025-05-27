@@ -1,11 +1,11 @@
 package com.capstone.ads.repository.internal;
 
-import com.capstone.ads.model.Role;
+import com.capstone.ads.model.Roles;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface RoleRepository extends JpaRepository<Role, String> {
-    Optional<Role> findByName(String name);
+public interface RoleRepository extends JpaRepository<Roles, String> {
+    Optional<Roles> findByName(String name);
 
 }

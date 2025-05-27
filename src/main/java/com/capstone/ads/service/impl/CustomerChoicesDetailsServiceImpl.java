@@ -5,8 +5,8 @@ import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerChoicesDetailsMapper;
 import com.capstone.ads.model.AttributeValues;
+import com.capstone.ads.model.CustomerChoiceDetails;
 import com.capstone.ads.model.CustomerChoices;
-import com.capstone.ads.model.CustomerChoicesDetails;
 import com.capstone.ads.repository.internal.AttributeValuesRepository;
 import com.capstone.ads.repository.internal.CustomerChoicesDetailsRepository;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
@@ -42,7 +42,7 @@ public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetails
                 .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND));
         validateDuplicatedAttribute(customerChoices, attributeValues);
         validateAttributeNotBelongsToProductType(customerChoices, attributeValues);
-        var customerChoicesDetails = CustomerChoicesDetails.builder()
+        var customerChoicesDetails = CustomerChoiceDetails.builder()
                 .customerChoices(customerChoices)
                 .attributeValues(attributeValues)
                 .build();
@@ -70,9 +70,9 @@ public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetails
 
     @Override
     public CustomerChoicesDetailsDTO findById(String id) {
-        CustomerChoicesDetails customerChoicesDetails = customerChoicesDetailsRepository.findById(id)
+        CustomerChoiceDetails customerChoiceDetails = customerChoicesDetailsRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND));
-        return customerChoicesDetailsMapper.toDTO(customerChoicesDetails);
+        return customerChoicesDetailsMapper.toDTO(customerChoiceDetails);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetails
     }
 
     private void validateDuplicatedAttribute(CustomerChoices customerChoices, AttributeValues attributeValues) {
-        boolean isDuplicated = customerChoices.getCustomerChoicesDetails().stream()
+        boolean isDuplicated = customerChoices.getCustomerChoiceDetails().stream()
                 .anyMatch(detail ->
                         detail.getAttributeValues().getAttributes().getId()
                                 .equals(attributeValues.getAttributes().getId())
@@ -111,7 +111,7 @@ public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetails
     }
 
     private void validateAttributeNotBelongsToProductType(CustomerChoices customerChoices, AttributeValues attributeValues) {
-        boolean isBelong = customerChoices.getProductType().getAttributes().stream().anyMatch(detail ->
+        boolean isBelong = customerChoices.getProductTypes().getAttributes().stream().anyMatch(detail ->
                 detail.getId().equals(attributeValues.getAttributes().getId())
         );
         if (!isBelong) {
@@ -119,27 +119,27 @@ public class CustomerChoicesDetailsServiceImpl implements CustomerChoicesDetails
         }
     }
 
-    private void updateSubtotalAndTotal(CustomerChoicesDetails customerChoicesDetails) {
+    private void updateSubtotalAndTotal(CustomerChoiceDetails customerChoiceDetails) {
         // 1. Đảm bảo createdAt được thiết lập trước khi tính toán
-        if (customerChoicesDetails.getCreatedAt() == null) {
-            customerChoicesDetails.setCreatedAt(LocalDateTime.now());
+        if (customerChoiceDetails.getCreatedAt() == null) {
+            customerChoiceDetails.setCreatedAt(LocalDateTime.now());
         }
 
         // 2. Tính và cập nhật subtotal
-        customerChoicesDetails.setSubTotal(calculateService.calculateSubtotal(customerChoicesDetails.getId()));
-        customerChoicesDetails = customerChoicesDetailsRepository.saveAndFlush(customerChoicesDetails);
+        customerChoiceDetails.setSubTotal(calculateService.calculateSubtotal(customerChoiceDetails.getId()));
+        customerChoiceDetails = customerChoicesDetailsRepository.saveAndFlush(customerChoiceDetails);
 
         // 3. Refresh toàn bộ đồ thị đối tượng liên quan
-        entityManager.refresh(customerChoicesDetails); // Refresh chính details
-        entityManager.refresh(customerChoicesDetails.getCustomerChoices()); // Refresh customerChoices
+        entityManager.refresh(customerChoiceDetails); // Refresh chính details
+        entityManager.refresh(customerChoiceDetails.getCustomerChoices()); // Refresh customerChoices
 
         // 4. Tính toán total với dữ liệu mới nhất
-        String customerChoicesId = customerChoicesDetails.getCustomerChoices().getId();
+        String customerChoicesId = customerChoiceDetails.getCustomerChoices().getId();
         double total = calculateService.calculateTotal(customerChoicesId);
 
         // 5. Cập nhật total
-        customerChoicesDetails.getCustomerChoices().setTotalAmount(total);
-        customerChoicesDetailsRepository.saveAndFlush(customerChoicesDetails);
+        customerChoiceDetails.getCustomerChoices().setTotalAmount(total);
+        customerChoicesDetailsRepository.saveAndFlush(customerChoiceDetails);
 
         log.info("Updated total for customerChoices {}: {}", customerChoicesId, total);
     }

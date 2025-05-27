@@ -2,13 +2,12 @@ package com.capstone.ads.dto.order;
 
 import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.model.enums.OrderStatus;
-import com.capstone.ads.model.json.OrderHistory;
+import com.capstone.ads.model.json.CustomerChoiceHistories;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Builder
@@ -24,7 +23,7 @@ public class OrderDTO {
     String note;
     Boolean isCustomDesign;
     Timestamp deliveryDate;
-    OrderHistory histories;
+    CustomerChoiceHistories histories;
     OrderStatus status;
     LocalDateTime orderDate;
     UserDTO users;

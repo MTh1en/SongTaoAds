@@ -1,12 +1,12 @@
 package com.capstone.ads.repository.internal;
 
-import com.capstone.ads.model.ProductTypeSize;
+import com.capstone.ads.model.ProductTypeSizes;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ProductTypeSizeRepository extends JpaRepository<ProductTypeSize, String> {
-    List<ProductTypeSize> findByProductType_Id(String id);
+public interface ProductTypeSizeRepository extends JpaRepository<ProductTypeSizes, String> {
+    List<ProductTypeSizes> findByProductTypes_Id(String id);
 
-    boolean existsByProductType_IdAndSize_Id(String productTypeId, String sizeId);
+    boolean existsByProductTypes_IdAndSizes_Id(String productTypeId, String sizeId);
 }

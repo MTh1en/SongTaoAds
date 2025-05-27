@@ -59,7 +59,7 @@ public class AttributesServiceImpl implements AttributesService {
         productTypeRepository.findById(productTypeId)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
 
-        return attributesRepository.findByProductType_Id(productTypeId).stream()
+        return attributesRepository.findByProductTypes_Id(productTypeId).stream()
                 .map(attributesMapper::toDTO)
                 .collect(Collectors.toList());
     }
