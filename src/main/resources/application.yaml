@@ -30,6 +30,9 @@ spring:
       max-file-size: 20MB
       max-request-size: 50MB
       file-size-threshold: 1B
+  ai:
+    openai:
+      api-key: ${OPEN_AI_KEY}
 
 server:
   port: 8080
@@ -50,8 +53,6 @@ aws:
   region: ap-southeast-1
   bucket:
     name: songtaoads
-
-
 
 
 
