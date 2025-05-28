@@ -44,7 +44,7 @@ public class CustomDesignsServiceImpl implements CustomDesignsService {
 
     @Override
     @Transactional
-    public CustomDesignDTO designerCreateCustomDesign(String customDesignRequestId, String designerDescription, MultipartFile image) {
+    public CustomDesignDTO designerCreateCustomDesign(String customDesignRequestId, String designerDescription, MultipartFile customDesignImage) {
         var customDesignRequest = customDesignRequestsRepository.findByIdAndStatus(customDesignRequestId, CustomDesignRequestStatus.PROCESSING)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
 
@@ -52,7 +52,7 @@ public class CustomDesignsServiceImpl implements CustomDesignsService {
 
         CustomDesigns customDesigns = customDesignsMapper.toEntity(designerDescription, customDesignRequestId);
 
-        String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, image);
+        String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, customDesignImage);
         customDesigns.setImage(customDesignImageKey);
         customDesigns = customDesignsRepository.save(customDesigns);
         return customDesignsMapper.toDTO(customDesigns);
@@ -145,6 +145,9 @@ public class CustomDesignsServiceImpl implements CustomDesignsService {
 
     private String uploadCustomDesignImageToS3(String customDesignRequestId, MultipartFile file) {
         String customDesignImageKey = generateCustomDesignKey(customDesignRequestId);
+        if (file.isEmpty()) {
+            throw new AppException(ErrorCode.FILE_REQUIRED);
+        }
         s3Repository.uploadSingleFile(bucketName, file, customDesignImageKey);
         return customDesignImageKey;
     }

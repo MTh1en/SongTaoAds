@@ -1,6 +1,5 @@
 package com.capstone.ads.mapper;
 
-import com.capstone.ads.dto.customdesign.CustomDesignCreateRequest;
 import com.capstone.ads.dto.customdesign.CustomDesignDTO;
 import com.capstone.ads.dto.customdesign.CustomerDecisionCustomDesignRequest;
 import com.capstone.ads.dto.customdesign.DesignerUpdateDescriptionCustomDesignRequest;

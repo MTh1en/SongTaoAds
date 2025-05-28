@@ -1,7 +1,6 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.customdesign.CustomDesignCreateRequest;
 import com.capstone.ads.dto.customdesign.CustomDesignDTO;
 import com.capstone.ads.dto.customdesign.CustomerDecisionCustomDesignRequest;
 import com.capstone.ads.dto.customdesign.DesignerUpdateDescriptionCustomDesignRequest;
@@ -22,9 +21,9 @@ public class CustomDesignsController {
 
     @PostMapping(value = "/custom-design-requests/{customDesignRequestId}/custom-designs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<CustomDesignDTO> designerCreateCustomDesign(@PathVariable String customDesignRequestId,
-                                                                   @RequestParam("designerDescription") String designerDescription,
-                                                                   @RequestParam("file") MultipartFile file) {
-        var response = customDesignsService.designerCreateCustomDesign(customDesignRequestId, designerDescription, file);
+                                                                   @RequestPart String designerDescription,
+                                                                   @RequestPart MultipartFile customDesignImage) {
+        var response = customDesignsService.designerCreateCustomDesign(customDesignRequestId, designerDescription, customDesignImage);
         return ApiResponseBuilder.buildSuccessResponse("Create custom design successful", response);
     }
 
@@ -44,7 +43,7 @@ public class CustomDesignsController {
 
     @PutMapping(value = "/custom-designs/{customDesignId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<CustomDesignDTO> designerUploadImage(@PathVariable String customDesignId,
-                                                            @RequestParam("file") MultipartFile file) {
+                                                            @RequestPart("file") MultipartFile file) {
         var response = customDesignsService.designerUploadImage(customDesignId, file);
         return ApiResponseBuilder.buildSuccessResponse("Upload image successful", response);
     }
