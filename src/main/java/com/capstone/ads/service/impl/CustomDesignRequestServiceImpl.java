@@ -5,7 +5,7 @@ import com.capstone.ads.dto.customdesignrequest.CustomDesignRequestCreateRequest
 import com.capstone.ads.dto.customdesignrequest.CustomDesignRequestDTO;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
-import com.capstone.ads.mapper.CustomDesignRequestMapper;
+import com.capstone.ads.mapper.CustomDesignRequestsMapper;
 import com.capstone.ads.model.Users;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.repository.internal.CustomDesignRequestsRepository;
@@ -13,7 +13,7 @@ import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.repository.internal.CustomerDetailRepository;
 import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.service.CustomDesignRequestService;
-import com.capstone.ads.utils.CustomDesignStateValidator;
+import com.capstone.ads.utils.CustomDesignRequestStateValidator;
 import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +32,9 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     private final CustomerChoicesRepository customerChoicesRepository;
     private final UsersRepository usersRepository;
     private final CustomerDetailRepository customerDetailRepository;
-    private final CustomDesignRequestMapper customDesignRequestMapper;
+    private final CustomDesignRequestsMapper customDesignRequestsMapper;
     private final CustomerChoiceHistoriesConverter customerChoiceHistoriesConverter;
-    private final CustomDesignStateValidator customDesignStateValidator;
+    private final CustomDesignRequestStateValidator customDesignRequestStateValidator;
 
     @Override
     @Transactional
@@ -44,10 +44,11 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         }
         var customerChoices = customerChoicesRepository.findById(customerChoicesId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
-        var customDesignRequest = customDesignRequestMapper.toEntity(request, customerDetailId);
+
+        var customDesignRequest = customDesignRequestsMapper.toEntity(request, customerDetailId);
         customDesignRequest.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
-        return customDesignRequestMapper.toDTO(customDesignRequest);
+        return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 
     @Override
@@ -64,27 +65,27 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customerDesignRequest.setAssignDesigner(designer);
         customerDesignRequest.setStatus(CustomDesignRequestStatus.APPROVED);
         customerDesignRequest = customDesignRequestsRepository.save(customerDesignRequest);
-        return customDesignRequestMapper.toDTO(customerDesignRequest);
+        return customDesignRequestsMapper.toDTO(customerDesignRequest);
     }
 
     @Override
     public List<CustomDesignRequestDTO> findCustomerDesignRequestByCustomerDetailId(String customerDetailId) {
         return customDesignRequestsRepository.findByCustomerDetail_Id(customerDetailId).stream()
-                .map(customDesignRequestMapper::toDTO)
+                .map(customDesignRequestsMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<CustomDesignRequestDTO> findCustomerDetailRequestByAssignDesignerId(String assignDesignerId) {
         return customDesignRequestsRepository.findByAssignDesigner_Id(assignDesignerId).stream()
-                .map(customDesignRequestMapper::toDTO)
+                .map(customDesignRequestsMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<CustomDesignRequestDTO> findCustomerDetailRequestByStatus(CustomDesignRequestStatus status) {
         return customDesignRequestsRepository.findByStatus(status).stream()
-                .map(customDesignRequestMapper::toDTO)
+                .map(customDesignRequestsMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -92,11 +93,13 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     public CustomDesignRequestDTO changeStatusCustomDesignRequest(String customDesignRequestId, CustomDesignRequestStatus newStatus) {
         var customDesignRequest = customDesignRequestsRepository.findById(customDesignRequestId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
-        customDesignStateValidator.validateTransition(
+
+        customDesignRequestStateValidator.validateTransition(
                 customDesignRequest.getStatus(),
                 newStatus);
+
         customDesignRequest.setStatus(newStatus);
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
-        return customDesignRequestMapper.toDTO(customDesignRequest);
+        return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 }

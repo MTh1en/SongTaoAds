@@ -12,7 +12,7 @@ import org.mapstruct.Mapping;
 import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring")
-public interface CustomDesignRequestMapper {
+public interface CustomDesignRequestsMapper {
     @Mapping(target = "assignDesigner", source = "assignDesigner.id")
     @Mapping(target = "customerDetail", source = "customerDetail.id")
     CustomDesignRequestDTO toDTO(CustomDesignRequests customDesignRequests);
