@@ -8,9 +8,9 @@ import com.capstone.ads.dto.auth.RegisterRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.UsersMapper;
-import com.capstone.ads.model.Role;
+import com.capstone.ads.model.Roles;
 import com.capstone.ads.model.Users;
-import com.capstone.ads.repository.internal.RoleRepository;
+import com.capstone.ads.repository.internal.RolesRepository;
 import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.service.AccessTokenService;
 import com.capstone.ads.service.AuthService;
@@ -33,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
     private final UsersMapper usersMapper;
     private final AccessTokenService accessTokenService;
     private final RefreshTokenService refreshTokenService;
-    private final RoleRepository roleRepository;
+    private final RolesRepository rolesRepository;
 
     @Value("${app.jwt.refresh-token-ttl}")
     private int REFRESH_TOKEN_TTL;
@@ -64,14 +64,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void register(RegisterRequest request) {
-        Role role = roleRepository.findById(PredefinedRole.CUSTOMER_ROLE)
+        Roles roles = rolesRepository.findById(PredefinedRole.CUSTOMER_ROLE)
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
         // Tạo user mới
         Users newUser = usersMapper.register(request);
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setIsActive(true);
-        newUser.setRole(role);
+        newUser.setRoles(roles);
 
         usersRepository.save(newUser);
     }

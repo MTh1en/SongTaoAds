@@ -29,7 +29,7 @@ public class CustomerChoices {
     LocalDateTime updatedAt;
 
     @ManyToOne
-    ProductType productType;
+    ProductTypes productTypes;
 
     @OneToOne
     Users users;
@@ -39,12 +39,12 @@ public class CustomerChoices {
             cascade = CascadeType.ALL,  // Tự động lan truyền thao tác (bao gồm xóa)
             orphanRemoval = true       // Xóa các bản ghi con không còn tham chiếu
     )
-    List<CustomerChoicesDetails> customerChoicesDetails;
+    List<CustomerChoiceDetails> customerChoiceDetails;
 
     @OneToMany(
             mappedBy = "customerChoices",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    List<CustomerChoicesSize> customerChoicesSizes;
+    List<CustomerChoiceSizes> customerChoiceSizes;
 }

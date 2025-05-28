@@ -1,7 +1,7 @@
 package com.capstone.ads.model;
 
 import com.capstone.ads.model.enums.OrderStatus;
-import com.capstone.ads.model.json.OrderHistory;
+import com.capstone.ads.model.json.CustomerChoiceHistories;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -35,14 +35,13 @@ public class Orders {
     Double depositAmount;
     Double remainingAmount;
     String note;
-    Boolean isCustomDesign;
 
     @UpdateTimestamp
     LocalDateTime updateDate;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    OrderHistory histories;
+    CustomerChoiceHistories customerChoiceHistories;
 
     @Enumerated(EnumType.STRING)
     OrderStatus status;
@@ -55,4 +54,7 @@ public class Orders {
 
     @OneToOne
     AIDesigns aiDesigns;
+
+    @OneToOne
+    CustomDesigns customDesigns;
 }

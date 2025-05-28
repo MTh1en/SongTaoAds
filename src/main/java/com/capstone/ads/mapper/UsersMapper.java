@@ -16,10 +16,10 @@ public interface UsersMapper {
     UserDTO toDTO(Users users);
 
     @Mapping(target = "password", ignore = true) // Password will be handled separately
-    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "roles", ignore = true)
     Users toEntity(UserCreateRequest request);
 
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "roles", ignore = true)
     void updateUserUpdateRequestToEntity(UserProfileUpdateRequest request, @MappingTarget Users entity);
 }

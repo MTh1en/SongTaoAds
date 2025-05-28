@@ -1,6 +1,7 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
+import com.capstone.ads.dto.user.ChangePasswordRequest;
 import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.dto.user.UserCreateRequest;
 import com.capstone.ads.dto.user.UserProfileUpdateRequest;
@@ -47,10 +48,17 @@ public class UserController {
         return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
     }
 
-    @PutMapping(value = "/user/{userId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/users/{userId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<UserDTO> updateUserAvatar(@PathVariable String userId,
                                                  @RequestParam("avatar") MultipartFile avatar) throws IOException {
         var response = usersService.uploadUserAvatar(userId, avatar);
+        return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
+    }
+
+    @PutMapping("/users/{userId}/password")
+    public ApiResponse<UserDTO> updateUserPassword(@PathVariable String userId,
+                                                   @RequestBody ChangePasswordRequest request) {
+        var response = usersService.changePassword(userId, request);
         return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
     }
 
@@ -65,4 +73,5 @@ public class UserController {
         UserDTO response = usersService.getCurrentUserProfile();
         return ApiResponseBuilder.buildSuccessResponse("Profile retrieved successfully", response);
     }
+
 }

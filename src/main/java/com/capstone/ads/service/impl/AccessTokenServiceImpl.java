@@ -84,7 +84,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
 
     private String buildScope(Users user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
-        var role = user.getRole().getName();
+        var role = user.getRoles().getName();
         if (!StringUtils.isEmpty(role)) {
             stringJoiner.add("ROLE_" + role);
         }

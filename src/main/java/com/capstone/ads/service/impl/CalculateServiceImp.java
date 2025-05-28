@@ -3,7 +3,7 @@ package com.capstone.ads.service.impl;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.model.*;
-import com.capstone.ads.repository.internal.CustomerChoicesDetailsRepository;
+import com.capstone.ads.repository.internal.CustomerChoiceDetailsRepository;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.service.CalculateService;
 import jakarta.persistence.EntityManager;
@@ -27,14 +27,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CalculateServiceImp implements CalculateService {
     private final ExpressionParser parser = new SpelExpressionParser();
-    private final CustomerChoicesDetailsRepository customerChoicesDetailsRepository;
+    private final CustomerChoiceDetailsRepository customerChoiceDetailsRepository;
     private final CustomerChoicesRepository customerChoicesRepository;
     private final EntityManager entityManager;
 
     @Override
     @Transactional
     public Double calculateSubtotal(String customerChoicesDetailId) {
-        CustomerChoicesDetails details = getValidatedCustomerChoicesDetails(customerChoicesDetailId);
+        CustomerChoiceDetails details = getValidatedCustomerChoicesDetails(customerChoicesDetailId);
         Attributes attribute = details.getAttributeValues().getAttributes();
         Map<String, Double> variables = prepareVariablesForSubtotal(details);
         Double subtotal = calculateWithFormula(attribute.getCalculateFormula(), variables);
@@ -48,11 +48,11 @@ public class CalculateServiceImp implements CalculateService {
     @Transactional
     public Double calculateTotal(String customerChoicesId) {
         CustomerChoices customerChoices = getValidatedCustomerChoices(customerChoicesId);
-        ProductType productType = customerChoices.getProductType();
-        String totalFormula = productType.getCalculateFormula().trim();
+        ProductTypes productTypes = customerChoices.getProductTypes();
+        String totalFormula = productTypes.getCalculateFormula().trim();
 
         // Khởi tạo biến với giá trị mặc định từ ProductType attributes
-        Map<String, Double> variables = initializeVariables(productType);
+        Map<String, Double> variables = initializeVariables(productTypes);
 
         // Cập nhật biến từ CustomerChoicesSize (CAO, NGANG, KTCHỮVÀLOGO)
         updateSizeVariables(customerChoices, variables);
@@ -68,8 +68,8 @@ public class CalculateServiceImp implements CalculateService {
     }
 
     // Khởi tạo biến với giá trị mặc định 0.0 từ ProductType attributes
-    private Map<String, Double> initializeVariables(ProductType productType) {
-        List<String> productAttributes = getProductAttributes(productType);
+    private Map<String, Double> initializeVariables(ProductTypes productTypes) {
+        List<String> productAttributes = getProductAttributes(productTypes);
         Map<String, Double> variables = new HashMap<>();
         productAttributes.forEach(attr -> variables.put(attr, 0.0));
         return variables;
@@ -83,7 +83,7 @@ public class CalculateServiceImp implements CalculateService {
 
     // Cập nhật biến từ CustomerChoicesDetails
     private void updateAttributeVariables(CustomerChoices customerChoices, Map<String, Double> variables) {
-        customerChoices.getCustomerChoicesDetails().forEach(detail -> {
+        customerChoices.getCustomerChoiceDetails().forEach(detail -> {
             String attributeName = normalizeName(detail.getAttributeValues().getAttributes().getName());
             Double value = detail.getAttributeValues().getUnitPrice();
             variables.put(attributeName, value);
@@ -91,8 +91,8 @@ public class CalculateServiceImp implements CalculateService {
     }
 
     // Lấy danh sách tên thuộc tính từ ProductType
-    private List<String> getProductAttributes(ProductType productType) {
-        return Optional.ofNullable(productType.getAttributes())
+    private List<String> getProductAttributes(ProductTypes productTypes) {
+        return Optional.ofNullable(productTypes.getAttributes())
                 .orElse(List.of())
                 .stream()
                 .map(Attributes::getName)
@@ -102,12 +102,12 @@ public class CalculateServiceImp implements CalculateService {
     }
 
     // Chuẩn bị biến cho tính toán subtotal
-    private Map<String, Double> prepareVariablesForSubtotal(CustomerChoicesDetails customerChoicesDetails) {
+    private Map<String, Double> prepareVariablesForSubtotal(CustomerChoiceDetails customerChoiceDetails) {
         Map<String, Double> variables = new HashMap<>();
-        variables.put("unitPrice", Optional.ofNullable(customerChoicesDetails.getAttributeValues())
+        variables.put("unitPrice", Optional.ofNullable(customerChoiceDetails.getAttributeValues())
                 .map(AttributeValues::getUnitPrice)
                 .orElse(0.0));
-        variables.putAll(getSizeValues(customerChoicesDetails.getCustomerChoices()));
+        variables.putAll(getSizeValues(customerChoiceDetails.getCustomerChoices()));
         return variables;
     }
 
@@ -130,19 +130,19 @@ public class CalculateServiceImp implements CalculateService {
 
     // Lấy danh sách kích thước từ CustomerChoices
     private Map<String, Double> getSizeValues(CustomerChoices customerChoices) {
-        return Optional.ofNullable(customerChoices.getCustomerChoicesSizes())
+        return Optional.ofNullable(customerChoices.getCustomerChoiceSizes())
                 .orElse(List.of())
                 .stream()
                 .collect(Collectors.toMap(
-                        mapping -> normalizeName(mapping.getSize().getName()),
-                        CustomerChoicesSize::getSizeValue,
+                        mapping -> normalizeName(mapping.getSizes().getName()),
+                        CustomerChoiceSizes::getSizeValue,
                         (v1, v2) -> v1
                 ));
     }
 
     // Xác thực CustomerChoicesDetails
-    private CustomerChoicesDetails getValidatedCustomerChoicesDetails(String customerChoicesDetailId) {
-        CustomerChoicesDetails details = customerChoicesDetailsRepository.findById(customerChoicesDetailId)
+    private CustomerChoiceDetails getValidatedCustomerChoicesDetails(String customerChoicesDetailId) {
+        CustomerChoiceDetails details = customerChoiceDetailsRepository.findById(customerChoicesDetailId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND));
 
         if (details.getAttributeValues() == null || details.getAttributeValues().getAttributes() == null) {
@@ -156,13 +156,13 @@ public class CalculateServiceImp implements CalculateService {
         CustomerChoices customerChoices = customerChoicesRepository.findById(customerChoicesId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
 
-        if (customerChoices.getProductType() == null || customerChoices.getProductType().getCalculateFormula() == null) {
+        if (customerChoices.getProductTypes() == null || customerChoices.getProductTypes().getCalculateFormula() == null) {
             throw new AppException(ErrorCode.INVALID_FORMULA);
         }
 //        if (customerChoices.getCustomerChoicesDetails() == null || customerChoices.getCustomerChoicesDetails().isEmpty()) {
 //            throw new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND);
 //        }
-        if (customerChoices.getCustomerChoicesSizes() == null || customerChoices.getCustomerChoicesSizes().isEmpty()) {
+        if (customerChoices.getCustomerChoiceSizes() == null || customerChoices.getCustomerChoiceSizes().isEmpty()) {
             throw new AppException(ErrorCode.PRODUCT_TYPE_SIZE_NOT_FOUND);
         }
         return customerChoices;

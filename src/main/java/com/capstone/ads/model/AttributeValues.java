@@ -35,5 +35,5 @@ public class AttributeValues {
     Attributes attributes;
 
     @OneToMany(mappedBy = "attributeValues")
-    List<CustomerChoicesDetails> customerChoicesDetails;
+    List<CustomerChoiceDetails> customerChoiceDetails;
 }
