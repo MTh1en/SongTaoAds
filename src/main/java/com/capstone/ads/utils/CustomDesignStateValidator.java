@@ -2,7 +2,7 @@ package com.capstone.ads.utils;
 
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
-import com.capstone.ads.model.enums.CustomDesignRequestStatus;
+import com.capstone.ads.model.enums.CustomDesignStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;
@@ -11,36 +11,24 @@ import java.util.Set;
 
 @Component
 public class CustomDesignStateValidator {
-    private final Map<CustomDesignRequestStatus, Set<CustomDesignRequestStatus>> validTransitions;
+    private final Map<CustomDesignStatus, Set<CustomDesignStatus>> validTransitions;
 
     public CustomDesignStateValidator() {
-        this.validTransitions = new EnumMap<>(CustomDesignRequestStatus.class);
+        this.validTransitions = new EnumMap<>(CustomDesignStatus.class);
         initializeValidTransitions();
     }
 
     private void initializeValidTransitions() {
-        validTransitions.put(CustomDesignRequestStatus.PENDING, Set.of(
-                CustomDesignRequestStatus.APPROVED,
-                CustomDesignRequestStatus.REJECTED,
-                CustomDesignRequestStatus.CANCEL
+        validTransitions.put(CustomDesignStatus.PENDING, Set.of(
+                CustomDesignStatus.APPROVED,
+                CustomDesignStatus.REJECTED
         ));
 
-        validTransitions.put(CustomDesignRequestStatus.APPROVED, Set.of(
-                CustomDesignRequestStatus.PROCESSING
-        ));
-
-        validTransitions.put(CustomDesignRequestStatus.PROCESSING, Set.of(
-                CustomDesignRequestStatus.COMPLETED
-        ));
-
-        // REJECTED, CANCEL, COMPLETED are terminal states with no valid transitions
-        validTransitions.put(CustomDesignRequestStatus.REJECTED, Set.of());
-        validTransitions.put(CustomDesignRequestStatus.CANCEL, Set.of());
-        validTransitions.put(CustomDesignRequestStatus.COMPLETED, Set.of());
+        validTransitions.put(CustomDesignStatus.REJECTED, Set.of());
+        validTransitions.put(CustomDesignStatus.APPROVED, Set.of());
     }
 
-    public boolean isValidTransition(CustomDesignRequestStatus currentStatus,
-                                     CustomDesignRequestStatus newStatus) {
+    public boolean isValidTransition(CustomDesignStatus currentStatus, CustomDesignStatus newStatus) {
         if (currentStatus == null || newStatus == null) {
             return false;
         }
@@ -49,15 +37,14 @@ public class CustomDesignStateValidator {
         if (currentStatus == newStatus) {
             return true;
         }
-
         return validTransitions.getOrDefault(currentStatus, Set.of())
                 .contains(newStatus);
     }
 
-    public void validateTransition(CustomDesignRequestStatus currentStatus,
-                                   CustomDesignRequestStatus newStatus) {
+    public void validateTransition(CustomDesignStatus currentStatus,
+                                   CustomDesignStatus newStatus) {
         if (!isValidTransition(currentStatus, newStatus)) {
-            throw new AppException(ErrorCode.INVALID_CUSTOM_DESIGN_REQUEST_STATUS_TRANSITION);
+            throw new AppException(ErrorCode.INVALID_CUSTOM_DESIGN_STATUS_TRANSITION);
         }
     }
 }
