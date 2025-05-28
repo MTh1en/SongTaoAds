@@ -44,4 +44,7 @@ public class CustomDesignRequests {
 
     @ManyToOne
     CustomerDetail customerDetail;
+
+    @ManyToOne
+    Users assignDesigner;
 }

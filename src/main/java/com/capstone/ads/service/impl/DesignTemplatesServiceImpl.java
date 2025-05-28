@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     private final SecurityContextUtils securityContextUtils;
 
     @Override
+    @Transactional
     public DesignTemplateDTO createDesignTemplate(String productTypeId, DesignTemplateCreateRequest request) {
         if (!productTypesRepository.existsByIdAndIsAvailable(productTypeId, true))
             throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
@@ -49,6 +51,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     }
 
     @Override
+    @Transactional
     public DesignTemplateDTO updateDesignTemplateInformation(String designTemplateId, DesignTemplateUpdateRequest request) {
         DesignTemplates designTemplates = findDesignTemplateByIdAndAvailable(designTemplateId);
         designTemplatesMapper.updateEntityFromRequest(request, designTemplates);
@@ -57,6 +60,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     }
 
     @Override
+    @Transactional
     public DesignTemplateDTO uploadDesignTemplateImage(String designTemplateId, MultipartFile file) {
         DesignTemplates designTemplates = findDesignTemplateByIdAndAvailable(designTemplateId);
         String designTemplateImageKey = generateDesignTemplateKey(designTemplates.getProductTypes().getId(), designTemplateId);
@@ -87,6 +91,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     }
 
     @Override
+    @Transactional
     public void hardDeleteDesignTemplate(String designTemplateId) {
         if (!designTemplatesRepository.existsById(designTemplateId)) {
             throw new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND);
@@ -95,6 +100,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     }
 
     @Override
+    @Transactional
     public void softDeleteDesignTemplate(String designTemplateId, Boolean isAvailable) {
         DesignTemplates designTemplates = findById(designTemplateId);
         designTemplates.setIsAvailable(isAvailable);
