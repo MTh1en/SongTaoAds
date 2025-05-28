@@ -18,7 +18,8 @@ public interface CustomDesignsMapper {
 
     @Mapping(target = "customDesignRequests", expression = "java(mapToCustomDesignRequests(customerDesignRequestId))")
     @Mapping(target = "status", expression = "java(initStatus())")
-    CustomDesigns toEntity(CustomDesignCreateRequest request, String customerDesignRequestId);
+    @Mapping(target = "designerDescription", expression = "java(designerDescription)")
+    CustomDesigns toEntity(String designerDescription, String customerDesignRequestId);
 
     void updateEntityFromCustomerRequest(CustomerDecisionCustomDesignRequest request, @MappingTarget CustomDesigns customDesigns);
 

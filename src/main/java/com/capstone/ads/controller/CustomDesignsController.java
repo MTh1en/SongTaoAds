@@ -20,10 +20,11 @@ import java.util.List;
 public class CustomDesignsController {
     private final CustomDesignsService customDesignsService;
 
-    @PostMapping("/custom-design-requests/{customDesignRequestId}/custom-designs")
+    @PostMapping(value = "/custom-design-requests/{customDesignRequestId}/custom-designs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<CustomDesignDTO> designerCreateCustomDesign(@PathVariable String customDesignRequestId,
-                                                                   @RequestBody CustomDesignCreateRequest request) {
-        var response = customDesignsService.designerCreateCustomDesign(customDesignRequestId, request);
+                                                                   @RequestParam("designerDescription") String designerDescription,
+                                                                   @RequestParam("file") MultipartFile file) {
+        var response = customDesignsService.designerCreateCustomDesign(customDesignRequestId, designerDescription, file);
         return ApiResponseBuilder.buildSuccessResponse("Create custom design successful", response);
     }
 

@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface CustomDesignsService {
-    CustomDesignDTO designerCreateCustomDesign(String customDesignRequestId, CustomDesignCreateRequest request);
+    CustomDesignDTO designerCreateCustomDesign(String customDesignRequestId, String designerDescription, MultipartFile image);
 
     CustomDesignDTO customerDecisionCustomDesign(String customDesignId, CustomerDecisionCustomDesignRequest request);
 
