@@ -5,15 +5,12 @@ import com.capstone.ads.dto.order.OrderUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.OrdersMapper;
-import com.capstone.ads.model.CustomerChoices;
 import com.capstone.ads.model.Orders;
 import com.capstone.ads.model.enums.OrderStatus;
-import com.capstone.ads.model.json.CustomerChoiceHistories;
-import com.capstone.ads.model.json.orderhistory.AttributeSelection;
-import com.capstone.ads.model.json.orderhistory.SizeSelection;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.repository.internal.OrdersRepository;
 import com.capstone.ads.service.OrderService;
+import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +29,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrdersRepository orderRepository;
     private final OrdersMapper orderMapper;
     private final SecurityContextUtils securityContextUtils;
+    private final CustomerChoiceHistoriesConverter customerChoiceHistoriesConverter;
 
     @Override
     @Transactional
@@ -43,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
                 .orderDate(LocalDateTime.now())
                 .totalAmount(customerChoice.getTotalAmount())
                 .users(user)
-                .customerChoiceHistories(convertToCustomerChoiceToOrderHistory(customerChoice))
+                .customerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoice))
                 .status(OrderStatus.PENDING)
                 .build();
         orderRepository.save(orders);
@@ -88,28 +86,5 @@ public class OrderServiceImpl implements OrderService {
             throw new AppException(ErrorCode.ORDER_NOT_FOUND);
         }
         orderRepository.deleteById(id);
-    }
-
-    private CustomerChoiceHistories convertToCustomerChoiceToOrderHistory(CustomerChoices customerChoices) {
-        return CustomerChoiceHistories.builder()
-                .productTypeName(customerChoices.getProductTypes().getName())
-                .totalAmount(customerChoices.getTotalAmount())
-                .calculateFormula(customerChoices.getProductTypes().getCalculateFormula())
-                .attributeSelections(customerChoices.getCustomerChoiceDetails().stream()
-                        .map(detail -> AttributeSelection.builder()
-                                .attribute(detail.getAttributeValues().getAttributes().getName())
-                                .value(detail.getAttributeValues().getName())
-                                .unit(detail.getAttributeValues().getUnit())
-                                .materialPrice(detail.getAttributeValues().getMaterialPrice())
-                                .unitPrice(detail.getAttributeValues().getUnitPrice())
-                                .calculateFormula(detail.getAttributeValues().getAttributes().getCalculateFormula())
-                                .subTotal(detail.getSubTotal())
-                                .build()).collect(Collectors.toList()))
-                .sizeSelections(customerChoices.getCustomerChoiceSizes().stream()
-                        .map(detail -> SizeSelection.builder()
-                                .size(detail.getSizes().getName())
-                                .value(detail.getSizeValue())
-                                .build()).collect(Collectors.toList()))
-                .build();
     }
 }

@@ -9,4 +9,6 @@ public interface UsersRepository extends JpaRepository<Users, String> {
     Optional<Users> findByEmail(String email);
 
     Optional<Users> findByIdAndIsActive(String id, Boolean isActive);
+
+    Optional<Users> findByIdAndIsActiveAndRoles_Name(String id, Boolean isActive, String name);
 }

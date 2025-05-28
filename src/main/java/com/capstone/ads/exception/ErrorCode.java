@@ -15,6 +15,7 @@ public enum ErrorCode {
     ROLE_NOT_FOUND("Role not found", HttpStatus.NOT_FOUND),
     INVALID_TOKEN("Invalid token", HttpStatus.UNAUTHORIZED),
     INVALID_PRINCIPAL("Invalid principal", HttpStatus.UNAUTHORIZED),
+    DESIGNER_NOT_FOUND("Designer not found", HttpStatus.NOT_FOUND),
     //PRODUCT TYPE
     PRODUCT_TYPE_NOT_FOUND("Product type not found", HttpStatus.NOT_FOUND),
 
@@ -76,6 +77,10 @@ public enum ErrorCode {
     FILE_PROCESSING_FAILED("File processing failed", HttpStatus.INTERNAL_SERVER_ERROR),
 
     DESIGN_TEMPLATE_NOT_FOUND("Design template not found", HttpStatus.NOT_FOUND),
+    CUSTOM_DESIGN_REQUEST_PENDING_NOT_FOUND("Custom design request pending not found", HttpStatus.NOT_FOUND),
+    CUSTOM_DESIGN_REQUEST_NOT_FOUND("Custom design request not found", HttpStatus.NOT_FOUND),
+
+    INVALID_CUSTOM_DESIGN_REQUEST_STATUS_TRANSITION("Invalid custom design request status trasition", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
