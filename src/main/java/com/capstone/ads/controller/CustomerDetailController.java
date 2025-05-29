@@ -7,7 +7,9 @@ import com.capstone.ads.service.CustomerDetailService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,11 +20,14 @@ public class CustomerDetailController {
 
     private final CustomerDetailService customerDetailService;
 
-    @PostMapping("/customer-details")
-    public ApiResponse<CustomerDetailDTO> create(@Valid @RequestBody CustomerDetailRequest request) {
+    @PostMapping(value = "/customer-details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<CustomerDetailDTO> create(@RequestPart String companyName,
+                                                 @RequestPart String tagLine,
+                                                 @RequestPart String contactInfo,
+                                                 @RequestPart MultipartFile customerDetailLogo) {
         return ApiResponseBuilder.buildSuccessResponse(
                 "Create customer detail successful",
-                customerDetailService.createCustomerDetail(request)
+                customerDetailService.createCustomerDetail(companyName, tagLine, contactInfo, customerDetailLogo)
         );
     }
 
@@ -51,12 +56,19 @@ public class CustomerDetailController {
     }
 
     @PutMapping("/customer-details/{customerDetailId}")
-    public ApiResponse<CustomerDetailDTO> update(@Valid @PathVariable("customerDetailId") String customerDetailId,
-                                                 @RequestBody CustomerDetailRequest request) {
+    public ApiResponse<CustomerDetailDTO> updateCustomerDetailInformation(@Valid @PathVariable("customerDetailId") String customerDetailId,
+                                                                          @RequestBody CustomerDetailRequest request) {
         return ApiResponseBuilder.buildSuccessResponse(
                 "Update customer detail successful",
-                customerDetailService.updateCustomerDetail(customerDetailId, request)
+                customerDetailService.updateCustomerDetailInformation(customerDetailId, request)
         );
+    }
+
+    @PatchMapping(value = "/customer-details/{customerDetailId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<CustomerDetailDTO> updateCustomerDetailImage(@PathVariable("customerDetailId") String customerDetailId,
+                                                                    @RequestPart MultipartFile image) {
+        var response = customerDetailService.updateCustomerDetailLogoImage(customerDetailId, image);
+        return ApiResponseBuilder.buildSuccessResponse("Update customer detail logo image successful", response);
     }
 
     @DeleteMapping("/customer-details/{customerDetailId}")

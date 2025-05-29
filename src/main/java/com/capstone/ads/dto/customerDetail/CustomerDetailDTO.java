@@ -13,10 +13,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerDetailDTO {
-    private String id;
-    private String logoUrl;
-    private String companyName;
-    private String tagLine;
-    private String contactInfo;
-    private String userId;
+    String id;
+    String logoUrl;
+    String companyName;
+    String tagLine;
+    String contactInfo;
+    String userId;
 }
