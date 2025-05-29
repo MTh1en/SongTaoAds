@@ -9,6 +9,7 @@ import com.capstone.ads.model.AIDesigns;
 import com.capstone.ads.repository.external.S3Repository;
 import com.capstone.ads.repository.internal.AIDesignsRepository;
 import com.capstone.ads.repository.internal.CustomerDetailRepository;
+import com.capstone.ads.repository.internal.DesignTemplatesRepository;
 import com.capstone.ads.service.AIDesignsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,17 +31,19 @@ public class AIDesignsServiceImpl implements AIDesignsService {
     private String bucketName;
 
     private final CustomerDetailRepository customerDetailRepository;
+    private final DesignTemplatesRepository designTemplatesRepository;
     private final S3Repository s3Repository;
     private final AIDesignsRepository aiDesignsRepository;
     private final AIDesignsMapper aiDesignsMapper;
 
     @Override
     @Transactional
-    public AIDesignDTO createAIDesign(String customerDetailId, String customerNote, MultipartFile aiImage) {
+    public AIDesignDTO createAIDesign(String customerDetailId, String designTemplateId, String customerNote, MultipartFile aiImage) {
         customerDetailRepository.findById(customerDetailId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
-
-        AIDesigns aiDesigns = aiDesignsMapper.toEntity(customerDetailId, customerNote);
+        designTemplatesRepository.findByIdAndIsAvailable(designTemplateId, true)
+                .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
+        AIDesigns aiDesigns = aiDesignsMapper.toEntity(customerDetailId, designTemplateId, customerNote);
         String aiDesignImageUrl = uploadAIDesignImageToS3(customerDetailId, aiImage);
         aiDesigns.setImage(aiDesignImageUrl);
         aiDesigns = aiDesignsRepository.save(aiDesigns);

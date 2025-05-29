@@ -28,4 +28,6 @@ public class AIDesigns {
     LocalDateTime updateAt;
     @ManyToOne
     CustomerDetail customerDetail;
+    @ManyToOne
+    DesignTemplates designTemplates;
 }
