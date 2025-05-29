@@ -48,6 +48,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         var customDesignRequest = customDesignRequestsMapper.toEntity(request, customerDetailId);
         customDesignRequest.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
+        customerChoicesRepository.deleteById(customerChoicesId);
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 

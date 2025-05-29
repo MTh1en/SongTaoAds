@@ -23,9 +23,11 @@ public class AIDesigns {
     String customerNote;
 
     @CreationTimestamp
-    LocalDateTime creationAt;
+    LocalDateTime createAt;
     @UpdateTimestamp
     LocalDateTime updateAt;
     @ManyToOne
     CustomerDetail customerDetail;
+    @ManyToOne
+    DesignTemplates designTemplates;
 }

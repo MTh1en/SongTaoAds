@@ -17,11 +17,12 @@ import java.util.List;
 public class AIDesignsController {
     private final AIDesignsService service;
 
-    @PostMapping(value = "/customer-details/{customerDetailId}/ai-designs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/customer-details/{customerDetailId}/design-templates/{designTemplateId}/ai-designs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<AIDesignDTO> createAIDesign(@PathVariable String customerDetailId,
+                                                   @PathVariable String designTemplateId,
                                                    @RequestPart String customerNote,
                                                    @RequestPart MultipartFile aiImage) {
-        var response = service.createAIDesign(customerDetailId, customerNote, aiImage);
+        var response = service.createAIDesign(customerDetailId, designTemplateId, customerNote, aiImage);
         return ApiResponseBuilder.buildSuccessResponse("Create AIDesign successfully", response);
     }
 
