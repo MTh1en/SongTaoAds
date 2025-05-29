@@ -19,7 +19,7 @@ public class S3Controller {
     private final S3Service s3Service;
 
     @PostMapping(value = "/upload-single", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadSingleFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadSingleFile(@RequestPart("file") MultipartFile file) {
         String key = s3Service.uploadSingleFile(file);
         return new ResponseEntity<>(key, HttpStatus.OK);
     }

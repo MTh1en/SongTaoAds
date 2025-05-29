@@ -50,7 +50,7 @@ public class UserController {
 
     @PutMapping(value = "/users/{userId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<UserDTO> updateUserAvatar(@PathVariable String userId,
-                                                 @RequestParam("avatar") MultipartFile avatar) throws IOException {
+                                                 @RequestPart("avatar") MultipartFile avatar) throws IOException {
         var response = usersService.uploadUserAvatar(userId, avatar);
         return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
     }
