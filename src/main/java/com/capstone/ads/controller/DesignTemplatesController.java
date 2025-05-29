@@ -34,7 +34,8 @@ public class DesignTemplatesController {
     }
 
     @PutMapping(value = "/design-templates/{designTemplateId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<DesignTemplateDTO> updateDesignTemplateImage(@PathVariable String designTemplateId, MultipartFile designTemplateImage) {
+    public ApiResponse<DesignTemplateDTO> updateDesignTemplateImage(@PathVariable String designTemplateId,
+                                                                    @RequestPart("file") MultipartFile designTemplateImage) {
         var response = designTemplatesService.uploadDesignTemplateImage(designTemplateId, designTemplateImage);
         return ApiResponseBuilder.buildSuccessResponse("Update Design Template image successful!", response);
     }

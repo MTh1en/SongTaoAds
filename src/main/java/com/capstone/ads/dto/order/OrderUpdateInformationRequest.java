@@ -1,13 +1,14 @@
-package com.capstone.ads.dto.customdesign;
+package com.capstone.ads.dto.order;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CustomDesignCreateRequest {
-    String designerDescription;
+public class OrderUpdateInformationRequest {
+    String address;
+    String note;
 }

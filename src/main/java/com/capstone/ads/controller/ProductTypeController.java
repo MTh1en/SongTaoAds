@@ -34,7 +34,7 @@ public class ProductTypeController {
 
     @PutMapping(value = "/{productTypeId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ProductTypeDTO> updateProductTypeImage(@PathVariable String productTypeId,
-                                                              @RequestParam("file") MultipartFile productTypeImage) {
+                                                              @RequestPart("file") MultipartFile productTypeImage) {
         var response = service.uploadProductTypeImage(productTypeId, productTypeImage);
         return ApiResponseBuilder.buildSuccessResponse("Update product type image successful", response);
     }

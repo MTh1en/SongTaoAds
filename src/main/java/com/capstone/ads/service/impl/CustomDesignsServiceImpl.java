@@ -1,7 +1,6 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.S3ImageDuration;
-import com.capstone.ads.dto.customdesign.CustomDesignCreateRequest;
 import com.capstone.ads.dto.customdesign.CustomDesignDTO;
 import com.capstone.ads.dto.customdesign.CustomerDecisionCustomDesignRequest;
 import com.capstone.ads.dto.customdesign.DesignerUpdateDescriptionCustomDesignRequest;
@@ -45,13 +44,16 @@ public class CustomDesignsServiceImpl implements CustomDesignsService {
 
     @Override
     @Transactional
-    public CustomDesignDTO designerCreateCustomDesign(String customDesignRequestId, CustomDesignCreateRequest request) {
+    public CustomDesignDTO designerCreateCustomDesign(String customDesignRequestId, String designerDescription, MultipartFile customDesignImage) {
         var customDesignRequest = customDesignRequestsRepository.findByIdAndStatus(customDesignRequestId, CustomDesignRequestStatus.PROCESSING)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
 
         validateCreateRequest(customDesignRequest);
 
-        CustomDesigns customDesigns = customDesignsMapper.toEntity(request, customDesignRequestId);
+        CustomDesigns customDesigns = customDesignsMapper.toEntity(designerDescription, customDesignRequestId);
+
+        String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, customDesignImage);
+        customDesigns.setImage(customDesignImageKey);
         customDesigns = customDesignsRepository.save(customDesigns);
         return customDesignsMapper.toDTO(customDesigns);
     }
@@ -85,9 +87,9 @@ public class CustomDesignsServiceImpl implements CustomDesignsService {
     @Transactional
     public CustomDesignDTO designerUploadImage(String customDesignId, MultipartFile file) {
         CustomDesigns customDesigns = findCustomDesignByIdAndPendingStatus(customDesignId);
-        String customDesignImageKey = generateCustomDesignKey(customDesignId);
 
-        s3Repository.uploadSingleFile(bucketName, file, customDesignImageKey);
+        String customDesignRequestId = customDesigns.getCustomDesignRequests().getId();
+        String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, file);
         customDesigns.setImage(customDesignImageKey);
 
         customDesigns = customDesignsRepository.save(customDesigns);
@@ -115,8 +117,8 @@ public class CustomDesignsServiceImpl implements CustomDesignsService {
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_NOT_FOUND));
     }
 
-    private String generateCustomDesignKey(String customDesignId) {
-        return String.format("custom-design/%s/%s", customDesignId, UUID.randomUUID());
+    private String generateCustomDesignKey(String customDesignRequestId) {
+        return String.format("custom-design/%s/%s", customDesignRequestId, UUID.randomUUID());
     }
 
 
@@ -139,5 +141,14 @@ public class CustomDesignsServiceImpl implements CustomDesignsService {
         if (customDesignExists) {
             throw new AppException(ErrorCode.CUSTOM_DESIGN_IN_WAITING_DECISION_FROM_CUSTOMER);
         }
+    }
+
+    private String uploadCustomDesignImageToS3(String customDesignRequestId, MultipartFile file) {
+        String customDesignImageKey = generateCustomDesignKey(customDesignRequestId);
+        if (file.isEmpty()) {
+            throw new AppException(ErrorCode.FILE_REQUIRED);
+        }
+        s3Repository.uploadSingleFile(bucketName, file, customDesignImageKey);
+        return customDesignImageKey;
     }
 }

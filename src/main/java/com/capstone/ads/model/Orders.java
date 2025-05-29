@@ -29,7 +29,7 @@ public class Orders {
     @CreationTimestamp
     LocalDateTime orderDate;
 
-    Timestamp deliveryDate;
+    LocalDateTime deliveryDate;
     String address;
     Double totalAmount;
     Double depositAmount;
