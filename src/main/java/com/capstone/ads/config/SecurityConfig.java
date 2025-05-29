@@ -74,7 +74,7 @@ public class SecurityConfig {
                 "https://songtaoads.online",
                 "https://songtaoads.io.vn"
         ));
-        defaultConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        defaultConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         defaultConfig.setAllowedHeaders(Arrays.asList("Authorization", "X-XSRF-TOKEN", "Content-Type"));
         defaultConfig.setAllowCredentials(true); // Hỗ trợ cookie cho FE
         source.registerCorsConfiguration("/**", defaultConfig);
