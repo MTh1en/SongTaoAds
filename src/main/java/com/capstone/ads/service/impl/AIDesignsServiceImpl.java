@@ -76,7 +76,7 @@ public class AIDesignsServiceImpl implements AIDesignsService {
     }
 
     private String generateAIDesignKey(String customerDetailId) {
-        return String.format("/ai-designs/%s/%s", customerDetailId, UUID.randomUUID());
+        return String.format("ai-designs/%s/%s", customerDetailId, UUID.randomUUID());
     }
 
     private String uploadAIDesignImageToS3(String customerDetailId, MultipartFile file) {

@@ -12,5 +12,4 @@ public class CustomerDetailRequest {
     String companyName;
     String tagLine;
     String contactInfo;
-    String logoUrl;
 }
