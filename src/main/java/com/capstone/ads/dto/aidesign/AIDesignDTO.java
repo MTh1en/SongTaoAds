@@ -17,4 +17,5 @@ public class AIDesignDTO {
     LocalDateTime createAt;
     LocalDateTime updateAt;
     String customerDetail;
+    String designTemplates;
 }

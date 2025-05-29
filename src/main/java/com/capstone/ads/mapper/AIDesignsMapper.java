@@ -10,9 +10,11 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface AIDesignsMapper {
     @Mapping(target = "customerDetail", source = "customerDetail.id")
+    @Mapping(target = "designTemplates", source = "designTemplates.id")
     AIDesignDTO toDTO(AIDesigns aidesigns);
 
     @Mapping(target = "customerDetail", expression = "java(mapToCustomerDetail(customerDetailId))")
+    @Mapping(target = "designTemplates", expression = "java(mapToDesignTemplate(designTemplateId))")
     @Mapping(target = "customerNote", expression = "java(customerNote)")
     AIDesigns toEntity(String customerDetailId, String designTemplateId, String customerNote);
 
