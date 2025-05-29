@@ -1,7 +1,6 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.aidesign.AIDesignCreateRequest;
 import com.capstone.ads.dto.aidesign.AIDesignDTO;
 import com.capstone.ads.service.AIDesignsService;
 import com.capstone.ads.utils.ApiResponseBuilder;

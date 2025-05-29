@@ -3,6 +3,7 @@ package com.capstone.ads.dto.order;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -10,5 +11,5 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Builder
 public class OrderConfirmRequest {
-    private Timestamp deliveryDate;
+    private LocalDateTime deliveryDate;
 }
