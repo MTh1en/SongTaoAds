@@ -8,6 +8,12 @@ spring:
     username: ${DBMS_USERNAME}
     password: ${DBMS_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: 3
+      maximum-pool-size: 12
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 20000
   jpa:
     hibernate:
       ddl-auto: update
@@ -20,11 +26,18 @@ spring:
       host: ${SPRING_DATA_REDIS_HOST}
       port: 6379
       connect-timeout: 2000
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 5
+          min-idle: 2
+          max-wait: 2000
+        shutdown-timeout: 1000
   servlet:
     multipart:
       enabled: true
-      max-file-size: 10MB
-      max-request-size: 20MB
+      max-file-size: 50MB
+      max-request-size: 10MB
 
   ai:
     openai:
@@ -32,6 +45,10 @@ spring:
 
 server:
   port: 8080
+  tomcat:
+    threads:
+      max: 75
+      min-spare: 15
 
 app:
   base:
