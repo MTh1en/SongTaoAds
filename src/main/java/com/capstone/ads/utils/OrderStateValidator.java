@@ -21,8 +21,14 @@ public class OrderStateValidator {
     private void initializeValidTransitions() {
         validTransitions.put(OrderStatus.PENDING, Set.of(
                 OrderStatus.CANCELLED,
+                OrderStatus.APPROVED,
+                OrderStatus.REJECTED
+        ));
+
+        validTransitions.put(OrderStatus.APPROVED, Set.of(
                 OrderStatus.DEPOSITED
         ));
+
         validTransitions.put(OrderStatus.DEPOSITED, Set.of(
                 OrderStatus.CANCELLED,
                 OrderStatus.PROCESSING
@@ -31,6 +37,7 @@ public class OrderStateValidator {
         validTransitions.put(OrderStatus.PROCESSING, Set.of(
                 OrderStatus.COMPLETED
         ));
+        validTransitions.put(OrderStatus.REJECTED, Set.of());
         validTransitions.put(OrderStatus.CANCELLED, Set.of());
         validTransitions.put(OrderStatus.COMPLETED, Set.of());
     }
