@@ -27,7 +27,7 @@ public class CustomDesignsController {
         return ApiResponseBuilder.buildSuccessResponse("Create custom design successful", response);
     }
 
-    @PutMapping("/custom-designs/{customDesignId}/customer-decision")
+    @PatchMapping("/custom-designs/{customDesignId}/customer-decision")
     public ApiResponse<CustomDesignDTO> customerDecisionCustomDesign(@PathVariable String customDesignId,
                                                                      @RequestBody CustomerDecisionCustomDesignRequest request) {
         var response = customDesignsService.customerDecisionCustomDesign(customDesignId, request);
@@ -41,7 +41,7 @@ public class CustomDesignsController {
         return ApiResponseBuilder.buildSuccessResponse("Update design description successful", response);
     }
 
-    @PutMapping(value = "/custom-designs/{customDesignId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/custom-designs/{customDesignId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<CustomDesignDTO> designerUploadImage(@PathVariable String customDesignId,
                                                             @RequestPart("file") MultipartFile file) {
         var response = customDesignsService.designerUploadImage(customDesignId, file);

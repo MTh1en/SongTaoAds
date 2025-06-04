@@ -22,6 +22,7 @@ public class Sizes {
     String id;
     String name;
     String description;
+    Boolean isAvailable;
     @CreationTimestamp
     LocalDateTime createdAt;
     @UpdateTimestamp

@@ -25,14 +25,14 @@ public class ProductTypeController {
         return ApiResponseBuilder.buildSuccessResponse("Create product type successful", response);
     }
 
-    @PutMapping("/{productTypeId}/information")
+    @PatchMapping("/{productTypeId}/information")
     public ApiResponse<ProductTypeDTO> updateProductTypeInformation(@PathVariable String productTypeId,
                                                                     @RequestBody ProductTypeUpdateRequest request) {
         var response = service.updateInformation(productTypeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update product type information successful", response);
     }
 
-    @PutMapping(value = "/{productTypeId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{productTypeId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ProductTypeDTO> updateProductTypeImage(@PathVariable String productTypeId,
                                                               @RequestPart("file") MultipartFile productTypeImage) {
         var response = service.uploadProductTypeImage(productTypeId, productTypeImage);

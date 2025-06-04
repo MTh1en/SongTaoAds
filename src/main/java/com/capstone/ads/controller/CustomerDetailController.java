@@ -39,7 +39,7 @@ public class CustomerDetailController {
         );
     }
 
-    @GetMapping("/user/{userId}/customer-details")
+    @GetMapping("/users/{userId}/customer-details")
     public ApiResponse<CustomerDetailDTO> getByUserId(@PathVariable String userId) {
         return ApiResponseBuilder.buildSuccessResponse(
                 "Customer detail by user ID",
@@ -55,7 +55,7 @@ public class CustomerDetailController {
         );
     }
 
-    @PutMapping("/customer-details/{customerDetailId}")
+    @PatchMapping("/customer-details/{customerDetailId}/information")
     public ApiResponse<CustomerDetailDTO> updateCustomerDetailInformation(@Valid @PathVariable("customerDetailId") String customerDetailId,
                                                                           @RequestBody CustomerDetailRequest request) {
         return ApiResponseBuilder.buildSuccessResponse(
