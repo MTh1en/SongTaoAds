@@ -27,14 +27,14 @@ public class CustomDesignRequestsController {
         return ApiResponseBuilder.buildSuccessResponse("Create custom design request successful", response);
     }
 
-    @PutMapping("/custom-design-requests/{customDesignRequestId}/users/{designerId}")
+    @PatchMapping("/custom-design-requests/{customDesignRequestId}/users/{designerId}")
     public ApiResponse<CustomDesignRequestDTO> assignDesignerToCustomerRequest(@PathVariable String customDesignRequestId,
                                                                                @PathVariable String designerId) {
         var response = service.assignDesignerToCustomerRequest(customDesignRequestId, designerId);
         return ApiResponseBuilder.buildSuccessResponse("Assign custom design request successful", response);
     }
 
-    @PutMapping("/custom-design-requests/{customDesignRequestId}")
+    @PatchMapping("/custom-design-requests/{customDesignRequestId}/status")
     public ApiResponse<CustomDesignRequestDTO> changeCustomDesignRequestStatus(@PathVariable String customDesignRequestId,
                                                                                @RequestParam("status") CustomDesignRequestStatus status) {
         var response = service.changeStatusCustomDesignRequest(customDesignRequestId, status);
@@ -58,5 +58,4 @@ public class CustomDesignRequestsController {
         var response = service.findCustomerDetailRequestByStatus(status);
         return ApiResponseBuilder.buildSuccessResponse("Find custom design request by status successful", response);
     }
-
 }

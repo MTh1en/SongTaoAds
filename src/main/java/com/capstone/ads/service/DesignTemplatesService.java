@@ -21,6 +21,4 @@ public interface DesignTemplatesService {
     List<DesignTemplateDTO> findAllDesignTemplates();
 
     void hardDeleteDesignTemplate(String designTemplateId);
-
-    void softDeleteDesignTemplate(String designTemplateId, Boolean isAvailable);
 }

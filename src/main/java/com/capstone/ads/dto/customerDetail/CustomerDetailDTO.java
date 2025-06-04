@@ -18,5 +18,4 @@ public class CustomerDetailDTO {
     String companyName;
     String tagLine;
     String contactInfo;
-    String userId;
 }

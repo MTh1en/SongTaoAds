@@ -42,20 +42,20 @@ public class UserController {
         return ApiResponseBuilder.buildSuccessResponse("Users retrieved successfully", response);
     }
 
-    @PutMapping("/users/{userId}/profile")
+    @PatchMapping("/users/{userId}/profile")
     public ApiResponse<UserDTO> updateUserProfile(@Valid @PathVariable String userId, @RequestBody UserProfileUpdateRequest request) {
         UserDTO response = usersService.updateUserProfile(userId, request);
         return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
     }
 
-    @PutMapping(value = "/users/{userId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/users/{userId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<UserDTO> updateUserAvatar(@PathVariable String userId,
                                                  @RequestPart("avatar") MultipartFile avatar) throws IOException {
         var response = usersService.uploadUserAvatar(userId, avatar);
         return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
     }
 
-    @PutMapping("/users/{userId}/password")
+    @PatchMapping("/users/{userId}/password")
     public ApiResponse<UserDTO> updateUserPassword(@PathVariable String userId,
                                                    @RequestBody ChangePasswordRequest request) {
         var response = usersService.changePassword(userId, request);

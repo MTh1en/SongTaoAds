@@ -99,14 +99,6 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
         designTemplatesRepository.deleteById(designTemplateId);
     }
 
-    @Override
-    @Transactional
-    public void softDeleteDesignTemplate(String designTemplateId, Boolean isAvailable) {
-        DesignTemplates designTemplates = findById(designTemplateId);
-        designTemplates.setIsAvailable(isAvailable);
-        designTemplatesRepository.save(designTemplates);
-    }
-
     private DesignTemplates findById(String designTemplateId) {
         return designTemplatesRepository.findById(designTemplateId)
                 .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
