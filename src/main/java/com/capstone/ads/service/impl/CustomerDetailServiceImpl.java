@@ -60,7 +60,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
     public CustomerDetailDTO getCustomerDetailByUserId(String userId) {
         CustomerDetail customerDetail = customerDetailRepository.findByUsers_Id(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
-        return convertToCustomerDetailDTOWithLogoUrlIsPresignedURL(customerDetail);
+        return customerDetailMapper.toDTO(customerDetail);
     }
 
     @Override

@@ -14,4 +14,5 @@ public class SizeUpdateRequest {
     String name;
     @NotBlank(message = "Product Type Calculate Formula is Required")
     String description;
+    Boolean isAvailable;
 }

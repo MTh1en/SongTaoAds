@@ -53,6 +53,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
+    @Transactional
     public CustomDesignRequestDTO assignDesignerToCustomerRequest(String customDesignRequestId, String designerId) {
         List<CustomDesignRequestStatus> allowedStatuses = Arrays.asList(
                 CustomDesignRequestStatus.PENDING,
@@ -91,6 +92,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
+    @Transactional
     public CustomDesignRequestDTO changeStatusCustomDesignRequest(String customDesignRequestId, CustomDesignRequestStatus newStatus) {
         var customDesignRequest = customDesignRequestsRepository.findById(customDesignRequestId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));

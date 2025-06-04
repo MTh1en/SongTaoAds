@@ -14,4 +14,5 @@ public class DesignTemplateCreateRequest {
     String negativePrompt;
     Integer width;
     Integer height;
+    Boolean isAvailable;
 }

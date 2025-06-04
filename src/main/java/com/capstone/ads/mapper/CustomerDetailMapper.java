@@ -10,7 +10,6 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface CustomerDetailMapper {
-    @Mapping(source = "users.id", target = "userId")
     CustomerDetailDTO toDTO(CustomerDetail customerDetail);
 
     CustomerDetail toEntity(String companyName, String tagLine, String contactInfo);

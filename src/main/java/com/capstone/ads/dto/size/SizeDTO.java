@@ -14,6 +14,7 @@ public class SizeDTO {
     String id;
     String name;
     String description;
+    Boolean isAvailable;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }

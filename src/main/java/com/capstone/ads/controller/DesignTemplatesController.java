@@ -26,14 +26,14 @@ public class DesignTemplatesController {
         return ApiResponseBuilder.buildSuccessResponse("Create Design Template successful!", response);
     }
 
-    @PutMapping("/design-templates/{designTemplateId}/information")
+    @PatchMapping("/design-templates/{designTemplateId}/information")
     public ApiResponse<DesignTemplateDTO> updateDesignTemplateInformation(@PathVariable String designTemplateId,
                                                                           @RequestBody DesignTemplateUpdateRequest request) {
         var response = designTemplatesService.updateDesignTemplateInformation(designTemplateId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update Design Template information successful!", response);
     }
 
-    @PutMapping(value = "/design-templates/{designTemplateId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/design-templates/{designTemplateId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<DesignTemplateDTO> updateDesignTemplateImage(@PathVariable String designTemplateId,
                                                                     @RequestPart("file") MultipartFile designTemplateImage) {
         var response = designTemplatesService.uploadDesignTemplateImage(designTemplateId, designTemplateImage);
@@ -62,12 +62,5 @@ public class DesignTemplatesController {
     public ApiResponse<Void> hardDeleteDesignTemplate(@PathVariable String designTemplateId) {
         designTemplatesService.hardDeleteDesignTemplate(designTemplateId);
         return ApiResponseBuilder.buildSuccessResponse("Hard delete Design Template successful!", null);
-    }
-
-    @PatchMapping("/design-templates/{designTemplateId}/{isAvailable}")
-    public ApiResponse<Void> softDeleteDesignTemplate(@PathVariable String designTemplateId,
-                                                      @PathVariable Boolean isAvailable) {
-        designTemplatesService.softDeleteDesignTemplate(designTemplateId, isAvailable);
-        return ApiResponseBuilder.buildSuccessResponse("Soft delete Design Template successful!", null);
     }
 }

@@ -43,7 +43,7 @@ public class OrderController {
         return ApiResponseBuilder.buildSuccessResponse("Confirm order successful", response);
     }
 
-    @PutMapping("/orders/{orderId}/status")
+    @PatchMapping("/orders/{orderId}/status")
     public ApiResponse<OrderDTO> update(@PathVariable String orderId, @RequestParam OrderStatus status) {
         var response = service.changeOrderStatus(orderId, status);
         return ApiResponseBuilder.buildSuccessResponse("Confirm order successful", response);
