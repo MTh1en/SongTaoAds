@@ -1,5 +1,6 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.customdesign.CustomDesignDTO;
 import com.capstone.ads.dto.customdesign.CustomerDecisionCustomDesignRequest;
@@ -10,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -35,7 +34,7 @@ public class CustomDesignsController {
     }
 
     @PatchMapping("/custom-designs/{customDesignId}/designer-description")
-    public ApiResponse<CustomDesignDTO> designDTOApiResponse(@PathVariable String customDesignId,
+    public ApiResponse<CustomDesignDTO> designerUpdateDescription(@PathVariable String customDesignId,
                                                              @RequestBody DesignerUpdateDescriptionCustomDesignRequest request) {
         var response = customDesignsService.designerUpdateDescriptionCustomDesign(customDesignId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update design description successful", response);
@@ -49,9 +48,11 @@ public class CustomDesignsController {
     }
 
     @GetMapping("/custom-design-requests/{customDesignRequestId}/custom-designs")
-    public ApiResponse<List<CustomDesignDTO>> findCustomDesignByCustomDesignRequest(@PathVariable String customDesignRequestId) {
-        var response = customDesignsService.findCustomDesignByCustomDesignRequest(customDesignRequestId);
-        return ApiResponseBuilder.buildSuccessResponse("Find Custom Design by Custom Design Request successful", response);
+    public ApiPagingResponse<CustomDesignDTO> findCustomDesignByCustomDesignRequest(@PathVariable String customDesignRequestId,
+                                                                                    @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                                                    @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = customDesignsService.findCustomDesignByCustomDesignRequest(customDesignRequestId, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find Custom Design by Custom Design Request successful", response, page);
     }
 
     @DeleteMapping("/custom-designs/{customDesignId}")

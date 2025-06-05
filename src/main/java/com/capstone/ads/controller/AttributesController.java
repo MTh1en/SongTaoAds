@@ -1,5 +1,6 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.attribute.AttributesCreateRequest;
 import com.capstone.ads.dto.attribute.AttributesDTO;
@@ -22,23 +23,29 @@ public class AttributesController {
     @PostMapping("product-types/{productTypeId}/attributes")
     public ApiResponse<AttributesDTO> create(@Valid @PathVariable String productTypeId,
                                              @RequestBody AttributesCreateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Create attribute successful", service.create(productTypeId, request));
+        var response = service.create(productTypeId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Create attribute successful", response);
     }
 
     @PutMapping("/attributes/{attributeId}")
     public ApiResponse<AttributesDTO> update(@Valid @PathVariable String attributeId,
                                              @RequestBody AttributesUpdateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Update attribute successful", service.update(attributeId, request));
+        var response = service.update(attributeId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Update attribute successful", response);
     }
 
     @GetMapping("/attributes/{attributeId}")
     public ApiResponse<AttributesDTO> getById(@PathVariable String attributeId) {
-        return ApiResponseBuilder.buildSuccessResponse("attribute by Id", service.findById(attributeId));
+        var response = service.findById(attributeId);
+        return ApiResponseBuilder.buildSuccessResponse("attribute by Id", response);
     }
 
     @GetMapping("product-types/{productTypeId}/attributes")
-    public ApiResponse<List<AttributesDTO>> getAll(@PathVariable String productTypeId) {
-        return ApiResponseBuilder.buildSuccessResponse("Find all attribute by product type", service.findAllByProductTypeId(productTypeId));
+    public ApiPagingResponse<AttributesDTO> getAll(@PathVariable String productTypeId,
+                                                   @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                   @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findAllByProductTypeId(productTypeId, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find all attribute by product type", response, page);
     }
 
     @DeleteMapping("/attributes/{attributeId}")

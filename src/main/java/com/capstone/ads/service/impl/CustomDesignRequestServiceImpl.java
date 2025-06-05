@@ -17,12 +17,14 @@ import com.capstone.ads.utils.CustomDesignRequestStateValidator;
 import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -71,24 +73,24 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
-    public List<CustomDesignRequestDTO> findCustomerDesignRequestByCustomerDetailId(String customerDetailId) {
-        return customDesignRequestsRepository.findByCustomerDetail_Id(customerDetailId).stream()
-                .map(customDesignRequestsMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<CustomDesignRequestDTO> findCustomerDesignRequestByCustomerDetailId(String customerDetailId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return customDesignRequestsRepository.findByCustomerDetail_Id(customerDetailId, pageable)
+                .map(customDesignRequestsMapper::toDTO);
     }
 
     @Override
-    public List<CustomDesignRequestDTO> findCustomerDetailRequestByAssignDesignerId(String assignDesignerId) {
-        return customDesignRequestsRepository.findByAssignDesigner_Id(assignDesignerId).stream()
-                .map(customDesignRequestsMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<CustomDesignRequestDTO> findCustomerDetailRequestByAssignDesignerId(String assignDesignerId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return customDesignRequestsRepository.findByAssignDesigner_Id(assignDesignerId, pageable)
+                .map(customDesignRequestsMapper::toDTO);
     }
 
     @Override
-    public List<CustomDesignRequestDTO> findCustomerDetailRequestByStatus(CustomDesignRequestStatus status) {
-        return customDesignRequestsRepository.findByStatus(status).stream()
-                .map(customDesignRequestsMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<CustomDesignRequestDTO> findCustomerDetailRequestByStatus(CustomDesignRequestStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return customDesignRequestsRepository.findByStatus(status, pageable)
+                .map(customDesignRequestsMapper::toDTO);
     }
 
     @Override

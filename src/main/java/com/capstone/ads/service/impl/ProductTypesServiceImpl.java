@@ -13,13 +13,14 @@ import com.capstone.ads.repository.internal.ProductTypesRepository;
 import com.capstone.ads.service.ProductTypesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,10 +56,10 @@ public class ProductTypesServiceImpl implements ProductTypesService {
     }
 
     @Override
-    public List<ProductTypeDTO> findAllProductType() {
-        return productTypesRepository.findAll().stream()
-                .map(productTypesMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<ProductTypeDTO> findAllProductType(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return productTypesRepository.findAll(pageable)
+                .map(productTypesMapper::toDTO);
     }
 
     @Override

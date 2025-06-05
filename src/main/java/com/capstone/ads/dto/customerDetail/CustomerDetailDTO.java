@@ -1,9 +1,5 @@
 package com.capstone.ads.dto.customerDetail;
 
-import com.capstone.ads.model.Users;
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToOne;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,4 +14,5 @@ public class CustomerDetailDTO {
     String companyName;
     String tagLine;
     String contactInfo;
+    String userId;
 }

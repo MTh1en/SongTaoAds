@@ -19,11 +19,11 @@ import com.capstone.ads.utils.OrderStateValidator;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -80,10 +80,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDTO> findOrderByStatus(OrderStatus status) {
-        return orderRepository.findByStatus(status).stream()
-                .map(orderMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<OrderDTO> findOrderByStatus(OrderStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return orderRepository.findByStatus(status, pageable)
+                .map(orderMapper::toDTO);
     }
 
     @Override
@@ -137,10 +137,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDTO> findOrderByUserId(String userId) {
-        return orderRepository.findByUsers_Id(userId).stream()
-                .map(orderMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<OrderDTO> findOrderByUserId(String userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return orderRepository.findByUsers_Id(userId, pageable).map(orderMapper::toDTO);
     }
 
     private CustomerChoices findCustomerChoice(String customerChoiceId) {

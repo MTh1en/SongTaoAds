@@ -2,6 +2,8 @@ package com.capstone.ads.repository.internal;
 
 import com.capstone.ads.model.CustomDesignRequests;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -12,9 +14,9 @@ public interface CustomDesignRequestsRepository extends JpaRepository<CustomDesi
 
     Optional<CustomDesignRequests> findByIdAndStatusIn(String id, List<CustomDesignRequestStatus> statuses);
 
-    List<CustomDesignRequests> findByCustomerDetail_Id(String id);
+    Page<CustomDesignRequests> findByCustomerDetail_Id(String id, Pageable pageable);
 
-    List<CustomDesignRequests> findByAssignDesigner_Id(String id);
+    Page<CustomDesignRequests> findByAssignDesigner_Id(String id, Pageable pageable);
 
-    List<CustomDesignRequests> findByStatus(CustomDesignRequestStatus status);
+    Page<CustomDesignRequests> findByStatus(CustomDesignRequestStatus status, Pageable pageable);
 }

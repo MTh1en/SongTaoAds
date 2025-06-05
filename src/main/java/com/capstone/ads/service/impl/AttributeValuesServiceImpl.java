@@ -11,11 +11,11 @@ import com.capstone.ads.repository.internal.AttributeValuesRepository;
 import com.capstone.ads.repository.internal.AttributesRepository;
 import com.capstone.ads.service.AttributeValuesService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
 
         AttributeValues attributeValues = attributeValuesMapper.toEntity(request, attributesId);
         attributeValues = attributeValuesRepository.save(attributeValues);
-        return attributeValuesMapper.toDTO(attributeValues); // createAt and updateAt may be null in response
+        return attributeValuesMapper.toDTO(attributeValues);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
 
         attributeValuesMapper.updateEntityFromRequest(request, attributeValues);
         attributeValues = attributeValuesRepository.save(attributeValues);
-        return attributeValuesMapper.toDTO(attributeValues); // updateAt may be null in response
+        return attributeValuesMapper.toDTO(attributeValues);
     }
 
     @Override
@@ -54,13 +54,14 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
     }
 
     @Override
-    public List<AttributeValuesDTO> findAllByAttributesId(String attributesId) {
+    public Page<AttributeValuesDTO> findAllByAttributesId(String attributesId, int page, int size) {
         if (!attributesRepository.existsById(attributesId))
             throw new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND);
 
-        return attributeValuesRepository.findByAttributes_Id(attributesId).stream()
-                .map(attributeValuesMapper::toDTO)
-                .collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        return attributeValuesRepository.findByAttributes_Id(attributesId, pageable)
+                .map(attributeValuesMapper::toDTO);
     }
 
     @Override

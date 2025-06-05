@@ -1,5 +1,6 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.user.ChangePasswordRequest;
 import com.capstone.ads.dto.user.UserDTO;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -26,25 +26,26 @@ public class UserController {
 
     @PostMapping("/users")
     public ApiResponse<UserDTO> createUser(@Valid @RequestBody UserCreateRequest request) {
-        UserDTO response = usersService.createUser(request);
+        var response = usersService.createUser(request);
         return ApiResponseBuilder.buildSuccessResponse("User created successfully", response);
     }
 
     @GetMapping("/users/{userId}")
     public ApiResponse<UserDTO> getUserById(@PathVariable String userId) {
-        UserDTO response = usersService.getUserById(userId);
+        var response = usersService.getUserById(userId);
         return ApiResponseBuilder.buildSuccessResponse("User retrieved successfully", response);
     }
 
     @GetMapping("/users")
-    public ApiResponse<List<UserDTO>> getAllUsers() {
-        List<UserDTO> response = usersService.getAllUsers();
-        return ApiResponseBuilder.buildSuccessResponse("Users retrieved successfully", response);
+    public ApiPagingResponse<UserDTO> getAllUsers(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                  @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = usersService.getAllUsers(page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Users retrieved successfully", response, page);
     }
 
     @PatchMapping("/users/{userId}/profile")
     public ApiResponse<UserDTO> updateUserProfile(@Valid @PathVariable String userId, @RequestBody UserProfileUpdateRequest request) {
-        UserDTO response = usersService.updateUserProfile(userId, request);
+        var response = usersService.updateUserProfile(userId, request);
         return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
     }
 
@@ -70,7 +71,7 @@ public class UserController {
 
     @GetMapping("/users/profile")
     public ApiResponse<UserDTO> getProfile() {
-        UserDTO response = usersService.getCurrentUserProfile();
+        var response = usersService.getCurrentUserProfile();
         return ApiResponseBuilder.buildSuccessResponse("Profile retrieved successfully", response);
     }
 

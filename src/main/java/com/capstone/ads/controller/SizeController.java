@@ -1,5 +1,6 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.size.SizeCreateRequest;
 import com.capstone.ads.dto.size.SizeDTO;
@@ -38,9 +39,10 @@ public class SizeController {
     }
 
     @GetMapping
-    public ApiResponse<List<SizeDTO>> getAll() {
-        var response = service.findAll();
-        return ApiResponseBuilder.buildSuccessResponse("Find all size", response);
+    public ApiPagingResponse<SizeDTO> getAll(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findAll(page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find all size", response, page);
     }
 
     @DeleteMapping("/{sizeId}")
