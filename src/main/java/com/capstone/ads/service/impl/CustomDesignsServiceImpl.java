@@ -19,6 +19,9 @@ import com.capstone.ads.utils.CustomDesignStateValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -97,10 +100,10 @@ public class CustomDesignsServiceImpl implements CustomDesignsService {
     }
 
     @Override
-    public List<CustomDesignDTO> findCustomDesignByCustomDesignRequest(String customDesignRequestId) {
-        return customDesignsRepository.findByCustomDesignRequests_Id(customDesignRequestId).stream()
-                .map(this::convertToCustomDesignDTOWithImageIsPresignedURL)
-                .collect(Collectors.toList());
+    public Page<CustomDesignDTO> findCustomDesignByCustomDesignRequest(String customDesignRequestId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return customDesignsRepository.findByCustomDesignRequests_Id(customDesignRequestId, pageable)
+                .map(this::convertToCustomDesignDTOWithImageIsPresignedURL);
     }
 
     @Override

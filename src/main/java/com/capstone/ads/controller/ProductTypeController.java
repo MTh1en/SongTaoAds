@@ -1,5 +1,6 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.producttype.ProductTypeCreateRequest;
 import com.capstone.ads.dto.producttype.ProductTypeDTO;
@@ -46,9 +47,10 @@ public class ProductTypeController {
     }
 
     @GetMapping
-    public ApiResponse<List<ProductTypeDTO>> findAllProductType() {
-        var response = service.findAllProductType();
-        return ApiResponseBuilder.buildSuccessResponse("Find all product type", response);
+    public ApiPagingResponse<ProductTypeDTO> findAllProductType(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                                @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findAllProductType(page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find all product type", response, page);
     }
 
     @DeleteMapping("/{productTypeId}")

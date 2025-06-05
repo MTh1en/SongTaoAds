@@ -1,5 +1,6 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.customdesignrequest.CustomDesignRequestCreateRequest;
 import com.capstone.ads.dto.customdesignrequest.CustomDesignRequestDTO;
@@ -9,8 +10,6 @@ import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,20 +41,26 @@ public class CustomDesignRequestsController {
     }
 
     @GetMapping("/customer-details/{customerDetailId}/custom-design-requests")
-    public ApiResponse<List<CustomDesignRequestDTO>> findCustomerDesignRequestByCustomerDetailId(@PathVariable String customerDetailId) {
-        var response = service.findCustomerDesignRequestByCustomerDetailId(customerDetailId);
-        return ApiResponseBuilder.buildSuccessResponse("Find custom design request by custom detail request successful", response);
+    public ApiPagingResponse<CustomDesignRequestDTO> findCustomerDesignRequestByCustomerDetailId(@PathVariable String customerDetailId,
+                                                                                                 @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                                                                 @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findCustomerDesignRequestByCustomerDetailId(customerDetailId, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request by custom detail request successful", response, page);
     }
 
     @GetMapping("/users/{designerId}/custom-design-requests")
-    public ApiResponse<List<CustomDesignRequestDTO>> findCustomerDetailRequestByAssignDesignerId(@PathVariable String designerId) {
-        var response = service.findCustomerDetailRequestByAssignDesignerId(designerId);
-        return ApiResponseBuilder.buildSuccessResponse("Find custom design request by designer request successful", response);
+    public ApiPagingResponse<CustomDesignRequestDTO> findCustomerDetailRequestByAssignDesignerId(@PathVariable String designerId,
+                                                                                                 @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                                                                 @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findCustomerDetailRequestByAssignDesignerId(designerId, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request by designer request successful", response, page);
     }
 
     @GetMapping("/custom-design-requests")
-    public ApiResponse<List<CustomDesignRequestDTO>> findCustomerDetailRequestByStatus(@RequestParam("status") CustomDesignRequestStatus status) {
-        var response = service.findCustomerDetailRequestByStatus(status);
-        return ApiResponseBuilder.buildSuccessResponse("Find custom design request by status successful", response);
+    public ApiPagingResponse<CustomDesignRequestDTO> findCustomerDetailRequestByStatus(@RequestParam("status") CustomDesignRequestStatus status,
+                                                                                       @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                                                       @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findCustomerDetailRequestByStatus(status, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request by status successful", response, page);
     }
 }

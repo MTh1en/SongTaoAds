@@ -3,9 +3,8 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.producttype.ProductTypeCreateRequest;
 import com.capstone.ads.dto.producttype.ProductTypeDTO;
 import com.capstone.ads.dto.producttype.ProductTypeUpdateRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 public interface ProductTypesService {
     ProductTypeDTO createProductTypeService(ProductTypeCreateRequest request);
@@ -14,7 +13,7 @@ public interface ProductTypesService {
 
     ProductTypeDTO findProductTypeByProductTypeId(String productTypeId);
 
-    List<ProductTypeDTO> findAllProductType();
+    Page<ProductTypeDTO> findAllProductType(int page, int size);
 
     void forceDeleteProductType(String productTypeId);
 

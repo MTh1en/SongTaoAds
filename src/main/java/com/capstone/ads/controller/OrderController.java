@@ -1,5 +1,6 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.order.OrderConfirmRequest;
 import com.capstone.ads.dto.order.OrderDTO;
@@ -9,8 +10,6 @@ import com.capstone.ads.service.OrderService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -56,15 +55,19 @@ public class OrderController {
     }
 
     @GetMapping("/users/{userId}/orders")
-    public ApiResponse<List<OrderDTO>> getByUserId(@PathVariable String userId) {
-        var response = service.findOrderByUserId(userId);
-        return ApiResponseBuilder.buildSuccessResponse("Find Order by UserId: ", response);
+    public ApiPagingResponse<OrderDTO> getByUserId(@PathVariable String userId,
+                                                   @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                   @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findOrderByUserId(userId, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find Order by Users", response, page);
     }
 
     @GetMapping("/orders")
-    public ApiResponse<List<OrderDTO>> findOrderByStatus(@RequestParam OrderStatus orderStatus) {
-        var response = service.findOrderByStatus(orderStatus);
-        return ApiResponseBuilder.buildSuccessResponse("Find Order By Status", response);
+    public ApiPagingResponse<OrderDTO> findOrderByStatus(@RequestParam OrderStatus orderStatus,
+                                                         @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                         @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findOrderByStatus(orderStatus, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find Order By Status", response, page);
     }
 
     @DeleteMapping("/orders/{orderId}")

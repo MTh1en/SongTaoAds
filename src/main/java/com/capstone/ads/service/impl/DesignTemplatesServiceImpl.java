@@ -16,13 +16,14 @@ import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -77,17 +78,19 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     }
 
     @Override
-    public List<DesignTemplateDTO> findDesignTemplateByProductTypeId(String productTypeId) {
-        return findListDesignTemplatesByProductTypeAndAvailable(productTypeId).stream()
-                .map(this::convertToDesignTemplateDTOWithImageIsPresignedURL)
-                .collect(Collectors.toList());
+    public Page<DesignTemplateDTO> findDesignTemplateByProductTypeId(String productTypeId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        return designTemplatesRepository.findByProductTypes_IdAndIsAvailable(productTypeId, true, pageable)
+                .map(this::convertToDesignTemplateDTOWithImageIsPresignedURL);
     }
 
     @Override
-    public List<DesignTemplateDTO> findAllDesignTemplates() {
-        return designTemplatesRepository.findAll().stream()
-                .map(this::convertToDesignTemplateDTOWithImageIsPresignedURL)
-                .collect(Collectors.toList());
+    public Page<DesignTemplateDTO> findAllDesignTemplates(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        return designTemplatesRepository.findAll(pageable)
+                .map(this::convertToDesignTemplateDTOWithImageIsPresignedURL);
     }
 
     @Override
@@ -111,10 +114,6 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
 
     private String generateDesignTemplateKey(String productTypeId, String designTemplateId) {
         return String.format("design-template/%s/%s", productTypeId, designTemplateId);
-    }
-
-    private List<DesignTemplates> findListDesignTemplatesByProductTypeAndAvailable(String productTypeId) {
-        return designTemplatesRepository.findByProductTypes_IdAndIsAvailable(productTypeId, true);
     }
 
     private DesignTemplateDTO convertToDesignTemplateDTOWithImageIsPresignedURL(DesignTemplates designTemplates) {

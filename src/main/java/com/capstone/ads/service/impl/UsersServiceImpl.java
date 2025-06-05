@@ -18,6 +18,9 @@ import com.capstone.ads.service.UserService;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,10 +69,10 @@ public class UsersServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getAllUsers() {
-        return usersRepository.findAll().stream()
-                .map(usersMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<UserDTO> getAllUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return usersRepository.findAll(pageable)
+                .map(usersMapper::toDTO);
     }
 
     @Override

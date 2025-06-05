@@ -4,6 +4,7 @@ import com.capstone.ads.dto.order.OrderConfirmRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateInformationRequest;
 import com.capstone.ads.model.enums.OrderStatus;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface OrderService {
 
     OrderDTO findOrderById(String orderId);
 
-    List<OrderDTO> findOrderByStatus(OrderStatus status);
+    Page<OrderDTO> findOrderByStatus(OrderStatus status, int page, int size);
 
     OrderDTO customerUpdateOrderInformation(String orderId, OrderUpdateInformationRequest request);
 
@@ -24,5 +25,5 @@ public interface OrderService {
 
     OrderDTO changeOrderStatus(String orderId, OrderStatus orderStatus);
 
-    List<OrderDTO> findOrderByUserId(String userId);
+    Page<OrderDTO> findOrderByUserId(String userId, int page, int size);
 }

@@ -1,5 +1,6 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.aidesign.AIDesignDTO;
 import com.capstone.ads.service.AIDesignsService;
@@ -8,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -27,9 +26,11 @@ public class AIDesignsController {
     }
 
     @GetMapping("/customer-details/{customerDetailId}/ai-designs")
-    public ApiResponse<List<AIDesignDTO>> findAIDesignByCustomerDetailId(@PathVariable String customerDetailId) {
-        var response = service.findAIDesignByCustomerDetailId(customerDetailId);
-        return ApiResponseBuilder.buildSuccessResponse("Find AIDesign by Customer Detail Id successfully", response);
+    public ApiPagingResponse<AIDesignDTO> findAIDesignByCustomerDetailId(@PathVariable String customerDetailId,
+                                                                         @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                                         @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findAIDesignByCustomerDetailId(customerDetailId, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find AIDesign by Customer Detail Id successfully", response, page);
     }
 
     @DeleteMapping("/ai-designs/{aiDesignId}")
