@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thanh toán thất bại</title>
+  <title>Xác minh thành công</title>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Custom CSS -->
-  <link rel="stylesheet" th:href="@{/css/PaymentFailure.css}">
+  <link rel="stylesheet" th:href="@{/css/VerificationSuccess.css}">
 </head>
 <body>
 <div class="container">
-  <div class="failure-card">
-    <div class="icon-failure">
-      <i class="fas fa-times-circle"></i>
+  <div class="success-card">
+    <div class="icon-success">
+      <i class="fas fa-check-circle"></i>
     </div>
-    <h1>Thanh toán thất bại!</h1>
-    <p>Rất tiếc, giao dịch của bạn không thành công.</p>
+    <h1>Xác minh thành công!</h1>
+    <p>Tài khoản của bạn đã được xác minh thành công. Cảm ơn bạn đã hoàn tất quá trình.</p>
     <a th:href="'https://songtaoads.io.vn/'" class="btn-home">Quay lại trang chủ</a>
   </div>
 </div>

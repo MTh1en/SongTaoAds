@@ -6,20 +6,16 @@ import com.capstone.ads.dto.stablediffusion.controlnet.Args;
 import com.capstone.ads.dto.stablediffusion.controlnet.ControlNet;
 import com.capstone.ads.dto.stablediffusion.progress.ProgressRequest;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.util.Collections;
 
 @Mapper(componentModel = "spring")
 public interface StableDiffusionMapper {
-    @Mapping(target = "image", source = "imageBase64")
-    Args mapArgs(String imageBase64);
+    Args mapArgs(String image);
 
-    @Mapping(target = "forceTaskId", source = "userId")
-    TextToImageRequest mapTextToImageRequest(String prompt, AlwaysonScripts alwaysonScripts, String userId);
+    TextToImageRequest mapTextToImageRequest(String prompt, AlwaysonScripts alwaysonScripts, String forceTaskId);
 
-    @Mapping(target = "idTask", source = "taskId")
-    ProgressRequest mapProgressRequest(String taskId);
+    ProgressRequest mapProgressRequest(String idTask);
 
     default AlwaysonScripts mapAlwaysonScripts(Args args) {
         return AlwaysonScripts.builder()

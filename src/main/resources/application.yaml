@@ -69,6 +69,11 @@ aws:
 stable-diffusion:
   url: ${STABLE_DIFFUSION_URL}
   token: ${STABLE_DIFFUSION_TOKEN}
+brevo:
+  key: ${BREVO_KEY}
+  sender-name: ${SENDER_NAME}
+  sender-email: ${SENDER_EMAIL}
+  verify-url: ${VERIFY_URL}
 
 
 

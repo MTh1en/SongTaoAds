@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác minh tài khoản</title>
+</head>
+<body style="margin:0; padding:0; font-family:Arial,sans-serif; background-color:#f5f5f5;">
+<!-- Container chính -->
+<div style="width:100%; max-width:600px; margin:0 auto; background-color:#ffffff;">
+    <!-- Header -->
+    <div style="text-align:center; padding:20px; background-color:#EEEEEE;">
+        <img src="https://img.mailinblue.com/9024037/images/content_library/original/684598c0d54dfce6fde81934.png"
+             alt="Quảng Cáo Tây Ninh Logo" style="max-width:500px;">
+    </div>
+
+    <!-- Dòng kẻ ngang -->
+    <div style="height:2px; background-color:#000000;"></div>
+
+    <!-- Nội dung chính -->
+    <div style="padding:25px; background-color:#EEEEEE;">
+        <h1 style="color:#1e3a8a; font-size:24px; font-weight:600; margin-bottom:20px; text-align:center;">QUẢNG CÁO SONG TẠO</h1>
+
+        <p style="color:#333333; font-size:16px; line-height:1.5; margin-bottom:15px;">
+            Xin chào <span th:text="${fullName}" style="font-weight:bold;"></span>,
+        </p>
+
+        <p style="color:#333333; font-size:16px; line-height:1.5; margin-bottom:15px;">
+            Xin chân thành cảm ơn bạn đã sử dụng dịch vụ của Song Tạo.
+        </p>
+
+        <p style="color:#333333; font-size:16px; line-height:1.5; margin-bottom:25px;">
+            Song Tạo xin thông báo tài khoản của bạn đã được đăng ký. Để hoàn tất quá trình đăng ký, vui lòng nhấn vào nút bên dưới để xác thực tài khoản của bạn.
+        </p>
+
+        <!-- Nút xác nhận -->
+        <div style="text-align:center; margin:30px 0;">
+            <a th:href="${url}" style="display:inline-block; padding:12px 30px; background-color:#28a745; color:#ffffff; text-decoration:none; border-radius:25px; font-size:16px; font-weight:600;">
+                NHẤN VÀO ĐÂY
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="background-color:#2D3044; color:#ffffff; padding:20px; text-align:center; font-size:14px;">
+        <p style="margin:5px 0;">Quảng cáo Song Tạo</p>
+        <p style="margin:5px 0;">623 Điện Biên Phủ, Ninh Thạnh, TP Tây Ninh, Tây Ninh</p>
+        <p style="margin:5px 0;">
+            <a href="mailto:quangcaosongtao@gmail.com" style="color:#ffffff; text-decoration:underline;">
+                quangcaosongtao@gmail.com
+            </a>
+        </p>
+    </div>
+</div>
+</body>
+</html>
