@@ -36,6 +36,14 @@ public class UserController {
         return ApiResponseBuilder.buildSuccessResponse("User retrieved successfully", response);
     }
 
+    @GetMapping("/users/role")
+    public ApiPagingResponse<UserDTO> getUsersByRole(@RequestParam(value = "roleName", defaultValue = "CUSTOMER") String roleName,
+                                                     @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                     @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = usersService.getUsersByRoleName(roleName, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Users retrieved successfully", response, page);
+    }
+
     @GetMapping("/users")
     public ApiPagingResponse<UserDTO> getAllUsers(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
                                                   @RequestParam(value = "size", required = false, defaultValue = "10") int size) {

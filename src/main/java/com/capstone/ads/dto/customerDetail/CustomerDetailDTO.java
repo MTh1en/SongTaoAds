@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.customerDetail;
 
+import com.capstone.ads.dto.user.UserDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,5 +15,5 @@ public class CustomerDetailDTO {
     String companyName;
     String tagLine;
     String contactInfo;
-    String userId;
+    UserDTO users;
 }

@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.PredefinedRole;
 import com.capstone.ads.constaint.S3ImageDuration;
 import com.capstone.ads.dto.user.ChangePasswordRequest;
 import com.capstone.ads.dto.user.UserDTO;
@@ -76,6 +77,16 @@ public class UsersServiceImpl implements UserService {
     }
 
     @Override
+    public Page<UserDTO> getUsersByRoleName(String roleName, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        if (!isValidRole(roleName)) {
+            throw new AppException(ErrorCode.ROLE_NOT_FOUND);
+        }
+        return usersRepository.findByIsActiveAndRoles_Name(true, roleName, pageable)
+                .map(usersMapper::toDTO);
+    }
+
+    @Override
     public UserDTO updateUserProfile(String userId, UserProfileUpdateRequest request) {
         Users user = findUserByIdAndActive(userId);
 
@@ -137,5 +148,13 @@ public class UsersServiceImpl implements UserService {
     private Users findUserByIdAndActive(String userId) {
         return usersRepository.findByIdAndIsActive(userId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private boolean isValidRole(String role) {
+        return role.equals(PredefinedRole.ADMIN_ROLE) ||
+                role.equals(PredefinedRole.CUSTOMER_ROLE) ||
+                role.equals(PredefinedRole.STAFF_ROLE) ||
+                role.equals(PredefinedRole.DESIGNER_ROLE) ||
+                role.equals(PredefinedRole.SALE_ROLE);
     }
 }
