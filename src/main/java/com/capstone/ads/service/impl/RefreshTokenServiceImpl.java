@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.RedisKeyNaming;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.service.RefreshTokenService;
@@ -28,8 +29,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     private int refreshTokenTtl;
 
     private final RedisTemplate<String, String> redisTemplate;
-    private static final String REFRESH_TOKEN_PREFIX = "refresh_token:";
-    private static final String USER_REFRESH_TOKENS_PREFIX = "user_refresh_tokens:";
+
 
     @Override
     public String generateRefreshToken() {
@@ -39,8 +39,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public void saveRefreshToken(String email, String refreshToken) {
         String tokenHashed = hashToken(refreshToken);
-        String tokenKey = REFRESH_TOKEN_PREFIX + tokenHashed;
-        String userTokenSetKey = USER_REFRESH_TOKENS_PREFIX + email;
+        String tokenKey = RedisKeyNaming.REFRESH_TOKEN + tokenHashed;
+        String userTokenSetKey = RedisKeyNaming.USER_REFRESH_TOKENS + email;
 
         String tokenStorageInRedis = BCrypt.hashpw(refreshToken, BCrypt.gensalt());
         Instant now = Instant.now();
@@ -59,8 +59,8 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public boolean isValid(String email, String refreshToken) {
         String tokenHashed = hashToken(refreshToken);
-        String tokenKey = REFRESH_TOKEN_PREFIX + tokenHashed;
-        String userTokenSetKey = USER_REFRESH_TOKENS_PREFIX + email;
+        String tokenKey = RedisKeyNaming.REFRESH_TOKEN + tokenHashed;
+        String userTokenSetKey = RedisKeyNaming.USER_REFRESH_TOKENS + email;
 
         if (!isTokenInUserSet(userTokenSetKey, tokenHashed)) {
             log.warn("Refresh token not found in user's token set for email: {}", email);
@@ -86,7 +86,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public String getEmail(String refreshToken) {
         String tokenHashed = hashToken(refreshToken);
-        String tokenKey = REFRESH_TOKEN_PREFIX + tokenHashed;
+        String tokenKey = RedisKeyNaming.REFRESH_TOKEN + tokenHashed;
 
         String email = (String) redisTemplate.opsForHash().get(tokenKey, "email");
         if (StringUtils.isEmpty(email)) {
@@ -98,14 +98,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public void revokeToken(String email) {
-        String userTokenSetKey = USER_REFRESH_TOKENS_PREFIX + email;
+        String userTokenSetKey = RedisKeyNaming.USER_REFRESH_TOKENS + email;
         Set<String> tokenHashes = redisTemplate.opsForSet().members(userTokenSetKey);
         if (tokenHashes.isEmpty()) {
             log.info("No refresh tokens to revoke for email: {}", email);
             return;
         }
         tokenHashes.forEach(tokenHash -> {
-            String tokenKey = REFRESH_TOKEN_PREFIX + tokenHash;
+            String tokenKey = RedisKeyNaming.REFRESH_TOKEN + tokenHash;
             redisTemplate.delete(tokenKey);
         });
         redisTemplate.delete(userTokenSetKey);
