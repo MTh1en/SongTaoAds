@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.RedisKeyNaming;
 import com.capstone.ads.dto.email.TransactionalEmailRequest;
 import com.capstone.ads.dto.email.TransactionalEmailResponse;
 import com.capstone.ads.dto.email.transactional.Params;
@@ -63,18 +64,25 @@ public class VerificationServiceImpl implements VerificationService {
     @Override
     public String generateVerificationCode(String email) {
         String verificationCode = UUID.randomUUID().toString();
-        redisTemplate.opsForValue().set(verificationCode, email, 15, TimeUnit.MINUTES);
+        if (redisTemplate.hasKey(email)) {
+            redisTemplate.delete(email);
+        }
+
+        String verificationEmailKey = RedisKeyNaming.VERIFICATION_EMAIL + email;
+        redisTemplate.opsForValue().set(verificationEmailKey, verificationCode, 15, TimeUnit.MINUTES);
         return verificationCode;
     }
 
     @Override
     public Boolean validateVerificationCode(String email, String verificationCode) {
-        String emailStored = redisTemplate.opsForValue().get(verificationCode);
-        if (emailStored == null) {
+        String verificationEmailKey = RedisKeyNaming.VERIFICATION_EMAIL + email;
+
+        String storedCode = redisTemplate.opsForValue().get(verificationEmailKey);
+        if (storedCode == null) {
             return false;
         }
-        boolean isValid = email.equals(emailStored);
-        if (isValid) redisTemplate.delete(verificationCode);
+        boolean isValid = verificationCode.equals(storedCode);
+        if (isValid) redisTemplate.delete(verificationEmailKey);
         return isValid;
     }
 }
