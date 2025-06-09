@@ -70,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
         // Tạo user mới
         Users newUser = usersMapper.register(request);
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
-        newUser.setIsActive(true);
+        newUser.setIsActive(false);
         newUser.setRoles(roles);
 
         usersRepository.save(newUser);
@@ -105,6 +105,13 @@ public class AuthServiceImpl implements AuthService {
         var email = refreshTokenService.getEmail(refreshToken);
         refreshTokenService.revokeToken(email);
         clearCookies(response);
+    }
+
+    @Override
+    public void verifyUser(String email) {
+        Users verificationUser = findUserByEmail(email);
+        verificationUser.setIsActive(true);
+        usersRepository.save(verificationUser);
     }
 
     private Users findUserByEmail(String email) {
