@@ -24,6 +24,7 @@ public class ChatBotLog {
     @ManyToOne
     Users users;
 
+
     String question;
     String answer;
 

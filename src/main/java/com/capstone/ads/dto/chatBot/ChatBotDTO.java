@@ -24,6 +24,7 @@ public class ChatBotDTO {
     @ManyToOne
     Users users;
 
+
     String question;
     String answer;
 
