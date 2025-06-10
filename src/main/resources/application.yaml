@@ -42,6 +42,9 @@ spring:
   ai:
     openai:
       api-key: ${OPEN_AI_KEY}
+      chat:
+        options:
+          model: ${MODEL_CHAT}
 
 server:
   port: 8080
