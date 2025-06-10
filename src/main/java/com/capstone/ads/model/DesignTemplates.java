@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -38,4 +39,7 @@ public class DesignTemplates {
 
     @ManyToOne
     ProductTypes productTypes;
+
+    @OneToMany(mappedBy = "designTemplates")
+    List<AIDesigns> aiDesigns;
 }

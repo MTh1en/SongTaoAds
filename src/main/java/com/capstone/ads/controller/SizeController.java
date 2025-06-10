@@ -1,5 +1,6 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.size.SizeCreateRequest;
 import com.capstone.ads.dto.size.SizeDTO;
@@ -20,23 +21,28 @@ public class SizeController {
 
     @PostMapping
     public ApiResponse<SizeDTO> create(@Valid @RequestBody SizeCreateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Create size successful", service.create(request));
+        var response = service.create(request);
+        return ApiResponseBuilder.buildSuccessResponse("Create size successful", response);
     }
 
     @PutMapping("/{sizeId}")
     public ApiResponse<SizeDTO> update(@Valid @PathVariable String sizeId,
-                                          @RequestBody SizeUpdateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Update size successful", service.update(sizeId, request));
+                                       @RequestBody SizeUpdateRequest request) {
+        var response = service.update(sizeId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Update size successful", response);
     }
 
     @GetMapping("/{sizeId}")
     public ApiResponse<SizeDTO> getById(@PathVariable String sizeId) {
-        return ApiResponseBuilder.buildSuccessResponse("size by Id", service.findById(sizeId));
+        var response = service.findById(sizeId);
+        return ApiResponseBuilder.buildSuccessResponse("size by Id", response);
     }
 
     @GetMapping
-    public ApiResponse<List<SizeDTO>> getAll() {
-        return ApiResponseBuilder.buildSuccessResponse("Find all size", service.findAll());
+    public ApiPagingResponse<SizeDTO> getAll(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findAll(page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find all size", response, page);
     }
 
     @DeleteMapping("/{sizeId}")

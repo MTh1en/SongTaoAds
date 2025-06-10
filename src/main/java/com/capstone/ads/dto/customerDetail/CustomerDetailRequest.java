@@ -9,9 +9,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerDetailRequest {
-     String logoUrl;
-     String companyName;
-     String tagLine;
-     String contactInfo;
-     String userId;
+    String companyName;
+    String tagLine;
+    String contactInfo;
 }

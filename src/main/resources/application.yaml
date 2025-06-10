@@ -8,6 +8,12 @@ spring:
     username: ${DBMS_USERNAME}
     password: ${DBMS_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: 3
+      maximum-pool-size: 12
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 20000
   jpa:
     hibernate:
       ddl-auto: update
@@ -22,14 +28,17 @@ spring:
       connect-timeout: 2000
       lettuce:
         pool:
-          max-active: 8
-          max-idle: 8
-          min-idle: 0
+          max-active: 10
+          max-idle: 5
+          min-idle: 2
+          max-wait: 2000
+        shutdown-timeout: 1000
   servlet:
     multipart:
-      max-file-size: 20MB
-      max-request-size: 50MB
-      file-size-threshold: 1B
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 10MB
+
   ai:
     openai:
       api-key: ${OPEN_AI_KEY}
@@ -39,6 +48,10 @@ spring:
 
 server:
   port: 8080
+  tomcat:
+    threads:
+      max: 75
+      min-spare: 15
 
 app:
   base:
@@ -56,6 +69,15 @@ aws:
   region: ap-southeast-1
   bucket:
     name: songtaoads
+stable-diffusion:
+  url: ${STABLE_DIFFUSION_URL}
+  token: ${STABLE_DIFFUSION_TOKEN}
+brevo:
+  key: ${BREVO_KEY}
+  sender-name: ${SENDER_NAME}
+  sender-email: ${SENDER_EMAIL}
+  verify-url: ${VERIFY_URL}
+
 
 
 

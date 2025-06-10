@@ -4,6 +4,8 @@ import com.capstone.ads.dto.user.ChangePasswordRequest;
 import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.dto.user.UserCreateRequest;
 import com.capstone.ads.dto.user.UserProfileUpdateRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -14,7 +16,9 @@ public interface UserService {
 
     UserDTO getUserById(String userId);
 
-    List<UserDTO> getAllUsers();
+    Page<UserDTO> getUsersByRoleName(String roleName, int page, int size);
+
+    Page<UserDTO> getAllUsers(int page, int size);
 
     UserDTO updateUserProfile(String userId, UserProfileUpdateRequest request);
 

@@ -11,6 +11,9 @@ import com.capstone.ads.repository.internal.AttributesRepository;
 import com.capstone.ads.repository.internal.ProductTypesRepository;
 import com.capstone.ads.service.AttributesService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,14 +57,14 @@ public class AttributesServiceImpl implements AttributesService {
     }
 
     @Override
-    public List<AttributesDTO> findAllByProductTypeId(String productTypeId) {
+    public Page<AttributesDTO> findAllByProductTypeId(String productTypeId, int page, int size) {
         // Validate productTypeId
         productTypesRepository.findById(productTypeId)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
 
-        return attributesRepository.findByProductTypes_Id(productTypeId).stream()
-                .map(attributesMapper::toDTO)
-                .collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return attributesRepository.findByProductTypes_Id(productTypeId, pageable)
+                .map(attributesMapper::toDTO);
     }
 
     @Override

@@ -1,9 +1,6 @@
 package com.capstone.ads.dto.customerDetail;
 
-import com.capstone.ads.model.Users;
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToOne;
+import com.capstone.ads.dto.user.UserDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,10 +10,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerDetailDTO {
-    private String id;
-    private String logoUrl;
-    private String companyName;
-    private String tagLine;
-    private String contactInfo;
-    private String userId;
+    String id;
+    String logoUrl;
+    String companyName;
+    String tagLine;
+    String contactInfo;
+    UserDTO users;
 }

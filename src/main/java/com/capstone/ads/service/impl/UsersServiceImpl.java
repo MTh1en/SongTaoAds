@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.PredefinedRole;
 import com.capstone.ads.constaint.S3ImageDuration;
 import com.capstone.ads.dto.user.ChangePasswordRequest;
 import com.capstone.ads.dto.user.UserDTO;
@@ -18,6 +19,9 @@ import com.capstone.ads.service.UserService;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,10 +70,20 @@ public class UsersServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getAllUsers() {
-        return usersRepository.findAll().stream()
-                .map(usersMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<UserDTO> getAllUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return usersRepository.findAll(pageable)
+                .map(usersMapper::toDTO);
+    }
+
+    @Override
+    public Page<UserDTO> getUsersByRoleName(String roleName, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        if (!isValidRole(roleName)) {
+            throw new AppException(ErrorCode.ROLE_NOT_FOUND);
+        }
+        return usersRepository.findByIsActiveAndRoles_Name(true, roleName, pageable)
+                .map(usersMapper::toDTO);
     }
 
     @Override
@@ -134,5 +148,13 @@ public class UsersServiceImpl implements UserService {
     private Users findUserByIdAndActive(String userId) {
         return usersRepository.findByIdAndIsActive(userId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private boolean isValidRole(String role) {
+        return role.equals(PredefinedRole.ADMIN_ROLE) ||
+                role.equals(PredefinedRole.CUSTOMER_ROLE) ||
+                role.equals(PredefinedRole.STAFF_ROLE) ||
+                role.equals(PredefinedRole.DESIGNER_ROLE) ||
+                role.equals(PredefinedRole.SALE_ROLE);
     }
 }

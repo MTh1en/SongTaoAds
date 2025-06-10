@@ -1,50 +1,78 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
+import com.capstone.ads.dto.order.OrderConfirmRequest;
 import com.capstone.ads.dto.order.OrderDTO;
-import com.capstone.ads.dto.order.OrderUpdateRequest;
+import com.capstone.ads.dto.order.OrderUpdateInformationRequest;
+import com.capstone.ads.model.enums.OrderStatus;
 import com.capstone.ads.service.OrderService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class OrderController {
+    private final OrderService service;
 
-    private final OrderService orderService;
-
-    @PostMapping("customer-choices/{customerChoiceId}/orders")
-    public ApiResponse<OrderDTO> create(@PathVariable String customerChoiceId) {
-        return ApiResponseBuilder.buildSuccessResponse("Create order successful", orderService.createOrder(customerChoiceId));
+    @PostMapping("/custom-designs/{customDesignId}/orders")
+    public ApiResponse<OrderDTO> createOrderByCustomDesign(@PathVariable String customDesignId) {
+        var response = service.createOrderByCustomDesign(customDesignId);
+        return ApiResponseBuilder.buildSuccessResponse("Create order successful", response);
     }
 
-    @PutMapping("/orders/{orderId}")
-    public ApiResponse<OrderDTO> update(@PathVariable String orderId, @RequestBody OrderUpdateRequest request) {
-        return ApiResponseBuilder.buildSuccessResponse("Update order successful", orderService.updateOrder(orderId, request));
+    @PostMapping("/ai-designs/{aiDesignId}/customer-choices/{customerChoiceId}/orders")
+    public ApiResponse<OrderDTO> createOrderByAIDesign(@PathVariable String aiDesignId,
+                                                       @PathVariable String customerChoiceId) {
+        var response = service.createOrderByAIDesign(customerChoiceId, aiDesignId);
+        return ApiResponseBuilder.buildSuccessResponse("Create order successful", response);
+    }
+
+    @PatchMapping("/orders/{orderId}/customer-information")
+    public ApiResponse<OrderDTO> update(@PathVariable String orderId, @RequestBody OrderUpdateInformationRequest request) {
+        var response = service.customerUpdateOrderInformation(orderId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Update order information successful", response);
+    }
+
+    @PatchMapping("/orders/{orderId}/sale-confirm")
+    public ApiResponse<OrderDTO> update(@PathVariable String orderId, @RequestBody OrderConfirmRequest request) {
+        var response = service.saleConfirmOrder(orderId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Confirm order successful", response);
+    }
+
+    @PatchMapping("/orders/{orderId}/status")
+    public ApiResponse<OrderDTO> update(@PathVariable String orderId, @RequestParam OrderStatus status) {
+        var response = service.changeOrderStatus(orderId, status);
+        return ApiResponseBuilder.buildSuccessResponse("Confirm order successful", response);
     }
 
     @GetMapping("/orders/{orderId}")
-    public ApiResponse<OrderDTO> getById(@PathVariable String orderId) {
-        return ApiResponseBuilder.buildSuccessResponse("Order by Id", orderService.getOrderById(orderId));
+    public ApiResponse<OrderDTO> findOrderById(@PathVariable String orderId) {
+        var response = service.findOrderById(orderId);
+        return ApiResponseBuilder.buildSuccessResponse("Find Order by Id", response);
     }
 
     @GetMapping("/users/{userId}/orders")
-    public ApiResponse<List<OrderDTO>> getByUserId(@PathVariable String userId) {
-        return ApiResponseBuilder.buildSuccessResponse("Order by user: ", orderService.getOrderByUserId(userId));
+    public ApiPagingResponse<OrderDTO> getByUserId(@PathVariable String userId,
+                                                   @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                   @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findOrderByUserId(userId, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find Order by Users", response, page);
     }
 
     @GetMapping("/orders")
-    public ApiResponse<List<OrderDTO>> getAll() {
-        return ApiResponseBuilder.buildSuccessResponse("Find all orders", orderService.getAllOrders());
+    public ApiPagingResponse<OrderDTO> findOrderByStatus(@RequestParam OrderStatus orderStatus,
+                                                         @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                         @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findOrderByStatus(orderStatus, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find Order By Status", response, page);
     }
 
     @DeleteMapping("/orders/{orderId}")
-    public ApiResponse<Void> delete(@PathVariable String orderId) {
-        orderService.deleteOrder(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete order successful", null);
+    public ApiResponse<Void> hardDeleteOrder(@PathVariable String orderId) {
+        service.hardDeleteOrder(orderId);
+        return ApiResponseBuilder.buildSuccessResponse("Hard delete order successful", null);
     }
 }

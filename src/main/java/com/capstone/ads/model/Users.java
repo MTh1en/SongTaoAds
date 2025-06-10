@@ -51,4 +51,6 @@ public class Users {
     @OneToMany(mappedBy = "users")
     List<DesignTemplates> designTemplates;
 
+    @OneToMany(mappedBy = "assignDesigner")
+    List<CustomDesignRequests> customDesignRequests;
 }

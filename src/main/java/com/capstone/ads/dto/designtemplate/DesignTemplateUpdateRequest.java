@@ -14,4 +14,5 @@ public class DesignTemplateUpdateRequest {
     String negativePrompt;
     Integer width;
     Integer height;
+    Boolean isAvailable;
 }

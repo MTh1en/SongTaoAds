@@ -5,6 +5,7 @@ import com.capstone.ads.dto.auth.AuthResponse;
 import com.capstone.ads.dto.auth.LoginRequest;
 import com.capstone.ads.dto.auth.RegisterRequest;
 import com.capstone.ads.service.AuthService;
+import com.capstone.ads.service.VerificationService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -14,11 +15,12 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
-    AuthService authService;
+    private final AuthService authService;
+    private final VerificationService verificationService;
+
 
     @PostMapping("/login")
     public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
@@ -29,6 +31,7 @@ public class AuthController {
     @PostMapping("/register")
     public ApiResponse<Void> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
+        verificationService.sendVerifyEmail(request.getFullName(), request.getEmail());
         return ApiResponseBuilder.buildSuccessResponse("Registration successful", null);
     }
 

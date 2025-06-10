@@ -15,6 +15,7 @@ public enum ErrorCode {
     ROLE_NOT_FOUND("Role not found", HttpStatus.NOT_FOUND),
     INVALID_TOKEN("Invalid token", HttpStatus.UNAUTHORIZED),
     INVALID_PRINCIPAL("Invalid principal", HttpStatus.UNAUTHORIZED),
+    DESIGNER_NOT_FOUND("Designer not found", HttpStatus.NOT_FOUND),
     //PRODUCT TYPE
     PRODUCT_TYPE_NOT_FOUND("Product type not found", HttpStatus.NOT_FOUND),
 
@@ -74,8 +75,17 @@ public enum ErrorCode {
 
     //FILE PROCESSING
     FILE_PROCESSING_FAILED("File processing failed", HttpStatus.INTERNAL_SERVER_ERROR),
+    FILE_REQUIRED("File required", HttpStatus.BAD_REQUEST),
 
     DESIGN_TEMPLATE_NOT_FOUND("Design template not found", HttpStatus.NOT_FOUND),
+    CUSTOM_DESIGN_REQUEST_PENDING_NOT_FOUND("Custom design request pending not found", HttpStatus.NOT_FOUND),
+    CUSTOM_DESIGN_REQUEST_NOT_FOUND("Custom design request not found", HttpStatus.NOT_FOUND),
+
+    INVALID_CUSTOM_DESIGN_REQUEST_STATUS_TRANSITION("Invalid custom design request status transition", HttpStatus.BAD_REQUEST),
+    CUSTOM_DESIGN_NOT_FOUND("Custom design not found", HttpStatus.NOT_FOUND),
+    INVALID_CUSTOM_DESIGN_STATUS_TRANSITION("Invalid custom design status transition", HttpStatus.BAD_REQUEST),
+    CUSTOM_DESIGN_IN_WAITING_DECISION_FROM_CUSTOMER("Custom design in waiting decision from customer", HttpStatus.BAD_REQUEST),
+    INVALID_ORDER_STATUS_TRANSITION("Invalid order status transition", HttpStatus.BAD_REQUEST),
 
     //CHAT BOT
     EXTERNAL_SERVICE_ERROR("External service error", HttpStatus.INTERNAL_SERVER_ERROR),

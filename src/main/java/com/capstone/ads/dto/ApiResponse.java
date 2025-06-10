@@ -1,10 +1,8 @@
 package com.capstone.ads.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -15,11 +13,12 @@ import java.time.format.DateTimeFormatter;
 @NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ApiResponse<T> implements Serializable {
     @Builder.Default
-    private Boolean success = true;
+    Boolean success = true;
     @Builder.Default
-    private String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    private String message;
-    private T result;
+    String timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    String message;
+    T result;
 }

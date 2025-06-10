@@ -50,8 +50,7 @@ public class S3RepositoryImpl implements S3Repository {
                 .key(key)
                 .build();
 
-        ResponseInputStream<GetObjectResponse> res = s3Client.getObject(getObjectRequest);
-        try {
+        try (ResponseInputStream<GetObjectResponse> res = s3Client.getObject(getObjectRequest)) {
             // Lấy contentType từ response, không phải request
             String contentType = res.response().contentType() != null ? res.response().contentType() : "application/octet-stream";
             byte[] content = res.readAllBytes(); // Nạp vào RAM, phù hợp với file nhỏ
@@ -62,12 +61,6 @@ public class S3RepositoryImpl implements S3Repository {
         } catch (IOException e) {
             log.error("IO Exception while downloading file with key {}", key, e);
             throw new RuntimeException("Download failed", e);
-        } finally {
-            try {
-                res.close(); // Đóng stream để giải phóng tài nguyên
-            } catch (IOException e) {
-                log.warn("Failed to close response stream for key {}", key, e);
-            }
         }
     }
 
@@ -83,6 +76,20 @@ public class S3RepositoryImpl implements S3Repository {
         } catch (Exception e) {
             log.error("Failed to generate presigned URL for key: {}", key, e);
             throw new RuntimeException("Failed to generate presigned URL", e);
+        }
+    }
+
+    @Override
+    public byte[] downloadImageAsBytes(String bucketName, String key) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+        try (ResponseInputStream<GetObjectResponse> res = s3Client.getObject(getObjectRequest)) {
+            return res.readAllBytes();
+        } catch (IOException e) {
+            log.error("Failed to download image from S3. Bucket: {}, Key: {}", bucketName, key, e);
+            throw new RuntimeException("Image download failed", e);
         }
     }
 }
