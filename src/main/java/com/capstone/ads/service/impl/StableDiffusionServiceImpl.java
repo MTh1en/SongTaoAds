@@ -19,6 +19,7 @@ import com.capstone.ads.utils.DataConverter;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,9 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
         AlwaysonScripts alwaysonScripts = stableDiffusionMapper.mapAlwaysonScripts(controlNetArgs);
 
         // Xây dựng TextToImageRequest
+        if (Strings.isBlank(prompt)) {
+            prompt = "A simple advertising 2d background";
+        }
         TextToImageRequest request = stableDiffusionMapper.mapTextToImageRequest(prompt, alwaysonScripts, userId);
 
         var response = stableDiffusionRepository.textToImage(bearerStableDiffusionToken, request);

@@ -21,14 +21,12 @@ public class ChatBotLog {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    @ManyToOne
-    Users users;
-
-
     String question;
     String answer;
 
     @CreationTimestamp
     LocalDateTime createdAt;
 
+    @ManyToOne
+    Users users;
 }
