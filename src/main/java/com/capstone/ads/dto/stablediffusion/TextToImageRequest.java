@@ -14,7 +14,8 @@ import java.util.Map;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TextToImageRequest {
-    String prompt;
+    @Builder.Default
+    String prompt = "A simple advertising 2d background";
 
     @Builder.Default
     @JsonProperty("negative_prompt")
@@ -33,7 +34,7 @@ public class TextToImageRequest {
     Integer nIter = 1;
 
     @Builder.Default
-    Integer steps = 25;
+    Integer steps = 30;
 
     @Builder.Default
     Double width = 1024.0;
@@ -53,16 +54,16 @@ public class TextToImageRequest {
     @JsonProperty("override_settings")
     Map<String, Object> overrideSettings = new HashMap<>() {
         {
-            put("sd_model_checkpoint", "dreamshaperXL_v21TurboDPMSDE.safetensors");
+            put("sd_model_checkpoint", "dreamshaper_8.safetensors");
         }
     };
 
     @Builder.Default
     @JsonProperty("sampler_name")
-    String samplerName = "DPM++ 2M SDE";
+    String samplerName = "Euler";
 
     @Builder.Default
-    String scheduler = "karras";
+    String scheduler = "simple";
 
     @JsonProperty(value = "force_task_id")
     String forceTaskId;

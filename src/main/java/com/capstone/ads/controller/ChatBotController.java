@@ -17,26 +17,31 @@ import java.util.List;
 @RequestMapping("/api/chat-bot")
 @RequiredArgsConstructor
 public class ChatBotController {
-
     private final ChatBotService chatBotService;
 
     @PostMapping("/chat")
     public ApiResponse<String> chat(@RequestBody ChatRequest request) {
-        String reply = chatBotService.chat(request.getPrompt());
+        String reply = chatBotService.chat(request);
         return ApiResponseBuilder.buildSuccessResponse("Chat response retrieved successfully.", reply);
+    }
+
+    @PostMapping("/translate-to-txt2img-prompt")
+    public ApiResponse<String> translate(@RequestBody ChatRequest request) {
+        String reply = chatBotService.translateToTextToImagePrompt(request.getPrompt());
+        return ApiResponseBuilder.buildSuccessResponse("Translate retrieved successfully.", reply);
     }
 
     @PostMapping(value = "/upload-file-finetune", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<FileUploadResponse> uploadFileToFinetune(
-           @RequestParam  MultipartFile file) {
+            @RequestParam MultipartFile file) {
         FileUploadResponse response = chatBotService.uploadFileToFinetune(file);
         return ApiResponseBuilder.buildSuccessResponse("File uploaded successfully for fine-tuning", response);
     }
 
     @PostMapping("/finetune-model")
-    public ApiResponse<FineTuningJobResponse> finetuneModel( @RequestBody FineTuningJobRequest request) {
+    public ApiResponse<FineTuningJobResponse> finetuneModel(@RequestBody FineTuningJobRequest request) {
         FineTuningJobResponse response = chatBotService.fineTuningJob(request);
-       return ApiResponseBuilder.buildSuccessResponse("Fine-tuning job created successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Fine-tuning job created successfully", response);
     }
 
     @GetMapping("/files/{fileId}")
@@ -55,9 +60,10 @@ public class ChatBotController {
     @DeleteMapping("/files/{fileId}")
     public ApiResponse<FileDeletionResponse> deleteFile(
             @PathVariable String fileId) {
-        FileDeletionResponse response =   chatBotService.deleteUploadedFile(fileId);
-       return ApiResponseBuilder.buildSuccessResponse("File deleted successfully", response);
+        FileDeletionResponse response = chatBotService.deleteUploadedFile(fileId);
+        return ApiResponseBuilder.buildSuccessResponse("File deleted successfully", response);
     }
+
     @GetMapping("/fine-tune-jobs")
     public ApiResponse<List<FineTuningJobResponse>> getFineTuningJobs() {
         List<FineTuningJobResponse> response = chatBotService.getAllFineTuneJobs();
