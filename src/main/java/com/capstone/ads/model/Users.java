@@ -43,7 +43,7 @@ public class Users {
     LocalDateTime updateAt;
 
     @ManyToOne
-    private Roles roles;
+    Roles roles;
 
     @OneToMany(mappedBy = "users")
     List<Orders> orders;
@@ -53,4 +53,7 @@ public class Users {
 
     @OneToMany(mappedBy = "assignDesigner")
     List<CustomDesignRequests> customDesignRequests;
+
+    @OneToMany(mappedBy = "users")
+    List<ChatBotLog> chatBotLogs;
 }

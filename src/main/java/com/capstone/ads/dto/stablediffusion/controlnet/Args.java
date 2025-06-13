@@ -18,7 +18,7 @@ public class Args {
     @Builder.Default
     String module = "depth_anything_v2";
     @Builder.Default
-    String model = "diffusers_xl_depth_full [2f51180b]";
+    String model = "control_sd15_depth [fef5e48e]";
     @Builder.Default
     Double weight = 0.8;
 
@@ -48,5 +48,5 @@ public class Args {
 
     @Builder.Default
     @JsonProperty(value = "control_mode")
-    String controlMode = "Balanced";
+    String controlMode = "ControlNet is more important";
 }
