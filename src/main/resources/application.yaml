@@ -18,6 +18,7 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: false
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html

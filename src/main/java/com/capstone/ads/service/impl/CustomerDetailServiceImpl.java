@@ -51,20 +51,20 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
     }
 
     @Override
-    public CustomerDetailDTO getCustomerDetailById(String customerDetailId) {
-        CustomerDetail customerDetail = findCustomerDetailById(customerDetailId);
+    public CustomerDetailDTO findCustomerDetailById(String customerDetailId) {
+        CustomerDetail customerDetail = findById(customerDetailId);
         return convertToCustomerDetailDTOWithLogoUrlIsPresignedURL(customerDetail);
     }
 
     @Override
-    public CustomerDetailDTO getCustomerDetailByUserId(String userId) {
+    public CustomerDetailDTO findCustomerDetailByUserId(String userId) {
         CustomerDetail customerDetail = customerDetailRepository.findByUsers_Id(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
         return customerDetailMapper.toDTO(customerDetail);
     }
 
     @Override
-    public List<CustomerDetailDTO> getAllCustomerDetails() {
+    public List<CustomerDetailDTO> findAllCustomerDetails() {
         return customerDetailRepository.findAll().stream()
                 .map(this::convertToCustomerDetailDTOWithLogoUrlIsPresignedURL)
                 .collect(Collectors.toList());
@@ -72,7 +72,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
 
     @Override
     public CustomerDetailDTO updateCustomerDetailInformation(String customerDetailId, CustomerDetailRequest request) {
-        CustomerDetail customerDetail = findCustomerDetailById(customerDetailId);
+        CustomerDetail customerDetail = findById(customerDetailId);
         customerDetailMapper.updateEntityFromDTO(request, customerDetail);
         customerDetail = customerDetailRepository.save(customerDetail);
         return customerDetailMapper.toDTO(customerDetail);
@@ -80,7 +80,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
 
     @Override
     public CustomerDetailDTO updateCustomerDetailLogoImage(String customerDetailId, MultipartFile logoImage) {
-        CustomerDetail customerDetail = findCustomerDetailById(customerDetailId);
+        CustomerDetail customerDetail = findById(customerDetailId);
         String newImageLogoUrl = uploadCustomDesignImageToS3(customerDetailId, logoImage);
         customerDetail.setLogoUrl(newImageLogoUrl);
         customerDetail = customerDetailRepository.save(customerDetail);
@@ -88,14 +88,14 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
     }
 
     @Override
-    public void deleteCustomerDetail(String id) {
+    public void hardDeleteCustomerDetail(String id) {
         if (!customerDetailRepository.existsById(id)) {
             throw new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND);
         }
         customerDetailRepository.deleteById(id);
     }
 
-    private CustomerDetail findCustomerDetailById(String customerDetailId) {
+    private CustomerDetail findById(String customerDetailId) {
         return customerDetailRepository.findById(customerDetailId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
     }

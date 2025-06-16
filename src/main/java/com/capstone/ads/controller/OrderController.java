@@ -73,6 +73,6 @@ public class OrderController {
     @DeleteMapping("/orders/{orderId}")
     public ApiResponse<Void> hardDeleteOrder(@PathVariable String orderId) {
         service.hardDeleteOrder(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Hard delete order successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Hard hardDeleteAttribute order successful", null);
     }
 }

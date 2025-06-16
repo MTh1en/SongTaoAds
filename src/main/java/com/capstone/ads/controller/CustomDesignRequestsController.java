@@ -19,9 +19,10 @@ public class CustomDesignRequestsController {
     private final CustomDesignRequestService service;
 
     @PostMapping("/customer-details/{customerDetailId}/customer-choices/{customerChoiceId}")
-    public ApiResponse<CustomDesignRequestDTO> createCustomDesignRequest(@PathVariable String customerDetailId,
-                                                                         @PathVariable String customerChoiceId,
-                                                                         @RequestBody CustomDesignRequestCreateRequest request) {
+    public ApiResponse<CustomDesignRequestDTO> createCustomDesignRequest(
+            @PathVariable String customerDetailId,
+            @PathVariable String customerChoiceId,
+            @RequestBody CustomDesignRequestCreateRequest request) {
         var response = service.createCustomDesignRequest(customerDetailId, customerChoiceId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create custom design request successful", response);
     }
@@ -34,16 +35,17 @@ public class CustomDesignRequestsController {
     }
 
     @PatchMapping("/custom-design-requests/{customDesignRequestId}/status")
-    public ApiResponse<CustomDesignRequestDTO> changeCustomDesignRequestStatus(@PathVariable String customDesignRequestId,
+    public ApiResponse<CustomDesignRequestDTO> changeStatusCustomDesignRequest(@PathVariable String customDesignRequestId,
                                                                                @RequestParam("status") CustomDesignRequestStatus status) {
         var response = service.changeStatusCustomDesignRequest(customDesignRequestId, status);
         return ApiResponseBuilder.buildSuccessResponse("Change custom design request status successful", response);
     }
 
     @GetMapping("/customer-details/{customerDetailId}/custom-design-requests")
-    public ApiPagingResponse<CustomDesignRequestDTO> findCustomerDesignRequestByCustomerDetailId(@PathVariable String customerDetailId,
-                                                                                                 @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                                                                 @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+    public ApiPagingResponse<CustomDesignRequestDTO> findCustomerDesignRequestByCustomerDetailId(
+            @PathVariable String customerDetailId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findCustomerDesignRequestByCustomerDetailId(customerDetailId, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request by custom detail request successful", response, page);
     }

@@ -7,15 +7,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ProductTypesService {
-    ProductTypeDTO createProductTypeService(ProductTypeCreateRequest request);
+    ProductTypeDTO createProductType(ProductTypeCreateRequest request);
 
-    ProductTypeDTO updateInformation(String productTypeId, ProductTypeUpdateRequest request);
+    ProductTypeDTO updateProductTypeInformation(String productTypeId, ProductTypeUpdateRequest request);
 
     ProductTypeDTO findProductTypeByProductTypeId(String productTypeId);
 
     Page<ProductTypeDTO> findAllProductType(int page, int size);
 
-    void forceDeleteProductType(String productTypeId);
+    void hardDeleteProductType(String productTypeId);
 
     ProductTypeDTO uploadProductTypeImage(String productTypeId, MultipartFile file);
 }

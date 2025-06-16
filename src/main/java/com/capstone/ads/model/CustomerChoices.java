@@ -21,7 +21,6 @@ public class CustomerChoices {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     Double totalAmount;
-    Boolean isFinal;
 
     @CreationTimestamp
     LocalDateTime createdAt;

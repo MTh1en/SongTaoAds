@@ -35,7 +35,7 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
 
     @Override
     @Transactional
-    public CustomerChoicesSizeDTO create(String customerChoicesId, String sizeId, CustomerChoicesSizeCreateRequest request) {
+    public CustomerChoicesSizeDTO createCustomerChoiceSize(String customerChoicesId, String sizeId, CustomerChoicesSizeCreateRequest request) {
         var customerChoice = customerChoicesRepository.findById(customerChoicesId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
         if (!sizesRepository.existsById(sizeId))
@@ -52,7 +52,7 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
 
     @Override
     @Transactional
-    public CustomerChoicesSizeDTO update(String customerChoiceSizeId, CustomerChoicesSizeUpdateRequest request) {
+    public CustomerChoicesSizeDTO updateValueInCustomerChoiceSize(String customerChoiceSizeId, CustomerChoicesSizeUpdateRequest request) {
         var customerChoicesSize = customerChoiceSizesRepository.findById(customerChoiceSizeId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_SIZE_NOT_FOUND));
         customerChoiceSizesMapper.updateEntityFromRequest(request, customerChoicesSize);
@@ -64,14 +64,14 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
     }
 
     @Override
-    public CustomerChoicesSizeDTO findById(String id) {
+    public CustomerChoicesSizeDTO findCustomerChoiceSizeById(String id) {
         CustomerChoiceSizes customerChoiceSizes = customerChoiceSizesRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_SIZE_NOT_FOUND));
         return customerChoiceSizesMapper.toDTO(customerChoiceSizes);
     }
 
     @Override
-    public List<CustomerChoicesSizeDTO> findAllByCustomerChoicesId(String customerChoicesId) {
+    public List<CustomerChoicesSizeDTO> findAllCustomerChoiceSizeByCustomerChoicesId(String customerChoicesId) {
         if (!customerChoicesRepository.existsById(customerChoicesId))
             throw new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND);
 
@@ -82,7 +82,7 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
 
     @Override
     @Transactional
-    public void delete(String id) {
+    public void hardDeleteCustomerChoiceSize(String id) {
         if (!customerChoiceSizesRepository.existsById(id)) {
             throw new AppException(ErrorCode.CUSTOMER_CHOICES_SIZE_NOT_FOUND);
         }

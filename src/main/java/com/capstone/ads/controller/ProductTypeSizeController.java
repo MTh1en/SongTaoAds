@@ -16,18 +16,20 @@ public class ProductTypeSizeController {
     private final ProductTypeSizesService service;
 
     @PostMapping("/product-types/{productTypeId}/sizes/{sizeId}")
-    public ApiResponse<ProductTypeSizeDTO> create(@PathVariable String productTypeId, @PathVariable String sizeId) {
-        return ApiResponseBuilder.buildSuccessResponse("Create product type successful", service.create(productTypeId, sizeId));
+    public ApiResponse<ProductTypeSizeDTO> createProductTypeSize(@PathVariable String productTypeId, @PathVariable String sizeId) {
+        var response = service.createProductTypeSize(productTypeId, sizeId);
+        return ApiResponseBuilder.buildSuccessResponse("Create product type successful", response);
     }
 
     @GetMapping("product-types/{productTypeId}/product-type-sizes")
-    public ApiResponse<List<ProductTypeSizeDTO>> getAllByProductTypeId(@PathVariable String productTypeId) {
-        return ApiResponseBuilder.buildSuccessResponse("Find all product type size by product type", service.getAllByProductTypeId(productTypeId));
+    public ApiResponse<List<ProductTypeSizeDTO>> getAllProductTypeSizeByProductTypeId(@PathVariable String productTypeId) {
+        var response = service.findAllProductTypeSizeByProductTypeId(productTypeId);
+        return ApiResponseBuilder.buildSuccessResponse("Find all product type size by product type", response);
     }
 
     @DeleteMapping("/product-type-sizes/{productTypeSizeId}")
-    public ApiResponse<Void> delete(@PathVariable String productTypeSizeId) {
-        service.delete(productTypeSizeId);
+    public ApiResponse<Void> hardDeleteProductTypeSize(@PathVariable String productTypeSizeId) {
+        service.hardDeleteProductTypeSize(productTypeSizeId);
         return ApiResponseBuilder.buildSuccessResponse("Delete product type size successful", null);
     }
 }
