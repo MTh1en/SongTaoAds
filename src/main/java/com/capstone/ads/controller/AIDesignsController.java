@@ -34,7 +34,7 @@ public class AIDesignsController {
     }
 
     @DeleteMapping("/ai-designs/{aiDesignId}")
-    public ApiResponse<Void> deleteAIDesign(@PathVariable String aiDesignId) {
+    public ApiResponse<Void> hardDeleteAIDesign(@PathVariable String aiDesignId) {
         service.hardDeleteAIDesign(aiDesignId);
         return ApiResponseBuilder.buildSuccessResponse("Delete AIDesign successful", null);
     }

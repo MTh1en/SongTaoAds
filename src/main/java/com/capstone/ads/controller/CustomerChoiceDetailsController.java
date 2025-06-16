@@ -16,29 +16,35 @@ public class CustomerChoiceDetailsController {
     private final CustomerChoiceDetailsService service;
 
     @PostMapping("/customer-choices/{customerChoiceId}/attribute-values/{attributeValueId}")
-    public ApiResponse<CustomerChoicesDetailsDTO> create(@PathVariable String customerChoiceId, @PathVariable String attributeValueId) {
-        return ApiResponseBuilder.buildSuccessResponse("Create customer choices detail successful", service.create(customerChoiceId, attributeValueId));
+    public ApiResponse<CustomerChoicesDetailsDTO> createCustomerChoiceDetail(@PathVariable String customerChoiceId,
+                                                                             @PathVariable String attributeValueId) {
+        var response = service.createCustomerChoiceDetail(customerChoiceId, attributeValueId);
+        return ApiResponseBuilder.buildSuccessResponse("Create customer choices detail successful", response);
     }
 
     @PutMapping("/customer-choice-details/{customerChoiceDetailId}/attribute-values/{attributeValueId}")
-    public ApiResponse<CustomerChoicesDetailsDTO> updateAttributeValue(@PathVariable String customerChoiceDetailId,
-                                                                       @PathVariable String attributeValueId) {
-        return ApiResponseBuilder.buildSuccessResponse("Update customer choices size successful", service.updateAttributeValue(customerChoiceDetailId, attributeValueId));
+    public ApiResponse<CustomerChoicesDetailsDTO> updateAttributeValueInCustomerChoiceDetail(
+            @PathVariable String customerChoiceDetailId,
+            @PathVariable String attributeValueId) {
+        var response = service.updateAttributeValueInCustomerChoiceDetail(customerChoiceDetailId, attributeValueId);
+        return ApiResponseBuilder.buildSuccessResponse("Update customer choices size successful", response);
     }
 
     @GetMapping("/customer-choice-details/{customerChoiceDetailId}")
-    public ApiResponse<CustomerChoicesDetailsDTO> getById(@PathVariable String customerChoiceDetailId) {
-        return ApiResponseBuilder.buildSuccessResponse("customer choices detail by Id", service.findById(customerChoiceDetailId));
+    public ApiResponse<CustomerChoicesDetailsDTO> findCustomerChoiceDetailById(@PathVariable String customerChoiceDetailId) {
+        var response = service.findCustomerChoiceDetailById(customerChoiceDetailId);
+        return ApiResponseBuilder.buildSuccessResponse("customer choices detail by Id", response);
     }
 
     @GetMapping("/customer-choices/{customerChoiceId}/customer-choice-details")
-    public ApiResponse<List<CustomerChoicesDetailsDTO>> getNewestByCustomer(@PathVariable String customerChoiceId) {
-        return ApiResponseBuilder.buildSuccessResponse("Find all customer choices detail by product type", service.findAllByCustomerChoicesId(customerChoiceId));
+    public ApiResponse<List<CustomerChoicesDetailsDTO>> findAllCustomerChoiceDetailByCustomerChoicesId(@PathVariable String customerChoiceId) {
+        var response = service.findAllCustomerChoiceDetailByCustomerChoicesId(customerChoiceId);
+        return ApiResponseBuilder.buildSuccessResponse("Find all customer choices detail by product type", response);
     }
 
     @DeleteMapping("/customer-choice-details/{customerChoiceDetailId}")
-    public ApiResponse<Void> delete(@PathVariable String customerChoiceDetailId) {
-        service.delete(customerChoiceDetailId);
+    public ApiResponse<Void> hardDeleteCustomerChoiceDetail(@PathVariable String customerChoiceDetailId) {
+        service.hardDeleteCustomerChoiceDetail(customerChoiceDetailId);
         return ApiResponseBuilder.buildSuccessResponse("Delete customer choices detail successful", null);
     }
 }

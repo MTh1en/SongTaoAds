@@ -12,8 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/product-types")
 @RequiredArgsConstructor
@@ -22,19 +20,19 @@ public class ProductTypeController {
 
     @PostMapping
     public ApiResponse<ProductTypeDTO> createProductType(@RequestBody ProductTypeCreateRequest request) {
-        var response = service.createProductTypeService(request);
+        var response = service.createProductType(request);
         return ApiResponseBuilder.buildSuccessResponse("Create product type successful", response);
     }
 
     @PatchMapping("/{productTypeId}/information")
     public ApiResponse<ProductTypeDTO> updateProductTypeInformation(@PathVariable String productTypeId,
                                                                     @RequestBody ProductTypeUpdateRequest request) {
-        var response = service.updateInformation(productTypeId, request);
+        var response = service.updateProductTypeInformation(productTypeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update product type information successful", response);
     }
 
     @PatchMapping(value = "/{productTypeId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<ProductTypeDTO> updateProductTypeImage(@PathVariable String productTypeId,
+    public ApiResponse<ProductTypeDTO> uploadProductTypeImage(@PathVariable String productTypeId,
                                                               @RequestPart("file") MultipartFile productTypeImage) {
         var response = service.uploadProductTypeImage(productTypeId, productTypeImage);
         return ApiResponseBuilder.buildSuccessResponse("Update product type image successful", response);
@@ -54,8 +52,8 @@ public class ProductTypeController {
     }
 
     @DeleteMapping("/{productTypeId}")
-    public ApiResponse<Void> delete(@PathVariable String productTypeId) {
-        service.forceDeleteProductType(productTypeId);
+    public ApiResponse<Void> hardDeleteProductType(@PathVariable String productTypeId) {
+        service.hardDeleteProductType(productTypeId);
         return ApiResponseBuilder.buildSuccessResponse("Delete product type successful", null);
     }
 }

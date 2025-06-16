@@ -90,7 +90,7 @@ public class UsersServiceImpl implements UserService {
     public UserDTO updateUserProfile(String userId, UserProfileUpdateRequest request) {
         Users user = findUserByIdAndActive(userId);
 
-        // Use MapStruct to updateInformation entity fields
+        // Use MapStruct to updateProductTypeInformation entity fields
         usersMapper.updateUserUpdateRequestToEntity(request, user);
 
         Users updatedUser = usersRepository.save(user);

@@ -9,15 +9,15 @@ import java.util.List;
 public interface CustomerDetailService {
     CustomerDetailDTO createCustomerDetail(String companyName, String tagLine, String contactInfo, MultipartFile customerDetailLogo);
 
-    CustomerDetailDTO getCustomerDetailById(String customerDetailId);
+    CustomerDetailDTO findCustomerDetailById(String customerDetailId);
 
-    CustomerDetailDTO getCustomerDetailByUserId(String customerDetailId);
+    CustomerDetailDTO findCustomerDetailByUserId(String customerDetailId);
 
-    List<CustomerDetailDTO> getAllCustomerDetails();
+    List<CustomerDetailDTO> findAllCustomerDetails();
 
     CustomerDetailDTO updateCustomerDetailInformation(String customerDetailId, CustomerDetailRequest request);
 
     CustomerDetailDTO updateCustomerDetailLogoImage(String customerDetailId, MultipartFile logoImage);
 
-    void deleteCustomerDetail(String customerDetailId);
+    void hardDeleteCustomerDetail(String customerDetailId);
 }

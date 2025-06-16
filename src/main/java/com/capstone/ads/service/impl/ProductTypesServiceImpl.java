@@ -34,7 +34,7 @@ public class ProductTypesServiceImpl implements ProductTypesService {
 
     @Override
     @Transactional
-    public ProductTypeDTO createProductTypeService(ProductTypeCreateRequest request) {
+    public ProductTypeDTO createProductType(ProductTypeCreateRequest request) {
         ProductTypes productTypes = productTypesMapper.toEntity(request);
         productTypes = productTypesRepository.save(productTypes);
         return productTypesMapper.toDTO(productTypes);
@@ -42,7 +42,7 @@ public class ProductTypesServiceImpl implements ProductTypesService {
 
     @Override
     @Transactional
-    public ProductTypeDTO updateInformation(String productTypeId, ProductTypeUpdateRequest request) {
+    public ProductTypeDTO updateProductTypeInformation(String productTypeId, ProductTypeUpdateRequest request) {
         ProductTypes productTypes = getProductTypeByIdAndAvailable(productTypeId);
         productTypesMapper.updateEntityFromRequest(request, productTypes);
         productTypes = productTypesRepository.save(productTypes);
@@ -64,7 +64,7 @@ public class ProductTypesServiceImpl implements ProductTypesService {
 
     @Override
     @Transactional
-    public void forceDeleteProductType(String id) {
+    public void hardDeleteProductType(String id) {
         if (!productTypesRepository.existsById(id)) {
             throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
         }

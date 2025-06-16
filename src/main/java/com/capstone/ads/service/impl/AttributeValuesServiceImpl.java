@@ -26,7 +26,7 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
 
     @Override
     @Transactional
-    public AttributeValuesDTO create(String attributesId, AttributeValuesCreateRequest request) {
+    public AttributeValuesDTO createAttributeValue(String attributesId, AttributeValuesCreateRequest request) {
         if (!attributesRepository.existsById(attributesId))
             throw new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND);
 
@@ -37,7 +37,7 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
 
     @Override
     @Transactional
-    public AttributeValuesDTO update(String attributeValueId, AttributeValuesUpdateRequest request) {
+    public AttributeValuesDTO updateAttributeValueInformation(String attributeValueId, AttributeValuesUpdateRequest request) {
         AttributeValues attributeValues = attributeValuesRepository.findById(attributeValueId)
                 .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND));
 
@@ -47,14 +47,14 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
     }
 
     @Override
-    public AttributeValuesDTO findById(String id) {
+    public AttributeValuesDTO findAttributeValueById(String id) {
         AttributeValues attributeValues = attributeValuesRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND));
         return attributeValuesMapper.toDTO(attributeValues);
     }
 
     @Override
-    public Page<AttributeValuesDTO> findAllByAttributesId(String attributesId, int page, int size) {
+    public Page<AttributeValuesDTO> findAllAttributeValueByAttributesId(String attributesId, int page, int size) {
         if (!attributesRepository.existsById(attributesId))
             throw new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND);
 
@@ -66,7 +66,7 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
 
     @Override
     @Transactional
-    public void delete(String id) {
+    public void hardDeleteAttributeValue(String id) {
         if (!attributeValuesRepository.existsById(id))
             throw new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND);
 

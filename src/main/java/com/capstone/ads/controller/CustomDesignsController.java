@@ -34,8 +34,8 @@ public class CustomDesignsController {
     }
 
     @PatchMapping("/custom-designs/{customDesignId}/designer-description")
-    public ApiResponse<CustomDesignDTO> designerUpdateDescription(@PathVariable String customDesignId,
-                                                             @RequestBody DesignerUpdateDescriptionCustomDesignRequest request) {
+    public ApiResponse<CustomDesignDTO> designerUpdateDescriptionCustomDesign(@PathVariable String customDesignId,
+                                                                              @RequestBody DesignerUpdateDescriptionCustomDesignRequest request) {
         var response = customDesignsService.designerUpdateDescriptionCustomDesign(customDesignId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update design description successful", response);
     }
@@ -56,7 +56,7 @@ public class CustomDesignsController {
     }
 
     @DeleteMapping("/custom-designs/{customDesignId}")
-    public ApiResponse<Void> deleteCustomDesign(@PathVariable String customDesignId) {
+    public ApiResponse<Void> hardDeleteCustomDesign(@PathVariable String customDesignId) {
         customDesignsService.hardDeleteCustomDesign(customDesignId);
         return ApiResponseBuilder.buildSuccessResponse("Delete Custom Design successful", null);
     }

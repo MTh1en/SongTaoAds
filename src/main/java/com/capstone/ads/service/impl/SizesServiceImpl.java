@@ -24,7 +24,7 @@ public class SizesServiceImpl implements SizeService {
 
     @Override
     @Transactional
-    public SizeDTO create(SizeCreateRequest request) {
+    public SizeDTO createSize(SizeCreateRequest request) {
         Sizes sizes = sizesMapper.toEntity(request);
         sizes = sizesRepository.save(sizes);
         return sizesMapper.toDTO(sizes);
@@ -32,7 +32,7 @@ public class SizesServiceImpl implements SizeService {
 
     @Override
     @Transactional
-    public SizeDTO update(String id, SizeUpdateRequest request) {
+    public SizeDTO updateSizeInformation(String id, SizeUpdateRequest request) {
         Sizes sizes = sizesRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.SIZE_NOT_FOUND));
         sizesMapper.updateEntityFromRequest(request, sizes);
@@ -41,14 +41,14 @@ public class SizesServiceImpl implements SizeService {
     }
 
     @Override
-    public SizeDTO findById(String id) {
+    public SizeDTO findSizeById(String id) {
         Sizes sizes = sizesRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.SIZE_NOT_FOUND));
         return sizesMapper.toDTO(sizes);
     }
 
     @Override
-    public Page<SizeDTO> findAll(int page, int size) {
+    public Page<SizeDTO> findAllSize(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         return sizesRepository.findAll(pageable)
                 .map(sizesMapper::toDTO);
@@ -56,7 +56,7 @@ public class SizesServiceImpl implements SizeService {
 
     @Override
     @Transactional
-    public void delete(String id) {
+    public void hardDeleteSize(String id) {
         if (!sizesRepository.existsById(id)) {
             throw new AppException(ErrorCode.SIZE_NOT_FOUND);
         }

@@ -7,13 +7,13 @@ import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeUpdateRequest;
 import java.util.List;
 
 public interface CustomerChoiceSizesService {
-    CustomerChoicesSizeDTO create(String customerChoicesId, String sizeId, CustomerChoicesSizeCreateRequest request);
+    CustomerChoicesSizeDTO createCustomerChoiceSize(String customerChoicesId, String sizeId, CustomerChoicesSizeCreateRequest request);
 
-    CustomerChoicesSizeDTO update(String customerChoiceSizeId, CustomerChoicesSizeUpdateRequest request);
+    CustomerChoicesSizeDTO updateValueInCustomerChoiceSize(String customerChoiceSizeId, CustomerChoicesSizeUpdateRequest request);
 
-    CustomerChoicesSizeDTO findById(String customerChoiceSizeId);
+    CustomerChoicesSizeDTO findCustomerChoiceSizeById(String customerChoiceSizeId);
 
-    List<CustomerChoicesSizeDTO> findAllByCustomerChoicesId(String customerChoicesId);
+    List<CustomerChoicesSizeDTO> findAllCustomerChoiceSizeByCustomerChoicesId(String customerChoicesId);
 
-    void delete(String id);
+    void hardDeleteCustomerChoiceSize(String id);
 }

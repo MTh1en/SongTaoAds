@@ -35,7 +35,7 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
 
     @Override
     @Transactional
-    public CustomerChoicesDetailsDTO create(String customerChoicesId, String attributeValueId) {
+    public CustomerChoicesDetailsDTO createCustomerChoiceDetail(String customerChoicesId, String attributeValueId) {
         var customerChoices = customerChoicesRepository.findById(customerChoicesId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
         var attributeValues = attributeValuesRepository.findById(attributeValueId)
@@ -53,7 +53,7 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
 
     @Override
     @Transactional
-    public CustomerChoicesDetailsDTO updateAttributeValue(String customerChoiceDetailId, String attributeValueId) {
+    public CustomerChoicesDetailsDTO updateAttributeValueInCustomerChoiceDetail(String customerChoiceDetailId, String attributeValueId) {
         var customerChoicesDetails = customerChoiceDetailsRepository.findById(customerChoiceDetailId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND));
         var attributeValue = attributeValuesRepository.findById(attributeValueId)
@@ -69,14 +69,14 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
     }
 
     @Override
-    public CustomerChoicesDetailsDTO findById(String id) {
+    public CustomerChoicesDetailsDTO findCustomerChoiceDetailById(String id) {
         CustomerChoiceDetails customerChoiceDetails = customerChoiceDetailsRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND));
         return customerChoiceDetailsMapper.toDTO(customerChoiceDetails);
     }
 
     @Override
-    public List<CustomerChoicesDetailsDTO> findAllByCustomerChoicesId(String customerChoicesId) {
+    public List<CustomerChoicesDetailsDTO> findAllCustomerChoiceDetailByCustomerChoicesId(String customerChoicesId) {
         if (!customerChoicesRepository.existsById(customerChoicesId))
             throw new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND);
         return customerChoiceDetailsRepository.findByCustomerChoices_IdOrderByCreatedAtAsc(customerChoicesId).stream()
@@ -86,7 +86,7 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
 
     @Override
     @Transactional
-    public void delete(String id) {
+    public void hardDeleteCustomerChoiceDetail(String id) {
         if (!customerChoiceDetailsRepository.existsById(id)) {
             throw new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND);
         }

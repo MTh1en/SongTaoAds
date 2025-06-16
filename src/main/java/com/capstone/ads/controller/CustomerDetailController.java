@@ -21,21 +21,19 @@ public class CustomerDetailController {
     private final CustomerDetailService customerDetailService;
 
     @PostMapping(value = "/customer-details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<CustomerDetailDTO> create(@RequestPart String companyName,
+    public ApiResponse<CustomerDetailDTO> createCustomerDetail(@RequestPart String companyName,
                                                  @RequestPart String tagLine,
                                                  @RequestPart String contactInfo,
                                                  @RequestPart MultipartFile customerDetailLogo) {
-        return ApiResponseBuilder.buildSuccessResponse(
-                "Create customer detail successful",
-                customerDetailService.createCustomerDetail(companyName, tagLine, contactInfo, customerDetailLogo)
-        );
+        var response = customerDetailService.createCustomerDetail(companyName, tagLine, contactInfo, customerDetailLogo);
+        return ApiResponseBuilder.buildSuccessResponse("Create customer detail successful", response);
     }
 
     @GetMapping("/customer-details/{customerDetailId}")
-    public ApiResponse<CustomerDetailDTO> getById(@PathVariable("customerDetailId") String customerDetailId) {
+    public ApiResponse<CustomerDetailDTO> getCustomerDetailById(@PathVariable("customerDetailId") String customerDetailId) {
         return ApiResponseBuilder.buildSuccessResponse(
                 "Customer detail by ID",
-                customerDetailService.getCustomerDetailById(customerDetailId)
+                customerDetailService.findCustomerDetailById(customerDetailId)
         );
     }
 
@@ -43,7 +41,7 @@ public class CustomerDetailController {
     public ApiResponse<CustomerDetailDTO> getByUserId(@PathVariable String userId) {
         return ApiResponseBuilder.buildSuccessResponse(
                 "Customer detail by user ID",
-                customerDetailService.getCustomerDetailByUserId(userId)
+                customerDetailService.findCustomerDetailByUserId(userId)
         );
     }
 
@@ -51,7 +49,7 @@ public class CustomerDetailController {
     public ApiResponse<List<CustomerDetailDTO>> getAll() {
         return ApiResponseBuilder.buildSuccessResponse(
                 "Find all customer details",
-                customerDetailService.getAllCustomerDetails()
+                customerDetailService.findAllCustomerDetails()
         );
     }
 
@@ -73,7 +71,7 @@ public class CustomerDetailController {
 
     @DeleteMapping("/customer-details/{customerDetailId}")
     public ApiResponse<Void> delete(@PathVariable("customerDetailId") String customerDetailId) {
-        customerDetailService.deleteCustomerDetail(customerDetailId);
+        customerDetailService.hardDeleteCustomerDetail(customerDetailId);
         return ApiResponseBuilder.buildSuccessResponse("Delete customer detail successful", null);
     }
 }

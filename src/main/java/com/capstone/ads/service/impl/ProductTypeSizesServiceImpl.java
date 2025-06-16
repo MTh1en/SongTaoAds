@@ -26,7 +26,7 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
 
     @Override
     @Transactional
-    public ProductTypeSizeDTO create(String productTypeId, String sizeId) {
+    public ProductTypeSizeDTO createProductTypeSize(String productTypeId, String sizeId) {
         if (!productTypesRepository.existsById(productTypeId)) throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
         if (!sizesRepository.existsById(sizeId)) throw new AppException(ErrorCode.SIZE_NOT_FOUND);
         ProductTypeSizes productTypeSizes = productTypeSizesMapper.toEntity(productTypeId, sizeId);
@@ -36,7 +36,7 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductTypeSizeDTO> getAllByProductTypeId(String productTypeId) {
+    public List<ProductTypeSizeDTO> findAllProductTypeSizeByProductTypeId(String productTypeId) {
         return productTypeSizesRepository.findByProductTypes_Id(productTypeId).stream()
                 .map(productTypeSizesMapper::toDTO)
                 .collect(Collectors.toList());
@@ -44,7 +44,7 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
 
     @Override
     @Transactional
-    public void delete(String productTypeSizeId) {
+    public void hardDeleteProductTypeSize(String productTypeSizeId) {
         if(!productTypeSizesRepository.existsById(productTypeSizeId)) throw new AppException(ErrorCode.PRODUCT_TYPE_SIZE_NOT_FOUND);
         productTypeSizesRepository.deleteById(productTypeSizeId);
     }

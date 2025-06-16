@@ -5,16 +5,14 @@ import com.capstone.ads.dto.attributevalue.AttributeValuesDTO;
 import com.capstone.ads.dto.attributevalue.AttributeValuesUpdateRequest;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
 public interface AttributeValuesService {
-    AttributeValuesDTO create(String attributesId, AttributeValuesCreateRequest request);
+    AttributeValuesDTO createAttributeValue(String attributesId, AttributeValuesCreateRequest request);
 
-    AttributeValuesDTO update(String attributeValueId, AttributeValuesUpdateRequest request);
+    AttributeValuesDTO updateAttributeValueInformation(String attributeValueId, AttributeValuesUpdateRequest request);
 
-    AttributeValuesDTO findById(String id);
+    AttributeValuesDTO findAttributeValueById(String id);
 
-    Page<AttributeValuesDTO> findAllByAttributesId(String attributesId, int page, int size);
+    Page<AttributeValuesDTO> findAllAttributeValueByAttributesId(String attributesId, int page, int size);
 
-    void delete(String id);
+    void hardDeleteAttributeValue(String id);
 }

@@ -63,6 +63,6 @@ public class DesignTemplatesController {
     @DeleteMapping("/design-templates/{designTemplateId}")
     public ApiResponse<Void> hardDeleteDesignTemplate(@PathVariable String designTemplateId) {
         designTemplatesService.hardDeleteDesignTemplate(designTemplateId);
-        return ApiResponseBuilder.buildSuccessResponse("Hard delete Design Template successful!", null);
+        return ApiResponseBuilder.buildSuccessResponse("Hard hardDeleteAttribute Design Template successful!", null);
     }
 }
