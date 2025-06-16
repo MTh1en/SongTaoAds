@@ -50,8 +50,8 @@ public class ChatBotServiceImpl implements ChatBotService {
         ChatCompletionRequest completionRequest = new ChatCompletionRequest();
         completionRequest.setModel(modelName);
         completionRequest.setMessages(List.of(
-                new ChatCompletionRequest.Message("system", "Based on the customer's request, write a prompt in English to create an image of the billboard. Do not create an image, only return the prompt in English."),
-                new ChatCompletionRequest.Message("user", prompt)
+                new ChatCompletionRequest.Message("system", "Based on the customer's request, let write a prompt in English to create an image of the billboard. Note: Do not create an image, only the prompt in English in the answer in one line and no prefix like the answer is: ..."),
+                new ChatCompletionRequest.Message("user", "The customer request is:" + prompt)
         ));
         ChatCompletionResponse response = chatBotRepository.getChatCompletions(
                 "Bearer " + openaiApiKey,
