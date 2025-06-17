@@ -5,10 +5,10 @@ import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ProductTypeSizesMapper;
 import com.capstone.ads.model.ProductTypeSizes;
-import com.capstone.ads.repository.internal.ProductTypesRepository;
 import com.capstone.ads.repository.internal.ProductTypeSizesRepository;
-import com.capstone.ads.repository.internal.SizesRepository;
 import com.capstone.ads.service.ProductTypeSizesService;
+import com.capstone.ads.service.ProductTypesService;
+import com.capstone.ads.service.SizeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,16 +19,17 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
+    private final ProductTypesService productTypesService;
+    private final SizeService sizeService;
     private final ProductTypeSizesRepository productTypeSizesRepository;
-    private final ProductTypesRepository productTypesRepository;
-    private final SizesRepository sizesRepository;
     private final ProductTypeSizesMapper productTypeSizesMapper;
 
     @Override
     @Transactional
     public ProductTypeSizeDTO createProductTypeSize(String productTypeId, String sizeId) {
-        if (!productTypesRepository.existsById(productTypeId)) throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
-        if (!sizesRepository.existsById(sizeId)) throw new AppException(ErrorCode.SIZE_NOT_FOUND);
+        productTypesService.validateProductTypeExistsAndAvailable(productTypeId);
+        sizeService.validateSizeExistsAndIsAvailable(sizeId);
+
         ProductTypeSizes productTypeSizes = productTypeSizesMapper.toEntity(productTypeId, sizeId);
         productTypeSizes = productTypeSizesRepository.save(productTypeSizes);
         return productTypeSizesMapper.toDTO(productTypeSizes);
@@ -45,7 +46,8 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
     @Override
     @Transactional
     public void hardDeleteProductTypeSize(String productTypeSizeId) {
-        if(!productTypeSizesRepository.existsById(productTypeSizeId)) throw new AppException(ErrorCode.PRODUCT_TYPE_SIZE_NOT_FOUND);
+        if (!productTypeSizesRepository.existsById(productTypeSizeId))
+            throw new AppException(ErrorCode.PRODUCT_TYPE_SIZE_NOT_FOUND);
         productTypeSizesRepository.deleteById(productTypeSizeId);
     }
 }

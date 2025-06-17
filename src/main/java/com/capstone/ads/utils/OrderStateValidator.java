@@ -3,6 +3,7 @@ package com.capstone.ads.utils;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.model.enums.OrderStatus;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;
@@ -21,11 +22,6 @@ public class OrderStateValidator {
     private void initializeValidTransitions() {
         validTransitions.put(OrderStatus.PENDING, Set.of(
                 OrderStatus.CANCELLED,
-                OrderStatus.APPROVED,
-                OrderStatus.REJECTED
-        ));
-
-        validTransitions.put(OrderStatus.APPROVED, Set.of(
                 OrderStatus.DEPOSITED
         ));
 
@@ -35,9 +31,20 @@ public class OrderStateValidator {
         ));
 
         validTransitions.put(OrderStatus.PROCESSING, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.IN_PRODUCTION
+        ));
+
+        validTransitions.put(OrderStatus.IN_PRODUCTION, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.DELIVERING
+        ));
+
+        validTransitions.put(OrderStatus.DELIVERING, Set.of(
+                OrderStatus.CANCELLED,
                 OrderStatus.COMPLETED
         ));
-        validTransitions.put(OrderStatus.REJECTED, Set.of());
+
         validTransitions.put(OrderStatus.CANCELLED, Set.of());
         validTransitions.put(OrderStatus.COMPLETED, Set.of());
     }

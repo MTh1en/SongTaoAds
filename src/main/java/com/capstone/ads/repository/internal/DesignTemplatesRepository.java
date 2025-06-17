@@ -15,4 +15,8 @@ public interface DesignTemplatesRepository extends JpaRepository<DesignTemplates
     Page<DesignTemplates> findByProductTypes_IdAndIsAvailable(String id, Boolean isAvailable, Pageable pageable);
 
     Page<DesignTemplates> findByIsAvailable(Boolean isAvailable, Pageable pageable);
+
+    boolean existsByIdAndIsAvailable(String id, Boolean isAvailable);
+
+
 }

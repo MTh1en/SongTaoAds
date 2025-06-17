@@ -29,7 +29,6 @@ public class CalculateServiceImp implements CalculateService {
     private final ExpressionParser parser = new SpelExpressionParser();
     private final CustomerChoiceDetailsRepository customerChoiceDetailsRepository;
     private final CustomerChoicesRepository customerChoicesRepository;
-    private final EntityManager entityManager;
 
     @Override
     @Transactional

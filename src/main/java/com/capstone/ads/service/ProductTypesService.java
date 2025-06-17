@@ -18,4 +18,7 @@ public interface ProductTypesService {
     void hardDeleteProductType(String productTypeId);
 
     ProductTypeDTO uploadProductTypeImage(String productTypeId, MultipartFile file);
+
+    //INTERNAL FUNCTION
+    void validateProductTypeExistsAndAvailable(String productTypeId);
 }

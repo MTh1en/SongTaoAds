@@ -11,14 +11,13 @@ import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.UsersMapper;
 import com.capstone.ads.model.Roles;
 import com.capstone.ads.model.Users;
-import com.capstone.ads.repository.external.S3Repository;
 import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.repository.internal.RolesRepository;
 
+import com.capstone.ads.service.S3Service;
 import com.capstone.ads.service.UserService;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,22 +26,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UsersServiceImpl implements UserService {
-    @Value("${aws.bucket.name}")
-    private String bucketName;
-
-    private final UsersRepository usersRepository;
+    private final S3Service s3Service;
     private final RolesRepository rolesRepository;
+    private final UsersRepository usersRepository;
     private final UsersMapper usersMapper;
     private final SecurityContextUtils securityContextUtils;
-    private final S3Repository s3Repository;
 
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
@@ -63,21 +57,21 @@ public class UsersServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserById(String id) {
+    public UserDTO findUserById(String id) {
         Users user = usersRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return usersMapper.toDTO(user);
     }
 
     @Override
-    public Page<UserDTO> getAllUsers(int page, int size) {
+    public Page<UserDTO> findAllUsers(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         return usersRepository.findAll(pageable)
                 .map(usersMapper::toDTO);
     }
 
     @Override
-    public Page<UserDTO> getUsersByRoleName(String roleName, int page, int size) {
+    public Page<UserDTO> findUsersByRoleName(String roleName, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         if (!isValidRole(roleName)) {
             throw new AppException(ErrorCode.ROLE_NOT_FOUND);
@@ -87,6 +81,7 @@ public class UsersServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDTO updateUserProfile(String userId, UserProfileUpdateRequest request) {
         Users user = findUserByIdAndActive(userId);
 
@@ -98,6 +93,7 @@ public class UsersServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(String id) {
         if (!usersRepository.existsById(id)) {
             throw new AppException(ErrorCode.USER_NOT_FOUND);
@@ -116,7 +112,7 @@ public class UsersServiceImpl implements UserService {
     public UserDTO uploadUserAvatar(String userId, MultipartFile file) {
         Users user = findUserByIdAndActive(userId);
         String avatarName = generateAvatarName(user.getId());
-        s3Repository.uploadSingleFile(bucketName, file, avatarName);
+        s3Service.uploadSingleFile(avatarName, file);
         user.setAvatar(avatarName);
         usersRepository.save(user);
         return usersMapper.toDTO(user);
@@ -132,6 +128,14 @@ public class UsersServiceImpl implements UserService {
         return usersMapper.toDTO(user);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public void validateUserExistsAndIsActive(String userId) {
+        if (!usersRepository.existsByIdAndIsActive(userId, true)) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+    }
+
     private String generateAvatarName(String userId) {
         return String.format("avatar/%s/%s", userId, UUID.randomUUID());
     }
@@ -139,7 +143,7 @@ public class UsersServiceImpl implements UserService {
     private UserDTO convertUserToDTOWithAvatarIsPresignedURL(Users user) {
         var userResponse = usersMapper.toDTO(user);
         if (!Objects.isNull(userResponse.getAvatar())) {
-            var avatarImageDownloadFromS3 = s3Repository.generatePresignedUrl(bucketName, user.getAvatar(), S3ImageDuration.AVATAR_IMAGE_DURATION);
+            var avatarImageDownloadFromS3 = s3Service.getPresignedUrl(user.getAvatar(), S3ImageDuration.AVATAR_IMAGE_DURATION);
             userResponse.setAvatar(avatarImageDownloadFromS3);
         }
         return userResponse;

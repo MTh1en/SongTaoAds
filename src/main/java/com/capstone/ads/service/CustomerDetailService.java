@@ -20,4 +20,7 @@ public interface CustomerDetailService {
     CustomerDetailDTO updateCustomerDetailLogoImage(String customerDetailId, MultipartFile logoImage);
 
     void hardDeleteCustomerDetail(String customerDetailId);
+
+    //INTERNAL FUNCTION
+    void validateCustomerDetailExists(String customerDetailId);
 }

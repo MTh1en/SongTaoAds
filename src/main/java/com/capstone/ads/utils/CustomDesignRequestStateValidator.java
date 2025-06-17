@@ -20,17 +20,29 @@ public class CustomDesignRequestStateValidator {
 
     private void initializeValidTransitions() {
         validTransitions.put(CustomDesignRequestStatus.PENDING, Set.of(
+                CustomDesignRequestStatus.PRICING_NOTIFIED,
+                CustomDesignRequestStatus.CANCEL
+        ));
+
+        validTransitions.put(CustomDesignRequestStatus.PRICING_NOTIFIED, Set.of(
                 CustomDesignRequestStatus.APPROVED,
                 CustomDesignRequestStatus.REJECTED,
                 CustomDesignRequestStatus.CANCEL
         ));
 
         validTransitions.put(CustomDesignRequestStatus.APPROVED, Set.of(
-                CustomDesignRequestStatus.PROCESSING
+                CustomDesignRequestStatus.PROCESSING,
+                CustomDesignRequestStatus.CANCEL
         ));
 
         validTransitions.put(CustomDesignRequestStatus.PROCESSING, Set.of(
-                CustomDesignRequestStatus.COMPLETED
+                CustomDesignRequestStatus.FULLY_PAID,
+                CustomDesignRequestStatus.CANCEL
+        ));
+
+        validTransitions.put(CustomDesignRequestStatus.FULLY_PAID, Set.of(
+                CustomDesignRequestStatus.COMPLETED,
+                CustomDesignRequestStatus.CANCEL
         ));
 
         // REJECTED, CANCEL, COMPLETED are terminal states with no valid transitions

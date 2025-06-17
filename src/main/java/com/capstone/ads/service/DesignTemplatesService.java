@@ -3,6 +3,7 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.designtemplate.DesignTemplateCreateRequest;
 import com.capstone.ads.dto.designtemplate.DesignTemplateDTO;
 import com.capstone.ads.dto.designtemplate.DesignTemplateUpdateRequest;
+import com.capstone.ads.model.DesignTemplates;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,4 +23,9 @@ public interface DesignTemplatesService {
     Page<DesignTemplateDTO> findAllDesignTemplates(int page, int size);
 
     void hardDeleteDesignTemplate(String designTemplateId);
+
+    //INTERNAL FUNCTION
+    void validateDesignTemplateExistsAndAvailable(String designTemplateId);
+
+    DesignTemplates getDesignTemplateById(String designTemplateId);
 }

@@ -6,6 +6,7 @@ import com.capstone.ads.dto.customdesignrequest.CustomDesignRequestDTO;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomDesignRequestsMapper;
+import com.capstone.ads.model.CustomDesignRequests;
 import com.capstone.ads.model.Users;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.repository.internal.CustomDesignRequestsRepository;
@@ -106,5 +107,11 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequest.setStatus(newStatus);
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
         return customDesignRequestsMapper.toDTO(customDesignRequest);
+    }
+
+    @Override
+    public CustomDesignRequests getCustomDesignRequestById(String customDesignRequestId) {
+        return customDesignRequestsRepository.findById(customDesignRequestId)
+                .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
     }
 }

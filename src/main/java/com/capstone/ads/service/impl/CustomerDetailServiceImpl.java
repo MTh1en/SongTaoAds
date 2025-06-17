@@ -8,14 +8,14 @@ import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerDetailMapper;
 import com.capstone.ads.model.CustomerDetail;
 import com.capstone.ads.model.Users;
-import com.capstone.ads.repository.external.S3Repository;
 import com.capstone.ads.repository.internal.CustomerDetailRepository;
-import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.service.CustomerDetailService;
+import com.capstone.ads.service.S3Service;
+import com.capstone.ads.service.UserService;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -26,25 +26,21 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CustomerDetailServiceImpl implements CustomerDetailService {
-    @Value("${aws.bucket.name}")
-    private String bucketName;
-
+    private final UserService userService;
+    private final S3Service s3Service;
     private final CustomerDetailRepository customerDetailRepository;
-    private final UsersRepository userRepository;
-    private final S3Repository s3Repository;
     private final CustomerDetailMapper customerDetailMapper;
     private final SecurityContextUtils securityContextUtils;
 
     @Override
     public CustomerDetailDTO createCustomerDetail(String companyName, String tagLine, String contactInfo, MultipartFile customerDetailLogo) {
         Users users = securityContextUtils.getCurrentUser();
-        Users user = userRepository.findById(users.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        userService.validateUserExistsAndIsActive(users.getId());
 
         CustomerDetail customerDetail = customerDetailMapper.toEntity(companyName, tagLine, contactInfo);
         String logoKeyAfterUploadToS3 = uploadCustomDesignImageToS3(users.getId(), customerDetailLogo);
         customerDetail.setLogoUrl(logoKeyAfterUploadToS3);
-        customerDetail.setUsers(user);
+        customerDetail.setUsers(users);
 
         customerDetail = customerDetailRepository.save(customerDetail);
         return customerDetailMapper.toDTO(customerDetail);
@@ -95,6 +91,14 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
         customerDetailRepository.deleteById(id);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public void validateCustomerDetailExists(String customerDetailId) {
+        if (!customerDetailRepository.existsById(customerDetailId)) {
+            throw new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND);
+        }
+    }
+
     private CustomerDetail findById(String customerDetailId) {
         return customerDetailRepository.findById(customerDetailId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
@@ -109,14 +113,14 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
         if (logo.isEmpty()) {
             throw new AppException(ErrorCode.FILE_REQUIRED);
         }
-        s3Repository.uploadSingleFile(bucketName, logo, customerDetailImageKey);
+        s3Service.uploadSingleFile(customerDetailImageKey, logo);
         return customerDetailImageKey;
     }
 
     private CustomerDetailDTO convertToCustomerDetailDTOWithLogoUrlIsPresignedURL(CustomerDetail customerDetail) {
         var customerDetailDTOResponse = customerDetailMapper.toDTO(customerDetail);
         if (!Objects.isNull(customerDetail.getLogoUrl())) {
-            var designTemplateImagePresigned = s3Repository.generatePresignedUrl(bucketName, customerDetail.getLogoUrl(), S3ImageDuration.CUSTOM_DESIGN_DURATION);
+            var designTemplateImagePresigned = s3Service.getPresignedUrl(customerDetail.getLogoUrl(), S3ImageDuration.CUSTOM_DESIGN_DURATION);
             customerDetailDTOResponse.setLogoUrl(designTemplateImagePresigned);
         }
         return customerDetailDTOResponse;

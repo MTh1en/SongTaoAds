@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SizesRepository extends JpaRepository<Sizes, String> {
+    boolean existsByIdAndIsAvailable(String id, Boolean isAvailable);
 }

@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AttributesRepository extends JpaRepository<Attributes, String> {
     Page<Attributes> findByProductTypes_Id(String id, Pageable pageable);
+
+    boolean existsByIdAndIsAvailable(String id, Boolean isAvailable);
 }
