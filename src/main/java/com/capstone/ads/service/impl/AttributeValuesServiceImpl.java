@@ -1,15 +1,15 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.dto.attributevalue.AttributeValuesCreateRequest;
-import com.capstone.ads.dto.attributevalue.AttributeValuesDTO;
-import com.capstone.ads.dto.attributevalue.AttributeValuesUpdateRequest;
+import com.capstone.ads.dto.attribute_value.AttributeValuesCreateRequest;
+import com.capstone.ads.dto.attribute_value.AttributeValuesDTO;
+import com.capstone.ads.dto.attribute_value.AttributeValuesUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.AttributeValuesMapper;
 import com.capstone.ads.model.AttributeValues;
 import com.capstone.ads.repository.internal.AttributeValuesRepository;
-import com.capstone.ads.repository.internal.AttributesRepository;
 import com.capstone.ads.service.AttributeValuesService;
+import com.capstone.ads.service.AttributesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,15 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class AttributeValuesServiceImpl implements AttributeValuesService {
+    private final AttributesService attributesService;
     private final AttributeValuesRepository attributeValuesRepository;
-    private final AttributesRepository attributesRepository;
     private final AttributeValuesMapper attributeValuesMapper;
 
     @Override
     @Transactional
     public AttributeValuesDTO createAttributeValue(String attributesId, AttributeValuesCreateRequest request) {
-        if (!attributesRepository.existsById(attributesId))
-            throw new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND);
+        attributesService.validateAttributeExistsAndIsAvailable(attributesId);
 
         AttributeValues attributeValues = attributeValuesMapper.toEntity(request, attributesId);
         attributeValues = attributeValuesRepository.save(attributeValues);
@@ -55,8 +54,7 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
 
     @Override
     public Page<AttributeValuesDTO> findAllAttributeValueByAttributesId(String attributesId, int page, int size) {
-        if (!attributesRepository.existsById(attributesId))
-            throw new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND);
+        attributesService.validateAttributeExistsAndIsAvailable(attributesId);
 
         Pageable pageable = PageRequest.of(page - 1, size);
 

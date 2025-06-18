@@ -32,7 +32,7 @@ public class UserController {
 
     @GetMapping("/users/{userId}")
     public ApiResponse<UserDTO> getUserById(@PathVariable String userId) {
-        var response = usersService.getUserById(userId);
+        var response = usersService.findUserById(userId);
         return ApiResponseBuilder.buildSuccessResponse("User retrieved successfully", response);
     }
 
@@ -40,14 +40,14 @@ public class UserController {
     public ApiPagingResponse<UserDTO> getUsersByRole(@RequestParam(value = "roleName", defaultValue = "CUSTOMER") String roleName,
                                                      @RequestParam(value = "page", required = false, defaultValue = "1") int page,
                                                      @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = usersService.getUsersByRoleName(roleName, page, size);
+        var response = usersService.findUsersByRoleName(roleName, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Users retrieved successfully", response, page);
     }
 
     @GetMapping("/users")
     public ApiPagingResponse<UserDTO> getAllUsers(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
                                                   @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = usersService.getAllUsers(page, size);
+        var response = usersService.findAllUsers(page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Users retrieved successfully", response, page);
     }
 

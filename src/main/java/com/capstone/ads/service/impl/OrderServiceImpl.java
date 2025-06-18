@@ -7,12 +7,11 @@ import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.OrdersMapper;
 import com.capstone.ads.model.*;
-import com.capstone.ads.model.enums.CustomDesignStatus;
 import com.capstone.ads.model.enums.OrderStatus;
-import com.capstone.ads.repository.internal.AIDesignsRepository;
-import com.capstone.ads.repository.internal.CustomDesignsRepository;
-import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.repository.internal.OrdersRepository;
+import com.capstone.ads.service.AIDesignsService;
+import com.capstone.ads.service.CustomDesignRequestService;
+import com.capstone.ads.service.CustomerChoicesService;
 import com.capstone.ads.service.OrderService;
 import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
 import com.capstone.ads.utils.OrderStateValidator;
@@ -29,46 +28,45 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class OrderServiceImpl implements OrderService {
-    private final CustomerChoicesRepository customerChoicesRepository;
-    private final CustomDesignsRepository customDesignsRepository;
-    private final AIDesignsRepository aiDesignsRepository;
     private final OrdersRepository orderRepository;
     private final OrdersMapper orderMapper;
     private final SecurityContextUtils securityContextUtils;
     private final CustomerChoiceHistoriesConverter customerChoiceHistoriesConverter;
     private final OrderStateValidator orderStateValidator;
+    private final CustomDesignRequestService customDesignRequestService;
+    private final CustomerChoicesService customerChoicesService;
+    private final AIDesignsService aiDesignsService;
 
     @Override
     @Transactional
-    public OrderDTO createOrderByCustomDesign(String customDesignId) {
-        CustomDesigns customDesigns = customDesignsRepository.findByIdAndStatus(customDesignId, CustomDesignStatus.APPROVED)
-                .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_NOT_FOUND));
-        CustomDesignRequests customDesignRequests = customDesigns.getCustomDesignRequests();
+    public OrderDTO createOrderByCustomDesign(String customDesignRequestId, String customerChoiceId) {
+        CustomDesignRequests customDesignRequests = customDesignRequestService.getCustomDesignRequestById(customDesignRequestId);
+        CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoiceId);
         Users users = securityContextUtils.getCurrentUser();
 
-        Orders orders = orderMapper.toEntityFromCreateOrderByCustomDesign(customDesigns, users);
+        Orders orders = orderMapper.toEntityFromCreateOrderByCustomDesign(customDesignRequests, users);
         orders.setCustomerChoiceHistories(customDesignRequests.getCustomerChoiceHistories() != null
                 ? customDesignRequests.getCustomerChoiceHistories()
                 : null);
         orders.setTotalAmount(customDesignRequests.getCustomerChoiceHistories().getTotalAmount());
+        orders.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
+
         orderRepository.save(orders);
         return orderMapper.toDTO(orders);
     }
 
     @Override
     @Transactional
-    public OrderDTO createOrderByAIDesign(String customerChoiceId, String aiDesignId) {
-        CustomerChoices customerChoice = findCustomerChoice(customerChoiceId);
+    public OrderDTO createOrderByAIDesign(String aiDesignId, String customerChoiceId) {
+        AIDesigns aiDesigns = aiDesignsService.getAIDesignById(aiDesignId);
+        CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoiceId);
         Users users = securityContextUtils.getCurrentUser();
-        AIDesigns aiDesigns = aiDesignsRepository.findById(aiDesignId)
-                .orElseThrow(() -> new AppException(ErrorCode.AI_DESIGN_NOT_FOUND));
 
         Orders orders = orderMapper.toEntityFromCreateOrderByAIDesign(aiDesigns, users);
-        orders.setTotalAmount(customerChoice.getTotalAmount());
-        orders.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoice));
+        orders.setTotalAmount(customerChoices.getTotalAmount());
+        orders.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
 
         orders = orderRepository.save(orders);
-        customerChoicesRepository.deleteById(customerChoiceId);
         return orderMapper.toDTO(orders);
     }
 
@@ -140,10 +138,5 @@ public class OrderServiceImpl implements OrderService {
     public Page<OrderDTO> findOrderByUserId(String userId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         return orderRepository.findByUsers_Id(userId, pageable).map(orderMapper::toDTO);
-    }
-
-    private CustomerChoices findCustomerChoice(String customerChoiceId) {
-        return customerChoicesRepository.findById(customerChoiceId)
-                .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
     }
 }

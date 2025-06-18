@@ -90,6 +90,8 @@ public enum ErrorCode {
     //CHAT BOT
     EXTERNAL_SERVICE_ERROR("External service error", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_INPUT("Invalid input", HttpStatus.BAD_REQUEST),
+
+    PRICE_PROPOSAL_NOT_FOUND("Price proposal not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

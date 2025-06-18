@@ -6,12 +6,10 @@ import com.capstone.ads.dto.order.OrderUpdateInformationRequest;
 import com.capstone.ads.model.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
 public interface OrderService {
-    OrderDTO createOrderByCustomDesign(String customDesignId);
+    OrderDTO createOrderByCustomDesign(String customDesignRequestId, String customerChoiceId);
 
-    OrderDTO createOrderByAIDesign(String customerChoiceId, String aiDesignId);
+    OrderDTO createOrderByAIDesign(String aiDesignId, String customerChoiceId);
 
     OrderDTO findOrderById(String orderId);
 

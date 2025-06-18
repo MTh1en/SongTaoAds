@@ -8,8 +8,8 @@ import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.AttributesMapper;
 import com.capstone.ads.model.Attributes;
 import com.capstone.ads.repository.internal.AttributesRepository;
-import com.capstone.ads.repository.internal.ProductTypesRepository;
 import com.capstone.ads.service.AttributesService;
+import com.capstone.ads.service.ProductTypesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,21 +17,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class AttributesServiceImpl implements AttributesService {
-    private final AttributesRepository attributesRepository;
-    private final ProductTypesRepository productTypesRepository;
+    private final ProductTypesService productTypesService;
     private final AttributesMapper attributesMapper;
+    private final AttributesRepository attributesRepository;
 
     @Override
     @Transactional
     public AttributesDTO createAttribute(String productTypeId, AttributesCreateRequest request) {
-        productTypesRepository.findById(productTypeId)
-                .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
+        productTypesService.validateProductTypeExistsAndAvailable(productTypeId);
 
         Attributes attributes = attributesMapper.toEntity(productTypeId, request);
         attributes = attributesRepository.save(attributes);
@@ -58,9 +54,7 @@ public class AttributesServiceImpl implements AttributesService {
 
     @Override
     public Page<AttributesDTO> findAllAttributeByProductTypeId(String productTypeId, int page, int size) {
-        // Validate productTypeId
-        productTypesRepository.findById(productTypeId)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
+        productTypesService.validateProductTypeExistsAndAvailable(productTypeId);
 
         Pageable pageable = PageRequest.of(page - 1, size);
         return attributesRepository.findByProductTypes_Id(productTypeId, pageable)
@@ -74,5 +68,13 @@ public class AttributesServiceImpl implements AttributesService {
             throw new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND);
         }
         attributesRepository.deleteById(productTypeId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void validateAttributeExistsAndIsAvailable(String attributeId) {
+        if (!attributesRepository.existsByIdAndIsAvailable(attributeId, true)) {
+            throw new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND);
+        }
     }
 }

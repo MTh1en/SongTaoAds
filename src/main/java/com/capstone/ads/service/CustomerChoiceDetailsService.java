@@ -1,6 +1,6 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.customerchoicedetail.CustomerChoicesDetailsDTO;
+import com.capstone.ads.dto.customer_choice_detail.CustomerChoicesDetailsDTO;
 
 import java.util.List;
 

@@ -2,9 +2,9 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.designtemplate.DesignTemplateCreateRequest;
-import com.capstone.ads.dto.designtemplate.DesignTemplateDTO;
-import com.capstone.ads.dto.designtemplate.DesignTemplateUpdateRequest;
+import com.capstone.ads.dto.design_template.DesignTemplateCreateRequest;
+import com.capstone.ads.dto.design_template.DesignTemplateDTO;
+import com.capstone.ads.dto.design_template.DesignTemplateUpdateRequest;
 import com.capstone.ads.service.DesignTemplatesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;

@@ -1,19 +1,16 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.dto.file.FileData;
-import com.capstone.ads.dto.stablediffusion.TextToImageRequest;
-import com.capstone.ads.dto.stablediffusion.controlnet.AlwaysonScripts;
-import com.capstone.ads.dto.stablediffusion.controlnet.Args;
-import com.capstone.ads.dto.stablediffusion.pendingtask.PendingTaskResponse;
-import com.capstone.ads.dto.stablediffusion.progress.ProgressRequest;
-import com.capstone.ads.dto.stablediffusion.progress.ProgressResponse;
-import com.capstone.ads.exception.AppException;
-import com.capstone.ads.exception.ErrorCode;
+import com.capstone.ads.dto.stable_diffusion.TextToImageRequest;
+import com.capstone.ads.dto.stable_diffusion.controlnet.AlwaysonScripts;
+import com.capstone.ads.dto.stable_diffusion.controlnet.Args;
+import com.capstone.ads.dto.stable_diffusion.pendingtask.PendingTaskResponse;
+import com.capstone.ads.dto.stable_diffusion.progress.ProgressRequest;
+import com.capstone.ads.dto.stable_diffusion.progress.ProgressResponse;
 import com.capstone.ads.mapper.StableDiffusionMapper;
-import com.capstone.ads.model.DesignTemplates;
-import com.capstone.ads.repository.external.S3Repository;
 import com.capstone.ads.repository.external.StableDiffusionRepository;
-import com.capstone.ads.repository.internal.DesignTemplatesRepository;
+import com.capstone.ads.service.DesignTemplatesService;
+import com.capstone.ads.service.S3Service;
 import com.capstone.ads.service.StableDiffusionService;
 import com.capstone.ads.utils.DataConverter;
 import com.capstone.ads.utils.SecurityContextUtils;
@@ -30,14 +27,12 @@ import org.springframework.stereotype.Service;
 public class StableDiffusionServiceImpl implements StableDiffusionService {
     @Value("${stable-diffusion.token}")
     private String stableDiffusionToken;
-    @Value("${aws.bucket.name}")
-    private String bucketName;
 
+    private final DesignTemplatesService designTemplatesService;
+    private final S3Service s3Service;
     private final StableDiffusionRepository stableDiffusionRepository;
-    private final DesignTemplatesRepository designTemplatesRepository;
-    private final S3Repository s3Repository;
-    private final SecurityContextUtils securityContextUtils;
     private final StableDiffusionMapper stableDiffusionMapper;
+    private final SecurityContextUtils securityContextUtils;
 
     @Override
     public FileData generateImage(String designTemplateId, String prompt) {
@@ -85,15 +80,10 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
         return String.format("Bearer %s", stableDiffusionToken);
     }
 
-    private DesignTemplates findDesignTemplateById(String designTemplateId) {
-        return designTemplatesRepository.findById(designTemplateId)
-                .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
-    }
-
 
     private String getImageBytesFromDesignTemplate(String designTemplateId) {
-        var designTemplate = findDesignTemplateById(designTemplateId);
-        byte[] imageBytes = s3Repository.downloadImageAsBytes(bucketName, designTemplate.getImage());
-        return DataConverter.convertByteArrayToBase64(imageBytes);
+        var designTemplate = designTemplatesService.getDesignTemplateById(designTemplateId);
+        FileData imageFileData = s3Service.downloadFile(designTemplate.getImage());
+        return DataConverter.convertByteArrayToBase64(imageFileData.getContent());
     }
 }

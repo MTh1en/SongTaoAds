@@ -1,18 +1,20 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.PredefinedRole;
-import com.capstone.ads.dto.customdesignrequest.CustomDesignRequestCreateRequest;
-import com.capstone.ads.dto.customdesignrequest.CustomDesignRequestDTO;
+import com.capstone.ads.dto.custom_design_request.CustomDesignRequestCreateRequest;
+import com.capstone.ads.dto.custom_design_request.CustomDesignRequestDTO;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomDesignRequestsMapper;
+import com.capstone.ads.model.CustomDesignRequests;
+import com.capstone.ads.model.CustomerChoices;
 import com.capstone.ads.model.Users;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.repository.internal.CustomDesignRequestsRepository;
-import com.capstone.ads.repository.internal.CustomerChoicesRepository;
-import com.capstone.ads.repository.internal.CustomerDetailRepository;
-import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.service.CustomDesignRequestService;
+import com.capstone.ads.service.CustomerChoicesService;
+import com.capstone.ads.service.CustomerDetailService;
+import com.capstone.ads.service.UserService;
 import com.capstone.ads.utils.CustomDesignRequestStateValidator;
 import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +32,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class CustomDesignRequestServiceImpl implements CustomDesignRequestService {
+    private final CustomerChoicesService customerChoicesService;
+    private final UserService userService;
+    private final CustomerDetailService customerDetailService;
     private final CustomDesignRequestsRepository customDesignRequestsRepository;
-    private final CustomerChoicesRepository customerChoicesRepository;
-    private final UsersRepository usersRepository;
-    private final CustomerDetailRepository customerDetailRepository;
     private final CustomDesignRequestsMapper customDesignRequestsMapper;
     private final CustomerChoiceHistoriesConverter customerChoiceHistoriesConverter;
     private final CustomDesignRequestStateValidator customDesignRequestStateValidator;
@@ -41,33 +43,30 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     @Override
     @Transactional
     public CustomDesignRequestDTO createCustomDesignRequest(String customerDetailId, String customerChoicesId, CustomDesignRequestCreateRequest request) {
-        if (!customerDetailRepository.existsById(customerDetailId)) {
-            throw new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND);
-        }
-        var customerChoices = customerChoicesRepository.findById(customerChoicesId)
-                .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
+        customerDetailService.validateCustomerDetailExists(customerDetailId);
+        CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoicesId);
 
         var customDesignRequest = customDesignRequestsMapper.toEntity(request, customerDetailId);
         customDesignRequest.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
-        customerChoicesRepository.deleteById(customerChoicesId);
+
+        customerChoicesService.hardDeleteCustomerChoice(customerChoicesId);
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 
     @Override
     @Transactional
     public CustomDesignRequestDTO assignDesignerToCustomerRequest(String customDesignRequestId, String designerId) {
+        Users designer = userService.getUsersByIdAndIsActiveAndRoleName(designerId, true, PredefinedRole.DESIGNER_ROLE);
         List<CustomDesignRequestStatus> allowedStatuses = Arrays.asList(
                 CustomDesignRequestStatus.PENDING,
-                CustomDesignRequestStatus.APPROVED
+                CustomDesignRequestStatus.APPROVED_PRICING
         );
         var customerDesignRequest = customDesignRequestsRepository.findByIdAndStatusIn(customDesignRequestId, allowedStatuses)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_PENDING_NOT_FOUND));
-        Users designer = usersRepository.findByIdAndIsActiveAndRoles_Name(designerId, true, PredefinedRole.DESIGNER_ROLE)
-                .orElseThrow(() -> new AppException(ErrorCode.DESIGNER_NOT_FOUND));
 
         customerDesignRequest.setAssignDesigner(designer);
-        customerDesignRequest.setStatus(CustomDesignRequestStatus.APPROVED);
+        customerDesignRequest.setStatus(CustomDesignRequestStatus.PROCESSING);
         customerDesignRequest = customDesignRequestsRepository.save(customerDesignRequest);
         return customDesignRequestsMapper.toDTO(customerDesignRequest);
     }
@@ -106,5 +105,22 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequest.setStatus(newStatus);
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
         return customDesignRequestsMapper.toDTO(customDesignRequest);
+    }
+
+    @Override
+    public CustomDesignRequests getCustomDesignRequestById(String customDesignRequestId) {
+        return customDesignRequestsRepository.findById(customDesignRequestId)
+                .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
+    }
+
+    @Override
+    public void updateCustomDesignRequestStatus(String customDesignRequestId, CustomDesignRequestStatus status) {
+        var customDesignRequest = customDesignRequestsRepository.findById(customDesignRequestId)
+                .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
+
+        customDesignRequestStateValidator.validateTransition(customDesignRequest.getStatus(), status);
+        customDesignRequest.setStatus(status);
+
+        customDesignRequestsRepository.save(customDesignRequest);
     }
 }

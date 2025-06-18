@@ -16,7 +16,7 @@ public interface OrdersMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", expression = "java(initStatus())")
     @Mapping(target = "orderDate", expression = "java(initOrderDate())")
-    Orders toEntityFromCreateOrderByCustomDesign(CustomDesigns customDesigns, Users users);
+    Orders toEntityFromCreateOrderByCustomDesign(CustomDesignRequests customDesignRequests, Users users);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", expression = "java(initStatus())")

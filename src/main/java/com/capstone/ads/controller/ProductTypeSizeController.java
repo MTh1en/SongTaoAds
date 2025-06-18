@@ -1,7 +1,7 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.producttypesize.ProductTypeSizeDTO;
+import com.capstone.ads.dto.product_type_size.ProductTypeSizeDTO;
 import com.capstone.ads.service.ProductTypeSizesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;

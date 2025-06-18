@@ -2,8 +2,8 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.customdesignrequest.CustomDesignRequestCreateRequest;
-import com.capstone.ads.dto.customdesignrequest.CustomDesignRequestDTO;
+import com.capstone.ads.dto.custom_design_request.CustomDesignRequestCreateRequest;
+import com.capstone.ads.dto.custom_design_request.CustomDesignRequestDTO;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.utils.ApiResponseBuilder;

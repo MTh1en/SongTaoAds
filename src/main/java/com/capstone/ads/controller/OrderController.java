@@ -17,16 +17,17 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
     private final OrderService service;
 
-    @PostMapping("/custom-designs/{customDesignId}/orders")
-    public ApiResponse<OrderDTO> createOrderByCustomDesign(@PathVariable String customDesignId) {
-        var response = service.createOrderByCustomDesign(customDesignId);
+    @PostMapping("/custom-design-request/{customDesignRequestId}/customer-choices/{customerChoiceId}/orders")
+    public ApiResponse<OrderDTO> createOrderByCustomDesign(@PathVariable String customDesignRequestId,
+                                                           @PathVariable String customerChoiceId) {
+        var response = service.createOrderByCustomDesign(customDesignRequestId, customerChoiceId);
         return ApiResponseBuilder.buildSuccessResponse("Create order successful", response);
     }
 
     @PostMapping("/ai-designs/{aiDesignId}/customer-choices/{customerChoiceId}/orders")
     public ApiResponse<OrderDTO> createOrderByAIDesign(@PathVariable String aiDesignId,
                                                        @PathVariable String customerChoiceId) {
-        var response = service.createOrderByAIDesign(customerChoiceId, aiDesignId);
+        var response = service.createOrderByAIDesign(aiDesignId, customerChoiceId);
         return ApiResponseBuilder.buildSuccessResponse("Create order successful", response);
     }
 
@@ -55,9 +56,9 @@ public class OrderController {
     }
 
     @GetMapping("/users/{userId}/orders")
-    public ApiPagingResponse<OrderDTO> getByUserId(@PathVariable String userId,
-                                                   @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                   @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+    public ApiPagingResponse<OrderDTO> findOrderByUserId(@PathVariable String userId,
+                                                         @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                         @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findOrderByUserId(userId, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find Order by Users", response, page);
     }

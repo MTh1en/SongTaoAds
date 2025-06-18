@@ -1,7 +1,7 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.customerchoicedetail.CustomerChoicesDetailsDTO;
+import com.capstone.ads.dto.customer_choice_detail.CustomerChoicesDetailsDTO;
 import com.capstone.ads.service.CustomerChoiceDetailsService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;

@@ -2,8 +2,8 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.file.FileData;
-import com.capstone.ads.dto.stablediffusion.pendingtask.PendingTaskResponse;
-import com.capstone.ads.dto.stablediffusion.progress.ProgressResponse;
+import com.capstone.ads.dto.stable_diffusion.pendingtask.PendingTaskResponse;
+import com.capstone.ads.dto.stable_diffusion.progress.ProgressResponse;
 import com.capstone.ads.service.ChatBotService;
 import com.capstone.ads.service.StableDiffusionService;
 import com.capstone.ads.utils.ApiResponseBuilder;

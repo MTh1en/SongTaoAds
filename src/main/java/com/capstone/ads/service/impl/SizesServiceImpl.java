@@ -10,6 +10,7 @@ import com.capstone.ads.model.Sizes;
 import com.capstone.ads.repository.internal.SizesRepository;
 import com.capstone.ads.service.SizeService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.engine.jdbc.Size;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -61,5 +62,13 @@ public class SizesServiceImpl implements SizeService {
             throw new AppException(ErrorCode.SIZE_NOT_FOUND);
         }
         sizesRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void validateSizeExistsAndIsAvailable(String sizeId) {
+        if (!sizesRepository.existsByIdAndIsAvailable(sizeId, true)) {
+            throw new AppException(ErrorCode.SIZE_NOT_FOUND);
+        }
     }
 }

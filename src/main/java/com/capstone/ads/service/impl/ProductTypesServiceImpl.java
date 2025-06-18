@@ -1,18 +1,17 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.S3ImageDuration;
-import com.capstone.ads.dto.producttype.ProductTypeCreateRequest;
-import com.capstone.ads.dto.producttype.ProductTypeDTO;
-import com.capstone.ads.dto.producttype.ProductTypeUpdateRequest;
+import com.capstone.ads.dto.product_type.ProductTypeCreateRequest;
+import com.capstone.ads.dto.product_type.ProductTypeDTO;
+import com.capstone.ads.dto.product_type.ProductTypeUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ProductTypesMapper;
 import com.capstone.ads.model.ProductTypes;
-import com.capstone.ads.repository.external.S3Repository;
 import com.capstone.ads.repository.internal.ProductTypesRepository;
 import com.capstone.ads.service.ProductTypesService;
+import com.capstone.ads.service.S3Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,12 +24,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ProductTypesServiceImpl implements ProductTypesService {
-    @Value("${aws.bucket.name}")
-    private String bucketName;
-
+    private final S3Service s3Service;
     private final ProductTypesRepository productTypesRepository;
     private final ProductTypesMapper productTypesMapper;
-    private final S3Repository s3Repository;
 
     @Override
     @Transactional
@@ -78,11 +74,18 @@ public class ProductTypesServiceImpl implements ProductTypesService {
 
         String productTypeKey = generateProductTypeImageKey(productTypeId);
 
-        s3Repository.uploadSingleFile(bucketName, file, productTypeKey);
+        s3Service.uploadSingleFile(productTypeKey, file);
         productTypes.setImage(productTypeKey);
         productTypesRepository.save(productTypes);
 
         return productTypesMapper.toDTO(productTypes);
+    }
+
+    @Override
+    public void validateProductTypeExistsAndAvailable(String productTypeId) {
+        if (!productTypesRepository.existsByIdAndIsAvailable(productTypeId, true)) {
+            throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
+        }
     }
 
     private String generateProductTypeImageKey(String productTypeId) {
@@ -97,7 +100,7 @@ public class ProductTypesServiceImpl implements ProductTypesService {
     private ProductTypeDTO convertProductTypeToProductTypeDTOWithImageUrl(ProductTypes productTypes) {
         var productTypeDTOResponse = productTypesMapper.toDTO(productTypes);
 
-        var productTypeImage = s3Repository.generatePresignedUrl(bucketName, productTypes.getImage(), S3ImageDuration.PRODUCT_TYPE_IMAGE_DURATION);
+        var productTypeImage = s3Service.getPresignedUrl(productTypes.getImage(), S3ImageDuration.PRODUCT_TYPE_IMAGE_DURATION);
         productTypeDTOResponse.setImage(productTypeImage);
 
         return productTypeDTOResponse;

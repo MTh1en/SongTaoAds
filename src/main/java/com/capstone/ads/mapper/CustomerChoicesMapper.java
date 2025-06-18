@@ -1,6 +1,6 @@
 package com.capstone.ads.mapper;
 
-import com.capstone.ads.dto.customerchoice.CustomerChoicesDTO;
+import com.capstone.ads.dto.customer_choice.CustomerChoicesDTO;
 import com.capstone.ads.model.CustomerChoices;
 import com.capstone.ads.model.ProductTypes;
 import com.capstone.ads.model.Users;

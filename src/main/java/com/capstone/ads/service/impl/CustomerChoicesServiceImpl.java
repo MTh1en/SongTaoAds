@@ -1,14 +1,14 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.dto.customerchoice.CustomerChoicesDTO;
+import com.capstone.ads.dto.customer_choice.CustomerChoicesDTO;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerChoicesMapper;
 import com.capstone.ads.model.CustomerChoices;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
-import com.capstone.ads.repository.internal.ProductTypesRepository;
-import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.service.CustomerChoicesService;
+import com.capstone.ads.service.ProductTypesService;
+import com.capstone.ads.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,16 +16,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CustomerChoicesServiceImpl implements CustomerChoicesService {
+    private final UserService userService;
+    private final ProductTypesService productTypesService;
     private final CustomerChoicesRepository customerChoicesRepository;
-    private final UsersRepository usersRepository;
-    private final ProductTypesRepository productTypesRepository;
     private final CustomerChoicesMapper customerChoicesMapper;
 
     @Override
     @Transactional
     public CustomerChoicesDTO createCustomerChoice(String customerId, String productTypeId) {
-        if (!usersRepository.existsById(customerId)) throw new AppException(ErrorCode.USER_NOT_FOUND);
-        if (!productTypesRepository.existsById(productTypeId)) throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
+        userService.validateUserExistsAndIsActive(customerId);
+        productTypesService.validateProductTypeExistsAndAvailable(productTypeId);
 
         CustomerChoices customerChoices = customerChoicesMapper.toEntity(customerId, productTypeId);
         customerChoices.setTotalAmount(0.0);
@@ -42,8 +42,7 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
 
     @Override
     public CustomerChoicesDTO findCustomerChoiceByUserId(String userId) {
-        usersRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        userService.validateUserExistsAndIsActive(userId);
 
         var customerChoicesDetail = customerChoicesRepository.findByUsers_IdOrderByUpdatedAtDesc(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
@@ -57,5 +56,12 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
             throw new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND);
         }
         customerChoicesRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public CustomerChoices getCustomerChoiceById(String customerChoiceId) {
+        return customerChoicesRepository.findById(customerChoiceId)
+                .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
     }
 }

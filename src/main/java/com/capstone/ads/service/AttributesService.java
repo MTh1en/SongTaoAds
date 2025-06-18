@@ -15,4 +15,7 @@ public interface AttributesService {
     Page<AttributesDTO> findAllAttributeByProductTypeId(String productTypeId, int page, int size);
 
     void hardDeleteAttribute(String attributeId);
+
+    //INTERNAL FUNCTION
+    void validateAttributeExistsAndIsAvailable(String attributeId);
 }

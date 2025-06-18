@@ -1,8 +1,8 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.customerDetail.CustomerDetailDTO;
-import com.capstone.ads.dto.customerDetail.CustomerDetailRequest;
+import com.capstone.ads.dto.customer_detail.CustomerDetailDTO;
+import com.capstone.ads.dto.customer_detail.CustomerDetailRequest;
 import com.capstone.ads.service.CustomerDetailService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import jakarta.validation.Valid;

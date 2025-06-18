@@ -1,10 +1,10 @@
 package com.capstone.ads.repository.external;
 
-import com.capstone.ads.dto.stablediffusion.TextToImageRequest;
-import com.capstone.ads.dto.stablediffusion.TextToImageResponse;
-import com.capstone.ads.dto.stablediffusion.pendingtask.PendingTaskResponse;
-import com.capstone.ads.dto.stablediffusion.progress.ProgressRequest;
-import com.capstone.ads.dto.stablediffusion.progress.ProgressResponse;
+import com.capstone.ads.dto.stable_diffusion.TextToImageRequest;
+import com.capstone.ads.dto.stable_diffusion.TextToImageResponse;
+import com.capstone.ads.dto.stable_diffusion.pendingtask.PendingTaskResponse;
+import com.capstone.ads.dto.stable_diffusion.progress.ProgressRequest;
+import com.capstone.ads.dto.stable_diffusion.progress.ProgressResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
