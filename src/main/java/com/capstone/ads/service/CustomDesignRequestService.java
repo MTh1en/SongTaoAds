@@ -24,4 +24,6 @@ public interface CustomDesignRequestService {
     CustomDesignRequests getCustomDesignRequestById(String customDesignRequestId);
 
     void updateCustomDesignRequestStatus(String customDesignRequestId, CustomDesignRequestStatus status);
+
+    void updateCustomDesignRequestApprovedPricing(String customDesignRequestId, Integer totalPrice, Integer depositAmount);
 }

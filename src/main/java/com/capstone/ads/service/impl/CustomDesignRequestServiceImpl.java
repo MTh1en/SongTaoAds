@@ -115,12 +115,23 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     @Override
     public void updateCustomDesignRequestStatus(String customDesignRequestId, CustomDesignRequestStatus status) {
-        var customDesignRequest = customDesignRequestsRepository.findById(customDesignRequestId)
-                .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
+        var customDesignRequest = getCustomDesignRequestById(customDesignRequestId);
 
         customDesignRequestStateValidator.validateTransition(customDesignRequest.getStatus(), status);
         customDesignRequest.setStatus(status);
 
         customDesignRequestsRepository.save(customDesignRequest);
+    }
+
+    @Override
+    public void updateCustomDesignRequestApprovedPricing(String customDesignRequestId, Integer totalPrice, Integer depositAmount) {
+        var customDesignRequest = getCustomDesignRequestById(customDesignRequestId);
+
+        customDesignRequestStateValidator.validateTransition(customDesignRequest.getStatus(), CustomDesignRequestStatus.APPROVED_PRICING);
+        customDesignRequest.setTotalPrice(totalPrice);
+        customDesignRequest.setDepositAmount(depositAmount);
+        customDesignRequest.setRemainingAmount(totalPrice - depositAmount);
+        customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
+        customDesignRequest.setStatus(CustomDesignRequestStatus.APPROVED_PRICING);
     }
 }
