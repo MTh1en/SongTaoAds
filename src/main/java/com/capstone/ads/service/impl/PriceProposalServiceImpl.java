@@ -84,7 +84,7 @@ public class PriceProposalServiceImpl implements PriceProposalService {
         priceProposal.setStatus(PriceProposalStatus.APPROVED);
         priceProposal = priceProposalRepository.save(priceProposal);
 
-        customDesignRequestService.updateCustomDesignRequestStatus(customerDesignRequestId, CustomDesignRequestStatus.APPROVED_PRICING);
+        customDesignRequestService.updateCustomDesignRequestApprovedPricing(customerDesignRequestId, priceProposal.getTotalPrice(), priceProposal.getDepositAmount());
 
         return priceProposalMapper.toDTO(priceProposal);
     }
