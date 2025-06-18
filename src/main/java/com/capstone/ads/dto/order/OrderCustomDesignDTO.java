@@ -1,6 +1,6 @@
 package com.capstone.ads.dto.order;
 
-import com.capstone.ads.model.enums.CustomDesignStatus;
+import com.capstone.ads.model.enums.DemoDesignStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,5 +18,5 @@ public class OrderCustomDesignDTO {
     String designerDescription;
     LocalDateTime createAt;
     LocalDateTime updateAt;
-    CustomDesignStatus status;
+    DemoDesignStatus status;
 }

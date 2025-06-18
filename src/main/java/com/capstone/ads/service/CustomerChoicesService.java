@@ -1,6 +1,6 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.customerchoice.CustomerChoicesDTO;
+import com.capstone.ads.dto.customer_choice.CustomerChoicesDTO;
 import com.capstone.ads.model.CustomerChoices;
 
 public interface CustomerChoicesService {

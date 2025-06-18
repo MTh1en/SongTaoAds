@@ -2,9 +2,9 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.producttype.ProductTypeCreateRequest;
-import com.capstone.ads.dto.producttype.ProductTypeDTO;
-import com.capstone.ads.dto.producttype.ProductTypeUpdateRequest;
+import com.capstone.ads.dto.product_type.ProductTypeCreateRequest;
+import com.capstone.ads.dto.product_type.ProductTypeDTO;
+import com.capstone.ads.dto.product_type.ProductTypeUpdateRequest;
 import com.capstone.ads.service.ProductTypesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;

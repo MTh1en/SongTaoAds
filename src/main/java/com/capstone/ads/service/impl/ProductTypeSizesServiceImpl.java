@@ -1,6 +1,6 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.dto.producttypesize.ProductTypeSizeDTO;
+import com.capstone.ads.dto.product_type_size.ProductTypeSizeDTO;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ProductTypeSizesMapper;

@@ -1,8 +1,8 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.S3ImageDuration;
-import com.capstone.ads.dto.customerDetail.CustomerDetailDTO;
-import com.capstone.ads.dto.customerDetail.CustomerDetailRequest;
+import com.capstone.ads.dto.customer_detail.CustomerDetailDTO;
+import com.capstone.ads.dto.customer_detail.CustomerDetailRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerDetailMapper;

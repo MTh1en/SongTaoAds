@@ -1,12 +1,12 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.dto.file.FileData;
-import com.capstone.ads.dto.stablediffusion.TextToImageRequest;
-import com.capstone.ads.dto.stablediffusion.controlnet.AlwaysonScripts;
-import com.capstone.ads.dto.stablediffusion.controlnet.Args;
-import com.capstone.ads.dto.stablediffusion.pendingtask.PendingTaskResponse;
-import com.capstone.ads.dto.stablediffusion.progress.ProgressRequest;
-import com.capstone.ads.dto.stablediffusion.progress.ProgressResponse;
+import com.capstone.ads.dto.stable_diffusion.TextToImageRequest;
+import com.capstone.ads.dto.stable_diffusion.controlnet.AlwaysonScripts;
+import com.capstone.ads.dto.stable_diffusion.controlnet.Args;
+import com.capstone.ads.dto.stable_diffusion.pendingtask.PendingTaskResponse;
+import com.capstone.ads.dto.stable_diffusion.progress.ProgressRequest;
+import com.capstone.ads.dto.stable_diffusion.progress.ProgressResponse;
 import com.capstone.ads.mapper.StableDiffusionMapper;
 import com.capstone.ads.repository.external.StableDiffusionRepository;
 import com.capstone.ads.service.DesignTemplatesService;

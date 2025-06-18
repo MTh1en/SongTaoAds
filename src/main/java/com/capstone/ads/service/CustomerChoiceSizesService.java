@@ -1,8 +1,8 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeCreateRequest;
-import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeDTO;
-import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeUpdateRequest;
+import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeCreateRequest;
+import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeDTO;
+import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeUpdateRequest;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.customerDetail.CustomerDetailDTO;
-import com.capstone.ads.dto.customerDetail.CustomerDetailRequest;
+import com.capstone.ads.dto.customer_detail.CustomerDetailDTO;
+import com.capstone.ads.dto.customer_detail.CustomerDetailRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

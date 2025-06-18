@@ -1,9 +1,9 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.S3ImageDuration;
-import com.capstone.ads.dto.producttype.ProductTypeCreateRequest;
-import com.capstone.ads.dto.producttype.ProductTypeDTO;
-import com.capstone.ads.dto.producttype.ProductTypeUpdateRequest;
+import com.capstone.ads.dto.product_type.ProductTypeCreateRequest;
+import com.capstone.ads.dto.product_type.ProductTypeDTO;
+import com.capstone.ads.dto.product_type.ProductTypeUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ProductTypesMapper;

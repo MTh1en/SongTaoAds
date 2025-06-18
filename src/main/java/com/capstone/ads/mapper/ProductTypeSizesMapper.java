@@ -1,6 +1,6 @@
 package com.capstone.ads.mapper;
 
-import com.capstone.ads.dto.producttypesize.ProductTypeSizeDTO;
+import com.capstone.ads.dto.product_type_size.ProductTypeSizeDTO;
 import com.capstone.ads.model.ProductTypeSizes;
 import com.capstone.ads.model.ProductTypes;
 import com.capstone.ads.model.Sizes;

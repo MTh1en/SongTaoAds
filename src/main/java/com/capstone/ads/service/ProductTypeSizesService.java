@@ -1,6 +1,6 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.producttypesize.ProductTypeSizeDTO;
+import com.capstone.ads.dto.product_type_size.ProductTypeSizeDTO;
 
 import java.util.List;
 

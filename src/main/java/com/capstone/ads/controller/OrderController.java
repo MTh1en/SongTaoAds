@@ -6,7 +6,7 @@ import com.capstone.ads.dto.order.OrderConfirmRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateInformationRequest;
 import com.capstone.ads.model.enums.OrderStatus;
-import com.capstone.ads.orchestration.OrderOrchestrationService;
+import com.capstone.ads.service.OrderService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,19 +15,19 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class OrderController {
-    private final OrderOrchestrationService service;
+    private final OrderService service;
 
     @PostMapping("/custom-design-request/{customDesignRequestId}/customer-choices/{customerChoiceId}/orders")
     public ApiResponse<OrderDTO> createOrderByCustomDesign(@PathVariable String customDesignRequestId,
                                                            @PathVariable String customerChoiceId) {
-        var response = service.createOrderByCustomDesignAndDeleteCustomerChoice(customDesignRequestId, customerChoiceId);
+        var response = service.createOrderByCustomDesign(customDesignRequestId, customerChoiceId);
         return ApiResponseBuilder.buildSuccessResponse("Create order successful", response);
     }
 
     @PostMapping("/ai-designs/{aiDesignId}/customer-choices/{customerChoiceId}/orders")
     public ApiResponse<OrderDTO> createOrderByAIDesign(@PathVariable String aiDesignId,
                                                        @PathVariable String customerChoiceId) {
-        var response = service.createOrderByAIDesignAndDeleteCustomerChoice(customerChoiceId, aiDesignId);
+        var response = service.createOrderByAIDesign(aiDesignId, customerChoiceId);
         return ApiResponseBuilder.buildSuccessResponse("Create order successful", response);
     }
 
@@ -57,8 +57,8 @@ public class OrderController {
 
     @GetMapping("/users/{userId}/orders")
     public ApiPagingResponse<OrderDTO> findOrderByUserId(@PathVariable String userId,
-                                                   @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                   @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+                                                         @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                         @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findOrderByUserId(userId, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find Order by Users", response, page);
     }

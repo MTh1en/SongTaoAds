@@ -136,6 +136,12 @@ public class UsersServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public Users getUsersByIdAndIsActiveAndRoleName(String userId, boolean isActive, String roleName) {
+        return usersRepository.findByIdAndIsActiveAndRoles_Name(userId, true, roleName)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
     private String generateAvatarName(String userId) {
         return String.format("avatar/%s/%s", userId, UUID.randomUUID());
     }

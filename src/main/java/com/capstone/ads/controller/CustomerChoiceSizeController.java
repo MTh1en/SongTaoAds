@@ -1,9 +1,9 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeCreateRequest;
-import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeDTO;
-import com.capstone.ads.dto.customerchoicesize.CustomerChoicesSizeUpdateRequest;
+import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeCreateRequest;
+import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeDTO;
+import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeUpdateRequest;
 import com.capstone.ads.service.CustomerChoiceSizesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import jakarta.validation.Valid;

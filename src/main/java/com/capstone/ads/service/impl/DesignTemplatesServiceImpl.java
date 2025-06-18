@@ -1,9 +1,9 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.S3ImageDuration;
-import com.capstone.ads.dto.designtemplate.DesignTemplateCreateRequest;
-import com.capstone.ads.dto.designtemplate.DesignTemplateDTO;
-import com.capstone.ads.dto.designtemplate.DesignTemplateUpdateRequest;
+import com.capstone.ads.dto.design_template.DesignTemplateCreateRequest;
+import com.capstone.ads.dto.design_template.DesignTemplateDTO;
+import com.capstone.ads.dto.design_template.DesignTemplateUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.DesignTemplatesMapper;

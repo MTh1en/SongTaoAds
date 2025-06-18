@@ -1,14 +1,13 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.dto.attributevalue.AttributeValuesCreateRequest;
-import com.capstone.ads.dto.attributevalue.AttributeValuesDTO;
-import com.capstone.ads.dto.attributevalue.AttributeValuesUpdateRequest;
+import com.capstone.ads.dto.attribute_value.AttributeValuesCreateRequest;
+import com.capstone.ads.dto.attribute_value.AttributeValuesDTO;
+import com.capstone.ads.dto.attribute_value.AttributeValuesUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.AttributeValuesMapper;
 import com.capstone.ads.model.AttributeValues;
 import com.capstone.ads.repository.internal.AttributeValuesRepository;
-import com.capstone.ads.repository.internal.AttributesRepository;
 import com.capstone.ads.service.AttributeValuesService;
 import com.capstone.ads.service.AttributesService;
 import lombok.RequiredArgsConstructor;

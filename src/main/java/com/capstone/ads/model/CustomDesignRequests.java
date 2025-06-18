@@ -25,6 +25,10 @@ public class CustomDesignRequests {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String requirements;
+    Integer totalPrice;
+    Integer depositAmount;
+    Integer remainingAmount;
+    String finalDesignImage;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
@@ -40,7 +44,10 @@ public class CustomDesignRequests {
     CustomDesignRequestStatus status;
 
     @OneToMany(mappedBy = "customDesignRequests")
-    List<CustomDesigns> customDesigns;
+    List<DemoDesigns> demoDesigns;
+
+    @OneToMany(mappedBy = "customDesignRequests")
+    List<PriceProposal> priceProposals;
 
     @ManyToOne
     CustomerDetail customerDetail;

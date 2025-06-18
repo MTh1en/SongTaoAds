@@ -1,6 +1,6 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.dto.customerchoicedetail.CustomerChoicesDetailsDTO;
+import com.capstone.ads.dto.customer_choice_detail.CustomerChoicesDetailsDTO;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerChoiceDetailsMapper;

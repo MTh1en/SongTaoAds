@@ -3,11 +3,16 @@ package com.capstone.ads.model.enums;
 public enum CustomDesignRequestStatus {
     PENDING,
     PRICING_NOTIFIED,
-    APPROVED,
-    REJECTED,
-    CANCEL,
-    COMPLETED,
-    PROCESSING,
+    NEGOTIATING,
+    APPROVED_PRICING,
     DEPOSITED,
-    FULLY_PAID
+    PROCESSING,
+    DESIGNER_REJECTED,
+    DEMO_SUBMITTED,
+    REVISION_REQUESTED,
+    WAITING_FULL_PAYMENT,
+    FULLY_PAID,
+    COMPLETED,
+    CANCEL,
+    REJECTED_PRICING
 }
