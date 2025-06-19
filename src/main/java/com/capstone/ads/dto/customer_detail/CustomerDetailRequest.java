@@ -10,6 +10,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerDetailRequest {
     String companyName;
-    String tagLine;
+    String address;
     String contactInfo;
 }

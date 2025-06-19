@@ -1,8 +1,8 @@
 package com.capstone.ads.model.enums;
 
 public enum OrderStatus {
-    PENDING,
     PENDING_DESIGN,
+    PENDING,
     CANCELLED,
     DEPOSITED,
     PROCESSING,

@@ -22,10 +22,10 @@ public class CustomerDetailController {
 
     @PostMapping(value = "/customer-details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<CustomerDetailDTO> createCustomerDetail(@RequestPart String companyName,
-                                                 @RequestPart String tagLine,
-                                                 @RequestPart String contactInfo,
-                                                 @RequestPart MultipartFile customerDetailLogo) {
-        var response = customerDetailService.createCustomerDetail(companyName, tagLine, contactInfo, customerDetailLogo);
+                                                               @RequestPart String address,
+                                                               @RequestPart String contactInfo,
+                                                               @RequestPart MultipartFile customerDetailLogo) {
+        var response = customerDetailService.createCustomerDetail(companyName, address, contactInfo, customerDetailLogo);
         return ApiResponseBuilder.buildSuccessResponse("Create customer detail successful", response);
     }
 

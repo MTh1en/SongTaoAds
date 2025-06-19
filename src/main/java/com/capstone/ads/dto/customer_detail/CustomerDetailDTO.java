@@ -13,7 +13,7 @@ public class CustomerDetailDTO {
     String id;
     String logoUrl;
     String companyName;
-    String tagLine;
+    String address;
     String contactInfo;
     UserDTO users;
 }
