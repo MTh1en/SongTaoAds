@@ -1,7 +1,6 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.payment.CreatePaymentRequest;
 import com.capstone.ads.service.PaymentService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
@@ -17,28 +16,34 @@ import vn.payos.type.WebhookData;
 public class PaymentController {
     private final PaymentService paymentService;
 
-    @PostMapping("/payments/deposit")
-    public ApiResponse<CheckoutResponseData> createPaymentDepositAmount(@RequestBody CreatePaymentRequest request) throws Exception {
-        CheckoutResponseData response = paymentService.createDepositPaymentLink(request);
+    @PostMapping("/orders/{orderId}/deposit")
+    public ApiResponse<CheckoutResponseData> createOrderDepositPaymentLink(@PathVariable String orderId) throws Exception {
+        CheckoutResponseData response = paymentService.createOrderDepositPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
-    @PostMapping("/payments/remaining")
-    public ApiResponse<CheckoutResponseData> createPaymentRemainingAmount(@RequestBody CreatePaymentRequest request) throws Exception {
-        CheckoutResponseData response = paymentService.createRemainingPaymentLink(request);
+    @PostMapping("/orders/{orderId}/remaining")
+    public ApiResponse<CheckoutResponseData> createOrderRemainingPaymentLink(@PathVariable String orderId) throws Exception {
+        CheckoutResponseData response = paymentService.createOrderRemainingPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
-    @GetMapping("orders/{orderId}/callback")
-    public ApiResponse<Void> payOsCallback(@PathVariable String orderId) {
-        paymentService.handlePayOsCallback(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Callback processed successfully", null);
+    @PostMapping("/custom-design-requests/{customDesignRequestId}/deposit")
+    public ApiResponse<CheckoutResponseData> createCustomDesignRequestDepositPaymentLink(@PathVariable String customDesignRequestId) throws Exception {
+        CheckoutResponseData response = paymentService.createCustomDesignRequestDepositPaymentLink(customDesignRequestId);
+        return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
+    }
+
+    @PostMapping("/custom-design-requests/{customDesignRequestId}/remaining")
+    public ApiResponse<CheckoutResponseData> createCustomDesignRequestRemainingPaymentLink(@PathVariable String customDesignRequestId) throws Exception {
+        CheckoutResponseData response = paymentService.createCustomDesignRequestRemainingPaymentLink(customDesignRequestId);
+        return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
     @PostMapping("/webhook/handle-webhook")
     public ApiResponse<String> handleWebHook(@RequestBody Webhook webhook) throws Exception {
         WebhookData webhookData = paymentService.verifyPaymentWebhookData(webhook);
-        paymentService.updateOrderStatusByWebhookData(webhookData);
+        paymentService.updateStatusByWebhookData(webhookData);
         return ApiResponseBuilder.buildSuccessResponse("Handle callback successfully", null);
     }
 

@@ -1,21 +1,21 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.payment.CreatePaymentRequest;
-
 import vn.payos.type.CheckoutResponseData;
 import vn.payos.type.Webhook;
 import vn.payos.type.WebhookData;
 
 public interface PaymentService {
-    CheckoutResponseData createDepositPaymentLink(CreatePaymentRequest request) throws Exception;
+    CheckoutResponseData createOrderDepositPaymentLink(String orderId) throws Exception;
 
-    CheckoutResponseData createRemainingPaymentLink(CreatePaymentRequest request) throws Exception;
+    CheckoutResponseData createOrderRemainingPaymentLink(String orderId) throws Exception;
 
-    void handlePayOsCallback(String orderId);
+    CheckoutResponseData createCustomDesignRequestDepositPaymentLink(String orderId) throws Exception;
+
+    CheckoutResponseData createCustomDesignRequestRemainingPaymentLink(String orderId) throws Exception;
 
     WebhookData verifyPaymentWebhookData(Webhook Webhook) throws Exception;
 
-    void updateOrderStatusByWebhookData(WebhookData webhookData);
+    void updateStatusByWebhookData(WebhookData webhookData);
 
     String confirmWebhookUrl(String webhookUrl) throws Exception;
 

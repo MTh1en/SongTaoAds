@@ -78,7 +78,7 @@ public enum ErrorCode {
     FILE_REQUIRED("File required", HttpStatus.BAD_REQUEST),
 
     DESIGN_TEMPLATE_NOT_FOUND("Design template not found", HttpStatus.NOT_FOUND),
-    CUSTOM_DESIGN_REQUEST_PENDING_NOT_FOUND("Custom design request pending not found", HttpStatus.NOT_FOUND),
+    CUSTOM_DESIGN_REQUEST_DEPOSITED_NOT_FOUND("Custom design request deposited not found", HttpStatus.NOT_FOUND),
     CUSTOM_DESIGN_REQUEST_NOT_FOUND("Custom design request not found", HttpStatus.NOT_FOUND),
 
     INVALID_CUSTOM_DESIGN_REQUEST_STATUS_TRANSITION("Invalid custom design request status transition", HttpStatus.BAD_REQUEST),

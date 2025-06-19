@@ -139,4 +139,10 @@ public class OrderServiceImpl implements OrderService {
         Pageable pageable = PageRequest.of(page - 1, size);
         return orderRepository.findByUsers_Id(userId, pageable).map(orderMapper::toDTO);
     }
+
+    @Override
+    public Orders getOrderById(String orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+    }
 }

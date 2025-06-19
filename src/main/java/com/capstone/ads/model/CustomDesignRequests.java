@@ -49,6 +49,9 @@ public class CustomDesignRequests {
     @OneToMany(mappedBy = "customDesignRequests")
     List<PriceProposal> priceProposals;
 
+    @OneToMany(mappedBy = "customDesignRequests")
+    List<Payments> payments;
+
     @ManyToOne
     CustomerDetail customerDetail;
 

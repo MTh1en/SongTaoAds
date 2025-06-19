@@ -26,4 +26,6 @@ public interface CustomDesignRequestService {
     void updateCustomDesignRequestStatus(String customDesignRequestId, CustomDesignRequestStatus status);
 
     void updateCustomDesignRequestApprovedPricing(String customDesignRequestId, Integer totalPrice, Integer depositAmount);
+
+    void updateCustomDesignRequestFromWebhookResult(CustomDesignRequests customDesignRequests, boolean isDeposit);
 }

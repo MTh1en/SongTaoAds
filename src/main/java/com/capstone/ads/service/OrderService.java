@@ -3,6 +3,7 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.order.OrderConfirmRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateInformationRequest;
+import com.capstone.ads.model.Orders;
 import com.capstone.ads.model.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 
@@ -24,4 +25,7 @@ public interface OrderService {
     OrderDTO changeOrderStatus(String orderId, OrderStatus orderStatus);
 
     Page<OrderDTO> findOrderByUserId(String userId, int page, int size);
+
+    //INTERNAL FUNCTION
+    Orders getOrderById(String orderId);
 }

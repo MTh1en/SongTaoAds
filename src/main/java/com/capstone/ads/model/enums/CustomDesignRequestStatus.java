@@ -6,6 +6,7 @@ public enum CustomDesignRequestStatus {
     NEGOTIATING,
     APPROVED_PRICING,
     DEPOSITED,
+    ASSIGNED_DESIGNER,
     PROCESSING,
     DESIGNER_REJECTED,
     DEMO_SUBMITTED,

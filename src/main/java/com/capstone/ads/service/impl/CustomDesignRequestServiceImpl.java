@@ -25,9 +25,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -58,15 +55,11 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     @Transactional
     public CustomDesignRequestDTO assignDesignerToCustomerRequest(String customDesignRequestId, String designerId) {
         Users designer = userService.getUsersByIdAndIsActiveAndRoleName(designerId, true, PredefinedRole.DESIGNER_ROLE);
-        List<CustomDesignRequestStatus> allowedStatuses = Arrays.asList(
-                CustomDesignRequestStatus.PENDING,
-                CustomDesignRequestStatus.APPROVED_PRICING
-        );
-        var customerDesignRequest = customDesignRequestsRepository.findByIdAndStatusIn(customDesignRequestId, allowedStatuses)
-                .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_PENDING_NOT_FOUND));
+        var customerDesignRequest = customDesignRequestsRepository.findByIdAndStatus(customDesignRequestId, CustomDesignRequestStatus.DEPOSITED)
+                .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_DEPOSITED_NOT_FOUND));
 
         customerDesignRequest.setAssignDesigner(designer);
-        customerDesignRequest.setStatus(CustomDesignRequestStatus.PROCESSING);
+        customerDesignRequest.setStatus(CustomDesignRequestStatus.ASSIGNED_DESIGNER);
         customerDesignRequest = customDesignRequestsRepository.save(customerDesignRequest);
         return customDesignRequestsMapper.toDTO(customerDesignRequest);
     }
@@ -107,6 +100,9 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 
+
+    //INTERNAL FUNCTION//
+
     @Override
     public CustomDesignRequests getCustomDesignRequestById(String customDesignRequestId) {
         return customDesignRequestsRepository.findById(customDesignRequestId)
@@ -133,5 +129,12 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequest.setRemainingAmount(totalPrice - depositAmount);
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
         customDesignRequest.setStatus(CustomDesignRequestStatus.APPROVED_PRICING);
+    }
+
+    @Override
+    public void updateCustomDesignRequestFromWebhookResult(CustomDesignRequests customDesignRequests, boolean isDeposit) {
+        if (isDeposit) customDesignRequests.setStatus(CustomDesignRequestStatus.DEPOSITED);
+        else customDesignRequests.setStatus(CustomDesignRequestStatus.FULLY_PAID);
+        customDesignRequestsRepository.save(customDesignRequests);
     }
 }

@@ -1,17 +1,17 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.constaint.PaymentPolicy;
-import com.capstone.ads.dto.payment.CreatePaymentRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
+import com.capstone.ads.model.CustomDesignRequests;
 import com.capstone.ads.model.Orders;
 import com.capstone.ads.model.Payments;
-import com.capstone.ads.model.enums.OrderStatus;
 import com.capstone.ads.model.enums.PaymentMethod;
 import com.capstone.ads.model.enums.PaymentStatus;
-import com.capstone.ads.repository.internal.OrdersRepository;
 import com.capstone.ads.repository.internal.PaymentsRepository;
+import com.capstone.ads.service.CustomDesignRequestService;
+import com.capstone.ads.service.OrderService;
 import com.capstone.ads.service.PaymentService;
+import com.capstone.ads.utils.DataConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +21,7 @@ import vn.payos.PayOS;
 import vn.payos.type.*;
 
 import java.security.SecureRandom;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -40,40 +41,33 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final SecureRandom random = new SecureRandom();
     private final PaymentsRepository paymentRepository;
-    private final OrdersRepository orderRepository;
+    private final OrderService orderService;
+    private final CustomDesignRequestService customDesignRequestService;
 
     @Override
-    public CheckoutResponseData createDepositPaymentLink(CreatePaymentRequest request) throws Exception {
-        Orders order = validateOrder(request.getOrderId());
-        Double depositAmount = calculateAmount(order.getTotalAmount(), PaymentPolicy.DEPOSIT_PERCENTAGE);
-        return createPaymentLink(request, order, depositAmount, true);
+    public CheckoutResponseData createOrderDepositPaymentLink(String orderId) throws Exception {
+        Orders order = orderService.getOrderById(orderId);
+        return createPaymentLinkForOrder(order, true);
     }
 
     @Override
-    public CheckoutResponseData createRemainingPaymentLink(CreatePaymentRequest request) throws Exception {
-        Orders order = validateOrder(request.getOrderId());
-        if (order.getStatus() != OrderStatus.DEPOSITED) {
-            log.error("Order {} is not in DEPOSITED status, current status: {}", request.getOrderId(), order.getStatus());
-            throw new AppException(ErrorCode.INVALID_ORDER_STATUS);
-        }
-        Double remainingAmount = calculateAmount(order.getTotalAmount(), PaymentPolicy.REMAINING_PERCENTAGE);
-        return createPaymentLink(request, order, remainingAmount, false);
+    public CheckoutResponseData createOrderRemainingPaymentLink(String orderId) throws Exception {
+        Orders order = orderService.getOrderById(orderId);
+        return createPaymentLinkForOrder(order, false);
     }
 
     @Override
-    public void handlePayOsCallback(String orderId) {
-        Orders orders = validateOrder(orderId);
-        orders.getPayments().forEach(payment -> {
-            {
-                if (Boolean.FALSE.equals(payment.getIsDeposit())) {
-                    orders.setStatus(OrderStatus.COMPLETED);
-                } else {
-                    orders.setStatus(OrderStatus.DEPOSITED);
-                }
-            }
-        });
-        orderRepository.save(orders);
+    public CheckoutResponseData createCustomDesignRequestDepositPaymentLink(String orderId) throws Exception {
+        CustomDesignRequests customDesignRequests = customDesignRequestService.getCustomDesignRequestById(orderId);
+        return createPaymentLinkForCustomDesignRequest(customDesignRequests, true);
     }
+
+    @Override
+    public CheckoutResponseData createCustomDesignRequestRemainingPaymentLink(String orderId) throws Exception {
+        CustomDesignRequests customDesignRequests = customDesignRequestService.getCustomDesignRequestById(orderId);
+        return createPaymentLinkForCustomDesignRequest(customDesignRequests, false);
+    }
+
 
     @Override
     public WebhookData verifyPaymentWebhookData(Webhook Webhook) throws Exception {
@@ -83,16 +77,24 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public void updateOrderStatusByWebhookData(WebhookData webhookData) {
+    public void updateStatusByWebhookData(WebhookData webhookData) {
         Payments payment = paymentRepository.findByCode(webhookData.getOrderCode())
                 .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
+        boolean isDeposit = payment.getIsDeposit();
         if (webhookData.getCode().equals("00")) {
             payment.setStatus(PaymentStatus.SUCCESS);
+            if (!Objects.isNull(payment.getCustomDesignRequests())) {
+                CustomDesignRequests customDesignRequests = payment.getCustomDesignRequests();
+                customDesignRequestService.updateCustomDesignRequestFromWebhookResult(customDesignRequests, isDeposit);
+            }
+            if (!Objects.isNull(payment.getOrders())) {
+                Orders orders = payment.getOrders();
+                //Method update order
+            }
         } else {
             payment.setStatus(PaymentStatus.FAILED);
         }
-        paymentRepository.saveAndFlush(payment);
-        updateOrderStatus(payment);
+        paymentRepository.save(payment);
     }
 
     @Override
@@ -110,49 +112,28 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payments);
     }
 
-    private Orders validateOrder(String orderId) {
-        Orders order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
-        if (order.getTotalAmount() == null || order.getTotalAmount() <= 0 || order.getUsers() == null) {
-            log.error("Invalid order data for order {}: totalAmount or users is invalid", orderId);
-            throw new AppException(ErrorCode.ORDER_NOT_FOUND);
-        }
-        return order;
-    }
-
-    private Double calculateAmount(Double totalAmount, Double percentage) {
-        return totalAmount * percentage;
-    }
-
-    private CheckoutResponseData createPaymentLink(CreatePaymentRequest request, Orders order, Double amount, boolean isDeposit) throws Exception {
+    private CheckoutResponseData createPaymentLinkForOrder(Orders order, boolean isDeposit) throws Exception {
         PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
         long paymentCode = generateOrderCode();
 
-        long rounded = Math.round(amount);
-        Integer payOsAmount = Math.toIntExact(rounded);
-
-        // Create ItemData
-        ItemData itemData = ItemData.builder()
-                .name(String.format("%s Payment for Order of - %s",
-                        isDeposit ? "Deposit" : "Remaining", order.getUsers().getFullName()))
-                .price(payOsAmount)
-                .quantity(1)
-                .build();
+        double amount = (isDeposit)
+                ? order.getDepositAmount()
+                : order.getRemainingAmount();
+        int payOsAmount = DataConverter.convertDoubleToInt(amount);
 
         // Create PaymentData
         PaymentData paymentData = PaymentData.builder()
                 .orderCode(paymentCode)
+                .description("Orders")
                 .amount(payOsAmount)
-                .description(request.getDescription())
                 .returnUrl(BASE_URL + "/api/payments/success")
                 .cancelUrl(BASE_URL + "/api/payments/fail/" + paymentCode)
-                .item(itemData)
                 .build();
 
         // Create and save Payment entity
         Payments payment = Payments.builder()
                 .code(paymentCode)
-                .totalAmount(payOsAmount)
+                .amount(payOsAmount)
                 .method(PaymentMethod.PAYOS)
                 .status(PaymentStatus.PENDING)
                 .isDeposit(isDeposit)
@@ -161,29 +142,42 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
 
         // Create payment link
-        CheckoutResponseData response = payOS.createPaymentLink(paymentData);
+        return payOS.createPaymentLink(paymentData);
+    }
 
-        log.info("Created {} payment link for order {}: payOsPaymentLinkId={}, paymentUrl={}",
-                isDeposit ? "deposit" : "remaining", order.getId(), response.getPaymentLinkId(), response.getCheckoutUrl());
+    private CheckoutResponseData createPaymentLinkForCustomDesignRequest(CustomDesignRequests customDesignRequests, boolean isDeposit) throws Exception {
+        PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
 
-        return response;
+        long paymentCode = generateOrderCode();
+
+        int payOsAmount = (isDeposit)
+                ? customDesignRequests.getDepositAmount()
+                : customDesignRequests.getRemainingAmount();
+        // Create PaymentData
+        PaymentData paymentData = PaymentData.builder()
+                .orderCode(paymentCode)
+                .description("Custom Design Request")
+                .amount(payOsAmount)
+                .returnUrl(BASE_URL + "/api/payments/success")
+                .cancelUrl(BASE_URL + "/api/payments/fail/" + paymentCode)
+                .build();
+
+        // Create and save Payment entity
+        Payments payment = Payments.builder()
+                .code(paymentCode)
+                .amount(payOsAmount)
+                .method(PaymentMethod.PAYOS)
+                .status(PaymentStatus.PENDING)
+                .isDeposit(isDeposit)
+                .customDesignRequests(customDesignRequests)
+                .build();
+        paymentRepository.save(payment);
+
+        // Create payment link
+        return payOS.createPaymentLink(paymentData);
     }
 
     private long generateOrderCode() {
         return Math.abs(random.nextLong() % 10000000000L);
-    }
-
-    private void updateOrderStatus(Payments payment) {
-        Orders order = payment.getOrders();
-        if (payment.getStatus().equals(PaymentStatus.SUCCESS)) {
-            if (payment.getIsDeposit()) {
-                order.setStatus(OrderStatus.DEPOSITED);
-                order.setDepositAmount(payment.getTotalAmount().doubleValue());
-            } else {
-                order.setStatus(OrderStatus.COMPLETED);
-                order.setRemainingAmount(payment.getTotalAmount().doubleValue());
-            }
-        }
-        orderRepository.save(order);
     }
 }
