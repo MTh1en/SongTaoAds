@@ -30,16 +30,16 @@ public class CustomDesignRequests {
     Integer remainingAmount;
     String finalDesignImage;
     Boolean isNeedSupport;
-
+    Boolean hasOrder;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     CustomerChoiceHistories customerChoiceHistories;
 
     @CreationTimestamp
-    LocalDateTime createdAt;
+    LocalDateTime createAt;
 
     @UpdateTimestamp
-    LocalDateTime updatedAt;
+    LocalDateTime updateAt;
 
     @Enumerated(EnumType.STRING)
     CustomDesignRequestStatus status;

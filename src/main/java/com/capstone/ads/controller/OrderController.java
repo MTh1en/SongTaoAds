@@ -33,19 +33,13 @@ public class OrderController {
 
     @PatchMapping("/orders/{orderId}/customer-information")
     public ApiResponse<OrderDTO> update(@PathVariable String orderId, @RequestBody OrderUpdateInformationRequest request) {
-        var response = service.customerUpdateOrderInformation(orderId, request);
+        var response = service.customerProvideAddress(orderId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update order information successful", response);
     }
 
     @PatchMapping("/orders/{orderId}/sale-confirm")
     public ApiResponse<OrderDTO> update(@PathVariable String orderId, @RequestBody OrderConfirmRequest request) {
-        var response = service.saleConfirmOrder(orderId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Confirm order successful", response);
-    }
-
-    @PatchMapping("/orders/{orderId}/status")
-    public ApiResponse<OrderDTO> update(@PathVariable String orderId, @RequestParam OrderStatus status) {
-        var response = service.changeOrderStatus(orderId, status);
+        var response = service.saleNotifyEstimateDeliveryDate(orderId, request);
         return ApiResponseBuilder.buildSuccessResponse("Confirm order successful", response);
     }
 

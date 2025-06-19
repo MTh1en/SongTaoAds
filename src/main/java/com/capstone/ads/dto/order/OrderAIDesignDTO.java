@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderAIDesignDTO {
     String id;
-    String image;
     String customerNote;
+    String image;
     LocalDateTime createAt;
     LocalDateTime updateAt;
 }

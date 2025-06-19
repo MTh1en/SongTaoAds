@@ -12,20 +12,20 @@ public interface OrderService {
 
     OrderDTO createOrderByAIDesign(String aiDesignId, String customerChoiceId);
 
+    OrderDTO customerProvideAddress(String orderId, OrderUpdateInformationRequest request);
+
+    OrderDTO saleNotifyEstimateDeliveryDate(String orderId, OrderConfirmRequest request);
+
     OrderDTO findOrderById(String orderId);
 
     Page<OrderDTO> findOrderByStatus(OrderStatus status, int page, int size);
 
-    OrderDTO customerUpdateOrderInformation(String orderId, OrderUpdateInformationRequest request);
-
-    OrderDTO saleConfirmOrder(String orderId, OrderConfirmRequest request);
-
     void hardDeleteOrder(String orderId);
-
-    OrderDTO changeOrderStatus(String orderId, OrderStatus orderStatus);
 
     Page<OrderDTO> findOrderByUserId(String userId, int page, int size);
 
     //INTERNAL FUNCTION
     Orders getOrderById(String orderId);
+
+    void updateOrderStatus(String orderId, OrderStatus status);
 }

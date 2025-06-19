@@ -41,12 +41,14 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     @Override
     @Transactional
-    public CustomDesignRequestDTO createCustomDesignRequest(String customerDetailId, String customerChoicesId, CustomDesignRequestCreateRequest request) {
+    public CustomDesignRequestDTO createCustomDesignRequest(String customerDetailId, String customerChoicesId,
+                                                            CustomDesignRequestCreateRequest request) {
         customerDetailService.validateCustomerDetailExists(customerDetailId);
         CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoicesId);
 
         var customDesignRequest = customDesignRequestsMapper.toEntity(request, customerDetailId);
         customDesignRequest.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
+        customDesignRequest.setHasOrder(request.getHasOrder());
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
 
         customerChoicesService.hardDeleteCustomerChoice(customerChoicesId);
@@ -99,10 +101,11 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     public CustomDesignRequestDTO designerUploadFinalDesignImage(String customDesignRequestId, MultipartFile finalDesignImage) {
         CustomDesignRequests customDesignRequest = getCustomDesignRequestById(customDesignRequestId);
 
-        var finalDesignImageUrl = uploadCustomDesignImageToS3(customDesignRequestId, finalDesignImage);
+        var finalDesignImageUrl = uploadCustomDesignRequestImageToS3(customDesignRequestId, finalDesignImage);
         customDesignRequestStateValidator.validateTransition(customDesignRequest.getStatus(), CustomDesignRequestStatus.COMPLETED);
         customDesignRequest.setFinalDesignImage(finalDesignImageUrl);
         customDesignRequest.setStatus(CustomDesignRequestStatus.COMPLETED);
+        customDesignRequestsRepository.save(customDesignRequest);
 
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
@@ -189,7 +192,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         return String.format("custom-design/%s/final", customDesignRequestId);
     }
 
-    private String uploadCustomDesignImageToS3(String customDesignRequestId, MultipartFile file) {
+    private String uploadCustomDesignRequestImageToS3(String customDesignRequestId, MultipartFile file) {
         String customDesignImageKey = generateCustomDesignRequestKey(customDesignRequestId);
         if (file.isEmpty()) {
             throw new AppException(ErrorCode.FILE_REQUIRED);

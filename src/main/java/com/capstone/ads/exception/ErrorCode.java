@@ -73,7 +73,7 @@ public enum ErrorCode {
     ATTRIBUTE_EXISTED_IN_CUSTOMER_CHOICES_DETAIL("Attribute existed in Customer choices detail", HttpStatus.BAD_REQUEST),
     CUSTOMER_CHOICE_SIZE_EXISTED("Customer choice size already existed", HttpStatus.BAD_REQUEST),
 
-    //FILE PROCESSING
+    //FILE IN_PROGRESS
     FILE_PROCESSING_FAILED("File processing failed", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_REQUIRED("File required", HttpStatus.BAD_REQUEST),
 
@@ -92,6 +92,8 @@ public enum ErrorCode {
     INVALID_INPUT("Invalid input", HttpStatus.BAD_REQUEST),
 
     PRICE_PROPOSAL_NOT_FOUND("Price proposal not found", HttpStatus.NOT_FOUND),
+
+    CONTRACT_NOT_FOUND("Contract not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

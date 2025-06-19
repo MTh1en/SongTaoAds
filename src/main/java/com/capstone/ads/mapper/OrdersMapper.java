@@ -14,13 +14,23 @@ import java.time.LocalDateTime;
 @Mapper(componentModel = "spring")
 public interface OrdersMapper {
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "status", expression = "java(initStatus())")
+    @Mapping(target = "status", expression = "java(initOrderStatus())")
     @Mapping(target = "orderDate", expression = "java(initOrderDate())")
+    @Mapping(target = "aiDesigns", ignore = true)
+    @Mapping(target = "customDesignRequests", source = "customDesignRequests")
+    @Mapping(target = "depositAmount", ignore = true)
+    @Mapping(target = "remainingAmount", ignore = true)
+    @Mapping(target = "totalAmount", ignore = true)
     Orders toEntityFromCreateOrderByCustomDesign(CustomDesignRequests customDesignRequests, Users users);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "status", expression = "java(initStatus())")
+    @Mapping(target = "status", expression = "java(initOrderStatus())")
     @Mapping(target = "orderDate", expression = "java(initOrderDate())")
+    @Mapping(target = "aiDesigns", source = "aiDesigns")
+    @Mapping(target = "customDesignRequests", ignore = true)
+    @Mapping(target = "depositAmount", ignore = true)
+    @Mapping(target = "remainingAmount", ignore = true)
+    @Mapping(target = "totalAmount", ignore = true)
     Orders toEntityFromCreateOrderByAIDesign(AIDesigns aiDesigns, Users users);
 
     OrderDTO toDTO(Orders order);
@@ -33,7 +43,7 @@ public interface OrdersMapper {
         return LocalDateTime.now();
     }
 
-    default OrderStatus initStatus() {
-        return OrderStatus.PENDING;
+    default OrderStatus initOrderStatus() {
+        return OrderStatus.PENDING_CONTRACT;
     }
 }

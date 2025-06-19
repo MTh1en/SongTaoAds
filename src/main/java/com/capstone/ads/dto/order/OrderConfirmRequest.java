@@ -1,6 +1,7 @@
 package com.capstone.ads.dto.order;
 
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderConfirmRequest {
-    private LocalDateTime deliveryDate;
+    LocalDateTime deliveryDate;
 }

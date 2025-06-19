@@ -48,7 +48,7 @@ public class OrderServiceImpl implements OrderService {
         orders.setCustomerChoiceHistories(customDesignRequests.getCustomerChoiceHistories() != null
                 ? customDesignRequests.getCustomerChoiceHistories()
                 : null);
-        orders.setTotalAmount(customDesignRequests.getCustomerChoiceHistories().getTotalAmount());
+        orders.setTotalAmount(customerChoices.getTotalAmount());
         orders.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
 
         orderRepository.save(orders);
@@ -86,8 +86,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO customerUpdateOrderInformation(String orderId, OrderUpdateInformationRequest request) {
-        Orders orders = orderRepository.findByIdAndStatus(orderId, OrderStatus.PENDING)
+    public OrderDTO customerProvideAddress(String orderId, OrderUpdateInformationRequest request) {
+        Orders orders = orderRepository.findByIdAndStatus(orderId, OrderStatus.PENDING_CONTRACT)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
         orderMapper.updateEntityFromUpdateInformationRequest(request, orders);
@@ -98,12 +98,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO saleConfirmOrder(String orderId, OrderConfirmRequest request) {
+    public OrderDTO saleNotifyEstimateDeliveryDate(String orderId, OrderConfirmRequest request) {
         Orders orders = orderRepository.findByIdAndStatus(orderId, OrderStatus.DEPOSITED)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
         orderMapper.updateEntityFromConfirmRequest(request, orders);
-        orders.setStatus(OrderStatus.PROCESSING);
+        orders.setStatus(OrderStatus.IN_PROGRESS);
         orders = orderRepository.save(orders);
 
         return orderMapper.toDTO(orders);
@@ -119,22 +119,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
-    public OrderDTO changeOrderStatus(String orderId, OrderStatus newStatus) {
-        Orders orders = orderRepository.findById(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
-
-        orderStateValidator.validateTransition(
-                orders.getStatus(),
-                newStatus
-        );
-
-        orders.setStatus(newStatus);
-        orders = orderRepository.save(orders);
-        return orderMapper.toDTO(orders);
-    }
-
-    @Override
     public Page<OrderDTO> findOrderByUserId(String userId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         return orderRepository.findByUsers_Id(userId, pageable).map(orderMapper::toDTO);
@@ -144,5 +128,13 @@ public class OrderServiceImpl implements OrderService {
     public Orders getOrderById(String orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+    }
+
+    @Override
+    public void updateOrderStatus(String orderId, OrderStatus status) {
+        Orders orders = getOrderById(orderId);
+        orderStateValidator.validateTransition(orders.getStatus(), status);
+        orders.setStatus(status);
+        orderRepository.save(orders);
     }
 }
