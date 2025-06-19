@@ -62,6 +62,7 @@ public class CustomDesignRequestStateValidator {
 
         validTransitions.put(CustomDesignRequestStatus.DEMO_SUBMITTED, Set.of(
                 CustomDesignRequestStatus.WAITING_FULL_PAYMENT,
+                CustomDesignRequestStatus.REVISION_REQUESTED,
                 CustomDesignRequestStatus.CANCEL
         ));
 

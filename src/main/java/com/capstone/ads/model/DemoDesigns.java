@@ -20,10 +20,12 @@ public class DemoDesigns {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-
-    String demoImage;
-    String customerNote;
     String designerDescription;
+    String demoImage;
+
+    String customerNote;
+    String customerFeedbackImage;
+
     Integer version;
 
     @CreationTimestamp

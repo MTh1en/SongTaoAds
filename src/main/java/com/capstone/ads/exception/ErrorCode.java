@@ -84,7 +84,7 @@ public enum ErrorCode {
     INVALID_CUSTOM_DESIGN_REQUEST_STATUS_TRANSITION("Invalid custom design request status transition", HttpStatus.BAD_REQUEST),
     CUSTOM_DESIGN_NOT_FOUND("Custom design not found", HttpStatus.NOT_FOUND),
     INVALID_CUSTOM_DESIGN_STATUS_TRANSITION("Invalid custom design status transition", HttpStatus.BAD_REQUEST),
-    CUSTOM_DESIGN_IN_WAITING_DECISION_FROM_CUSTOMER("Custom design in waiting decision from customer", HttpStatus.BAD_REQUEST),
+    DEMO_DESIGN_IN_WAITING_DECISION_FROM_CUSTOMER("Demo design in waiting decision from customer", HttpStatus.BAD_REQUEST),
     INVALID_ORDER_STATUS_TRANSITION("Invalid order status transition", HttpStatus.BAD_REQUEST),
 
     //CHAT BOT

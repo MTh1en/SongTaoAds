@@ -1,7 +1,7 @@
 package com.capstone.ads.mapper;
 
+import com.capstone.ads.dto.demo_design.CustomerRejectCustomDesignRequest;
 import com.capstone.ads.dto.demo_design.DemoDesignDTO;
-import com.capstone.ads.dto.demo_design.CustomerDecisionCustomDesignRequest;
 import com.capstone.ads.dto.demo_design.DesignerUpdateDescriptionCustomDesignRequest;
 import com.capstone.ads.model.CustomDesignRequests;
 import com.capstone.ads.model.DemoDesigns;
@@ -20,7 +20,7 @@ public interface DemoDesignsMapper {
     @Mapping(target = "designerDescription", expression = "java(designerDescription)")
     DemoDesigns toEntity(String designerDescription, String customerDesignRequestId);
 
-    void updateEntityFromCustomerRequest(CustomerDecisionCustomDesignRequest request, @MappingTarget DemoDesigns demoDesigns);
+    void updateEntityFromCustomerRequest(CustomerRejectCustomDesignRequest request, @MappingTarget DemoDesigns demoDesigns);
 
     void updateEntityFromDesignerRequest(DesignerUpdateDescriptionCustomDesignRequest request, @MappingTarget DemoDesigns demoDesigns);
 

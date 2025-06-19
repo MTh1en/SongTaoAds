@@ -2,8 +2,8 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
+import com.capstone.ads.dto.demo_design.CustomerRejectCustomDesignRequest;
 import com.capstone.ads.dto.demo_design.DemoDesignDTO;
-import com.capstone.ads.dto.demo_design.CustomerDecisionCustomDesignRequest;
 import com.capstone.ads.dto.demo_design.DesignerUpdateDescriptionCustomDesignRequest;
 import com.capstone.ads.service.DemoDesignsService;
 import com.capstone.ads.utils.ApiResponseBuilder;
@@ -26,10 +26,23 @@ public class DemoDesignsController {
         return ApiResponseBuilder.buildSuccessResponse("Create custom design successful", response);
     }
 
-    @PatchMapping("/custom-designs/{customDesignId}/customer-decision")
-    public ApiResponse<DemoDesignDTO> customerDecisionCustomDesign(@PathVariable String customDesignId,
-                                                                   @RequestBody CustomerDecisionCustomDesignRequest request) {
-        var response = demoDesignsService.customerDecisionCustomDesign(customDesignId, request);
+    @PatchMapping("/custom-designs/{customDesignId}/approve")
+    public ApiResponse<DemoDesignDTO> customerApproveCustomDesign(@PathVariable String customDesignId) {
+        var response = demoDesignsService.customerApproveCustomDesign(customDesignId);
+        return ApiResponseBuilder.buildSuccessResponse("Custom design decision successful", response);
+    }
+
+    @PatchMapping("/custom-designs/{customDesignId}/reject")
+    public ApiResponse<DemoDesignDTO> customerRejectCustomDesign(@PathVariable String customDesignId,
+                                                                 @RequestBody CustomerRejectCustomDesignRequest request) {
+        var response = demoDesignsService.customerRejectCustomDesign(customDesignId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Custom design decision successful", response);
+    }
+
+    @PatchMapping(value = "/custom-designs/{customDesignId}/feedback-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<DemoDesignDTO> customerUploadFeedbackImage(@PathVariable String customDesignId,
+                                                                  @RequestPart MultipartFile customDesignImage) {
+        var response = demoDesignsService.customerUploadFeedbackImage(customDesignId, customDesignImage);
         return ApiResponseBuilder.buildSuccessResponse("Custom design decision successful", response);
     }
 

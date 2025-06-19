@@ -4,5 +4,4 @@ public enum DemoDesignStatus {
     PENDING,
     APPROVED,
     REJECTED,
-    NEED_SUPPORT
 }

@@ -29,6 +29,7 @@ public class CustomDesignRequests {
     Integer depositAmount;
     Integer remainingAmount;
     String finalDesignImage;
+    Boolean isNeedSupport;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")

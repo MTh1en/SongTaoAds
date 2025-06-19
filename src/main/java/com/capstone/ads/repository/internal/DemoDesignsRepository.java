@@ -17,4 +17,6 @@ public interface DemoDesignsRepository extends JpaRepository<DemoDesigns, String
     Page<DemoDesigns> findByCustomDesignRequests_Id(String id, Pageable pageable);
 
     boolean existsByCustomDesignRequests_IdAndStatusIn(String id, List<DemoDesignStatus> statuses);
+
+    int countByCustomDesignRequests_Id(String id);
 }

@@ -9,7 +9,9 @@ import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,11 +36,26 @@ public class CustomDesignRequestsController {
         return ApiResponseBuilder.buildSuccessResponse("Assign custom design request successful", response);
     }
 
-    @PatchMapping("/custom-design-requests/{customDesignRequestId}/status")
-    public ApiResponse<CustomDesignRequestDTO> changeStatusCustomDesignRequest(@PathVariable String customDesignRequestId,
-                                                                               @RequestParam("status") CustomDesignRequestStatus status) {
-        var response = service.changeStatusCustomDesignRequest(customDesignRequestId, status);
-        return ApiResponseBuilder.buildSuccessResponse("Change custom design request status successful", response);
+    @PatchMapping("/custom-design-requests/{customDesignRequestId}/approve")
+    public ApiResponse<CustomDesignRequestDTO> approveCustomDesignRequest(@PathVariable String customDesignRequestId) {
+        var response = service.designerApproveCustomDesignRequest(customDesignRequestId);
+        return ApiResponseBuilder.buildSuccessResponse("Designer approved custom design request assigned", response);
+    }
+
+    @PatchMapping("/custom-design-requests/{customDesignRequestId}/reject")
+    public ApiResponse<CustomDesignRequestDTO> rejectCustomDesignRequest(@PathVariable String customDesignRequestId) {
+        var response = service.designerRejectCustomDesignRequest(customDesignRequestId);
+        return ApiResponseBuilder.buildSuccessResponse("Designer rejected custom design request assigned", response);
+    }
+
+    @PatchMapping(
+            value = "/custom-design-requests/{customDesignRequestId}/final-design-image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ApiResponse<CustomDesignRequestDTO> designerUploadFinalDesignImage(@PathVariable String customDesignRequestId,
+                                                                              @RequestPart MultipartFile finalDesignImage) {
+        var response = service.designerUploadFinalDesignImage(customDesignRequestId, finalDesignImage);
+        return ApiResponseBuilder.buildSuccessResponse("Designer rejected custom design request assigned", response);
     }
 
     @GetMapping("/customer-details/{customerDetailId}/custom-design-requests")
