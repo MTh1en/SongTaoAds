@@ -50,7 +50,7 @@ public class PaymentController {
         log.info("Webhook verified: {}", webhook.getData());
         log.info("Webhook verified: {}", webhook.getDesc());
 
-        //paymentService.updateStatusByWebhookData(webhook);
+        paymentService.updateStatusByWebhookData(webhook);
         return webhookData;
     }
 
