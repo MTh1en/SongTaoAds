@@ -4,6 +4,7 @@ import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.service.PaymentService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import vn.payos.type.CheckoutResponseData;
@@ -13,6 +14,7 @@ import vn.payos.type.WebhookData;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentController {
     private final PaymentService paymentService;
 
@@ -41,10 +43,15 @@ public class PaymentController {
     }
 
     @PostMapping("/webhook/handle-webhook")
-    public ApiResponse<String> handleWebHook(@RequestBody Webhook webhook) throws Exception {
+    public WebhookData handleWebHook(@RequestBody Webhook webhook) throws Exception {
         WebhookData webhookData = paymentService.verifyPaymentWebhookData(webhook);
-        paymentService.updateStatusByWebhookData(webhookData);
-        return ApiResponseBuilder.buildSuccessResponse("Handle callback successfully", null);
+        log.info("Webhook verified: {}", webhook.getCode());
+        log.info("Webhook verified: {}", webhook.getSuccess());
+        log.info("Webhook verified: {}", webhook.getData());
+        log.info("Webhook verified: {}", webhook.getDesc());
+
+        paymentService.updateStatusByWebhookData(webhook);
+        return webhookData;
     }
 
     @PostMapping("/webhook/confirm-webhook-url")

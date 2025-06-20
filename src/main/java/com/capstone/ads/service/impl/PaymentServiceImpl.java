@@ -77,11 +77,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public void updateStatusByWebhookData(WebhookData webhookData) {
-        Payments payment = paymentRepository.findByCode(webhookData.getOrderCode())
+    public void updateStatusByWebhookData(Webhook Webhook) {
+        Payments payment = paymentRepository.findByCode(Webhook.getData().getOrderCode())
                 .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
         boolean isDeposit = payment.getIsDeposit();
-        if (webhookData.getCode().equals("00")) {
+        if (Webhook.getSuccess()) {
             payment.setStatus(PaymentStatus.SUCCESS);
             if (!Objects.isNull(payment.getCustomDesignRequests())) {
                 CustomDesignRequests customDesignRequests = payment.getCustomDesignRequests();
@@ -89,7 +89,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
             if (!Objects.isNull(payment.getOrders())) {
                 Orders orders = payment.getOrders();
-                //Method update order
+                orderService.updateOrderFromWebhookResult(orders, isDeposit);
             }
         } else {
             payment.setStatus(PaymentStatus.FAILED);
@@ -115,7 +115,7 @@ public class PaymentServiceImpl implements PaymentService {
     private CheckoutResponseData createPaymentLinkForOrder(Orders order, boolean isDeposit) throws Exception {
         PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
         long paymentCode = generateOrderCode();
-
+        long expiredInSeconds = (System.currentTimeMillis() / 1000) + (60 * 60);
         double amount = (isDeposit)
                 ? order.getDepositAmount()
                 : order.getRemainingAmount();
@@ -126,6 +126,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .orderCode(paymentCode)
                 .description("Orders")
                 .amount(payOsAmount)
+                .expiredAt(expiredInSeconds)
                 .returnUrl(BASE_URL + "/api/payments/success")
                 .cancelUrl(BASE_URL + "/api/payments/fail/" + paymentCode)
                 .build();
@@ -149,7 +150,7 @@ public class PaymentServiceImpl implements PaymentService {
         PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
 
         long paymentCode = generateOrderCode();
-
+        long expiredInSeconds = (System.currentTimeMillis() / 1000) + (60 * 60);
         int payOsAmount = (isDeposit)
                 ? customDesignRequests.getDepositAmount()
                 : customDesignRequests.getRemainingAmount();
@@ -157,6 +158,7 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentData paymentData = PaymentData.builder()
                 .orderCode(paymentCode)
                 .description("Custom Design Request")
+                .expiredAt(expiredInSeconds)
                 .amount(payOsAmount)
                 .returnUrl(BASE_URL + "/api/payments/success")
                 .cancelUrl(BASE_URL + "/api/payments/fail/" + paymentCode)

@@ -26,6 +26,17 @@ public class OrderStateValidator {
 
         validTransitions.put(OrderStatus.CONTRACT_SENT, Set.of(
                 OrderStatus.CANCELLED,
+                OrderStatus.CONTRACT_SIGNED,
+                OrderStatus.CONTRACT_DISCUSS
+        ));
+
+        validTransitions.put(OrderStatus.CONTRACT_DISCUSS, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.CONTRACT_SENT
+        ));
+
+        validTransitions.put(OrderStatus.CONTRACT_SIGNED, Set.of(
+                OrderStatus.CANCELLED,
                 OrderStatus.CONTRACT_CONFIRMED
         ));
 

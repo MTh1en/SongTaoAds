@@ -2,7 +2,7 @@ package com.capstone.ads.mapper;
 
 import com.capstone.ads.dto.order.OrderConfirmRequest;
 import com.capstone.ads.dto.order.OrderDTO;
-import com.capstone.ads.dto.order.OrderUpdateInformationRequest;
+import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
 import com.capstone.ads.model.*;
 import com.capstone.ads.model.enums.OrderStatus;
 import org.mapstruct.Mapper;
@@ -35,7 +35,7 @@ public interface OrdersMapper {
 
     OrderDTO toDTO(Orders order);
 
-    void updateEntityFromUpdateInformationRequest(OrderUpdateInformationRequest request, @MappingTarget Orders orders);
+    void updateEntityFromUpdateInformationRequest(OrderUpdateAddressRequest request, @MappingTarget Orders orders);
 
     void updateEntityFromConfirmRequest(OrderConfirmRequest request, @MappingTarget Orders orders);
 

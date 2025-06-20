@@ -46,6 +46,7 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
+    @Transactional
     public ContractDTO customerSendSingedContract(String contractId, MultipartFile singedContractFile) {
         Contract contract = getContractById(contractId);
         String orderId = contract.getOrders().getId();
@@ -55,11 +56,12 @@ public class ContractServiceImpl implements ContractService {
         contractMapper.sendSingedContract(singedContractUrl, contract);
         contractRepository.save(contract);
 
-        orderService.updateOrderStatus(orderId, OrderStatus.CONTRACT_CONFIRMED);
+        orderService.updateOrderStatus(orderId, OrderStatus.CONTRACT_SIGNED);
         return contractMapper.toDTO(contract);
     }
 
     @Override
+    @Transactional
     public ContractDTO saleSendRevisedContract(String contractId, MultipartFile contractFile) {
         Contract contract = getContractById(contractId);
         String orderId = contract.getOrders().getId();
@@ -74,13 +76,16 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
+    @Transactional
     public ContractDTO customerRequestDiscussForContract(String contractId) {
         Contract contract = getContractById(contractId);
+        String orderId = contract.getOrders().getId();
         contractStateValidator.validateTransition(contract.getStatus(), ContractStatus.NEED_DISCUSS);
 
         contract.setStatus(ContractStatus.NEED_DISCUSS);
         contract = contractRepository.save(contract);
 
+        orderService.updateOrderStatus(orderId, OrderStatus.CONTRACT_DISCUSS);
         return contractMapper.toDTO(contract);
     }
 

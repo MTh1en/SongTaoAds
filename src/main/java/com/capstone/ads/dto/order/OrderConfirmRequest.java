@@ -13,5 +13,5 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderConfirmRequest {
-    LocalDateTime deliveryDate;
+    LocalDateTime estimatedDeliveryDate;
 }
