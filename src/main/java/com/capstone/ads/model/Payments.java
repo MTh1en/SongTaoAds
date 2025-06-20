@@ -3,6 +3,7 @@ package com.capstone.ads.model;
 import com.capstone.ads.model.enums.PaymentMethod;
 import com.capstone.ads.model.enums.PaymentStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.AssertTrue;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,7 +22,7 @@ public class Payments {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    Integer totalAmount;
+    Integer amount;
     Long code;
     @Enumerated(EnumType.STRING)
     PaymentMethod method;
@@ -38,4 +39,12 @@ public class Payments {
 
     @ManyToOne
     Orders orders;
+
+    @ManyToOne
+    CustomDesignRequests customDesignRequests;
+
+    @AssertTrue(message = "Only one of order or customDesignRequest must be non-null")
+    private boolean isValidRelation() {
+        return (orders == null && customDesignRequests != null) || (orders != null && customDesignRequests == null);
+    }
 }

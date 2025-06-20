@@ -29,16 +29,17 @@ public class CustomDesignRequests {
     Integer depositAmount;
     Integer remainingAmount;
     String finalDesignImage;
-
+    Boolean isNeedSupport;
+    Boolean hasOrder;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     CustomerChoiceHistories customerChoiceHistories;
 
     @CreationTimestamp
-    LocalDateTime createdAt;
+    LocalDateTime createAt;
 
     @UpdateTimestamp
-    LocalDateTime updatedAt;
+    LocalDateTime updateAt;
 
     @Enumerated(EnumType.STRING)
     CustomDesignRequestStatus status;
@@ -48,6 +49,9 @@ public class CustomDesignRequests {
 
     @OneToMany(mappedBy = "customDesignRequests")
     List<PriceProposal> priceProposals;
+
+    @OneToMany(mappedBy = "customDesignRequests")
+    List<Payments> payments;
 
     @ManyToOne
     CustomerDetail customerDetail;

@@ -41,11 +41,14 @@ public class CustomDesignRequestStateValidator {
         ));
 
         validTransitions.put(CustomDesignRequestStatus.DEPOSITED, Set.of(
-                CustomDesignRequestStatus.PROCESSING,
-                CustomDesignRequestStatus.DESIGNER_REJECTED,
+                CustomDesignRequestStatus.ASSIGNED_DESIGNER,
                 CustomDesignRequestStatus.CANCEL
         ));
 
+        validTransitions.put(CustomDesignRequestStatus.ASSIGNED_DESIGNER, Set.of(
+                CustomDesignRequestStatus.DESIGNER_REJECTED,
+                CustomDesignRequestStatus.PROCESSING
+        ));
         validTransitions.put(CustomDesignRequestStatus.PROCESSING, Set.of(
                 CustomDesignRequestStatus.DEMO_SUBMITTED,
                 CustomDesignRequestStatus.REVISION_REQUESTED,
@@ -59,6 +62,7 @@ public class CustomDesignRequestStateValidator {
 
         validTransitions.put(CustomDesignRequestStatus.DEMO_SUBMITTED, Set.of(
                 CustomDesignRequestStatus.WAITING_FULL_PAYMENT,
+                CustomDesignRequestStatus.REVISION_REQUESTED,
                 CustomDesignRequestStatus.CANCEL
         ));
 

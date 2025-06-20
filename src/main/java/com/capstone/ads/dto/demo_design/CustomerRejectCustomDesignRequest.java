@@ -1,6 +1,6 @@
 package com.capstone.ads.dto.demo_design;
 
-import com.capstone.ads.model.enums.DemoDesignStatus;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CustomerDecisionCustomDesignRequest {
+public class CustomerRejectCustomDesignRequest {
+    @NotBlank(message = "Customer Note is Required")
     String customerNote;
-    DemoDesignStatus status;
 }

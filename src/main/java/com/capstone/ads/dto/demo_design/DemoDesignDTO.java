@@ -13,9 +13,11 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DemoDesignDTO {
     String id;
-    String image;
-    String customerNote;
     String designerDescription;
+    String demoImage;
+    String customerNote;
+    String customerFeedbackImage;
+    Integer version;
     LocalDateTime createAt;
     LocalDateTime updateAt;
     DemoDesignStatus status;

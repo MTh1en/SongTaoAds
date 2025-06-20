@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface CustomerDetailService {
-    CustomerDetailDTO createCustomerDetail(String companyName, String tagLine, String contactInfo, MultipartFile customerDetailLogo);
+    CustomerDetailDTO createCustomerDetail(String companyName, String address, String contactInfo, MultipartFile customerDetailLogo);
 
     CustomerDetailDTO findCustomerDetailById(String customerDetailId);
 

@@ -16,6 +16,8 @@ public interface CustomDesignRequestsRepository extends JpaRepository<CustomDesi
 
     Optional<CustomDesignRequests> findByIdAndStatusIn(String id, List<CustomDesignRequestStatus> statuses);
 
+    boolean existsByIdAndStatusIn(String id, List<CustomDesignRequestStatus> statuses);
+
     Page<CustomDesignRequests> findByCustomerDetail_Id(String id, Pageable pageable);
 
     Page<CustomDesignRequests> findByAssignDesigner_Id(String id, Pageable pageable);

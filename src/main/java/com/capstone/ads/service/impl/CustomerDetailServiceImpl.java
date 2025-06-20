@@ -33,11 +33,11 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
     private final SecurityContextUtils securityContextUtils;
 
     @Override
-    public CustomerDetailDTO createCustomerDetail(String companyName, String tagLine, String contactInfo, MultipartFile customerDetailLogo) {
+    public CustomerDetailDTO createCustomerDetail(String companyName, String address, String contactInfo, MultipartFile customerDetailLogo) {
         Users users = securityContextUtils.getCurrentUser();
         userService.validateUserExistsAndIsActive(users.getId());
 
-        CustomerDetail customerDetail = customerDetailMapper.toEntity(companyName, tagLine, contactInfo);
+        CustomerDetail customerDetail = customerDetailMapper.toEntity(companyName, address, contactInfo);
         String logoKeyAfterUploadToS3 = uploadCustomDesignImageToS3(users.getId(), customerDetailLogo);
         customerDetail.setLogoUrl(logoKeyAfterUploadToS3);
         customerDetail.setUsers(users);

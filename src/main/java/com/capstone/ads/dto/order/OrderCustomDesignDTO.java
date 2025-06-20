@@ -13,10 +13,8 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderCustomDesignDTO {
     String id;
-    String image;
-    String customerNote;
-    String designerDescription;
+    String requirements;
+    String finalDesignImage;
     LocalDateTime createAt;
     LocalDateTime updateAt;
-    DemoDesignStatus status;
 }

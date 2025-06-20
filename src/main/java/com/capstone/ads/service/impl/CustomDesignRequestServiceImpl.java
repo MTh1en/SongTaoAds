@@ -11,10 +11,7 @@ import com.capstone.ads.model.CustomerChoices;
 import com.capstone.ads.model.Users;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.repository.internal.CustomDesignRequestsRepository;
-import com.capstone.ads.service.CustomDesignRequestService;
-import com.capstone.ads.service.CustomerChoicesService;
-import com.capstone.ads.service.CustomerDetailService;
-import com.capstone.ads.service.UserService;
+import com.capstone.ads.service.*;
 import com.capstone.ads.utils.CustomDesignRequestStateValidator;
 import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +30,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class CustomDesignRequestServiceImpl implements CustomDesignRequestService {
+    private final S3Service s3Service;
     private final CustomerChoicesService customerChoicesService;
     private final UserService userService;
     private final CustomerDetailService customerDetailService;
@@ -42,12 +41,14 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     @Override
     @Transactional
-    public CustomDesignRequestDTO createCustomDesignRequest(String customerDetailId, String customerChoicesId, CustomDesignRequestCreateRequest request) {
+    public CustomDesignRequestDTO createCustomDesignRequest(String customerDetailId, String customerChoicesId,
+                                                            CustomDesignRequestCreateRequest request) {
         customerDetailService.validateCustomerDetailExists(customerDetailId);
         CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoicesId);
 
         var customDesignRequest = customDesignRequestsMapper.toEntity(request, customerDetailId);
         customDesignRequest.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
+        customDesignRequest.setHasOrder(request.getHasOrder());
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
 
         customerChoicesService.hardDeleteCustomerChoice(customerChoicesId);
@@ -58,17 +59,55 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     @Transactional
     public CustomDesignRequestDTO assignDesignerToCustomerRequest(String customDesignRequestId, String designerId) {
         Users designer = userService.getUsersByIdAndIsActiveAndRoleName(designerId, true, PredefinedRole.DESIGNER_ROLE);
-        List<CustomDesignRequestStatus> allowedStatuses = Arrays.asList(
-                CustomDesignRequestStatus.PENDING,
-                CustomDesignRequestStatus.APPROVED_PRICING
-        );
-        var customerDesignRequest = customDesignRequestsRepository.findByIdAndStatusIn(customDesignRequestId, allowedStatuses)
-                .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_PENDING_NOT_FOUND));
+        List<CustomDesignRequestStatus> allowedStatus = Arrays.asList(
+                CustomDesignRequestStatus.DEPOSITED,
+                CustomDesignRequestStatus.DESIGNER_REJECTED);
+        var customerDesignRequest = customDesignRequestsRepository.findByIdAndStatusIn(customDesignRequestId, allowedStatus)
+                .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_DEPOSITED_NOT_FOUND));
 
         customerDesignRequest.setAssignDesigner(designer);
-        customerDesignRequest.setStatus(CustomDesignRequestStatus.PROCESSING);
+        customerDesignRequest.setStatus(CustomDesignRequestStatus.ASSIGNED_DESIGNER);
         customerDesignRequest = customDesignRequestsRepository.save(customerDesignRequest);
         return customDesignRequestsMapper.toDTO(customerDesignRequest);
+    }
+
+    @Override
+    @Transactional
+    public CustomDesignRequestDTO designerApproveCustomDesignRequest(String customDesignRequestId) {
+        CustomDesignRequests customDesignRequest = getCustomDesignRequestById(customDesignRequestId);
+        customDesignRequestStateValidator.validateTransition(customDesignRequest.getStatus(), CustomDesignRequestStatus.PROCESSING);
+
+        customDesignRequest.setStatus(CustomDesignRequestStatus.PROCESSING);
+
+        customDesignRequestsRepository.save(customDesignRequest);
+        return customDesignRequestsMapper.toDTO(customDesignRequest);
+    }
+
+    @Override
+    @Transactional
+    public CustomDesignRequestDTO designerRejectCustomDesignRequest(String customDesignRequestId) {
+        CustomDesignRequests customDesignRequest = getCustomDesignRequestById(customDesignRequestId);
+        customDesignRequestStateValidator.validateTransition(customDesignRequest.getStatus(), CustomDesignRequestStatus.DESIGNER_REJECTED);
+
+        customDesignRequest.setStatus(CustomDesignRequestStatus.DESIGNER_REJECTED);
+        customDesignRequest.setAssignDesigner(null);
+
+        customDesignRequestsRepository.save(customDesignRequest);
+        return customDesignRequestsMapper.toDTO(customDesignRequest);
+    }
+
+    @Override
+    @Transactional
+    public CustomDesignRequestDTO designerUploadFinalDesignImage(String customDesignRequestId, MultipartFile finalDesignImage) {
+        CustomDesignRequests customDesignRequest = getCustomDesignRequestById(customDesignRequestId);
+
+        var finalDesignImageUrl = uploadCustomDesignRequestImageToS3(customDesignRequestId, finalDesignImage);
+        customDesignRequestStateValidator.validateTransition(customDesignRequest.getStatus(), CustomDesignRequestStatus.COMPLETED);
+        customDesignRequest.setFinalDesignImage(finalDesignImageUrl);
+        customDesignRequest.setStatus(CustomDesignRequestStatus.COMPLETED);
+        customDesignRequestsRepository.save(customDesignRequest);
+
+        return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 
     @Override
@@ -92,25 +131,22 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
                 .map(customDesignRequestsMapper::toDTO);
     }
 
-    @Override
-    @Transactional
-    public CustomDesignRequestDTO changeStatusCustomDesignRequest(String customDesignRequestId, CustomDesignRequestStatus newStatus) {
-        var customDesignRequest = customDesignRequestsRepository.findById(customDesignRequestId)
-                .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
-
-        customDesignRequestStateValidator.validateTransition(
-                customDesignRequest.getStatus(),
-                newStatus);
-
-        customDesignRequest.setStatus(newStatus);
-        customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
-        return customDesignRequestsMapper.toDTO(customDesignRequest);
-    }
+    //INTERNAL FUNCTION//
 
     @Override
     public CustomDesignRequests getCustomDesignRequestById(String customDesignRequestId) {
         return customDesignRequestsRepository.findById(customDesignRequestId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
+    }
+
+    @Override
+    public void validateCreateCustomDesign(String customDesignRequestId) {
+        List<CustomDesignRequestStatus> allowedStatus = Arrays.asList(
+                CustomDesignRequestStatus.PROCESSING,
+                CustomDesignRequestStatus.REVISION_REQUESTED
+        );
+        if (!customDesignRequestsRepository.existsByIdAndStatusIn(customDesignRequestId, allowedStatus))
+            throw new AppException(ErrorCode.DEMO_DESIGN_IN_WAITING_DECISION_FROM_CUSTOMER);
     }
 
     @Override
@@ -124,6 +160,16 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
+    public void updateCustomDesignRequestByCustomDesign(String customDesignRequestId, boolean isNeedSupport) {
+        var customDesignRequest = getCustomDesignRequestById(customDesignRequestId);
+        if (isNeedSupport) {
+            customDesignRequest.setStatus(CustomDesignRequestStatus.DEMO_SUBMITTED);
+            customDesignRequest.setIsNeedSupport(true);
+        } else customDesignRequest.setStatus(CustomDesignRequestStatus.DEMO_SUBMITTED);
+        customDesignRequestsRepository.save(customDesignRequest);
+    }
+
+    @Override
     public void updateCustomDesignRequestApprovedPricing(String customDesignRequestId, Integer totalPrice, Integer depositAmount) {
         var customDesignRequest = getCustomDesignRequestById(customDesignRequestId);
 
@@ -133,5 +179,25 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequest.setRemainingAmount(totalPrice - depositAmount);
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
         customDesignRequest.setStatus(CustomDesignRequestStatus.APPROVED_PRICING);
+    }
+
+    @Override
+    public void updateCustomDesignRequestFromWebhookResult(CustomDesignRequests customDesignRequests, boolean isDeposit) {
+        if (isDeposit) customDesignRequests.setStatus(CustomDesignRequestStatus.DEPOSITED);
+        else customDesignRequests.setStatus(CustomDesignRequestStatus.FULLY_PAID);
+        customDesignRequestsRepository.save(customDesignRequests);
+    }
+
+    private String generateCustomDesignRequestKey(String customDesignRequestId) {
+        return String.format("custom-design/%s/final", customDesignRequestId);
+    }
+
+    private String uploadCustomDesignRequestImageToS3(String customDesignRequestId, MultipartFile file) {
+        String customDesignImageKey = generateCustomDesignRequestKey(customDesignRequestId);
+        if (file.isEmpty()) {
+            throw new AppException(ErrorCode.FILE_REQUIRED);
+        }
+        s3Service.uploadSingleFile(customDesignImageKey, file);
+        return customDesignImageKey;
     }
 }

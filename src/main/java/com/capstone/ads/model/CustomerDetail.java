@@ -24,10 +24,10 @@ public class CustomerDetail implements Serializable {
 
     @Column(nullable = false)
     String companyName;
-    String tagLine;
+    String address;
     String contactInfo;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     Users users;
 
     @OneToMany(mappedBy = "customerDetail")

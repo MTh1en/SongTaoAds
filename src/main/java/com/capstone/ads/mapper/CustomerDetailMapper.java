@@ -11,7 +11,7 @@ import org.mapstruct.MappingTarget;
 public interface CustomerDetailMapper {
     CustomerDetailDTO toDTO(CustomerDetail customerDetail);
 
-    CustomerDetail toEntity(String companyName, String tagLine, String contactInfo);
+    CustomerDetail toEntity(String companyName, String address, String contactInfo);
 
     @Mapping(target = "users", ignore = true)
     void updateEntityFromDTO(CustomerDetailRequest request, @MappingTarget CustomerDetail customerDetail);

@@ -15,16 +15,32 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDTO {
     String id;
+    String address;
     Double totalAmount;
     Double depositAmount;
     Double remainingAmount;
-    String address;
     String note;
-    LocalDateTime deliveryDate;
+
+    String draftImageUrl;
+    String productImageUrl;
+    String deliveryImageUrl;
+    String installationImageUrl;
+
+
+    LocalDateTime estimatedDeliveryDate;
+    LocalDateTime depositPaidDate;
+    LocalDateTime productionStartDate;
+    LocalDateTime productionEndDate;
+    LocalDateTime deliveryStartDate;
+    LocalDateTime actualDeliveryDate;
+    LocalDateTime completionDate;
+
+    LocalDateTime orderDate;
+    LocalDateTime updateDate;
+
     CustomerChoiceHistories customerChoiceHistories;
     OrderStatus status;
-    LocalDateTime orderDate;
     UserDTO users;
     OrderAIDesignDTO aiDesigns;
-    OrderCustomDesignDTO customDesigns;
+    OrderCustomDesignDTO customDesignRequests;
 }

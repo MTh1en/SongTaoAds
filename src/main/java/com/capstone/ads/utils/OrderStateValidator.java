@@ -3,7 +3,6 @@ package com.capstone.ads.utils;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.model.enums.OrderStatus;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;
@@ -20,28 +19,58 @@ public class OrderStateValidator {
     }
 
     private void initializeValidTransitions() {
-        validTransitions.put(OrderStatus.PENDING, Set.of(
+        validTransitions.put(OrderStatus.PENDING_CONTRACT, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.CONTRACT_SENT
+        ));
+
+        validTransitions.put(OrderStatus.CONTRACT_SENT, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.CONTRACT_SIGNED,
+                OrderStatus.CONTRACT_DISCUSS
+        ));
+
+        validTransitions.put(OrderStatus.CONTRACT_DISCUSS, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.CONTRACT_SENT
+        ));
+
+        validTransitions.put(OrderStatus.CONTRACT_SIGNED, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.CONTRACT_CONFIRMED
+        ));
+
+        validTransitions.put(OrderStatus.CONTRACT_CONFIRMED, Set.of(
                 OrderStatus.CANCELLED,
                 OrderStatus.DEPOSITED
         ));
 
         validTransitions.put(OrderStatus.DEPOSITED, Set.of(
                 OrderStatus.CANCELLED,
-                OrderStatus.PROCESSING
+                OrderStatus.IN_PROGRESS
         ));
 
-        validTransitions.put(OrderStatus.PROCESSING, Set.of(
+        validTransitions.put(OrderStatus.IN_PROGRESS, Set.of(
                 OrderStatus.CANCELLED,
-                OrderStatus.IN_PRODUCTION
+                OrderStatus.PRODUCING
         ));
 
-        validTransitions.put(OrderStatus.IN_PRODUCTION, Set.of(
+        validTransitions.put(OrderStatus.PRODUCING, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.PRODUCTION_COMPLETED
+        ));
+
+        validTransitions.put(OrderStatus.PRODUCTION_COMPLETED, Set.of(
                 OrderStatus.CANCELLED,
                 OrderStatus.DELIVERING
         ));
 
         validTransitions.put(OrderStatus.DELIVERING, Set.of(
                 OrderStatus.CANCELLED,
+                OrderStatus.INSTALLED
+        ));
+
+        validTransitions.put(OrderStatus.INSTALLED, Set.of(
                 OrderStatus.COMPLETED
         ));
 

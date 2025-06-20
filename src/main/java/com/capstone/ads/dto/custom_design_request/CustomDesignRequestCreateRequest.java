@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.custom_design_request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,5 +10,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomDesignRequestCreateRequest {
+    @NotBlank(message = "Requirement is Required")
     String requirements;
+    Boolean hasOrder;
 }

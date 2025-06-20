@@ -73,18 +73,18 @@ public enum ErrorCode {
     ATTRIBUTE_EXISTED_IN_CUSTOMER_CHOICES_DETAIL("Attribute existed in Customer choices detail", HttpStatus.BAD_REQUEST),
     CUSTOMER_CHOICE_SIZE_EXISTED("Customer choice size already existed", HttpStatus.BAD_REQUEST),
 
-    //FILE PROCESSING
+    //FILE IN_PROGRESS
     FILE_PROCESSING_FAILED("File processing failed", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_REQUIRED("File required", HttpStatus.BAD_REQUEST),
 
     DESIGN_TEMPLATE_NOT_FOUND("Design template not found", HttpStatus.NOT_FOUND),
-    CUSTOM_DESIGN_REQUEST_PENDING_NOT_FOUND("Custom design request pending not found", HttpStatus.NOT_FOUND),
+    CUSTOM_DESIGN_REQUEST_DEPOSITED_NOT_FOUND("Custom design request deposited not found", HttpStatus.NOT_FOUND),
     CUSTOM_DESIGN_REQUEST_NOT_FOUND("Custom design request not found", HttpStatus.NOT_FOUND),
 
     INVALID_CUSTOM_DESIGN_REQUEST_STATUS_TRANSITION("Invalid custom design request status transition", HttpStatus.BAD_REQUEST),
     CUSTOM_DESIGN_NOT_FOUND("Custom design not found", HttpStatus.NOT_FOUND),
     INVALID_CUSTOM_DESIGN_STATUS_TRANSITION("Invalid custom design status transition", HttpStatus.BAD_REQUEST),
-    CUSTOM_DESIGN_IN_WAITING_DECISION_FROM_CUSTOMER("Custom design in waiting decision from customer", HttpStatus.BAD_REQUEST),
+    DEMO_DESIGN_IN_WAITING_DECISION_FROM_CUSTOMER("Demo design in waiting decision from customer", HttpStatus.BAD_REQUEST),
     INVALID_ORDER_STATUS_TRANSITION("Invalid order status transition", HttpStatus.BAD_REQUEST),
 
     //CHAT BOT
@@ -92,6 +92,8 @@ public enum ErrorCode {
     INVALID_INPUT("Invalid input", HttpStatus.BAD_REQUEST),
 
     PRICE_PROPOSAL_NOT_FOUND("Price proposal not found", HttpStatus.NOT_FOUND),
+
+    CONTRACT_NOT_FOUND("Contract not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

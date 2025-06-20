@@ -2,23 +2,21 @@ package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.S3ImageDuration;
 import com.capstone.ads.dto.demo_design.DemoDesignDTO;
-import com.capstone.ads.dto.demo_design.CustomerDecisionCustomDesignRequest;
+import com.capstone.ads.dto.demo_design.CustomerRejectCustomDesignRequest;
 import com.capstone.ads.dto.demo_design.DesignerUpdateDescriptionCustomDesignRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.DemoDesignsMapper;
-import com.capstone.ads.model.CustomDesignRequests;
 import com.capstone.ads.model.DemoDesigns;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.model.enums.DemoDesignStatus;
-import com.capstone.ads.repository.external.S3Repository;
-import com.capstone.ads.repository.internal.CustomDesignRequestsRepository;
 import com.capstone.ads.repository.internal.DemoDesignsRepository;
+import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.service.DemoDesignsService;
+import com.capstone.ads.service.S3Service;
 import com.capstone.ads.utils.DemoDesignStateValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,8 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -35,11 +31,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class DemoDesignsServiceImpl implements DemoDesignsService {
-    @Value("${aws.bucket.name}")
-    private String bucketName;
-
-    private final CustomDesignRequestsRepository customDesignRequestsRepository;
-    private final S3Repository s3Repository;
+    private final CustomDesignRequestService customDesignRequestService;
+    private final S3Service s3Service;
     private final DemoDesignsRepository demoDesignsRepository;
     private final DemoDesignsMapper demoDesignsMapper;
     private final DemoDesignStateValidator demoDesignStateValidator;
@@ -47,30 +40,64 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
     @Override
     @Transactional
     public DemoDesignDTO designerCreateCustomDesign(String customDesignRequestId, String designerDescription, MultipartFile customDesignImage) {
-        var customDesignRequest = customDesignRequestsRepository.findByIdAndStatus(customDesignRequestId, CustomDesignRequestStatus.PROCESSING)
-                .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
-
-        validateCreateRequest(customDesignRequest);
+        customDesignRequestService.validateCreateCustomDesign(customDesignRequestId);
 
         DemoDesigns demoDesigns = demoDesignsMapper.toEntity(designerDescription, customDesignRequestId);
 
+        //Kiểm tra phiên bản nếu có n bản thiết kế thì lúc tạo sẽ là bản thứ n + 1
+        int versionNumber = demoDesignsRepository.countByCustomDesignRequests_Id(customDesignRequestId) + 1;
+
+        //Lấy đường dẫn hình ảnh được lưu trữ ở S3
         String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, customDesignImage);
+
         demoDesigns.setDemoImage(customDesignImageKey);
+        demoDesigns.setVersion(versionNumber);
         demoDesigns = demoDesignsRepository.save(demoDesigns);
+
+        //Cập nhật lại trạng thái Request là đã gửi demo
+        customDesignRequestService.updateCustomDesignRequestByCustomDesign(customDesignRequestId, versionNumber > 3);
+
         return demoDesignsMapper.toDTO(demoDesigns);
     }
 
     @Override
     @Transactional
-    public DemoDesignDTO customerDecisionCustomDesign(String customDesignId, CustomerDecisionCustomDesignRequest request) {
+    public DemoDesignDTO customerApproveCustomDesign(String customDesignId) {
         DemoDesigns demoDesigns = findCustomDesignByIdAndPendingStatus(customDesignId);
+        String customDesignRequestId = demoDesigns.getCustomDesignRequests().getId();
 
-        demoDesignStateValidator.validateTransition(
-                demoDesigns.getStatus(),
-                request.getStatus()
-        );
+        demoDesignStateValidator.validateTransition(demoDesigns.getStatus(), DemoDesignStatus.APPROVED);
+        demoDesigns.setStatus(DemoDesignStatus.APPROVED);
+        demoDesigns = demoDesignsRepository.save(demoDesigns);
 
+        customDesignRequestService.updateCustomDesignRequestStatus(customDesignRequestId, CustomDesignRequestStatus.WAITING_FULL_PAYMENT);
+        return demoDesignsMapper.toDTO(demoDesigns);
+    }
+
+    @Override
+    @Transactional
+    public DemoDesignDTO customerRejectCustomDesign(String customDesignId, CustomerRejectCustomDesignRequest request) {
+        DemoDesigns demoDesigns = findCustomDesignByIdAndPendingStatus(customDesignId);
+        String customDesignRequestId = demoDesigns.getCustomDesignRequests().getId();
+
+        demoDesignStateValidator.validateTransition(demoDesigns.getStatus(), DemoDesignStatus.REJECTED);
         demoDesignsMapper.updateEntityFromCustomerRequest(request, demoDesigns);
+        demoDesigns.setStatus(DemoDesignStatus.REJECTED);
+        demoDesigns = demoDesignsRepository.save(demoDesigns);
+
+        customDesignRequestService.updateCustomDesignRequestStatus(customDesignRequestId, CustomDesignRequestStatus.REVISION_REQUESTED);
+        return demoDesignsMapper.toDTO(demoDesigns);
+    }
+
+    @Override
+    @Transactional
+    public DemoDesignDTO customerUploadFeedbackImage(String customDesignId, MultipartFile customDesignImage) {
+        DemoDesigns demoDesigns = findCustomDesignByIdAndPendingStatus(customDesignId);
+        String customDesignRequestId = demoDesigns.getCustomDesignRequests().getId();
+
+        String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, customDesignImage);
+        demoDesigns.setCustomerFeedbackImage(customDesignImageKey);
+
         demoDesigns = demoDesignsRepository.save(demoDesigns);
         return demoDesignsMapper.toDTO(demoDesigns);
     }
@@ -89,8 +116,8 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
     @Transactional
     public DemoDesignDTO designerUploadImage(String customDesignId, MultipartFile file) {
         DemoDesigns demoDesigns = findCustomDesignByIdAndPendingStatus(customDesignId);
-
         String customDesignRequestId = demoDesigns.getCustomDesignRequests().getId();
+
         String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, file);
         demoDesigns.setDemoImage(customDesignImageKey);
 
@@ -127,22 +154,10 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
     private DemoDesignDTO convertToCustomDesignDTOWithImageIsPresignedURL(DemoDesigns demoDesigns) {
         var customDesignDTOResponse = demoDesignsMapper.toDTO(demoDesigns);
         if (!Objects.isNull(demoDesigns.getDemoImage())) {
-            var designTemplateImagePresigned = s3Repository.generatePresignedUrl(bucketName, demoDesigns.getDemoImage(), S3ImageDuration.CUSTOM_DESIGN_DURATION);
-            customDesignDTOResponse.setImage(designTemplateImagePresigned);
+            var designTemplateImagePresigned = s3Service.getPresignedUrl(demoDesigns.getDemoImage(), S3ImageDuration.CUSTOM_DESIGN_DURATION);
+            customDesignDTOResponse.setDemoImage(designTemplateImagePresigned);
         }
         return customDesignDTOResponse;
-    }
-
-    private void validateCreateRequest(CustomDesignRequests customDesignRequests) {
-        List<DemoDesignStatus> allowedStatuses = Arrays.asList(
-                DemoDesignStatus.PENDING,
-                DemoDesignStatus.APPROVED
-        );
-        boolean customDesignExists = demoDesignsRepository.existsByCustomDesignRequests_IdAndStatusIn(customDesignRequests.getId(), allowedStatuses);
-
-        if (customDesignExists) {
-            throw new AppException(ErrorCode.CUSTOM_DESIGN_IN_WAITING_DECISION_FROM_CUSTOMER);
-        }
     }
 
     private String uploadCustomDesignImageToS3(String customDesignRequestId, MultipartFile file) {
@@ -150,7 +165,7 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
         if (file.isEmpty()) {
             throw new AppException(ErrorCode.FILE_REQUIRED);
         }
-        s3Repository.uploadSingleFile(bucketName, file, customDesignImageKey);
+        s3Service.uploadSingleFile(customDesignImageKey, file);
         return customDesignImageKey;
     }
 }
