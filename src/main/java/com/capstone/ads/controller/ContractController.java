@@ -4,10 +4,15 @@ import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.contract.ContractDTO;
 import com.capstone.ads.service.ContractService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -18,7 +23,8 @@ public class ContractController {
     @PostMapping(value = "/orders/{orderId}/contract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ContractDTO> saleSendFirstContract(
             @PathVariable String orderId,
-            @RequestParam(required = false, defaultValue = "10") Long depositPercentChanged,
+            @RequestParam(required = false, defaultValue = "10")
+            @Range(min = 1, max = 100, message = "Percent between from 1 to 100") Long depositPercentChanged,
             @RequestPart String contractNumber,
             @RequestPart MultipartFile contactFile) {
         var response = contractService.saleSendFirstContract(orderId, contractNumber, depositPercentChanged, contactFile);
@@ -35,7 +41,8 @@ public class ContractController {
     @PatchMapping(value = "/contracts/{contractId}/revised-contract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ContractDTO> saleSendRevisedContract(
             @PathVariable String contractId,
-            @RequestParam(required = false, defaultValue = "10") Long depositPercentChanged,
+            @RequestParam(required = false, defaultValue = "10")
+            @Range(min = 1, max = 100, message = "Percent between from 1 to 100") Long depositPercentChanged,
             @RequestPart MultipartFile contactFile) {
         var response = contractService.saleSendRevisedContract(contractId, depositPercentChanged, contactFile);
         return ApiResponseBuilder.buildSuccessResponse("Sale sent revised contract successfully", response);

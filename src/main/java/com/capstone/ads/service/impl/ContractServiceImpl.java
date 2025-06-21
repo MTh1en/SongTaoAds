@@ -37,10 +37,8 @@ public class ContractServiceImpl implements ContractService {
         Orders orders = orderService.getOrderById(orderId);
 
         String contractUrl = uploadContractImageToS3(contractNumber, contractFile);
-        log.info("Contract {}", depositPercentChanged);
         Contract contract = contractMapper.sendContract(contractNumber, depositPercentChanged, contractUrl);
         contract.setOrders(orders);
-        log.info("Contract {}", contract.getDepositPercentChanged());
         contract = contractRepository.save(contract);
 
         orderService.updateOrderStatus(orderId, OrderStatus.CONTRACT_SENT);
