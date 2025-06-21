@@ -3,13 +3,14 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.order.OrderConfirmRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
+import com.capstone.ads.model.Contract;
 import com.capstone.ads.model.Orders;
 import com.capstone.ads.model.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface OrderService {
-    OrderDTO createOrderByCustomDesign(String customDesignRequestId, String customerChoiceId);
+    OrderDTO createOrderByCustomDesign(String customDesignRequestId);
 
     OrderDTO createOrderByAIDesign(String aiDesignId, String customerChoiceId);
 

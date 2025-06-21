@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerChoicesSizeDTO {
     String id;
-    Double sizeValue;
+    Long sizeValue;
+    Long maxSize;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     String customerChoicesId;

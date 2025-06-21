@@ -20,6 +20,6 @@ public class ContractDTO {
     String signedContractUrl;
     LocalDateTime sentDate;
     LocalDateTime signedDate;
-    String note;
+    Long depositPercentChanged;
     ContractStatus status;
 }

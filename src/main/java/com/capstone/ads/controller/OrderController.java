@@ -19,10 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class OrderController {
     private final OrderService orderService;
 
-    @PostMapping("/custom-design-request/{customDesignRequestId}/customer-choices/{customerChoiceId}/orders")
-    public ApiResponse<OrderDTO> createOrderByCustomDesign(@PathVariable String customDesignRequestId,
-                                                           @PathVariable String customerChoiceId) {
-        var response = orderService.createOrderByCustomDesign(customDesignRequestId, customerChoiceId);
+    @PostMapping("/custom-design-request/{customDesignRequestId}/orders")
+    public ApiResponse<OrderDTO> createOrderByCustomDesign(@PathVariable String customDesignRequestId) {
+        var response = orderService.createOrderByCustomDesign(customDesignRequestId);
         return ApiResponseBuilder.buildSuccessResponse("Create order successful", response);
     }
 

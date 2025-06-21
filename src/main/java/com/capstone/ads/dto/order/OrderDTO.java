@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 public class OrderDTO {
     String id;
     String address;
-    Double totalAmount;
-    Double depositAmount;
-    Double remainingAmount;
+    Long totalAmount;
+    Long depositAmount;
+    Long remainingAmount;
     String note;
 
     String draftImageUrl;

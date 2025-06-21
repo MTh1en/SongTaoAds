@@ -30,7 +30,6 @@ public class CustomDesignRequests {
     Long remainingAmount;
     String finalDesignImage;
     Boolean isNeedSupport;
-    Boolean hasOrder;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     CustomerChoiceHistories customerChoiceHistories;

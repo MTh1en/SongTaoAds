@@ -15,9 +15,14 @@ import java.time.LocalDateTime;
 public class CustomDesignRequestDTO {
     String id;
     String requirements;
+    Long totalPrice;
+    Long depositAmount;
+    Long remainingAmount;
+    String finalDesignImage;
+    Boolean isNeedSupport;
     CustomerChoiceHistories customerChoiceHistories;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+    LocalDateTime createAt;
+    LocalDateTime updateAt;
     CustomDesignRequestStatus status;
     String customerDetail;
     String assignDesigner;

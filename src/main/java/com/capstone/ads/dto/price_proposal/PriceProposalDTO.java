@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PriceProposalDTO {
     String id;
-    Integer totalPrice;
-    Integer depositAmount;
+    Long totalPrice;
+    Long depositAmount;
     String rejectionReason;
-    Integer totalPriceOffer;
-    Integer depositAmountOffer;
+    Long totalPriceOffer;
+    Long depositAmountOffer;
     PriceProposalStatus status;
     LocalDateTime createAt;
     LocalDateTime updateAt;

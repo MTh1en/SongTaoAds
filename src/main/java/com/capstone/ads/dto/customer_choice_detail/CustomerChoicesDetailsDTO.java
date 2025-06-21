@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerChoicesDetailsDTO {
     String id;
-    Double subTotal;
+    Long subTotal;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     String customerChoicesId;

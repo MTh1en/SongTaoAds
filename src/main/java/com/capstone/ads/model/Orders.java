@@ -61,7 +61,7 @@ public class Orders {
     @OneToMany(mappedBy = "orders")
     List<Payments> payments;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "orders", cascade = CascadeType.ALL)
     Contract contract;
 
     @OneToOne

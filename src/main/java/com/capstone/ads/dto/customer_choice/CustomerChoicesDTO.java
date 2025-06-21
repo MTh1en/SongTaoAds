@@ -12,8 +12,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerChoicesDTO {
     String id;
-    Double totalAmount;
-    Boolean isFinal;
+    Long totalAmount;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     String userId;

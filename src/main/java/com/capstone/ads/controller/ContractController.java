@@ -16,10 +16,12 @@ public class ContractController {
     private final ContractService contractService;
 
     @PostMapping(value = "/orders/{orderId}/contract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<ContractDTO> saleSendFirstContract(@PathVariable String orderId,
-                                                          @RequestPart String contractNumber,
-                                                          @RequestPart MultipartFile contactFile) {
-        var response = contractService.saleSendFirstContract(orderId, contractNumber, contactFile);
+    public ApiResponse<ContractDTO> saleSendFirstContract(
+            @PathVariable String orderId,
+            @RequestParam(required = false, defaultValue = "10") Long depositPercentChanged,
+            @RequestPart String contractNumber,
+            @RequestPart MultipartFile contactFile) {
+        var response = contractService.saleSendFirstContract(orderId, contractNumber, depositPercentChanged, contactFile);
         return ApiResponseBuilder.buildSuccessResponse("Sale sent contract successfully", response);
     }
 
@@ -31,14 +33,16 @@ public class ContractController {
     }
 
     @PatchMapping(value = "/contracts/{contractId}/revised-contract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<ContractDTO> saleSendRevisedContract(@PathVariable String contractId,
-                                                            @RequestPart MultipartFile contactFile) {
-        var response = contractService.saleSendRevisedContract(contractId, contactFile);
+    public ApiResponse<ContractDTO> saleSendRevisedContract(
+            @PathVariable String contractId,
+            @RequestParam(required = false, defaultValue = "10") Long depositPercentChanged,
+            @RequestPart MultipartFile contactFile) {
+        var response = contractService.saleSendRevisedContract(contractId, depositPercentChanged, contactFile);
         return ApiResponseBuilder.buildSuccessResponse("Sale sent revised contract successfully", response);
     }
 
     @PatchMapping(value = "/contracts/{contractId}/discuss")
-    public ApiResponse<ContractDTO> customerSendSingedContract(@PathVariable String contractId) {
+    public ApiResponse<ContractDTO> customerRequestDiscussForContract(@PathVariable String contractId) {
         var response = contractService.customerRequestDiscussForContract(contractId);
         return ApiResponseBuilder.buildSuccessResponse("Customer request discuss successfully", response);
     }
