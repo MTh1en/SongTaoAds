@@ -16,13 +16,13 @@ public class CalculateController {
     private final CalculateService service;
 
     @PostMapping("/customer-choices-detail/{customerChoiceDetailId}/subtotal")
-    public ApiResponse<Double> subtotal(@PathVariable String customerChoiceDetailId) {
+    public ApiResponse<Long> subtotal(@PathVariable String customerChoiceDetailId) {
         var result = service.calculateSubtotal(customerChoiceDetailId);
         return ApiResponseBuilder.buildSuccessResponse("Calculate subtotal successful", result);
     }
 
     @PostMapping("/customer-choices/{customerChoiceId}/total")
-    public ApiResponse<Double> total(@PathVariable String customerChoiceId) {
+    public ApiResponse<Long> total(@PathVariable String customerChoiceId) {
         var result = service.calculateTotal(customerChoiceId);
         return ApiResponseBuilder.buildSuccessResponse("Calculate total successful", result);
     }

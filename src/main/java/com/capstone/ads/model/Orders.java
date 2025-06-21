@@ -25,9 +25,9 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String address;                         //Địa chỉ giao hàng
-    Double totalAmount;
-    Double depositAmount;
-    Double remainingAmount;
+    Long totalAmount;
+    Long depositAmount;
+    Long remainingAmount;
     String note;
 
     String draftImageUrl;                   //Hình ảnh sản phẩm bắt đầu thi công

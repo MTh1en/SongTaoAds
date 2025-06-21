@@ -28,7 +28,7 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
         productTypesService.validateProductTypeExistsAndAvailable(productTypeId);
 
         CustomerChoices customerChoices = customerChoicesMapper.toEntity(customerId, productTypeId);
-        customerChoices.setTotalAmount(0.0);
+        customerChoices.setTotalAmount(0L);
         customerChoices = customerChoicesRepository.save(customerChoices);
         return customerChoicesMapper.toDTO(customerChoices);
     }

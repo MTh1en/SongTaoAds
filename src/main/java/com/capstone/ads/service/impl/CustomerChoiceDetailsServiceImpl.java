@@ -135,7 +135,7 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
 
         // 4. Tính toán total với dữ liệu mới nhất
         String customerChoicesId = customerChoiceDetails.getCustomerChoices().getId();
-        double total = calculateService.calculateTotal(customerChoicesId);
+        long total = calculateService.calculateTotal(customerChoicesId);
 
         // 5. Cập nhật total
         customerChoiceDetails.getCustomerChoices().setTotalAmount(total);

@@ -1,7 +1,7 @@
 package com.capstone.ads.service;
 
 public interface CalculateService {
-    Double calculateSubtotal(String customerChoicesDetailId);
+    Long calculateSubtotal(String customerChoicesDetailId);
 
-    Double calculateTotal(String customerChoiceId);
+    Long calculateTotal(String customerChoiceId);
 }

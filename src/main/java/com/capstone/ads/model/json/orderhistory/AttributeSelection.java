@@ -14,8 +14,9 @@ public class AttributeSelection {
     String attribute;
     String value;
     String unit;
-    Double materialPrice;
-    Double unitPrice;
+    Long materialPrice;
+    Long unitPrice;
+    Boolean isMultiplier;
     String calculateFormula;
-    Double subTotal;
+    Long subTotal;
 }

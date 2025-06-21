@@ -103,7 +103,7 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
         entityManager.refresh(customerChoices);
 
         // 4. Tính toán và cập nhật total
-        double total = calculateService.calculateTotal(customerChoices.getId());
+        long total = calculateService.calculateTotal(customerChoices.getId());
         customerChoices.setTotalAmount(total);
         customerChoicesRepository.save(customerChoices);
 

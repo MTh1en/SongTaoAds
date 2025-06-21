@@ -34,7 +34,7 @@ public interface CustomDesignRequestService {
 
     void updateCustomDesignRequestByCustomDesign(String customDesignRequestId, boolean isNeedSupport);
 
-    void updateCustomDesignRequestApprovedPricing(String customDesignRequestId, Integer totalPrice, Integer depositAmount);
+    void updateCustomDesignRequestApprovedPricing(String customDesignRequestId, Long totalPrice, Long depositAmount);
 
     void updateCustomDesignRequestFromWebhookResult(CustomDesignRequests customDesignRequests, boolean isDeposit);
 }

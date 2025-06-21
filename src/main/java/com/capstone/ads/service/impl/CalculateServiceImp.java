@@ -6,7 +6,6 @@ import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.CustomerChoiceDetailsRepository;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.service.CalculateService;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.expression.Expression;
@@ -32,26 +31,22 @@ public class CalculateServiceImp implements CalculateService {
 
     @Override
     @Transactional
-    public Double calculateSubtotal(String customerChoicesDetailId) {
+    public Long calculateSubtotal(String customerChoicesDetailId) {
         CustomerChoiceDetails details = getValidatedCustomerChoicesDetails(customerChoicesDetailId);
         Attributes attribute = details.getAttributeValues().getAttributes();
-        Map<String, Double> variables = prepareVariablesForSubtotal(details);
-        Double subtotal = calculateWithFormula(attribute.getCalculateFormula(), variables);
-        return subtotal;
-//        log.info("Calculated subtotal: {}", subtotal);
-//        details.setSubTotal(subtotal);
-//        customerChoicesDetailsRepository.save(details);
+        Map<String, Long> variables = prepareVariablesForSubtotal(details);
+        return calculateWithFormula(attribute.getCalculateFormula(), variables);
     }
 
     @Override
     @Transactional
-    public Double calculateTotal(String customerChoicesId) {
+    public Long calculateTotal(String customerChoicesId) {
         CustomerChoices customerChoices = getValidatedCustomerChoices(customerChoicesId);
         ProductTypes productTypes = customerChoices.getProductTypes();
         String totalFormula = productTypes.getCalculateFormula().trim();
 
         // Khởi tạo biến với giá trị mặc định từ ProductType attributes
-        Map<String, Double> variables = initializeVariables(productTypes);
+        Map<String, Long> variables = initializeVariables(productTypes);
 
         // Cập nhật biến từ CustomerChoicesSize (CAO, NGANG, KTCHỮVÀLOGO)
         updateSizeVariables(customerChoices, variables);
@@ -59,7 +54,7 @@ public class CalculateServiceImp implements CalculateService {
         // Cập nhật biến từ CustomerChoicesDetails (unitPrice hoặc giá trị tính toán)
         updateAttributeVariables(customerChoices, variables);
 
-        Double total = calculateWithFormula(totalFormula, variables);
+        Long total = calculateWithFormula(totalFormula, variables);
         customerChoices.setTotalAmount(total);
         customerChoicesRepository.save(customerChoices);
         log.info("Calculated total for customerChoicesId {}: {}", customerChoicesId, total);
@@ -67,24 +62,26 @@ public class CalculateServiceImp implements CalculateService {
     }
 
     // Khởi tạo biến với giá trị mặc định 0.0 từ ProductType attributes
-    private Map<String, Double> initializeVariables(ProductTypes productTypes) {
+    private Map<String, Long> initializeVariables(ProductTypes productTypes) {
         List<String> productAttributes = getProductAttributes(productTypes);
-        Map<String, Double> variables = new HashMap<>();
-        productAttributes.forEach(attr -> variables.put(attr, 0.0));
+        Map<String, Long> variables = new HashMap<>();
+        productAttributes.forEach(attr -> variables.put(attr, 0L));
         return variables;
     }
 
     // Cập nhật biến từ CustomerChoicesSize
-    private void updateSizeVariables(CustomerChoices customerChoices, Map<String, Double> variables) {
-        Map<String, Double> sizeValues = getSizeValues(customerChoices);
+    private void updateSizeVariables(CustomerChoices customerChoices, Map<String, Long> variables) {
+        Map<String, Long> sizeValues = getSizeValues(customerChoices);
         variables.putAll(sizeValues);
     }
 
     // Cập nhật biến từ CustomerChoicesDetails
-    private void updateAttributeVariables(CustomerChoices customerChoices, Map<String, Double> variables) {
+    private void updateAttributeVariables(CustomerChoices customerChoices, Map<String, Long> variables) {
         customerChoices.getCustomerChoiceDetails().forEach(detail -> {
             String attributeName = normalizeName(detail.getAttributeValues().getAttributes().getName());
-            Double value = detail.getAttributeValues().getUnitPrice();
+            Long value = (detail.getAttributeValues().getIsMultiplier())
+                    ? detail.getAttributeValues().getUnitPrice() / 10
+                    : detail.getAttributeValues().getUnitPrice();
             variables.put(attributeName, value);
         });
     }
@@ -101,17 +98,17 @@ public class CalculateServiceImp implements CalculateService {
     }
 
     // Chuẩn bị biến cho tính toán subtotal
-    private Map<String, Double> prepareVariablesForSubtotal(CustomerChoiceDetails customerChoiceDetails) {
-        Map<String, Double> variables = new HashMap<>();
+    private Map<String, Long> prepareVariablesForSubtotal(CustomerChoiceDetails customerChoiceDetails) {
+        Map<String, Long> variables = new HashMap<>();
         variables.put("unitPrice", Optional.ofNullable(customerChoiceDetails.getAttributeValues())
                 .map(AttributeValues::getUnitPrice)
-                .orElse(0.0));
+                .orElse(0L));
         variables.putAll(getSizeValues(customerChoiceDetails.getCustomerChoices()));
         return variables;
     }
 
     // Tính toán giá trị từ công thức SpEL
-    private Double calculateWithFormula(String formula, Map<String, Double> variables) {
+    private Long calculateWithFormula(String formula, Map<String, Long> variables) {
         if (formula == null || formula.trim().isEmpty()) {
             throw new AppException(ErrorCode.INVALID_FORMULA);
         }
@@ -119,7 +116,7 @@ public class CalculateServiceImp implements CalculateService {
         StandardEvaluationContext context = new StandardEvaluationContext();
         context.setVariables(new HashMap<>(variables));
         Expression expression = parser.parseExpression(formula);
-        Double result = expression.getValue(context, Double.class);
+        Long result = expression.getValue(context, Long.class);
 
         if (result == null) {
             throw new AppException(ErrorCode.CALCULATION_FAILED);
@@ -128,14 +125,13 @@ public class CalculateServiceImp implements CalculateService {
     }
 
     // Lấy danh sách kích thước từ CustomerChoices
-    private Map<String, Double> getSizeValues(CustomerChoices customerChoices) {
+    private Map<String, Long> getSizeValues(CustomerChoices customerChoices) {
         return Optional.ofNullable(customerChoices.getCustomerChoiceSizes())
                 .orElse(List.of())
                 .stream()
                 .collect(Collectors.toMap(
                         mapping -> normalizeName(mapping.getSizes().getName()),
-                        CustomerChoiceSizes::getSizeValue,
-                        (v1, v2) -> v1
+                        CustomerChoiceSizes::getSizeValue
                 ));
     }
 
@@ -158,9 +154,6 @@ public class CalculateServiceImp implements CalculateService {
         if (customerChoices.getProductTypes() == null || customerChoices.getProductTypes().getCalculateFormula() == null) {
             throw new AppException(ErrorCode.INVALID_FORMULA);
         }
-//        if (customerChoices.getCustomerChoicesDetails() == null || customerChoices.getCustomerChoicesDetails().isEmpty()) {
-//            throw new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND);
-//        }
         if (customerChoices.getCustomerChoiceSizes() == null || customerChoices.getCustomerChoiceSizes().isEmpty()) {
             throw new AppException(ErrorCode.PRODUCT_TYPE_SIZE_NOT_FOUND);
         }

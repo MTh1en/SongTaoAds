@@ -19,7 +19,7 @@ public class CustomerChoiceDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    Double subTotal;
+    Long subTotal;
 
     @CreationTimestamp
     LocalDateTime createdAt;

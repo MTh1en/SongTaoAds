@@ -21,11 +21,11 @@ public class PriceProposal {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    Integer totalPrice;
-    Integer depositAmount;
+    Long totalPrice;
+    Long depositAmount;
     String rejectionReason;
-    Integer totalPriceOffer;
-    Integer depositAmountOffer;
+    Long totalPriceOffer;
+    Long depositAmountOffer;
 
     @Enumerated(EnumType.STRING)
     PriceProposalStatus status;

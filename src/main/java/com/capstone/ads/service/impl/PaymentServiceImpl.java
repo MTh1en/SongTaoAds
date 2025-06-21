@@ -116,7 +116,7 @@ public class PaymentServiceImpl implements PaymentService {
         PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
         long paymentCode = generateOrderCode();
         long expiredInSeconds = (System.currentTimeMillis() / 1000) + (60 * 60);
-        double amount = (isDeposit)
+        long amount = (isDeposit)
                 ? order.getDepositAmount()
                 : order.getRemainingAmount();
         int payOsAmount = DataConverter.convertDoubleToInt(amount);
@@ -134,7 +134,7 @@ public class PaymentServiceImpl implements PaymentService {
         // Create and save Payment entity
         Payments payment = Payments.builder()
                 .code(paymentCode)
-                .amount(payOsAmount)
+                .amount(amount)
                 .method(PaymentMethod.PAYOS)
                 .status(PaymentStatus.PENDING)
                 .isDeposit(isDeposit)
@@ -151,9 +151,11 @@ public class PaymentServiceImpl implements PaymentService {
 
         long paymentCode = generateOrderCode();
         long expiredInSeconds = (System.currentTimeMillis() / 1000) + (60 * 60);
-        int payOsAmount = (isDeposit)
+
+        long amount = (isDeposit)
                 ? customDesignRequests.getDepositAmount()
                 : customDesignRequests.getRemainingAmount();
+        int payOsAmount = DataConverter.convertDoubleToInt(amount);
         // Create PaymentData
         PaymentData paymentData = PaymentData.builder()
                 .orderCode(paymentCode)
@@ -167,7 +169,7 @@ public class PaymentServiceImpl implements PaymentService {
         // Create and save Payment entity
         Payments payment = Payments.builder()
                 .code(paymentCode)
-                .amount(payOsAmount)
+                .amount(amount)
                 .method(PaymentMethod.PAYOS)
                 .status(PaymentStatus.PENDING)
                 .isDeposit(isDeposit)

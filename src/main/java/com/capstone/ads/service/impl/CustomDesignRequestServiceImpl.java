@@ -51,7 +51,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequest.setHasOrder(request.getHasOrder());
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
 
-        customerChoicesService.hardDeleteCustomerChoice(customerChoicesId);
+//        customerChoicesService.hardDeleteCustomerChoice(customerChoicesId);
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 
@@ -170,7 +170,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
-    public void updateCustomDesignRequestApprovedPricing(String customDesignRequestId, Integer totalPrice, Integer depositAmount) {
+    public void updateCustomDesignRequestApprovedPricing(String customDesignRequestId, Long totalPrice, Long depositAmount) {
         var customDesignRequest = getCustomDesignRequestById(customDesignRequestId);
 
         customDesignRequestStateValidator.validateTransition(customDesignRequest.getStatus(), CustomDesignRequestStatus.APPROVED_PRICING);
