@@ -5,6 +5,8 @@ import com.capstone.ads.dto.customer_detail.CustomerDetailDTO;
 import com.capstone.ads.dto.customer_detail.CustomerDetailRequest;
 import com.capstone.ads.service.CustomerDetailService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -16,11 +18,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Tag(name = "CUSTOMER DETAIL")
 public class CustomerDetailController {
 
     private final CustomerDetailService customerDetailService;
 
     @PostMapping(value = "/customer-details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Tạo thông tin doanh nghiệp")
     public ApiResponse<CustomerDetailDTO> createCustomerDetail(@RequestPart String companyName,
                                                                @RequestPart String address,
                                                                @RequestPart String contactInfo,
@@ -30,6 +34,7 @@ public class CustomerDetailController {
     }
 
     @GetMapping("/customer-details/{customerDetailId}")
+    @Operation(summary = "Xem thông tin doanh nghiệp theo ID")
     public ApiResponse<CustomerDetailDTO> getCustomerDetailById(@PathVariable("customerDetailId") String customerDetailId) {
         return ApiResponseBuilder.buildSuccessResponse(
                 "Customer detail by ID",
@@ -38,6 +43,7 @@ public class CustomerDetailController {
     }
 
     @GetMapping("/users/{userId}/customer-details")
+    @Operation(summary = "Xem thông tin doanh nghiệp theo tài khoản")
     public ApiResponse<CustomerDetailDTO> getByUserId(@PathVariable String userId) {
         return ApiResponseBuilder.buildSuccessResponse(
                 "Customer detail by user ID",
@@ -46,6 +52,7 @@ public class CustomerDetailController {
     }
 
     @GetMapping("/customer-details")
+    @Operation(summary = "Xem tất cả thông tin doanh nghiệp")
     public ApiResponse<List<CustomerDetailDTO>> getAll() {
         return ApiResponseBuilder.buildSuccessResponse(
                 "Find all customer details",
@@ -54,6 +61,7 @@ public class CustomerDetailController {
     }
 
     @PatchMapping("/customer-details/{customerDetailId}/information")
+    @Operation(summary = "Cập nhật thông tin doanh nghiệp")
     public ApiResponse<CustomerDetailDTO> updateCustomerDetailInformation(@Valid @PathVariable("customerDetailId") String customerDetailId,
                                                                           @RequestBody CustomerDetailRequest request) {
         return ApiResponseBuilder.buildSuccessResponse(
@@ -63,6 +71,7 @@ public class CustomerDetailController {
     }
 
     @PatchMapping(value = "/customer-details/{customerDetailId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Cập nhât logo doanh nghiệp")
     public ApiResponse<CustomerDetailDTO> updateCustomerDetailImage(@PathVariable("customerDetailId") String customerDetailId,
                                                                     @RequestPart MultipartFile image) {
         var response = customerDetailService.updateCustomerDetailLogoImage(customerDetailId, image);
@@ -70,6 +79,7 @@ public class CustomerDetailController {
     }
 
     @DeleteMapping("/customer-details/{customerDetailId}")
+    @Operation(summary = "Xóa cứng thông tin doanh nghiệp")
     public ApiResponse<Void> delete(@PathVariable("customerDetailId") String customerDetailId) {
         customerDetailService.hardDeleteCustomerDetail(customerDetailId);
         return ApiResponseBuilder.buildSuccessResponse("Delete customer detail successful", null);

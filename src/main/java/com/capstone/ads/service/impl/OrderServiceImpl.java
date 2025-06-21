@@ -132,7 +132,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO managerUpdateOrderProducing(String orderId, MultipartFile draftImage) {
+    public OrderDTO staffUpdateOrderProducing(String orderId, MultipartFile draftImage) {
         Orders orders = getOrderById(orderId);
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.PRODUCING);
 
@@ -147,7 +147,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO managerUpdateOrderProductionComplete(String orderId, MultipartFile productImage) {
+    public OrderDTO staffUpdateOrderProductionComplete(String orderId, MultipartFile productImage) {
         Orders orders = getOrderById(orderId);
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.PRODUCTION_COMPLETED);
 
@@ -162,7 +162,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO managerUpdateOrderDelivering(String orderId, MultipartFile deliveryImage) {
+    public OrderDTO staffUpdateOrderDelivering(String orderId, MultipartFile deliveryImage) {
         Orders orders = getOrderById(orderId);
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.DELIVERING);
 
@@ -176,7 +176,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO manageUpdateOrderInstalled(String orderId, MultipartFile installedImage) {
+    public OrderDTO staffUpdateOrderInstalled(String orderId, MultipartFile installedImage) {
         Orders orders = getOrderById(orderId);
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.INSTALLED);
 

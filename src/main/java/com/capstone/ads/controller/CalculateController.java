@@ -3,6 +3,8 @@ package com.capstone.ads.controller;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.service.CalculateService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Tag(name = "CALCULATE FORMULA")
 public class CalculateController {
     private final CalculateService service;
 

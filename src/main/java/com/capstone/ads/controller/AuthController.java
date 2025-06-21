@@ -7,6 +7,7 @@ import com.capstone.ads.dto.auth.RegisterRequest;
 import com.capstone.ads.service.AuthService;
 import com.capstone.ads.service.VerificationService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -25,12 +26,14 @@ public class AuthController {
 
 
     @PostMapping("/login")
+    @Operation(summary = "Đăng nhập")
     public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
         var result = authService.login(request, response);
         return ApiResponseBuilder.buildSuccessResponse("Login successful", result);
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Đăng ký")
     public ApiResponse<Void> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
         verificationService.sendVerifyEmail(request.getFullName(), request.getEmail());
@@ -38,6 +41,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
+    @Operation(summary = "Làm mới token")
     public ApiResponse<AuthResponse> refreshToken(@CookieValue(value = "refresh_token", required = false) String refreshToken,
                                                   HttpServletResponse response) {
         var result = authService.refreshToken(refreshToken, response);
@@ -45,6 +49,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "Đăng xuất")
     public ApiResponse<Void> logout(@CookieValue(value = "refresh_token", required = false) String refreshToken,
                                     HttpServletResponse response) {
         authService.logout(refreshToken, response);

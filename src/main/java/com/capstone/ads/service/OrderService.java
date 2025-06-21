@@ -3,7 +3,6 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.order.OrderConfirmRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
-import com.capstone.ads.model.Contract;
 import com.capstone.ads.model.Orders;
 import com.capstone.ads.model.enums.OrderStatus;
 import org.springframework.data.domain.Page;
@@ -20,13 +19,13 @@ public interface OrderService {
 
     OrderDTO saleNotifyEstimateDeliveryDate(String orderId, OrderConfirmRequest request);
 
-    OrderDTO managerUpdateOrderProducing(String orderId, MultipartFile draftImage);
+    OrderDTO staffUpdateOrderProducing(String orderId, MultipartFile draftImage);
 
-    OrderDTO managerUpdateOrderProductionComplete(String orderId, MultipartFile productImage);
+    OrderDTO staffUpdateOrderProductionComplete(String orderId, MultipartFile productImage);
 
-    OrderDTO managerUpdateOrderDelivering(String orderId, MultipartFile deliveryImage);
+    OrderDTO staffUpdateOrderDelivering(String orderId, MultipartFile deliveryImage);
 
-    OrderDTO manageUpdateOrderInstalled(String orderId, MultipartFile installedImage);
+    OrderDTO staffUpdateOrderInstalled(String orderId, MultipartFile installedImage);
 
     OrderDTO findOrderById(String orderId);
 
