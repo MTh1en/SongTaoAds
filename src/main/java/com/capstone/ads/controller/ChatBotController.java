@@ -9,9 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chat-bot")
@@ -70,11 +69,30 @@ public class ChatBotController {
         return ApiResponseBuilder.buildSuccessResponse("Fine tuning jobs retrieved successfully", response);
     }
 
+    @GetMapping("/{fine-tune-job_id}/fine-tune-jobs")
+    public ApiResponse<FineTuningJobResponse> getFineTuningJobById(@PathVariable String fineTuneJobId) {
+        FineTuningJobResponse response = chatBotService.getFineTuningJob(fineTuneJobId);
+        return ApiResponseBuilder.buildSuccessResponse("Fine tuning job retrieved successfully", response);
+    }
+
     @PostMapping("/fine-tuning-jobs/{fineTuningJobId}/cancel")
     public ApiResponse<FineTuningJobResponse> cancelFineTuningJob(
             @PathVariable String fineTuningJobId) {
         FineTuningJobResponse response = chatBotService.cancelFineTuningJob(fineTuningJobId);
         return ApiResponseBuilder.buildSuccessResponse("Fine tuning job cancelled successfully", response);
+    }
+
+    @PostMapping("/fine-tuning-jobs/{fineTuningJobId}/select-model")
+    public ApiResponse<ModelChatBotDTO> selectModelChat(
+            @PathVariable String fineTuningJobId) {
+        ModelChatBotDTO response = chatBotService.setModeChatBot(fineTuningJobId);
+        return ApiResponseBuilder.buildSuccessResponse("Fine tuning job cancelled successfully", response);
+    }
+
+    @PostMapping(value = "/upload-file-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<List<Map<String, Object>>> uploadFileExcel(@RequestPart MultipartFile file) {
+        List<Map<String, Object>> resposne = chatBotService.uploadFileExcel(file);
+        return ApiResponseBuilder.buildSuccessResponse(("Uploaded file succseccfully"), resposne);
     }
 
 }
