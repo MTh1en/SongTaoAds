@@ -9,6 +9,7 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
@@ -41,6 +42,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(ApiResponse.builder()
+                .success(false)
+                .message("Validation Error")
+                .result(errors)
+                .build());
+    }
+
+    @ExceptionHandler(value = HandlerMethodValidationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMethodValidationException(HandlerMethodValidationException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getValueResults().forEach(error -> errors.put(
+                error.getMethodParameter().getParameterName(),
+                error.getResolvableErrors().getFirst().getDefaultMessage()));
         return ResponseEntity.badRequest().body(ApiResponse.builder()
                 .success(false)
                 .message("Validation Error")

@@ -25,12 +25,11 @@ public class CustomDesignRequests {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String requirements;
-    Integer totalPrice;
-    Integer depositAmount;
-    Integer remainingAmount;
+    Long totalPrice;
+    Long depositAmount;
+    Long remainingAmount;
     String finalDesignImage;
     Boolean isNeedSupport;
-    Boolean hasOrder;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     CustomerChoiceHistories customerChoiceHistories;

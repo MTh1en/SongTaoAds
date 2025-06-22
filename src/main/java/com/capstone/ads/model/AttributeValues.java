@@ -22,8 +22,9 @@ public class AttributeValues {
     String id;
     String name;
     String unit;
-    Double materialPrice;
-    Double unitPrice;
+    Long materialPrice;
+    Long unitPrice;
+    Boolean isMultiplier;
     Boolean isAvailable;
 
     @CreationTimestamp

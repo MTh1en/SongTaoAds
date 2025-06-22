@@ -3,6 +3,7 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeCreateRequest;
 import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeDTO;
 import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeUpdateRequest;
+import com.capstone.ads.model.CustomerChoiceSizes;
 
 import java.util.List;
 
@@ -16,4 +17,6 @@ public interface CustomerChoiceSizesService {
     List<CustomerChoicesSizeDTO> findAllCustomerChoiceSizeByCustomerChoicesId(String customerChoicesId);
 
     void hardDeleteCustomerChoiceSize(String id);
+
+    //INTERNAL FUNCTION
 }

@@ -22,7 +22,7 @@ public class Payments {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    Integer amount;
+    Long amount;
     Long code;
     @Enumerated(EnumType.STRING)
     PaymentMethod method;
