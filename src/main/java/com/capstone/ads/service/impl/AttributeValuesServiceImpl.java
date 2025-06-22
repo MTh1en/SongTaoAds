@@ -46,8 +46,8 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
     }
 
     @Override
-    public AttributeValuesDTO findAttributeValueById(String id) {
-        AttributeValues attributeValues = attributeValuesRepository.findById(id)
+    public AttributeValuesDTO findAttributeValueById(String attributeValueId) {
+        AttributeValues attributeValues = attributeValuesRepository.findById(attributeValueId)
                 .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND));
         return attributeValuesMapper.toDTO(attributeValues);
     }
@@ -64,10 +64,16 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
 
     @Override
     @Transactional
-    public void hardDeleteAttributeValue(String id) {
-        if (!attributeValuesRepository.existsById(id))
+    public void hardDeleteAttributeValue(String attributeValueId) {
+        if (!attributeValuesRepository.existsById(attributeValueId))
             throw new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND);
 
-        attributeValuesRepository.deleteById(id);
+        attributeValuesRepository.deleteById(attributeValueId);
+    }
+
+    @Override
+    public AttributeValues getAttributeValueById(String attributeValueId) {
+        return attributeValuesRepository.findById(attributeValueId)
+                .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND));
     }
 }

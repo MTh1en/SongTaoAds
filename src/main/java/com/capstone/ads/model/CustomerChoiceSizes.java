@@ -19,8 +19,9 @@ public class CustomerChoiceSizes {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    Long sizeValue;
-    Long maxSize;
+
+    @Column(scale = 2)
+    Float sizeValue;
     @CreationTimestamp
     LocalDateTime createdAt;
     @UpdateTimestamp

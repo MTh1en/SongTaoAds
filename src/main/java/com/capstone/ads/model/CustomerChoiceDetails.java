@@ -1,5 +1,6 @@
 package com.capstone.ads.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -20,15 +21,17 @@ public class CustomerChoiceDetails {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     Long subTotal;
-
+    Boolean isMultiplier;
     @CreationTimestamp
     LocalDateTime createdAt;
     @UpdateTimestamp
     LocalDateTime updatedAt;
 
     @ManyToOne
+    @JsonManagedReference
     CustomerChoices customerChoices;
 
     @ManyToOne
+    @JsonManagedReference
     AttributeValues attributeValues;
 }

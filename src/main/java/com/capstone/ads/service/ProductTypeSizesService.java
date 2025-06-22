@@ -10,4 +10,8 @@ public interface ProductTypeSizesService {
     List<ProductTypeSizeDTO> findAllProductTypeSizeByProductTypeId(String productTypeId);
 
     void hardDeleteProductTypeSize(String productTypeSizeId);
+
+    //INTERNAL FUNCTION
+
+    void validateProductTypeSizeExist(String productTypeId, String sizeId);
 }
