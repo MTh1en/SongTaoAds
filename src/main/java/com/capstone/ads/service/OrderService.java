@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface OrderService {
-    OrderDTO createOrderByCustomDesign(String customDesignRequestId, String customerChoiceId);
+    OrderDTO createOrderByCustomDesign(String customDesignRequestId);
 
     OrderDTO createOrderByAIDesign(String aiDesignId, String customerChoiceId);
 
@@ -19,13 +19,13 @@ public interface OrderService {
 
     OrderDTO saleNotifyEstimateDeliveryDate(String orderId, OrderConfirmRequest request);
 
-    OrderDTO managerUpdateOrderProducing(String orderId, MultipartFile draftImage);
+    OrderDTO staffUpdateOrderProducing(String orderId, MultipartFile draftImage);
 
-    OrderDTO managerUpdateOrderProductionComplete(String orderId, MultipartFile productImage);
+    OrderDTO staffUpdateOrderProductionComplete(String orderId, MultipartFile productImage);
 
-    OrderDTO managerUpdateOrderDelivering(String orderId, MultipartFile deliveryImage);
+    OrderDTO staffUpdateOrderDelivering(String orderId, MultipartFile deliveryImage);
 
-    OrderDTO manageUpdateOrderInstalled(String orderId, MultipartFile installedImage);
+    OrderDTO staffUpdateOrderInstalled(String orderId, MultipartFile installedImage);
 
     OrderDTO findOrderById(String orderId);
 

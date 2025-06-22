@@ -4,50 +4,54 @@ import com.capstone.ads.dto.customer_choice_detail.CustomerChoicesDetailsDTO;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerChoiceDetailsMapper;
-import com.capstone.ads.model.AttributeValues;
-import com.capstone.ads.model.CustomerChoiceDetails;
-import com.capstone.ads.model.CustomerChoices;
-import com.capstone.ads.repository.internal.AttributeValuesRepository;
+import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.CustomerChoiceDetailsRepository;
-import com.capstone.ads.repository.internal.CustomerChoicesRepository;
-import com.capstone.ads.service.CalculateService;
-import com.capstone.ads.service.CustomerChoiceDetailsService;
-import jakarta.persistence.EntityManager;
+import com.capstone.ads.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsService {
+    private final CustomerChoicesService customerChoicesService;
+    private final AttributeValuesService attributeValuesService;
     private final CustomerChoiceDetailsRepository customerChoiceDetailsRepository;
-    private final CustomerChoicesRepository customerChoicesRepository;
-    private final AttributeValuesRepository attributeValuesRepository;
     private final CustomerChoiceDetailsMapper customerChoiceDetailsMapper;
-    private final CalculateService calculateService;
-    private final EntityManager entityManager;
+    private final ExpressionParser parser = new SpelExpressionParser();
 
     @Override
     @Transactional
     public CustomerChoicesDetailsDTO createCustomerChoiceDetail(String customerChoicesId, String attributeValueId) {
-        var customerChoices = customerChoicesRepository.findById(customerChoicesId)
-                .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND));
-        var attributeValues = attributeValuesRepository.findById(attributeValueId)
-                .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND));
+        var customerChoices = customerChoicesService.getCustomerChoiceById(customerChoicesId);
+        var attributeValues = attributeValuesService.getAttributeValueById(attributeValueId);
+
         validateDuplicatedAttribute(customerChoices, attributeValues);
         validateAttributeNotBelongsToProductType(customerChoices, attributeValues);
         var customerChoicesDetails = CustomerChoiceDetails.builder()
+                .createdAt(LocalDateTime.now())
                 .customerChoices(customerChoices)
                 .attributeValues(attributeValues)
+                .isMultiplier(attributeValues.getIsMultiplier())
                 .build();
+
         customerChoicesDetails = customerChoiceDetailsRepository.save(customerChoicesDetails);
-        updateSubtotalAndTotal(customerChoicesDetails);
+        customerChoices.getCustomerChoiceDetails().add(customerChoicesDetails);
+        recalculateSubtotal(customerChoicesDetails);
+        customerChoicesService.recalculateTotalAmount(customerChoices);
         return customerChoiceDetailsMapper.toDTO(customerChoicesDetails);
     }
 
@@ -56,15 +60,15 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
     public CustomerChoicesDetailsDTO updateAttributeValueInCustomerChoiceDetail(String customerChoiceDetailId, String attributeValueId) {
         var customerChoicesDetails = customerChoiceDetailsRepository.findById(customerChoiceDetailId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND));
-        var attributeValue = attributeValuesRepository.findById(attributeValueId)
-                .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_VALUE_NOT_FOUND));
+        var attributeValue = attributeValuesService.getAttributeValueById(attributeValueId);
 
         validateAttributeBelongsToSameAttributeType(customerChoicesDetails.getAttributeValues(), attributeValue);
 
         customerChoicesDetails.setAttributeValues(attributeValue);
         customerChoicesDetails = customerChoiceDetailsRepository.save(customerChoicesDetails);
 
-        updateSubtotalAndTotal(customerChoicesDetails);
+        recalculateSubtotal(customerChoicesDetails);
+        customerChoicesService.recalculateTotalAmount(customerChoicesDetails.getCustomerChoices());
         return customerChoiceDetailsMapper.toDTO(customerChoicesDetails);
     }
 
@@ -77,8 +81,8 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
 
     @Override
     public List<CustomerChoicesDetailsDTO> findAllCustomerChoiceDetailByCustomerChoicesId(String customerChoicesId) {
-        if (!customerChoicesRepository.existsById(customerChoicesId))
-            throw new AppException(ErrorCode.CUSTOMER_CHOICES_NOT_FOUND);
+        customerChoicesService.validateCustomerChoiceExists(customerChoicesId);
+
         return customerChoiceDetailsRepository.findByCustomerChoices_IdOrderByCreatedAtAsc(customerChoicesId).stream()
                 .map(customerChoiceDetailsMapper::toDTO)
                 .collect(Collectors.toList());
@@ -91,6 +95,13 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
             throw new AppException(ErrorCode.CUSTOMER_CHOICES_DETAIL_NOT_FOUND);
         }
         customerChoiceDetailsRepository.deleteById(id);
+    }
+
+    @Override
+    public void recalculateSubtotal(CustomerChoiceDetails customerChoiceDetails) {
+        long newValue = calculateSubtotal(customerChoiceDetails);
+        customerChoiceDetails.setSubTotal(newValue);
+        customerChoiceDetailsRepository.save(customerChoiceDetails);
     }
 
     private void validateAttributeBelongsToSameAttributeType(AttributeValues currentValue, AttributeValues newValue) {
@@ -119,28 +130,47 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
         }
     }
 
-    private void updateSubtotalAndTotal(CustomerChoiceDetails customerChoiceDetails) {
-        // 1. Đảm bảo createdAt được thiết lập trước khi tính toán
-        if (customerChoiceDetails.getCreatedAt() == null) {
-            customerChoiceDetails.setCreatedAt(LocalDateTime.now());
-        }
+    //CALCULATE SUBTOTAL
 
-        // 2. Tính và cập nhật subtotal
-        customerChoiceDetails.setSubTotal(calculateService.calculateSubtotal(customerChoiceDetails.getId()));
-        customerChoiceDetails = customerChoiceDetailsRepository.saveAndFlush(customerChoiceDetails);
+    public Long calculateSubtotal(CustomerChoiceDetails customerChoicesDetail) {
+        Attributes attribute = customerChoicesDetail.getAttributeValues().getAttributes();
+        var attributeValues = customerChoicesDetail.getAttributeValues();
+        var customerChoiceSize = customerChoicesDetail.getCustomerChoices().getCustomerChoiceSizes();
 
-        // 3. Refresh toàn bộ đồ thị đối tượng liên quan
-        entityManager.refresh(customerChoiceDetails); // Refresh chính details
-        entityManager.refresh(customerChoiceDetails.getCustomerChoices()); // Refresh customerChoices
+        Map<String, Float> variables = prepareVariablesForSubtotal(attributeValues, customerChoiceSize);
 
-        // 4. Tính toán total với dữ liệu mới nhất
-        String customerChoicesId = customerChoiceDetails.getCustomerChoices().getId();
-        double total = calculateService.calculateTotal(customerChoicesId);
+        return calculateWithFormula(attribute.getCalculateFormula(), variables);
+    }
 
-        // 5. Cập nhật total
-        customerChoiceDetails.getCustomerChoices().setTotalAmount(total);
-        customerChoiceDetailsRepository.saveAndFlush(customerChoiceDetails);
+    private Map<String, Float> prepareVariablesForSubtotal(AttributeValues attributeValues, List<CustomerChoiceSizes> customerChoiceSizes) {
+        Map<String, Float> variables = new HashMap<>();
 
-        log.info("Updated total for customerChoices {}: {}", customerChoicesId, total);
+        variables.put("unitPrice", Optional.ofNullable(attributeValues)
+                .map(AttributeValues::getUnitPrice)
+                .orElse(0L).floatValue());
+
+        variables.putAll(getSizeValues(customerChoiceSizes));
+        return variables;
+    }
+
+    private Long calculateWithFormula(String formula, Map<String, Float> variables) {
+        StandardEvaluationContext context = new StandardEvaluationContext();
+        context.setVariables(new HashMap<>(variables));
+        Expression expression = parser.parseExpression(formula);
+        return expression.getValue(context, Long.class);
+    }
+
+    private Map<String, Float> getSizeValues(List<CustomerChoiceSizes> customerChoiceSizes) {
+        Map<String, Float> variables = new HashMap<>();
+        customerChoiceSizes.forEach(size -> {
+            String sizeName = size.getSizes().getName();
+            variables.put(normalizeName(sizeName), size.getSizeValue());
+        });
+        return variables;
+    }
+
+    // Chuẩn hóa tên (loại bỏ khoảng trắng)
+    private String normalizeName(String name) {
+        return name.trim().replaceAll("\\s+", "");
     }
 }

@@ -7,6 +7,8 @@ import com.capstone.ads.dto.custom_design_request.CustomDesignRequestDTO;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -17,10 +19,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Slf4j
+@Tag(name = "CUSTOM DESIGN REQUEST")
 public class CustomDesignRequestsController {
     private final CustomDesignRequestService service;
 
     @PostMapping("/customer-details/{customerDetailId}/customer-choices/{customerChoiceId}")
+    @Operation(summary = "Tạo thông yêu cầu thiết kế tùy chỉnh")
     public ApiResponse<CustomDesignRequestDTO> createCustomDesignRequest(
             @PathVariable String customerDetailId,
             @PathVariable String customerChoiceId,
@@ -30,6 +34,7 @@ public class CustomDesignRequestsController {
     }
 
     @PatchMapping("/custom-design-requests/{customDesignRequestId}/users/{designerId}")
+    @Operation(summary = "Chia Task cho Designer")
     public ApiResponse<CustomDesignRequestDTO> assignDesignerToCustomerRequest(@PathVariable String customDesignRequestId,
                                                                                @PathVariable String designerId) {
         var response = service.assignDesignerToCustomerRequest(customDesignRequestId, designerId);
@@ -37,12 +42,14 @@ public class CustomDesignRequestsController {
     }
 
     @PatchMapping("/custom-design-requests/{customDesignRequestId}/approve")
+    @Operation(summary = "Designer chấp nhận yêu cầu")
     public ApiResponse<CustomDesignRequestDTO> approveCustomDesignRequest(@PathVariable String customDesignRequestId) {
         var response = service.designerApproveCustomDesignRequest(customDesignRequestId);
         return ApiResponseBuilder.buildSuccessResponse("Designer approved custom design request assigned", response);
     }
 
     @PatchMapping("/custom-design-requests/{customDesignRequestId}/reject")
+    @Operation(summary = "Designer từ chối yêu cầu")
     public ApiResponse<CustomDesignRequestDTO> rejectCustomDesignRequest(@PathVariable String customDesignRequestId) {
         var response = service.designerRejectCustomDesignRequest(customDesignRequestId);
         return ApiResponseBuilder.buildSuccessResponse("Designer rejected custom design request assigned", response);
@@ -52,6 +59,7 @@ public class CustomDesignRequestsController {
             value = "/custom-design-requests/{customDesignRequestId}/final-design-image",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @Operation(summary = "Designer gửi bản thiết kế chính thức")
     public ApiResponse<CustomDesignRequestDTO> designerUploadFinalDesignImage(@PathVariable String customDesignRequestId,
                                                                               @RequestPart MultipartFile finalDesignImage) {
         var response = service.designerUploadFinalDesignImage(customDesignRequestId, finalDesignImage);
@@ -59,6 +67,7 @@ public class CustomDesignRequestsController {
     }
 
     @GetMapping("/customer-details/{customerDetailId}/custom-design-requests")
+    @Operation(summary = "Xem yêu cầu thiết kế theo thông tin doanh nghiệp")
     public ApiPagingResponse<CustomDesignRequestDTO> findCustomerDesignRequestByCustomerDetailId(
             @PathVariable String customerDetailId,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
@@ -68,17 +77,21 @@ public class CustomDesignRequestsController {
     }
 
     @GetMapping("/users/{designerId}/custom-design-requests")
-    public ApiPagingResponse<CustomDesignRequestDTO> findCustomerDetailRequestByAssignDesignerId(@PathVariable String designerId,
-                                                                                                 @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                                                                 @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+    @Operation(summary = "Designer xem những yêu cầu thiết kế được phân công cho mình")
+    public ApiPagingResponse<CustomDesignRequestDTO> findCustomerDetailRequestByAssignDesignerId(
+            @PathVariable String designerId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findCustomerDetailRequestByAssignDesignerId(designerId, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request by designer request successful", response, page);
     }
 
     @GetMapping("/custom-design-requests")
-    public ApiPagingResponse<CustomDesignRequestDTO> findCustomerDetailRequestByStatus(@RequestParam("status") CustomDesignRequestStatus status,
-                                                                                       @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                                                       @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+    @Operation(summary = "Xem yêu cầu thiết kế theo trạng thái")
+    public ApiPagingResponse<CustomDesignRequestDTO> findCustomerDetailRequestByStatus(
+            @RequestParam("status") CustomDesignRequestStatus status,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findCustomerDetailRequestByStatus(status, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request by status successful", response, page);
     }

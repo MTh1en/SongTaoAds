@@ -17,7 +17,7 @@ import java.util.List;
 public class CustomerChoiceHistories {
     String productTypeName;
     String calculateFormula;
-    Double totalAmount;
+    Long totalAmount;
     List<AttributeSelection> attributeSelections;
     List<SizeSelection> sizeSelections;
 }

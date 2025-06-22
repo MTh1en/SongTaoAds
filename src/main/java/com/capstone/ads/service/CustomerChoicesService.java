@@ -14,4 +14,8 @@ public interface CustomerChoicesService {
 
     //Internal Function
     CustomerChoices getCustomerChoiceById(String customerChoiceId);
+
+    void validateCustomerChoiceExists(String customerChoiceId);
+
+    void recalculateTotalAmount(CustomerChoices customerChoice);
 }

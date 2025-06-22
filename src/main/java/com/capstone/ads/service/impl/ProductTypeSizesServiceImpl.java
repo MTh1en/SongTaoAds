@@ -50,4 +50,11 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
             throw new AppException(ErrorCode.PRODUCT_TYPE_SIZE_NOT_FOUND);
         productTypeSizesRepository.deleteById(productTypeSizeId);
     }
+
+    @Override
+    public void validateProductTypeSizeExist(String productTypeId, String sizeId) {
+        if (!productTypeSizesRepository.existsByProductTypes_IdAndSizes_Id(productTypeId, sizeId)) {
+            throw new AppException(ErrorCode.SIZE_NOT_BELONG_PRODUCT_TYPE);
+        }
+    }
 }

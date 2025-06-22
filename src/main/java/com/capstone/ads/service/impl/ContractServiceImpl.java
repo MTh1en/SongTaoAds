@@ -33,11 +33,11 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     @Transactional
-    public ContractDTO saleSendFirstContract(String orderId, String contractNumber, MultipartFile contractFile) {
+    public ContractDTO saleSendFirstContract(String orderId, String contractNumber, Long depositPercentChanged, MultipartFile contractFile) {
         Orders orders = orderService.getOrderById(orderId);
 
         String contractUrl = uploadContractImageToS3(contractNumber, contractFile);
-        Contract contract = contractMapper.sendContract(contractNumber, contractUrl);
+        Contract contract = contractMapper.sendContract(contractNumber, depositPercentChanged, contractUrl);
         contract.setOrders(orders);
         contract = contractRepository.save(contract);
 
@@ -62,7 +62,7 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     @Transactional
-    public ContractDTO saleSendRevisedContract(String contractId, MultipartFile contractFile) {
+    public ContractDTO saleSendRevisedContract(String contractId, Long contractPercentChanged, MultipartFile contractFile) {
         Contract contract = getContractById(contractId);
         String orderId = contract.getOrders().getId();
         contractStateValidator.validateTransition(contract.getStatus(), ContractStatus.SENT);
@@ -96,7 +96,8 @@ public class ContractServiceImpl implements ContractService {
         return contractMapper.toDTO(contract);
     }
 
-    private Contract getContractById(String contractId) {
+    @Override
+    public Contract getContractById(String contractId) {
         return contractRepository.findById(contractId)
                 .orElseThrow(() -> new AppException(ErrorCode.CONTRACT_NOT_FOUND));
     }

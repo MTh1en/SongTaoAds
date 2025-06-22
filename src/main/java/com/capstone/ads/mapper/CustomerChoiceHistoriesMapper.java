@@ -21,6 +21,7 @@ public interface CustomerChoiceHistoriesMapper {
     @Mapping(target = "materialPrice", source = "attributeValues.materialPrice")
     @Mapping(target = "unitPrice", source = "attributeValues.unitPrice")
     @Mapping(target = "calculateFormula", source = "attributeValues.attributes.calculateFormula")
+    @Mapping(target = "isMultiplier", source = "attributeValues.isMultiplier")
     AttributeSelection toAttributeSelection(CustomerChoiceDetails customerChoiceDetails);
 
     @Mapping(target = "size", source = "sizes.name")

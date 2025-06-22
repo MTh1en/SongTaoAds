@@ -24,11 +24,12 @@ public class Contract {
     String signedContractUrl;
     LocalDateTime sentDate;
     LocalDateTime signedDate;
-    String note;
+    Long depositPercentChanged;
 
     @Enumerated(EnumType.STRING)
     ContractStatus status;
 
     @OneToOne
+    @JoinColumn  // Thêm @JoinColumn để chỉ định khóa ngoại
     Orders orders;
 }

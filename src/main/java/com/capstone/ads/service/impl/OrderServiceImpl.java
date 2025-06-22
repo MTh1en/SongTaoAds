@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.PaymentPolicy;
 import com.capstone.ads.dto.order.OrderConfirmRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
@@ -41,17 +42,16 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO createOrderByCustomDesign(String customDesignRequestId, String customerChoiceId) {
+    public OrderDTO createOrderByCustomDesign(String customDesignRequestId) {
         CustomDesignRequests customDesignRequests = customDesignRequestService.getCustomDesignRequestById(customDesignRequestId);
-        CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoiceId);
         Users users = securityContextUtils.getCurrentUser();
 
         Orders orders = orderMapper.toEntityFromCreateOrderByCustomDesign(customDesignRequests, users);
         orders.setCustomerChoiceHistories(customDesignRequests.getCustomerChoiceHistories() != null
                 ? customDesignRequests.getCustomerChoiceHistories()
                 : null);
-        orders.setTotalAmount(customerChoices.getTotalAmount());
-        orders.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
+        orders.setTotalAmount(customDesignRequests.getCustomerChoiceHistories().getTotalAmount());
+        orders.setCustomerChoiceHistories(customDesignRequests.getCustomerChoiceHistories());
 
         orderRepository.save(orders);
         return orderMapper.toDTO(orders);
@@ -75,9 +75,17 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDTO saleConfirmContractSigned(String orderId) {
         Orders orders = getOrderById(orderId);
+        Contract contract = orders.getContract();
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.CONTRACT_CONFIRMED);
 
+        long depositAmount = (long) ((!contract.getDepositPercentChanged().equals(PaymentPolicy.DEPOSIT_PERCENT))
+                ? orders.getTotalAmount() * ((double) contract.getDepositPercentChanged() / 100)
+                : orders.getTotalAmount() * ((double) PaymentPolicy.DEPOSIT_PERCENT / 100));
+        long remainingAmount = orders.getTotalAmount() - depositAmount;
+
         orders.setStatus(OrderStatus.CONTRACT_CONFIRMED);
+        orders.setDepositAmount(depositAmount);
+        orders.setRemainingAmount(remainingAmount);
         orderRepository.save(orders);
 
         return orderMapper.toDTO(orders);
@@ -124,7 +132,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO managerUpdateOrderProducing(String orderId, MultipartFile draftImage) {
+    public OrderDTO staffUpdateOrderProducing(String orderId, MultipartFile draftImage) {
         Orders orders = getOrderById(orderId);
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.PRODUCING);
 
@@ -139,7 +147,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO managerUpdateOrderProductionComplete(String orderId, MultipartFile productImage) {
+    public OrderDTO staffUpdateOrderProductionComplete(String orderId, MultipartFile productImage) {
         Orders orders = getOrderById(orderId);
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.PRODUCTION_COMPLETED);
 
@@ -154,7 +162,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO managerUpdateOrderDelivering(String orderId, MultipartFile deliveryImage) {
+    public OrderDTO staffUpdateOrderDelivering(String orderId, MultipartFile deliveryImage) {
         Orders orders = getOrderById(orderId);
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.DELIVERING);
 
@@ -168,7 +176,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO manageUpdateOrderInstalled(String orderId, MultipartFile installedImage) {
+    public OrderDTO staffUpdateOrderInstalled(String orderId, MultipartFile installedImage) {
         Orders orders = getOrderById(orderId);
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.INSTALLED);
 
