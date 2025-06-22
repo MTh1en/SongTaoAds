@@ -1,8 +1,8 @@
 package com.capstone.ads.mapper;
 
-import com.capstone.ads.dto.designtemplate.DesignTemplateCreateRequest;
-import com.capstone.ads.dto.designtemplate.DesignTemplateDTO;
-import com.capstone.ads.dto.designtemplate.DesignTemplateUpdateRequest;
+import com.capstone.ads.dto.design_template.DesignTemplateCreateRequest;
+import com.capstone.ads.dto.design_template.DesignTemplateDTO;
+import com.capstone.ads.dto.design_template.DesignTemplateUpdateRequest;
 import com.capstone.ads.model.DesignTemplates;
 import com.capstone.ads.model.ProductTypes;
 import com.capstone.ads.model.Users;

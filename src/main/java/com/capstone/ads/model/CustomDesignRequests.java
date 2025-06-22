@@ -25,22 +25,32 @@ public class CustomDesignRequests {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String requirements;
-
+    Long totalPrice;
+    Long depositAmount;
+    Long remainingAmount;
+    String finalDesignImage;
+    Boolean isNeedSupport;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     CustomerChoiceHistories customerChoiceHistories;
 
     @CreationTimestamp
-    LocalDateTime createdAt;
+    LocalDateTime createAt;
 
     @UpdateTimestamp
-    LocalDateTime updatedAt;
+    LocalDateTime updateAt;
 
     @Enumerated(EnumType.STRING)
     CustomDesignRequestStatus status;
 
     @OneToMany(mappedBy = "customDesignRequests")
-    List<CustomDesigns> customDesigns;
+    List<DemoDesigns> demoDesigns;
+
+    @OneToMany(mappedBy = "customDesignRequests")
+    List<PriceProposal> priceProposals;
+
+    @OneToMany(mappedBy = "customDesignRequests")
+    List<Payments> payments;
 
     @ManyToOne
     CustomerDetail customerDetail;

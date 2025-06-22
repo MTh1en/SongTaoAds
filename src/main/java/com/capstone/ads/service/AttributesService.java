@@ -3,16 +3,22 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.attribute.AttributesCreateRequest;
 import com.capstone.ads.dto.attribute.AttributesDTO;
 import com.capstone.ads.dto.attribute.AttributesUpdateRequest;
+import com.capstone.ads.model.Attributes;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface AttributesService {
-    AttributesDTO create(String productTypeId, AttributesCreateRequest request);
+    AttributesDTO createAttribute(String productTypeId, AttributesCreateRequest request);
 
-    AttributesDTO update(String attributeId, AttributesUpdateRequest request);
+    AttributesDTO updateAttributeInformation(String attributeId, AttributesUpdateRequest request);
 
-    AttributesDTO findById(String id);
+    AttributesDTO findAttributeById(String id);
 
-    Page<AttributesDTO> findAllByProductTypeId(String productTypeId, int page, int size);
+    Page<AttributesDTO> findAllAttributeByProductTypeId(String productTypeId, int page, int size);
 
-    void delete(String attributeId);
+    void hardDeleteAttribute(String attributeId);
+
+    //INTERNAL FUNCTION
+    void validateAttributeExistsAndIsAvailable(String attributeId);
 }

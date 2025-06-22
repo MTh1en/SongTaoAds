@@ -4,7 +4,7 @@ import com.capstone.ads.dto.file.FileData;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface S3Service {
-    String uploadSingleFile(MultipartFile file);
+    String uploadSingleFile(String keyName, MultipartFile file);
 
     FileData downloadFile(String key);
 

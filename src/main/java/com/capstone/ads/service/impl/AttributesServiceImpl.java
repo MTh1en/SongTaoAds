@@ -8,8 +8,8 @@ import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.AttributesMapper;
 import com.capstone.ads.model.Attributes;
 import com.capstone.ads.repository.internal.AttributesRepository;
-import com.capstone.ads.repository.internal.ProductTypesRepository;
 import com.capstone.ads.service.AttributesService;
+import com.capstone.ads.service.ProductTypesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,20 +18,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AttributesServiceImpl implements AttributesService {
-    private final AttributesRepository attributesRepository;
-    private final ProductTypesRepository productTypesRepository;
+    private final ProductTypesService productTypesService;
     private final AttributesMapper attributesMapper;
+    private final AttributesRepository attributesRepository;
 
     @Override
     @Transactional
-    public AttributesDTO create(String productTypeId, AttributesCreateRequest request) {
-        productTypesRepository.findById(productTypeId)
-                .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
+    public AttributesDTO createAttribute(String productTypeId, AttributesCreateRequest request) {
+        productTypesService.validateProductTypeExistsAndAvailable(productTypeId);
 
         Attributes attributes = attributesMapper.toEntity(productTypeId, request);
         attributes = attributesRepository.save(attributes);
@@ -40,7 +38,7 @@ public class AttributesServiceImpl implements AttributesService {
 
     @Override
     @Transactional
-    public AttributesDTO update(String attributeId, AttributesUpdateRequest request) {
+    public AttributesDTO updateAttributeInformation(String attributeId, AttributesUpdateRequest request) {
         Attributes attributes = attributesRepository.findById(attributeId)
                 .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
 
@@ -50,17 +48,15 @@ public class AttributesServiceImpl implements AttributesService {
     }
 
     @Override
-    public AttributesDTO findById(String productTypeId) {
+    public AttributesDTO findAttributeById(String productTypeId) {
         Attributes attributes = attributesRepository.findById(productTypeId)
                 .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
         return attributesMapper.toDTO(attributes);
     }
 
     @Override
-    public Page<AttributesDTO> findAllByProductTypeId(String productTypeId, int page, int size) {
-        // Validate productTypeId
-        productTypesRepository.findById(productTypeId)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
+    public Page<AttributesDTO> findAllAttributeByProductTypeId(String productTypeId, int page, int size) {
+        productTypesService.validateProductTypeExistsAndAvailable(productTypeId);
 
         Pageable pageable = PageRequest.of(page - 1, size);
         return attributesRepository.findByProductTypes_Id(productTypeId, pageable)
@@ -69,10 +65,18 @@ public class AttributesServiceImpl implements AttributesService {
 
     @Override
     @Transactional
-    public void delete(String productTypeId) {
+    public void hardDeleteAttribute(String productTypeId) {
         if (!attributesRepository.existsById(productTypeId)) {
             throw new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND);
         }
         attributesRepository.deleteById(productTypeId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void validateAttributeExistsAndIsAvailable(String attributeId) {
+        if (!attributesRepository.existsByIdAndIsAvailable(attributeId, true)) {
+            throw new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND);
+        }
     }
 }

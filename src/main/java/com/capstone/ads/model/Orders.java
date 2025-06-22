@@ -10,7 +10,6 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,17 +24,27 @@ public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-
-    @CreationTimestamp
-    LocalDateTime orderDate;
-
-    LocalDateTime deliveryDate;
-    String address;
-    Double totalAmount;
-    Double depositAmount;
-    Double remainingAmount;
+    String address;                         //Địa chỉ giao hàng
+    Long totalAmount;
+    Long depositAmount;
+    Long remainingAmount;
     String note;
 
+    String draftImageUrl;                   //Hình ảnh sản phẩm bắt đầu thi công
+    String productImageUrl;                 //Hình ảnh sản phẩm sau khi hoàn thành
+    String deliveryImageUrl;                //Hình ảnh chuẩn bị giao hàng
+    String installationImageUrl;            //Hình ảnh sau khi lắp đặt sau
+
+    LocalDateTime estimatedDeliveryDate;    //Ngày giao dự tính
+    LocalDateTime depositPaidDate;          //Ngày khách hàng đặt cọc
+    LocalDateTime productionStartDate;      //Ngày bắt đầu thi công
+    LocalDateTime productionEndDate;        //Ngày thi công xong
+    LocalDateTime deliveryStartDate;        //Ngày băt đầu vận chuyển
+    LocalDateTime actualDeliveryDate;       //Ngày giao hàng thực té
+    LocalDateTime completionDate;           //Ngày khách hàng thanhtoán phần còn lại
+
+    @CreationTimestamp
+    LocalDateTime orderDate;                //Ngày đặt hàng
     @UpdateTimestamp
     LocalDateTime updateDate;
 
@@ -52,9 +61,13 @@ public class Orders {
     @OneToMany(mappedBy = "orders")
     List<Payments> payments;
 
+    @OneToOne(mappedBy = "orders", cascade = CascadeType.ALL)
+    Contract contract;
+
     @OneToOne
     AIDesigns aiDesigns;
 
+
     @OneToOne
-    CustomDesigns customDesigns;
+    CustomDesignRequests customDesignRequests;
 }

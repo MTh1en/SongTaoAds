@@ -1,17 +1,21 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.customerchoice.CustomerChoicesDTO;
-
-import java.util.List;
+import com.capstone.ads.dto.customer_choice.CustomerChoicesDTO;
+import com.capstone.ads.model.CustomerChoices;
 
 public interface CustomerChoicesService {
-    CustomerChoicesDTO create(String customerId, String productTypeId);
+    CustomerChoicesDTO createCustomerChoice(String customerId, String productTypeId);
 
-    CustomerChoicesDTO finish(String customerId, String productTypeId);
+    CustomerChoicesDTO findCustomerChoiceById(String customerChoiceId);
 
-    CustomerChoicesDTO findById(String customerChoiceId);
+    CustomerChoicesDTO findCustomerChoiceByUserId(String userId);
 
-    CustomerChoicesDTO findNewestByUserId(String userId);
+    void hardDeleteCustomerChoice(String id);
 
-    void delete(String id);
+    //Internal Function
+    CustomerChoices getCustomerChoiceById(String customerChoiceId);
+
+    void validateCustomerChoiceExists(String customerChoiceId);
+
+    void recalculateTotalAmount(CustomerChoices customerChoice);
 }

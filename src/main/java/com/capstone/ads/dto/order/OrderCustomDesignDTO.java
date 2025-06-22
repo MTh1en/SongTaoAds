@@ -1,6 +1,5 @@
 package com.capstone.ads.dto.order;
 
-import com.capstone.ads.model.enums.CustomDesignStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,10 +12,8 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderCustomDesignDTO {
     String id;
-    String image;
-    String customerNote;
-    String designerDescription;
+    String requirements;
+    String finalDesignImage;
     LocalDateTime createAt;
     LocalDateTime updateAt;
-    CustomDesignStatus status;
 }

@@ -19,25 +19,61 @@ public class OrderStateValidator {
     }
 
     private void initializeValidTransitions() {
-        validTransitions.put(OrderStatus.PENDING, Set.of(
+        validTransitions.put(OrderStatus.PENDING_CONTRACT, Set.of(
                 OrderStatus.CANCELLED,
-                OrderStatus.APPROVED,
-                OrderStatus.REJECTED
+                OrderStatus.CONTRACT_SENT
         ));
 
-        validTransitions.put(OrderStatus.APPROVED, Set.of(
+        validTransitions.put(OrderStatus.CONTRACT_SENT, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.CONTRACT_SIGNED,
+                OrderStatus.CONTRACT_DISCUSS
+        ));
+
+        validTransitions.put(OrderStatus.CONTRACT_DISCUSS, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.CONTRACT_SENT
+        ));
+
+        validTransitions.put(OrderStatus.CONTRACT_SIGNED, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.CONTRACT_CONFIRMED
+        ));
+
+        validTransitions.put(OrderStatus.CONTRACT_CONFIRMED, Set.of(
+                OrderStatus.CANCELLED,
                 OrderStatus.DEPOSITED
         ));
 
         validTransitions.put(OrderStatus.DEPOSITED, Set.of(
                 OrderStatus.CANCELLED,
-                OrderStatus.PROCESSING
+                OrderStatus.IN_PROGRESS
         ));
 
-        validTransitions.put(OrderStatus.PROCESSING, Set.of(
+        validTransitions.put(OrderStatus.IN_PROGRESS, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.PRODUCING
+        ));
+
+        validTransitions.put(OrderStatus.PRODUCING, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.PRODUCTION_COMPLETED
+        ));
+
+        validTransitions.put(OrderStatus.PRODUCTION_COMPLETED, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.DELIVERING
+        ));
+
+        validTransitions.put(OrderStatus.DELIVERING, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.INSTALLED
+        ));
+
+        validTransitions.put(OrderStatus.INSTALLED, Set.of(
                 OrderStatus.COMPLETED
         ));
-        validTransitions.put(OrderStatus.REJECTED, Set.of());
+
         validTransitions.put(OrderStatus.CANCELLED, Set.of());
         validTransitions.put(OrderStatus.COMPLETED, Set.of());
     }

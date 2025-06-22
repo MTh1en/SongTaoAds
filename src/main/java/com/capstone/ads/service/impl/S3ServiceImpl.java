@@ -11,19 +11,17 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class S3ServiceImpl implements S3Service {
-
-    private final S3Repository s3Repository;
-
     @Value("${aws.bucket.name}")
     private String bucketName;
 
+    private final S3Repository s3Repository;
+
     @Override
-    public String uploadSingleFile(MultipartFile file) {
+    public String uploadSingleFile(String keyName, MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File cannot be null or empty");
         }
-        String fileName = file.getOriginalFilename();
-        return s3Repository.uploadSingleFile(bucketName, file, fileName);
+        return s3Repository.uploadSingleFile(bucketName, file, keyName);
     }
 
     @Override

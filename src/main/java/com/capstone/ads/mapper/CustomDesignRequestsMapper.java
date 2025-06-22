@@ -1,7 +1,7 @@
 package com.capstone.ads.mapper;
 
-import com.capstone.ads.dto.customdesignrequest.CustomDesignRequestCreateRequest;
-import com.capstone.ads.dto.customdesignrequest.CustomDesignRequestDTO;
+import com.capstone.ads.dto.custom_design_request.CustomDesignRequestCreateRequest;
+import com.capstone.ads.dto.custom_design_request.CustomDesignRequestDTO;
 import com.capstone.ads.model.CustomDesignRequests;
 import com.capstone.ads.model.CustomerDetail;
 import com.capstone.ads.model.Users;
@@ -19,7 +19,7 @@ public interface CustomDesignRequestsMapper {
 
     @Mapping(target = "assignDesigner", ignore = true)
     @Mapping(target = "customerDetail", expression = "java(mapToCustomerDetail(customerDetailId))")
-    @Mapping(target = "createdAt", expression = "java(initCreateAt())")
+    @Mapping(target = "createAt", expression = "java(initCreateAt())")
     @Mapping(target = "status", expression = "java(initStatus())")
     CustomDesignRequests toEntity(CustomDesignRequestCreateRequest request, String customerDetailId);
 

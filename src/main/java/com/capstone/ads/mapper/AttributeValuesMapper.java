@@ -1,8 +1,8 @@
 package com.capstone.ads.mapper;
 
-import com.capstone.ads.dto.attributevalue.AttributeValuesCreateRequest;
-import com.capstone.ads.dto.attributevalue.AttributeValuesDTO;
-import com.capstone.ads.dto.attributevalue.AttributeValuesUpdateRequest;
+import com.capstone.ads.dto.attribute_value.AttributeValuesCreateRequest;
+import com.capstone.ads.dto.attribute_value.AttributeValuesDTO;
+import com.capstone.ads.dto.attribute_value.AttributeValuesUpdateRequest;
 import com.capstone.ads.model.AttributeValues;
 import com.capstone.ads.model.Attributes;
 import org.mapstruct.Mapper;

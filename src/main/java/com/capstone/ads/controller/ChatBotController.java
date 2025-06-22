@@ -4,6 +4,8 @@ import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.chatBot.*;
 import com.capstone.ads.service.ChatBotService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/chat-bot")
 @RequiredArgsConstructor
+@Tag(name = "CHAT BOT")
 public class ChatBotController {
     private final ChatBotService chatBotService;
 

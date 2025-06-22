@@ -6,14 +6,13 @@ import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.AIDesignsMapper;
 import com.capstone.ads.model.AIDesigns;
-import com.capstone.ads.repository.external.S3Repository;
 import com.capstone.ads.repository.internal.AIDesignsRepository;
-import com.capstone.ads.repository.internal.CustomerDetailRepository;
-import com.capstone.ads.repository.internal.DesignTemplatesRepository;
 import com.capstone.ads.service.AIDesignsService;
+import com.capstone.ads.service.CustomerDetailService;
+import com.capstone.ads.service.DesignTemplatesService;
+import com.capstone.ads.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,25 +27,22 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class AIDesignsServiceImpl implements AIDesignsService {
-    @Value("${aws.bucket.name}")
-    private String bucketName;
-
-    private final CustomerDetailRepository customerDetailRepository;
-    private final DesignTemplatesRepository designTemplatesRepository;
-    private final S3Repository s3Repository;
+    private final CustomerDetailService customerDetailService;
+    private final DesignTemplatesService designTemplatesService;
+    private final S3Service s3Service;
     private final AIDesignsRepository aiDesignsRepository;
     private final AIDesignsMapper aiDesignsMapper;
 
     @Override
     @Transactional
     public AIDesignDTO createAIDesign(String customerDetailId, String designTemplateId, String customerNote, MultipartFile aiImage) {
-        customerDetailRepository.findById(customerDetailId)
-                .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
-        designTemplatesRepository.findByIdAndIsAvailable(designTemplateId, true)
-                .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
+        customerDetailService.validateCustomerDetailExists(customerDetailId);
+        designTemplatesService.validateDesignTemplateExistsAndAvailable(designTemplateId);
+
         AIDesigns aiDesigns = aiDesignsMapper.toEntity(customerDetailId, designTemplateId, customerNote);
         String aiDesignImageUrl = uploadAIDesignImageToS3(customerDetailId, aiImage);
         aiDesigns.setImage(aiDesignImageUrl);
+
         aiDesigns = aiDesignsRepository.save(aiDesigns);
         return aiDesignsMapper.toDTO(aiDesigns);
     }
@@ -68,10 +64,16 @@ public class AIDesignsServiceImpl implements AIDesignsService {
         aiDesignsRepository.deleteById(AIDesignId);
     }
 
+    @Override
+    public AIDesigns getAIDesignById(String AIDesignId) {
+        return aiDesignsRepository.findById(AIDesignId)
+                .orElseThrow(() -> new AppException(ErrorCode.AI_DESIGN_NOT_FOUND));
+    }
+
     private AIDesignDTO convertToAIDesignDTOWithImageIsPresignedURL(AIDesigns aiDesigns) {
         var aiDesignDTOResponse = aiDesignsMapper.toDTO(aiDesigns);
         if (!Objects.isNull(aiDesigns.getImage())) {
-            var designTemplateImagePresigned = s3Repository.generatePresignedUrl(bucketName, aiDesigns.getImage(), S3ImageDuration.CUSTOM_DESIGN_DURATION);
+            var designTemplateImagePresigned = s3Service.getPresignedUrl(aiDesigns.getImage(), S3ImageDuration.CUSTOM_DESIGN_DURATION);
             aiDesignDTOResponse.setImage(designTemplateImagePresigned);
         }
         return aiDesignDTOResponse;
@@ -86,7 +88,7 @@ public class AIDesignsServiceImpl implements AIDesignsService {
         if (file.isEmpty()) {
             throw new AppException(ErrorCode.FILE_REQUIRED);
         }
-        s3Repository.uploadSingleFile(bucketName, file, AIDesignImageKey);
+        s3Service.uploadSingleFile(AIDesignImageKey, file);
         return AIDesignImageKey;
     }
 }

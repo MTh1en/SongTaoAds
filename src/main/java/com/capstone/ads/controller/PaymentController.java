@@ -1,10 +1,12 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.payment.CreatePaymentRequest;
 import com.capstone.ads.service.PaymentService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import vn.payos.type.CheckoutResponseData;
@@ -14,32 +16,49 @@ import vn.payos.type.WebhookData;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Slf4j
+@Tag(name = "PAYMENT")
 public class PaymentController {
     private final PaymentService paymentService;
 
-    @PostMapping("/payments/deposit")
-    public ApiResponse<CheckoutResponseData> createPaymentDepositAmount(@RequestBody CreatePaymentRequest request) throws Exception {
-        CheckoutResponseData response = paymentService.createDepositPaymentLink(request);
+    @PostMapping("/orders/{orderId}/deposit")
+    @Operation(summary = "Đặt cọc theo đơn hàng")
+    public ApiResponse<CheckoutResponseData> createOrderDepositPaymentLink(@PathVariable String orderId) throws Exception {
+        CheckoutResponseData response = paymentService.createOrderDepositPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
-    @PostMapping("/payments/remaining")
-    public ApiResponse<CheckoutResponseData> createPaymentRemainingAmount(@RequestBody CreatePaymentRequest request) throws Exception {
-        CheckoutResponseData response = paymentService.createRemainingPaymentLink(request);
+    @PostMapping("/orders/{orderId}/remaining")
+    @Operation(summary = "Thanh toán hết đơn hàng")
+    public ApiResponse<CheckoutResponseData> createOrderRemainingPaymentLink(@PathVariable String orderId) throws Exception {
+        CheckoutResponseData response = paymentService.createOrderRemainingPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
-    @GetMapping("orders/{orderId}/callback")
-    public ApiResponse<Void> payOsCallback(@PathVariable String orderId) {
-        paymentService.handlePayOsCallback(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Callback processed successfully", null);
+    @PostMapping("/custom-design-requests/{customDesignRequestId}/deposit")
+    @Operation(summary = "Đặt cọc yêu cầu thiết kế")
+    public ApiResponse<CheckoutResponseData> createCustomDesignRequestDepositPaymentLink(@PathVariable String customDesignRequestId) throws Exception {
+        CheckoutResponseData response = paymentService.createCustomDesignRequestDepositPaymentLink(customDesignRequestId);
+        return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
+    }
+
+    @PostMapping("/custom-design-requests/{customDesignRequestId}/remaining")
+    @Operation(summary = "Thanh toán hết thiết kế")
+    public ApiResponse<CheckoutResponseData> createCustomDesignRequestRemainingPaymentLink(@PathVariable String customDesignRequestId) throws Exception {
+        CheckoutResponseData response = paymentService.createCustomDesignRequestRemainingPaymentLink(customDesignRequestId);
+        return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
     @PostMapping("/webhook/handle-webhook")
-    public ApiResponse<String> handleWebHook(@RequestBody Webhook webhook) throws Exception {
+    public WebhookData handleWebHook(@RequestBody Webhook webhook) throws Exception {
         WebhookData webhookData = paymentService.verifyPaymentWebhookData(webhook);
-        paymentService.updateOrderStatusByWebhookData(webhookData);
-        return ApiResponseBuilder.buildSuccessResponse("Handle callback successfully", null);
+        log.info("Webhook verified: {}", webhook.getCode());
+        log.info("Webhook verified: {}", webhook.getSuccess());
+        log.info("Webhook verified: {}", webhook.getData());
+        log.info("Webhook verified: {}", webhook.getDesc());
+
+        paymentService.updateStatusByWebhookData(webhook);
+        return webhookData;
     }
 
     @PostMapping("/webhook/confirm-webhook-url")

@@ -1,11 +1,10 @@
 package com.capstone.ads.mapper;
 
-import com.capstone.ads.dto.stablediffusion.TextToImageRequest;
-import com.capstone.ads.dto.stablediffusion.controlnet.AlwaysonScripts;
-import com.capstone.ads.dto.stablediffusion.controlnet.Args;
-import com.capstone.ads.dto.stablediffusion.controlnet.ControlNet;
-import com.capstone.ads.dto.stablediffusion.progress.ProgressRequest;
-import org.apache.logging.log4j.util.Strings;
+import com.capstone.ads.dto.stable_diffusion.TextToImageRequest;
+import com.capstone.ads.dto.stable_diffusion.controlnet.AlwaysonScripts;
+import com.capstone.ads.dto.stable_diffusion.controlnet.Args;
+import com.capstone.ads.dto.stable_diffusion.controlnet.ControlNet;
+import com.capstone.ads.dto.stable_diffusion.progress.ProgressRequest;
 import org.mapstruct.Mapper;
 
 import java.util.Collections;

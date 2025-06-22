@@ -1,20 +1,21 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.attributevalue.AttributeValuesCreateRequest;
-import com.capstone.ads.dto.attributevalue.AttributeValuesDTO;
-import com.capstone.ads.dto.attributevalue.AttributeValuesUpdateRequest;
+import com.capstone.ads.dto.attribute_value.AttributeValuesCreateRequest;
+import com.capstone.ads.dto.attribute_value.AttributeValuesDTO;
+import com.capstone.ads.dto.attribute_value.AttributeValuesUpdateRequest;
+import com.capstone.ads.model.AttributeValues;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
 public interface AttributeValuesService {
-    AttributeValuesDTO create(String attributesId, AttributeValuesCreateRequest request);
+    AttributeValuesDTO createAttributeValue(String attributesId, AttributeValuesCreateRequest request);
 
-    AttributeValuesDTO update(String attributeValueId, AttributeValuesUpdateRequest request);
+    AttributeValuesDTO updateAttributeValueInformation(String attributeValueId, AttributeValuesUpdateRequest request);
 
-    AttributeValuesDTO findById(String id);
+    AttributeValuesDTO findAttributeValueById(String attributeValueId);
 
-    Page<AttributeValuesDTO> findAllByAttributesId(String attributesId, int page, int size);
+    Page<AttributeValuesDTO> findAllAttributeValueByAttributesId(String attributesId, int page, int size);
 
-    void delete(String id);
+    void hardDeleteAttributeValue(String attributeValueId);
+
+    AttributeValues getAttributeValueById(String attributeValueId);
 }

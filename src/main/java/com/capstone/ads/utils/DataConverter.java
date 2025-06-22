@@ -13,4 +13,9 @@ public class DataConverter {
     public static byte[] convertBase64ToByteArray(String base64) {
         return Base64.getDecoder().decode(base64);
     }
+
+    public static int convertDoubleToInt(double d) {
+        long rounded = Math.round(d);
+        return Math.toIntExact(rounded);
+    }
 }

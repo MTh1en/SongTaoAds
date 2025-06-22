@@ -3,18 +3,20 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.size.SizeCreateRequest;
 import com.capstone.ads.dto.size.SizeDTO;
 import com.capstone.ads.dto.size.SizeUpdateRequest;
+import org.hibernate.engine.jdbc.Size;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
 public interface SizeService {
-    SizeDTO create(SizeCreateRequest request);
+    SizeDTO createSize(SizeCreateRequest request);
 
-    SizeDTO update(String id, SizeUpdateRequest request);
+    SizeDTO updateSizeInformation(String id, SizeUpdateRequest request);
 
-    SizeDTO findById(String id);
+    SizeDTO findSizeById(String id);
 
-    Page<SizeDTO> findAll(int page, int size);
+    Page<SizeDTO> findAllSize(int page, int size);
 
-    void delete(String id);
+    void hardDeleteSize(String id);
+
+    //INTERNAL FUNCTION
+    void validateSizeExistsAndIsAvailable(String sizeId);
 }

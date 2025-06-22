@@ -2,54 +2,61 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.attributevalue.AttributeValuesCreateRequest;
-import com.capstone.ads.dto.attributevalue.AttributeValuesDTO;
-import com.capstone.ads.dto.attributevalue.AttributeValuesUpdateRequest;
+import com.capstone.ads.dto.attribute_value.AttributeValuesCreateRequest;
+import com.capstone.ads.dto.attribute_value.AttributeValuesDTO;
+import com.capstone.ads.dto.attribute_value.AttributeValuesUpdateRequest;
 import com.capstone.ads.service.AttributeValuesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Tag(name = "ATTRIBUTE VALUE")
 public class AttributeValuesController {
     private final AttributeValuesService service;
 
     @PostMapping("/attributes/{attributeId}/attribute-values")
-    public ApiResponse<AttributeValuesDTO> create(@Valid @PathVariable String attributeId,
+    @Operation(summary = "Tạo giá trị thuộc tính")
+    public ApiResponse<AttributeValuesDTO> createAttributeValue(@Valid @PathVariable String attributeId,
                                                   @RequestBody AttributeValuesCreateRequest request) {
-        var response = service.create(attributeId, request);
+        var response = service.createAttributeValue(attributeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create attribute value successful", response);
     }
 
     @PutMapping("/attribute-values/{attributeValueId}")
-    public ApiResponse<AttributeValuesDTO> update(@Valid @PathVariable String attributeValueId,
+    @Operation(summary = "Cập nhật lại giá trị thuộc tính")
+    public ApiResponse<AttributeValuesDTO> updateAttributeValueInformation(@Valid @PathVariable String attributeValueId,
                                                   @RequestBody AttributeValuesUpdateRequest request) {
-        var response = service.update(attributeValueId, request);
+        var response = service.updateAttributeValueInformation(attributeValueId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update attribute value successful", response);
     }
 
     @GetMapping("/attribute-values/{attributeValueId}")
-    public ApiResponse<AttributeValuesDTO> getById(@PathVariable String attributeValueId) {
-        var response = service.findById(attributeValueId);
+    @Operation(summary = "Xem giá trị thuộc tính theo ID")
+    public ApiResponse<AttributeValuesDTO> findAttributeValueById(@PathVariable String attributeValueId) {
+        var response = service.findAttributeValueById(attributeValueId);
         return ApiResponseBuilder.buildSuccessResponse("attribute value by Id", response);
     }
 
     @GetMapping("/attributes/{attributeId}/attribute-values")
-    public ApiPagingResponse<AttributeValuesDTO> getAllByAttributes(@PathVariable String attributeId,
-                                                                    @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                                    @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = service.findAllByAttributesId(attributeId, page, size);
+    @Operation(summary = "Xem giá trị theo từng thuộc tính")
+    public ApiPagingResponse<AttributeValuesDTO> findAllAttributeValueByAttributesId(
+            @PathVariable String attributeId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findAllAttributeValueByAttributesId(attributeId, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find all attribute value by attribute", response, page);
     }
 
     @DeleteMapping("/attribute-values/{attributeValueId}")
-    public ApiResponse<Void> delete(@PathVariable String attributeValueId) {
-        service.delete(attributeValueId);
+    @Operation(summary = "Xóa cứng giá trị thuộc tính (Không dùng)")
+    public ApiResponse<Void> hardDeleteAttributeValue(@PathVariable String attributeValueId) {
+        service.hardDeleteAttributeValue(attributeValueId);
         return ApiResponseBuilder.buildSuccessResponse("Delete attribute value successful", null);
     }
 }
