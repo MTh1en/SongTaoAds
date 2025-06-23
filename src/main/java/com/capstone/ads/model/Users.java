@@ -56,4 +56,7 @@ public class Users {
 
     @OneToMany(mappedBy = "users")
     List<ChatBotLog> chatBotLogs;
+
+    @OneToMany(mappedBy = "sendBy")
+    List<Feedbacks> feedbacks;
 }

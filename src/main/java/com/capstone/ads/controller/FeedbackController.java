@@ -1,0 +1,68 @@
+package com.capstone.ads.controller;
+
+import com.capstone.ads.dto.ApiPagingResponse;
+import com.capstone.ads.dto.ApiResponse;
+import com.capstone.ads.dto.feedback.FeedbackDTO;
+import com.capstone.ads.dto.feedback.FeedbackResponseRequest;
+import com.capstone.ads.dto.feedback.FeedbackSendRequest;
+import com.capstone.ads.service.FeedbackService;
+import com.capstone.ads.utils.ApiResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api")
+@Tag(name = "FEEDBACK")
+public class FeedbackController {
+    private final FeedbackService feedbackService;
+
+    @PostMapping(value = "/orders/{orderId}/feedbacks", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Gửi feedback sau khi hoàn tất đơn hàng")
+    public ApiResponse<FeedbackDTO> sendFeedback(@PathVariable String orderId,
+                                                 @Valid @ModelAttribute FeedbackSendRequest request) {
+        var response = feedbackService.sendFeedback(orderId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Send feedback successful", response);
+    }
+
+    @PatchMapping("/feedbacks/{feedbackId}/response")
+    @Operation(summary = "Phản hồi feedback của khách hàng")
+    public ApiResponse<FeedbackDTO> responseFeedback(@Valid @PathVariable String feedbackId,
+                                                     @RequestBody FeedbackResponseRequest request) {
+        var response = feedbackService.responseFeedback(feedbackId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Response feedback successful", response);
+    }
+
+    @GetMapping("/orders/{orderId}/feedbacks")
+    @Operation(summary = "Xem phản hồi theo đơn hàng")
+    public ApiResponse<List<FeedbackDTO>> findFeedbackByOrderId(@PathVariable String orderId) {
+        var response = feedbackService.findFeedbackByOrderId(orderId);
+        return ApiResponseBuilder.buildSuccessResponse("Find feedback by Order successful", response);
+    }
+
+    @GetMapping("/users/{userId}/feedbacks")
+    @Operation(summary = "Xem phản hồi theo người dùng")
+    public ApiPagingResponse<FeedbackDTO> findFeedbackByUserId(
+            @PathVariable String userId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = feedbackService.findFeedbackByUserId(userId, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find Feedback by User successful", response, page);
+    }
+
+    @GetMapping("/feedbacks")
+    @Operation(summary = "Xem tất cả cá phản hồi")
+    public ApiPagingResponse<FeedbackDTO> findAllFeedback(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = feedbackService.findAllFeedback(page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find Feedback successful", response, page);
+    }
+}

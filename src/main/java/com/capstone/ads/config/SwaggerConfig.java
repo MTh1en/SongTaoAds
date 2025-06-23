@@ -42,6 +42,7 @@ public class SwaggerConfig {
                 .addTagsItem(new Tag().name("ORDER").description("Đơn hàng"))
                 .addTagsItem(new Tag().name("CONTRACT").description("Hợp đồng"))
                 .addTagsItem(new Tag().name("PAYMENT").description("Thanh toán"))
+                .addTagsItem(new Tag().name("FEEDBACK").description("Đánh giá"))
                 .addTagsItem(new Tag().name("PRODUCT TYPE").description("Loại sản phẩm"))
                 .addTagsItem(new Tag().name("PRODUCT TYPE SIZE").description("Kích thước sản phâm sử dụng"))
                 .addTagsItem(new Tag().name("SIZE").description("Kích thước"))
@@ -50,7 +51,6 @@ public class SwaggerConfig {
                 .addTagsItem(new Tag().name("CHAT BOT").description("Ai chat"))
                 .addTagsItem(new Tag().name("STABLE DIFFUSION").description("Ai image"))
                 .addTagsItem(new Tag().name("AWS S3").description("Xử lý file với S3"))
-                .addTagsItem(new Tag().name("CALCULATE FORMULA").description("Test công thức"))
                 ;
     }
 }
