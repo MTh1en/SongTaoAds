@@ -18,7 +18,6 @@ public interface ContractMapper {
     @Mapping(target = "status", expression = "java(sendContractStatus())")
     Contract sendContract(ContractSendRequest request, String contractUrl);
 
-    @Mapping(target = "signedContractUrl", source = "signedContractUrl")
     @Mapping(target = "signedDate", expression = "java(initLocalDateTime())")
     @Mapping(target = "status", expression = "java(sendSingedContractStatus())")
     void sendSingedContract(String signedContractUrl, @MappingTarget Contract contract);
