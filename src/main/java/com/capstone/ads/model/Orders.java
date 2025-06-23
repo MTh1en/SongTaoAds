@@ -61,12 +61,14 @@ public class Orders {
     @OneToMany(mappedBy = "orders")
     List<Payments> payments;
 
+    @OneToMany(mappedBy = "orders")
+    List<Feedbacks> feedbacks;
+
     @OneToOne(mappedBy = "orders", cascade = CascadeType.ALL)
     Contract contract;
 
     @OneToOne
     AIDesigns aiDesigns;
-
 
     @OneToOne
     CustomDesignRequests customDesignRequests;
