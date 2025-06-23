@@ -24,12 +24,20 @@ import java.util.List;
 public class FeedbackController {
     private final FeedbackService feedbackService;
 
-    @PostMapping(value = "/orders/{orderId}/feedbacks", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("/orders/{orderId}/feedbacks")
     @Operation(summary = "Gửi feedback sau khi hoàn tất đơn hàng")
     public ApiResponse<FeedbackDTO> sendFeedback(@PathVariable String orderId,
-                                                 @Valid @ModelAttribute FeedbackSendRequest request) {
+                                                 @Valid @RequestBody FeedbackSendRequest request) {
         var response = feedbackService.sendFeedback(orderId, request);
         return ApiResponseBuilder.buildSuccessResponse("Send feedback successful", response);
+    }
+
+    @PatchMapping(value = "/feedbacks/{feedbackId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "cập nhật hình ảnh feedback")
+    public ApiResponse<FeedbackDTO> uploadFeedbackImage(@PathVariable String feedbackId,
+                                                        @RequestPart MultipartFile feedbackImage) {
+        var response = feedbackService.uploadFeedbackImage(feedbackId, feedbackImage);
+        return ApiResponseBuilder.buildSuccessResponse("Upload feedback image successful", response);
     }
 
     @PatchMapping("/feedbacks/{feedbackId}/response")
@@ -64,5 +72,12 @@ public class FeedbackController {
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = feedbackService.findAllFeedback(page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find Feedback successful", response, page);
+    }
+
+    @DeleteMapping("/feedbacks/{feedbackId}")
+    @Operation(summary = "Xóa cứng phản hồi")
+    public ApiResponse<Void> hardDeleteFeedback(@PathVariable String feedbackId) {
+        feedbackService.hardDeleteFeedback(feedbackId);
+        return ApiResponseBuilder.buildSuccessResponse("Delete feedback successful", null);
     }
 }
