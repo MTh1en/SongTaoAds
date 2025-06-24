@@ -1,10 +1,12 @@
 package com.capstone.ads.model.enums;
 
 public enum OrderStatus {
+    PENDING_DESIGN,
     PENDING_CONTRACT,
     CONTRACT_SENT,
     CONTRACT_SIGNED,
     CONTRACT_DISCUSS,
+    CONTRACT_RESIGNED,
     CONTRACT_CONFIRMED,
     DEPOSITED,
     IN_PROGRESS,

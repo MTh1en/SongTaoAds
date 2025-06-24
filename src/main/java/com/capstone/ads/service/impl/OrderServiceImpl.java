@@ -8,9 +8,11 @@ import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.OrdersMapper;
 import com.capstone.ads.model.*;
+import com.capstone.ads.model.enums.ContractStatus;
 import com.capstone.ads.model.enums.OrderStatus;
 import com.capstone.ads.repository.internal.OrdersRepository;
 import com.capstone.ads.service.*;
+import com.capstone.ads.utils.ContractStateValidator;
 import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
 import com.capstone.ads.utils.OrderStateValidator;
 import com.capstone.ads.utils.SecurityContextUtils;
@@ -36,6 +38,7 @@ public class OrderServiceImpl implements OrderService {
     private final SecurityContextUtils securityContextUtils;
     private final CustomerChoiceHistoriesConverter customerChoiceHistoriesConverter;
     private final OrderStateValidator orderStateValidator;
+    private final ContractStateValidator contractStateValidator;
     private final CustomDesignRequestService customDesignRequestService;
     private final CustomerChoicesService customerChoicesService;
     private final AIDesignsService aiDesignsService;
@@ -47,11 +50,8 @@ public class OrderServiceImpl implements OrderService {
         Users users = securityContextUtils.getCurrentUser();
 
         Orders orders = orderMapper.toEntityFromCreateOrderByCustomDesign(customDesignRequests, users);
-        orders.setCustomerChoiceHistories(customDesignRequests.getCustomerChoiceHistories() != null
-                ? customDesignRequests.getCustomerChoiceHistories()
-                : null);
-        orders.setTotalAmount(customDesignRequests.getCustomerChoiceHistories().getTotalAmount());
         orders.setCustomerChoiceHistories(customDesignRequests.getCustomerChoiceHistories());
+        orders.setTotalAmount(customDesignRequests.getCustomerChoiceHistories().getTotalAmount());
 
         orderRepository.save(orders);
         return orderMapper.toDTO(orders);
@@ -69,6 +69,19 @@ public class OrderServiceImpl implements OrderService {
         orders.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
 
         orders = orderRepository.save(orders);
+        return orderMapper.toDTO(orders);
+    }
+
+    @Override
+    @Transactional
+    public OrderDTO saleRequestCustomerResignContract(String orderId) {
+        Orders orders = getOrderById(orderId);
+        orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.CONTRACT_RESIGNED);
+        contractStateValidator.validateTransition(orders.getContract().getStatus(), ContractStatus.NEED_RESIGNED);
+
+        orders.setStatus(OrderStatus.CONTRACT_RESIGNED);
+        orders.getContract().setStatus(ContractStatus.NEED_RESIGNED);
+        orderRepository.save(orders);
         return orderMapper.toDTO(orders);
     }
 
@@ -213,6 +226,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void updateOrderStatus(String orderId, OrderStatus status) {
         Orders orders = getOrderById(orderId);
         orderStateValidator.validateTransition(orders.getStatus(), status);
@@ -221,6 +235,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void updateOrderFromWebhookResult(Orders orders, boolean isDeposit) {
         if (isDeposit) {
             orders.setStatus(OrderStatus.DEPOSITED);

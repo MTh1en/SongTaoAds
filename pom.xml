@@ -119,6 +119,11 @@
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-openai</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>4.1.120.Final</version> <!-- Hoặc phiên bản mới nhất -->
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
