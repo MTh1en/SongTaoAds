@@ -41,6 +41,13 @@ public class OrderController {
         return ApiResponseBuilder.buildSuccessResponse("Create order successful", response);
     }
 
+    @PatchMapping("/orders/{orderId}/contract-resign")
+    @Operation(summary = "Sale yêu cầu khách hàng gửi lại bạn hợp đồng đã ký")
+    public ApiResponse<OrderDTO> saleRequestCustomerResignContract(@PathVariable String orderId) {
+        var response = orderService.saleRequestCustomerResignContract(orderId);
+        return ApiResponseBuilder.buildSuccessResponse("Sale request customer resign contract", response);
+    }
+
     @PatchMapping("/orders/{orderId}/contract-signed")
     @Operation(summary = "Sale xác nhận đơn hàng đã ký")
     public ApiResponse<OrderDTO> saleConfirmContractSigned(@PathVariable String orderId) {
