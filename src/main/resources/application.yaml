@@ -9,8 +9,8 @@ spring:
     password: ${DBMS_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      minimum-idle: 3
-      maximum-pool-size: 12
+      minimum-idle: 5
+      maximum-pool-size: 10
       idle-timeout: 30000
       max-lifetime: 1800000
       connection-timeout: 20000
@@ -29,9 +29,9 @@ spring:
       connect-timeout: 2000
       lettuce:
         pool:
-          max-active: 10
-          max-idle: 5
-          min-idle: 2
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
           max-wait: 2000
         shutdown-timeout: 1000
   servlet:
@@ -39,7 +39,6 @@ spring:
       enabled: true
       max-file-size: 50MB
       max-request-size: 10MB
-
   ai:
     openai:
       api-key: ${OPEN_AI_KEY}

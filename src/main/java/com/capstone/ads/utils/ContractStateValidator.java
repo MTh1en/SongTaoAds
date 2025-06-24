@@ -27,8 +27,12 @@ public class ContractStateValidator {
         validTransitions.put(ContractStatus.NEED_DISCUSS, Set.of(
                 ContractStatus.SENT
         ));
-
-        validTransitions.put(ContractStatus.SIGNED, Set.of());
+        validTransitions.put(ContractStatus.NEED_RESIGNED, Set.of(
+                ContractStatus.SIGNED
+        ));
+        validTransitions.put(ContractStatus.SIGNED, Set.of(
+                ContractStatus.NEED_RESIGNED
+        ));
     }
 
     public boolean isValidTransition(ContractStatus currentStatus, ContractStatus newStatus) {

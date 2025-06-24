@@ -13,6 +13,8 @@ public interface OrderService {
 
     OrderDTO createOrderByAIDesign(String aiDesignId, String customerChoiceId);
 
+    OrderDTO saleRequestCustomerResignContract(String orderId);
+
     OrderDTO saleConfirmContractSigned(String orderId);
 
     OrderDTO customerProvideAddress(String orderId, OrderUpdateAddressRequest request);
