@@ -73,7 +73,10 @@ public class CustomDesignRequestsController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findCustomerDesignRequestByCustomerDetailId(customerDetailId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request by custom detail request successful", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse(
+                "Find custom design request by custom detail request successful",
+                response, page
+        );
     }
 
     @GetMapping("/users/{designerId}/custom-design-requests")
@@ -83,7 +86,10 @@ public class CustomDesignRequestsController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findCustomerDetailRequestByAssignDesignerId(designerId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request by designer request successful", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse(
+                "Find custom design request by designer request successful",
+                response, page
+        );
     }
 
     @GetMapping("/custom-design-requests")
@@ -93,6 +99,8 @@ public class CustomDesignRequestsController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findCustomerDetailRequestByStatus(status, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request by status successful", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request by status successful",
+                response, page
+        );
     }
 }

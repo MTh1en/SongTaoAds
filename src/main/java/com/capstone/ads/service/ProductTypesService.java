@@ -3,6 +3,7 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.product_type.ProductTypeCreateRequest;
 import com.capstone.ads.dto.product_type.ProductTypeDTO;
 import com.capstone.ads.dto.product_type.ProductTypeUpdateRequest;
+import com.capstone.ads.model.ProductTypes;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,4 +22,6 @@ public interface ProductTypesService {
 
     //INTERNAL FUNCTION
     void validateProductTypeExistsAndAvailable(String productTypeId);
+
+    ProductTypes getProductTypeByIdAndAvailable(String productTypeId);
 }

@@ -16,13 +16,13 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class ProductTypes {
+public class CostTypes {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String name;
-    String image;
-    String calculateFormula;
+    String description;
+    String formula;
     Boolean isAvailable;
 
     @CreationTimestamp
@@ -30,18 +30,9 @@ public class ProductTypes {
     @UpdateTimestamp
     LocalDateTime updateAt;
 
-    @OneToMany(mappedBy = "productTypes")
-    List<Attributes> attributes;
+    @ManyToOne
+    ProductTypes productTypes;
 
-    @OneToMany(mappedBy = "productTypes")
-    List<CustomerChoices> customerChoices;
-
-    @OneToMany(mappedBy = "productTypes")
-    List<ProductTypeSizes> productTypeSizes;
-
-    @OneToMany(mappedBy = "productTypes")
-    List<DesignTemplates> designTemplates;
-
-    @OneToMany(mappedBy = "productTypes")
-    List<CostTypes> costTypes;
+    @OneToMany(mappedBy = "costTypes")
+    List<CustomerChoiceCosts> customerChoiceCosts;
 }

@@ -46,4 +46,11 @@ public class CustomerChoices {
             orphanRemoval = true
     )
     List<CustomerChoiceSizes> customerChoiceSizes;
+
+    @OneToMany(
+            mappedBy = "customerChoices",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    List<CustomerChoiceCosts> customerChoiceCosts;
 }

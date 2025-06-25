@@ -44,6 +44,7 @@ public class SwaggerConfig {
                 .addTagsItem(new Tag().name("PAYMENT").description("Thanh toán"))
                 .addTagsItem(new Tag().name("FEEDBACK").description("Đánh giá"))
                 .addTagsItem(new Tag().name("PRODUCT TYPE").description("Loại sản phẩm"))
+                .addTagsItem(new Tag().name("COST TYPE").description("Loại chi phí"))
                 .addTagsItem(new Tag().name("PRODUCT TYPE SIZE").description("Kích thước sản phâm sử dụng"))
                 .addTagsItem(new Tag().name("SIZE").description("Kích thước"))
                 .addTagsItem(new Tag().name("ATTRIBUTE").description("Thuốc tính"))
