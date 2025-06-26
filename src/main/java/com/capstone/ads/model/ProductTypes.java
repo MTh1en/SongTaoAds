@@ -30,7 +30,7 @@ public class ProductTypes {
     @UpdateTimestamp
     LocalDateTime updateAt;
 
-    @OneToMany(mappedBy = "productTypes")
+    @OneToMany(mappedBy = "productTypes", fetch = FetchType.EAGER)
     List<Attributes> attributes;
 
     @OneToMany(mappedBy = "productTypes")
