@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsService {
     private final CustomerChoicesService customerChoicesService;
+    private final CustomerChoiceCostsService customerChoiceCostsService;
     private final AttributeValuesService attributeValuesService;
     private final CustomerChoiceDetailsRepository customerChoiceDetailsRepository;
     private final CustomerChoiceDetailsMapper customerChoiceDetailsMapper;
@@ -50,7 +51,9 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
 
         customerChoicesDetails = customerChoiceDetailsRepository.save(customerChoicesDetails);
         customerChoices.getCustomerChoiceDetails().add(customerChoicesDetails);
+
         recalculateSubtotal(customerChoicesDetails);
+        customerChoiceCostsService.calculateAllCosts(customerChoices);
         customerChoicesService.recalculateTotalAmount(customerChoices);
         return customerChoiceDetailsMapper.toDTO(customerChoicesDetails);
     }
@@ -68,6 +71,7 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
         customerChoicesDetails = customerChoiceDetailsRepository.save(customerChoicesDetails);
 
         recalculateSubtotal(customerChoicesDetails);
+        customerChoiceCostsService.calculateAllCosts(customerChoicesDetails.getCustomerChoices());
         customerChoicesService.recalculateTotalAmount(customerChoicesDetails.getCustomerChoices());
         return customerChoiceDetailsMapper.toDTO(customerChoicesDetails);
     }

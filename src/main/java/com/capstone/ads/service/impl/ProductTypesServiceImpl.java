@@ -88,13 +88,14 @@ public class ProductTypesServiceImpl implements ProductTypesService {
         }
     }
 
-    private String generateProductTypeImageKey(String productTypeId) {
-        return String.format("product-type/%s/%s", productTypeId, UUID.randomUUID());
-    }
-
-    private ProductTypes getProductTypeByIdAndAvailable(String productTypeId) {
+    @Override
+    public ProductTypes getProductTypeByIdAndAvailable(String productTypeId) {
         return productTypesRepository.findByIdAndIsAvailable(productTypeId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
+    }
+
+    private String generateProductTypeImageKey(String productTypeId) {
+        return String.format("product-type/%s/%s", productTypeId, UUID.randomUUID());
     }
 
     private ProductTypeDTO convertProductTypeToProductTypeDTOWithImageUrl(ProductTypes productTypes) {

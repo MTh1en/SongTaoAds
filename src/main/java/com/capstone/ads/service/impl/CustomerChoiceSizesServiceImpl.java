@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesService {
     private final CustomerChoicesService customerChoicesService;
+    private final CustomerChoiceCostsService customerChoiceCostsService;
     private final SizeService sizeService;
     private final ProductTypeSizesService productTypeSizesService;
     private final CustomerChoiceDetailsService customerChoiceDetailsService;
@@ -49,12 +50,13 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
     @Transactional
     public CustomerChoicesSizeDTO updateValueInCustomerChoiceSize(String customerChoiceSizeId, CustomerChoicesSizeUpdateRequest request) {
         var customerChoicesSize = getCustomerChoiceSizesById(customerChoiceSizeId);
+        CustomerChoices customerChoice = customerChoicesSize.getCustomerChoices();
+
         customerChoiceSizesMapper.updateEntityFromRequest(request, customerChoicesSize);
         customerChoicesSize = customerChoiceSizesRepository.save(customerChoicesSize);
 
-        //Cập nhật lại subtotal và total khi giá thay đổi
-        CustomerChoices customerChoice = customerChoicesSize.getCustomerChoices();
         customerChoice.getCustomerChoiceDetails().forEach(customerChoiceDetailsService::recalculateSubtotal);
+        customerChoiceCostsService.calculateAllCosts(customerChoice);
         customerChoicesService.recalculateTotalAmount(customerChoice);
         return customerChoiceSizesMapper.toDTO(customerChoicesSize);
     }
