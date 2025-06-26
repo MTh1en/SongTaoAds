@@ -36,24 +36,21 @@ public class CustomerChoices {
     @OneToMany(
             mappedBy = "customerChoices",
             cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER
+            orphanRemoval = true
     )
     List<CustomerChoiceDetails> customerChoiceDetails;
 
     @OneToMany(
             mappedBy = "customerChoices",
             cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER
+            orphanRemoval = true
     )
     List<CustomerChoiceSizes> customerChoiceSizes;
 
     @OneToMany(
             mappedBy = "customerChoices",
             cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.EAGER
+            orphanRemoval = true
     )
     List<CustomerChoiceCosts> customerChoiceCosts;
 }

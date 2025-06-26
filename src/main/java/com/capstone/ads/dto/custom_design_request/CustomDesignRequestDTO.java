@@ -20,6 +20,7 @@ public class CustomDesignRequestDTO {
     Long remainingAmount;
     String finalDesignImage;
     Boolean isNeedSupport;
+    Boolean hasOrder;
     CustomerChoiceHistories customerChoiceHistories;
     LocalDateTime createAt;
     LocalDateTime updateAt;

@@ -111,7 +111,9 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequest.setStatus(CustomDesignRequestStatus.COMPLETED);
         customDesignRequestsRepository.save(customDesignRequest);
 
-        customOrderLogicUtils.updateOrderPendingContractAfterCustomDesignRequestCompleted(customDesignRequestId);
+        if (customDesignRequest.getHasOrder()) {
+            customOrderLogicUtils.updateOrderPendingContractAfterCustomDesignRequestCompleted(customDesignRequestId);
+        }
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 

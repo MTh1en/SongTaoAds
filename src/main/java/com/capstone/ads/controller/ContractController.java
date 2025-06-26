@@ -31,7 +31,7 @@ public class ContractController {
         return ApiResponseBuilder.buildSuccessResponse("Sale sent contract successfully", response);
     }
 
-    @PatchMapping(value = "/contracts/{contractId}/signed-contact", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/contracts/{contractId}/signed-contract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Khách hàng gửi hợp đồng đã ký")
     public ApiResponse<ContractDTO> customerSendSingedContract(@PathVariable String contractId,
                                                                @RequestPart MultipartFile signedContractFile) {
