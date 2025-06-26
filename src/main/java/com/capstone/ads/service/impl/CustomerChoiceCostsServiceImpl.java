@@ -103,7 +103,6 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
             Double value = detail.getAttributeValues().getIsMultiplier()
                     ? (detail.getAttributeValues().getUnitPrice() / 10.0)
                     : detail.getAttributeValues().getUnitPrice().doubleValue();
-            log.info("attrName: {}, value: {}", attrName, value);
             variables.put(attrName, value);
         });
 
