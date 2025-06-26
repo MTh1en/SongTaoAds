@@ -32,6 +32,7 @@ public class SwaggerConfig {
                 .addTagsItem(new Tag().name("USER").description("Tài khoản hệ thống"))
                 .addTagsItem(new Tag().name("CUSTOMER DETAIL").description("Thông tin doanh nghiệp"))
                 .addTagsItem(new Tag().name("CUSTOMER CHOICE").description("Loại sản phẩm khách hàng chọn"))
+                .addTagsItem(new Tag().name("CUSTOMER CHOICE COST").description("Giá cả khách hàng chọn"))
                 .addTagsItem(new Tag().name("CUSTOMER CHOICE SIZE").description("Kích thước khách hàng chọn"))
                 .addTagsItem(new Tag().name("CUSTOMER CHOICE DETAIL").description("Thuộc tính sản phẩm khách hàng chọn"))
                 .addTagsItem(new Tag().name("DESIGN TEMPLATE").description("Thiết kế mẫu dùng cho AI"))

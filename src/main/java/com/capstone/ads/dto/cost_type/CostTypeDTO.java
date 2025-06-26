@@ -16,6 +16,8 @@ public class CostTypeDTO {
     String name;
     String description;
     String formula;
+    Integer priority;
+    Boolean isCore;
     Boolean isAvailable;
     LocalDateTime createAt;
     LocalDateTime updateAt;

@@ -30,7 +30,7 @@ public class CostTypeController {
     }
 
     @PutMapping("/cost-types/{costTypeId}")
-    @Operation(summary = "Cập nhật thông tuin chi phí")
+    @Operation(summary = "Cập nhật thông tin chi phí")
     public ApiResponse<CostTypeDTO> updateCostTypeInformation(@PathVariable String costTypeId,
                                                               @RequestBody CostTypeUpdateRequest request) {
         var response = costTypesService.updateCostTypeInformation(costTypeId, request);

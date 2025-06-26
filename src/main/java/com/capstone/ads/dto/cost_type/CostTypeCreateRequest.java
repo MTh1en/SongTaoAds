@@ -12,5 +12,7 @@ public class CostTypeCreateRequest {
     String name;
     String description;
     String formula;
+    Integer priority;
+    Boolean isCore;
     Boolean isAvailable;
 }

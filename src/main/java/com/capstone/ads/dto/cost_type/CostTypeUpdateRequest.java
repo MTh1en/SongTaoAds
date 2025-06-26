@@ -12,5 +12,7 @@ public class CostTypeUpdateRequest {
     String name;
     String description;
     String formula;
+    Integer priority;
+    Boolean isCore;
     Boolean isAvailable;
 }

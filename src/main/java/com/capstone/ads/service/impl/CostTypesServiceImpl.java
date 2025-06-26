@@ -55,7 +55,7 @@ public class CostTypesServiceImpl implements CostTypesService {
 
     @Override
     public List<CostTypeDTO> findCostTypeByProductType(String productTypeId) {
-        return getCostTypesByProductType(productTypeId).stream()
+        return getCostTypesByProductTypeSortedByPriority(productTypeId).stream()
                 .map(costTypeMapper::toDTO)
                 .collect(Collectors.toList());
     }
@@ -84,7 +84,13 @@ public class CostTypesServiceImpl implements CostTypesService {
     }
 
     @Override
-    public List<CostTypes> getCostTypesByProductType(String productTypeId) {
-        return costTypesRepository.findByProductTypes_Id(productTypeId);
+    public CostTypes getCoreCostTypeByProductType(String productTypeId) {
+        return costTypesRepository.findByProductTypes_IdAndIsCore(productTypeId, true)
+                .orElseThrow(() -> new AppException(ErrorCode.COST_TYPE_NOT_FOUND));
+    }
+
+    @Override
+    public List<CostTypes> getCostTypesByProductTypeSortedByPriority(String productTypeId) {
+        return costTypesRepository.findByProductTypes_IdOrderByPriorityAsc(productTypeId);
     }
 }
