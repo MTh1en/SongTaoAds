@@ -1,6 +1,5 @@
 package com.capstone.ads.dto.feedback;
 
-import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.model.enums.FeedbackStatus;
 import lombok.*;
