@@ -27,7 +27,7 @@ public class Tickets {
      TicketStatus status; // ticket status: Open, In Progress, Closed
 
      @ManyToOne
-     Users user;
+     Users customer;
 
      @ManyToOne
      Users staff;

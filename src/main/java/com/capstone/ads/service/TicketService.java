@@ -3,6 +3,7 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.ticket.TicketDTO;
 import com.capstone.ads.dto.ticket.TicketReport;
 import com.capstone.ads.dto.ticket.TicketRequest;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -14,7 +15,8 @@ public interface TicketService {
     TicketDTO viewTicketDetails(String ticketId);
     List<TicketDTO> viewTicketsSentByCustomer();
     List<TicketDTO> viewTicketsOfStaff();
-    List<TicketDTO> viewAllTickets();
+    Page<TicketDTO> viewAllTickets(int page, int size);
     List<TicketDTO> viewTicketsByUserId(String userId);
     TicketDTO deliveryTicket(String ticketId);
+
 }

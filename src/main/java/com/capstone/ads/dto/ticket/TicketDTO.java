@@ -22,7 +22,7 @@ public class TicketDTO {
     String solution;
     TicketStatus status; // ticket status: Open, In Progress, Closed
     UserDTO staff;
-    UserDTO user;
+    UserDTO customer;
     OrderDTO orders;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

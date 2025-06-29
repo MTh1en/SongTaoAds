@@ -23,6 +23,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,7 +48,7 @@ public class ChatBotServiceImpl implements ChatBotService {
     @Override
     public String chat(ChatRequest request) {
         ChatCompletionRequest completionRequest = new ChatCompletionRequest();
-        String modelChat = String.valueOf(modelChatBotRepository.getModelChatBotByActive(true));
+        String modelChat = modelChatBotRepository.getModelChatBotByActive(true).get().getModelName();
         completionRequest.setModel(modelChat);
         completionRequest.setMessages(List.of(
                 new ChatCompletionRequest.Message("system", "Bạn là trợ lý AI tư vấn về thiết kế và in ấn biển quảng cáo."),
@@ -180,9 +183,8 @@ public class ChatBotServiceImpl implements ChatBotService {
     }
 
     @Override
-    public List<Map<String, Object>> uploadFileExcel(MultipartFile file) {
-        try(XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream())) {
-            // Get active sheet
+    public File uploadFileExcel(MultipartFile file, String fileName) {
+        try (XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream())) {
             int sheetIndex = workbook.getActiveSheetIndex();
             Sheet sheetToProcess = workbook.getSheetAt(sheetIndex);
             if (sheetToProcess == null) {
@@ -192,14 +194,14 @@ public class ChatBotServiceImpl implements ChatBotService {
             if (!rows.hasNext()) {
                 throw new AppException(ErrorCode.INVALID_INPUT);
             }
-            // Read headers
+
             List<String> headers = new ArrayList<>();
             Row headerRow = rows.next();
             headerRow.forEach(cell -> headers.add(getCellValueAsString(cell)));
             if (headers.isEmpty()) {
                 throw new AppException(ErrorCode.INVALID_INPUT);
             }
-            // Process data rows
+
             List<Map<String, Object>> rowsResult = new ArrayList<>();
             rows.forEachRemaining(row -> {
                 Map<String, Object> rowMap = new LinkedHashMap<>();
@@ -212,27 +214,49 @@ public class ChatBotServiceImpl implements ChatBotService {
             if (rowsResult.isEmpty()) {
                 throw new AppException(ErrorCode.INVALID_INPUT);
             }
-            String jsonl = convertToJsonl(rowsResult);
-            //return jsonl;
-            return rowsResult;
-        }catch (Exception e) {
+
+            String userHome = System.getProperty("user.home");
+            String downloadDir = userHome + File.separator + "Downloads";
+            String outputFilePath = downloadDir + File.separator + (fileName.endsWith(".jsonl") ? fileName : fileName + ".jsonl");
+            convertToJsonl(rowsResult, headers, outputFilePath);
+            return new File(outputFilePath);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private String convertToJsonl(List<Map<String, Object>> data) {
-            String jsonl = data.stream()
-                    .map(map -> {
-                        try {
-                            ObjectMapper objectMapper = new ObjectMapper();
-                            return objectMapper.writeValueAsString(map);
-                        } catch (Exception e) {
-                            throw new AppException(ErrorCode.INVALID_INPUT);
-                        }
-                    })
-                    .collect(Collectors.joining(""));
-            return jsonl;
+    private void convertToJsonl(List<Map<String, Object>> data, List<String> headers, String outputFilePath) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath))) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            for (Map<String, Object> row : data) {
+                // Transform row into OpenAI fine-tuning format (messages)
+                Map<String, List<Map<String, String>>> fineTuneEntry = new HashMap<>();
+                List<Map<String, String>> messages = new ArrayList<>();
+
+                String userContent = !headers.isEmpty() ? String.valueOf(row.getOrDefault(headers.get(0), "")) : "";
+                String assistantContent = headers.size() > 1 ? String.valueOf(row.getOrDefault(headers.get(1), "")) : "";
+
+                Map<String, String> userMessage = new HashMap<>();
+                userMessage.put("role", "user");
+                userMessage.put("content", userContent);
+                messages.add(userMessage);
+
+                Map<String, String> assistantMessage = new HashMap<>();
+                assistantMessage.put("role", "assistant");
+                assistantMessage.put("content", assistantContent);
+                messages.add(assistantMessage);
+
+                fineTuneEntry.put("messages", messages);
+
+                // Write each entry as a JSON line
+                String jsonLine = objectMapper.writeValueAsString(fineTuneEntry);
+                writer.write(jsonLine);
+                writer.newLine();
+            }
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.INVALID_INPUT);
         }
+    }
 
     private String getCellValueAsString(Cell cell) {
         if (cell == null) {
@@ -245,18 +269,11 @@ public class ChatBotServiceImpl implements ChatBotService {
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getDateCellValue().toString();
                 }
-                // Format numeric to avoid scientific notation
-                return String.format("%f", cell.getNumericCellValue()).replaceAll("\\.0+$", "");
+                return String.valueOf(cell.getNumericCellValue());
             case BOOLEAN:
                 return String.valueOf(cell.getBooleanCellValue());
             case FORMULA:
-                try {
-                    return cell.getStringCellValue();
-                } catch (Exception e) {
-                    return String.valueOf(cell.getNumericCellValue());
-                }
-            case BLANK:
-                return "";
+                return cell.getCellFormula();
             default:
                 return "";
         }

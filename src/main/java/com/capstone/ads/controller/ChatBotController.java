@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +73,7 @@ public class ChatBotController {
         return ApiResponseBuilder.buildSuccessResponse("Fine tuning jobs retrieved successfully", response);
     }
 
-    @GetMapping("/{fine-tune-job_id}/fine-tune-jobs")
+    @GetMapping("/{fineTuneJobId}/fine-tune-jobs")
     public ApiResponse<FineTuningJobResponse> getFineTuningJobById(@PathVariable String fineTuneJobId) {
         FineTuningJobResponse response = chatBotService.getFineTuningJob(fineTuneJobId);
         return ApiResponseBuilder.buildSuccessResponse("Fine tuning job retrieved successfully", response);
@@ -93,8 +94,9 @@ public class ChatBotController {
     }
 
     @PostMapping(value = "/upload-file-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<List<Map<String, Object>>> uploadFileExcel(@RequestPart MultipartFile file) {
-        List<Map<String, Object>> resposne = chatBotService.uploadFileExcel(file);
+    public ApiResponse<File> uploadFileExcel(@RequestParam("file") MultipartFile file,
+                                             @RequestParam("fileName") String fileName) {
+        File resposne = chatBotService.uploadFileExcel(file, fileName);
         return ApiResponseBuilder.buildSuccessResponse(("Uploaded file successfully"), resposne);
     }
 

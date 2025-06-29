@@ -1,9 +1,11 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.ticket.TicketDTO;
 import com.capstone.ads.dto.ticket.TicketReport;
 import com.capstone.ads.dto.ticket.TicketRequest;
+import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.service.TicketService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,9 +53,10 @@ public class TicketController {
     }
 
     @GetMapping("/tickets")
-    public ApiResponse<List<TicketDTO>> viewAllTickets() {
-        List<TicketDTO> tickets = ticketService.viewAllTickets();
-        return ApiResponseBuilder.buildSuccessResponse("Tickets retrieved successfully", tickets);
+    public ApiPagingResponse<TicketDTO> viewAllTickets(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                     @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var tickets = ticketService.viewAllTickets(page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Tickets retrieved successfully", tickets, page);
     }
 
     @GetMapping("/tickets/{ticketId}")

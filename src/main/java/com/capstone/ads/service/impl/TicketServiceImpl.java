@@ -16,6 +16,9 @@ import com.capstone.ads.service.OrderService;
 import com.capstone.ads.service.TicketService;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,35 +43,22 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TicketDTO reportTicketByStaff(String ticketId, TicketReport report) {
-        Tickets ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new AppException(ErrorCode.TICKET_NOT_FOUND));
-        if (ticket.getStatus() != TicketStatus.OPEN) {
-            throw new AppException(ErrorCode.TICKET_NOT_OPEN);}
-        String solution= report.getReport();
-        Users currentUser = securityContextUtils.getCurrentUser();
-        ticketsMapper.updateSolution(ticket, solution, currentUser);
-        ticket.setStaff(currentUser);
-        ticket.setStatus(TicketStatus.CLOSED);
-        ticket = ticketRepository.save(ticket);
-        return ticketsMapper.toDTO(ticket);
-    }
-
-    @Override
     public TicketDTO reportTicketBySaleStaff(String ticketId, TicketReport report) {
         Tickets ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new AppException(ErrorCode.TICKET_NOT_FOUND));
         if (ticket.getStatus() != TicketStatus.OPEN) {
             throw new AppException(ErrorCode.TICKET_NOT_OPEN);}
-        String solution= report.getReport();
-        Users currentUser = securityContextUtils.getCurrentUser();
-        ticketsMapper.updateSolution(ticket, solution, currentUser);
-        ticket.setStaff(currentUser);
-        ticket.setStatus(TicketStatus.CLOSED);
-        ticket = ticketRepository.save(ticket);
-        return ticketsMapper.toDTO(ticket);
+        return getTicketDTO(report, ticket);
     }
 
+    @Override
+    public TicketDTO reportTicketByStaff(String ticketId, TicketReport report) {
+        Tickets ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new AppException(ErrorCode.TICKET_NOT_FOUND));
+        if (ticket.getStatus() != TicketStatus.IN_PROGRESS) {
+            throw new AppException(ErrorCode.ROLE_NOT_AUTHORIZED);}
+        return getTicketDTO(report, ticket);
+    }
 
     @Override
     public TicketDTO deliveryTicket(String ticketId) {
@@ -107,19 +97,27 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public List<TicketDTO> viewAllTickets() {
-        List<Tickets> tickets = ticketRepository.findAll();
-        return tickets.stream()
-                .map(ticketsMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<TicketDTO> viewAllTickets(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return ticketRepository.findAll(pageable)
+                .map(ticketsMapper::toDTO);
     }
 
     @Override
     public List<TicketDTO> viewTicketsByUserId(String userId) {
-        List<Tickets> tickets = ticketRepository.findByUser_Id(userId);
+        List<Tickets> tickets = ticketRepository.findByCustomerId(userId);
         return tickets.stream()
                 .map(ticketsMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
+    private TicketDTO getTicketDTO(TicketReport report, Tickets ticket) {
+        String solution= report.getReport();
+        Users currentUser = securityContextUtils.getCurrentUser();
+        ticketsMapper.updateSolution(ticket, solution, currentUser);
+        ticket.setStaff(currentUser);
+        ticket.setStatus(TicketStatus.CLOSED);
+        ticket = ticketRepository.save(ticket);
+        return ticketsMapper.toDTO(ticket);
+    }
 }

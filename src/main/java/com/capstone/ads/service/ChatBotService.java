@@ -3,6 +3,7 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.chatBot.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,6 @@ public interface ChatBotService {
     FineTuningJobResponse getFineTuningJob(String jobId);
     FineTuningJobResponse cancelFineTuningJob(String fineTuningJobId);
 
-    List<Map<String, Object>> uploadFileExcel(MultipartFile file);
+    File uploadFileExcel(MultipartFile file, String fileName);
     ModelChatBotDTO setModeChatBot(String jobId);
 }

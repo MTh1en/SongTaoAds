@@ -6,10 +6,9 @@ import com.capstone.ads.model.enums.TicketStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface TicketRepository extends JpaRepository<Tickets, String> {
-    List<Tickets> findByUser_Id(String id);
+    List<Tickets> findByCustomerId(String customerId);
 
     List<Tickets> findByStatus(TicketStatus status);
 
