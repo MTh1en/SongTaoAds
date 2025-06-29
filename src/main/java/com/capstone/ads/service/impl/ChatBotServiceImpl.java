@@ -45,7 +45,8 @@ public class ChatBotServiceImpl implements ChatBotService {
     @Override
     public String chat(ChatRequest request) {
         ChatCompletionRequest completionRequest = new ChatCompletionRequest();
-        completionRequest.setModel(modelName);
+        String modelChat = String.valueOf(modelChatBotRepository.getModelChatBotByActive(true));
+        completionRequest.setModel(modelChat);
         completionRequest.setMessages(List.of(
                 new ChatCompletionRequest.Message("system", "Bạn là trợ lý AI tư vấn về thiết kế và in ấn biển quảng cáo."),
                 new ChatCompletionRequest.Message("user", request.getPrompt())
@@ -218,7 +219,6 @@ public class ChatBotServiceImpl implements ChatBotService {
             throw new RuntimeException(e);
         }
     }
-
 
     private String convertToJsonl(List<Map<String, Object>> data) {
             String jsonl = data.stream()

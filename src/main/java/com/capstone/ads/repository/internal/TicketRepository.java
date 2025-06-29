@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TicketRepository extends JpaRepository<Tickets, String> {
+    List<Tickets> findByUser_Id(String id);
+
     List<Tickets> findByStatus(TicketStatus status);
 
     List<Tickets> findBySeverity(TicketSeverity severity);
