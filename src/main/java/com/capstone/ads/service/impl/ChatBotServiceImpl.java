@@ -162,7 +162,6 @@ public class ChatBotServiceImpl implements ChatBotService {
             modelChatBotDTO.setModelName(newModelName);
             modelChatBotDTO.setPreviousModelName(modelName); // Current modelName from @Value
             modelChatBotDTO.setActive(true);
-
             ModelChatBot modelChatBot = modelChatBotMapper.toEntity(modelChatBotDTO);
             modelChatBotRepository.save(modelChatBot);
 
