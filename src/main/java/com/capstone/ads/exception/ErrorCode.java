@@ -91,6 +91,13 @@ public enum ErrorCode {
     EXTERNAL_SERVICE_ERROR("External service error", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_INPUT("Invalid input", HttpStatus.BAD_REQUEST),
 
+    //Ticket
+    TICKET_NOT_FOUND("Ticket not found", HttpStatus.NOT_FOUND),
+    TICKET_NOT_OPEN("Ticket not open", HttpStatus.BAD_REQUEST),
+    PROVIE_SOLUTION_TICKET("Provie solution ticket", HttpStatus.BAD_REQUEST),
+    INVALID_SEVERITY("Invalid severity", HttpStatus.BAD_REQUEST),
+    ROLE_NOT_AUTHORIZED("Role not authorized", HttpStatus.UNAUTHORIZED),
+
     PRICE_PROPOSAL_NOT_FOUND("Price proposal not found", HttpStatus.NOT_FOUND),
 
     CONTRACT_NOT_FOUND("Contract not found", HttpStatus.NOT_FOUND),

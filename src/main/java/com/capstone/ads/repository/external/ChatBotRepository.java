@@ -45,6 +45,11 @@ public interface ChatBotRepository {
     FineTuningJobListResponse getFineTuningJobs(
             @RequestHeader("Authorization") String authorization);
 
+    @GetMapping("/fine_tuning/jobs/{fine_tuning_job_id}")
+    FineTuningJobResponse getFineTuningJobById(
+            @RequestHeader("Authorization") String authorization,
+            @PathVariable("fine_tuning_job_id") String fineTuningJobId);
+
     @PostMapping(value = "/fine_tuning/jobs/{fine_tuning_job_id}/cancel")
     FineTuningJobResponse cancelFineTuningJob(
             @RequestHeader("Authorization") String authorization,

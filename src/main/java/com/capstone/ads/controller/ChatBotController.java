@@ -11,9 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chat-bot")
@@ -73,11 +73,31 @@ public class ChatBotController {
         return ApiResponseBuilder.buildSuccessResponse("Fine tuning jobs retrieved successfully", response);
     }
 
-    @PostMapping("/fine-tuning-jobs/{fineTuningJobId}/cancel")
+    @GetMapping("/{fineTuneJobId}/fine-tune-jobs")
+    public ApiResponse<FineTuningJobResponse> getFineTuningJobById(@PathVariable String fineTuneJobId) {
+        FineTuningJobResponse response = chatBotService.getFineTuningJob(fineTuneJobId);
+        return ApiResponseBuilder.buildSuccessResponse("Fine tuning job retrieved successfully", response);
+    }
+
+    @PostMapping("/{fineTuningJobId}/fine-tuning-jobs/cancel")
     public ApiResponse<FineTuningJobResponse> cancelFineTuningJob(
             @PathVariable String fineTuningJobId) {
         FineTuningJobResponse response = chatBotService.cancelFineTuningJob(fineTuningJobId);
         return ApiResponseBuilder.buildSuccessResponse("Fine tuning job cancelled successfully", response);
+    }
+
+    @PostMapping("/{fineTuningJobId}/fine-tuning-jobs/select-model")
+    public ApiResponse<ModelChatBotDTO> selectModelChat(
+            @PathVariable String fineTuningJobId) {
+        ModelChatBotDTO response = chatBotService.setModeChatBot(fineTuningJobId);
+        return ApiResponseBuilder.buildSuccessResponse("Fine tuning job cancelled successfully", response);
+    }
+
+    @PostMapping(value = "/upload-file-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<File> uploadFileExcel(@RequestParam("file") MultipartFile file,
+                                             @RequestParam("fileName") String fileName) {
+        File resposne = chatBotService.uploadFileExcel(file, fileName);
+        return ApiResponseBuilder.buildSuccessResponse(("Uploaded file successfully"), resposne);
     }
 
 }

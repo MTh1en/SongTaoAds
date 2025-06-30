@@ -1,6 +1,5 @@
 package com.capstone.ads.dto.order;
 
-import com.capstone.ads.model.enums.DemoDesignStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
