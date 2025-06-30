@@ -19,6 +19,11 @@ public class OrderStateValidator {
     }
 
     private void initializeValidTransitions() {
+        validTransitions.put(OrderStatus.PENDING_DESIGN, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.PENDING_CONTRACT
+        ));
+
         validTransitions.put(OrderStatus.PENDING_CONTRACT, Set.of(
                 OrderStatus.CANCELLED,
                 OrderStatus.CONTRACT_SENT
@@ -37,7 +42,13 @@ public class OrderStateValidator {
 
         validTransitions.put(OrderStatus.CONTRACT_SIGNED, Set.of(
                 OrderStatus.CANCELLED,
-                OrderStatus.CONTRACT_CONFIRMED
+                OrderStatus.CONTRACT_CONFIRMED,
+                OrderStatus.CONTRACT_RESIGNED
+        ));
+
+        validTransitions.put(OrderStatus.CONTRACT_RESIGNED, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.CONTRACT_SIGNED
         ));
 
         validTransitions.put(OrderStatus.CONTRACT_CONFIRMED, Set.of(

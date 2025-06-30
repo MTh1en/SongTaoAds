@@ -101,6 +101,10 @@ public enum ErrorCode {
     PRICE_PROPOSAL_NOT_FOUND("Price proposal not found", HttpStatus.NOT_FOUND),
 
     CONTRACT_NOT_FOUND("Contract not found", HttpStatus.NOT_FOUND),
+
+    FEEDBACK_NOT_FOUND("Feedback not found", HttpStatus.NOT_FOUND),
+
+    COST_TYPE_NOT_FOUND("Cost type not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

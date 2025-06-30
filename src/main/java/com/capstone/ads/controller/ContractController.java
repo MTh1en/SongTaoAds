@@ -2,12 +2,14 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.contract.ContractDTO;
+import com.capstone.ads.dto.contract.ContractRevisedRequest;
+import com.capstone.ads.dto.contract.ContractSendRequest;
 import com.capstone.ads.service.ContractService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.constraints.Range;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,15 +26,12 @@ public class ContractController {
     @Operation(summary = "Sale tạo bản hợp đồng đầu tiên")
     public ApiResponse<ContractDTO> saleSendFirstContract(
             @PathVariable String orderId,
-            @RequestParam(required = false, defaultValue = "10")
-            @Range(min = 1, max = 100, message = "Percent between from 1 to 100") Long depositPercentChanged,
-            @RequestPart String contractNumber,
-            @RequestPart MultipartFile contactFile) {
-        var response = contractService.saleSendFirstContract(orderId, contractNumber, depositPercentChanged, contactFile);
+            @Valid @ModelAttribute ContractSendRequest request) {
+        var response = contractService.saleSendFirstContract(orderId, request);
         return ApiResponseBuilder.buildSuccessResponse("Sale sent contract successfully", response);
     }
 
-    @PatchMapping(value = "/contracts/{contractId}/signed-contact", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/contracts/{contractId}/signed-contract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Khách hàng gửi hợp đồng đã ký")
     public ApiResponse<ContractDTO> customerSendSingedContract(@PathVariable String contractId,
                                                                @RequestPart MultipartFile signedContractFile) {
@@ -44,10 +43,8 @@ public class ContractController {
     @Operation(summary = "Sale gửi lại bản hợp đồng đã chỉnh sửa")
     public ApiResponse<ContractDTO> saleSendRevisedContract(
             @PathVariable String contractId,
-            @RequestParam(required = false, defaultValue = "10")
-            @Range(min = 1, max = 100, message = "Percent between from 1 to 100") Long depositPercentChanged,
-            @RequestPart MultipartFile contactFile) {
-        var response = contractService.saleSendRevisedContract(contractId, depositPercentChanged, contactFile);
+            @ModelAttribute ContractRevisedRequest request) {
+        var response = contractService.saleSendRevisedContract(contractId, request);
         return ApiResponseBuilder.buildSuccessResponse("Sale sent revised contract successfully", response);
     }
 

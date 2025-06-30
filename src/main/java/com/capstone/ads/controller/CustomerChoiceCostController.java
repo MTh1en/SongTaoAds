@@ -1,0 +1,27 @@
+package com.capstone.ads.controller;
+
+import com.capstone.ads.dto.ApiResponse;
+import com.capstone.ads.dto.customer_choice_cost.CustomerChoiceCostDTO;
+import com.capstone.ads.service.CustomerChoiceCostsService;
+import com.capstone.ads.utils.ApiResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api")
+@RequiredArgsConstructor
+@Tag(name = "CUSTOMER CHOICE COST")
+public class CustomerChoiceCostController {
+    private final CustomerChoiceCostsService customerChoiceCostsService;
+
+    @GetMapping("/customer-choices/{customerChoiceId}/customer-choice-costs")
+    @Operation(summary = "Xem các chi phí theo lựa chọn của khách hàng")
+    public ApiResponse<List<CustomerChoiceCostDTO>> findCustomerChoiceCostByCustomerChoice(@PathVariable String customerChoiceId) {
+        var response = customerChoiceCostsService.findCustomerChoiceCostByCustomerChoice(customerChoiceId);
+        return ApiResponseBuilder.buildSuccessResponse("Find customer choice cost by customer choice successful", response);
+    }
+}

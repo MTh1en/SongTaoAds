@@ -41,4 +41,7 @@ public class ProductTypes {
 
     @OneToMany(mappedBy = "productTypes")
     List<DesignTemplates> designTemplates;
+
+    @OneToMany(mappedBy = "productTypes")
+    List<CostTypes> costTypes;
 }

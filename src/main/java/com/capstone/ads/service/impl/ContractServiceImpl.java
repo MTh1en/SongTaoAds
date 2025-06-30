@@ -1,6 +1,9 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.PaymentPolicy;
 import com.capstone.ads.dto.contract.ContractDTO;
+import com.capstone.ads.dto.contract.ContractRevisedRequest;
+import com.capstone.ads.dto.contract.ContractSendRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ContractMapper;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -33,11 +37,14 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     @Transactional
-    public ContractDTO saleSendFirstContract(String orderId, String contractNumber, Long depositPercentChanged, MultipartFile contractFile) {
+    public ContractDTO saleSendFirstContract(String orderId, ContractSendRequest request) {
         Orders orders = orderService.getOrderById(orderId);
+        if (Objects.isNull(request.getDepositPercentChanged())) {
+            request.setDepositPercentChanged(PaymentPolicy.DEPOSIT_PERCENT);
+        }
 
-        String contractUrl = uploadContractImageToS3(contractNumber, contractFile);
-        Contract contract = contractMapper.sendContract(contractNumber, depositPercentChanged, contractUrl);
+        String contractUrl = uploadContractImageToS3(request.getContractNumber(), request.getContactFile());
+        Contract contract = contractMapper.sendContract(request, contractUrl);
         contract.setOrders(orders);
         contract = contractRepository.save(contract);
 
@@ -62,13 +69,17 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     @Transactional
-    public ContractDTO saleSendRevisedContract(String contractId, Long contractPercentChanged, MultipartFile contractFile) {
+    public ContractDTO saleSendRevisedContract(String contractId, ContractRevisedRequest request) {
         Contract contract = getContractById(contractId);
         String orderId = contract.getOrders().getId();
-        contractStateValidator.validateTransition(contract.getStatus(), ContractStatus.SENT);
 
-        String contractUrl = uploadContractImageToS3(contract.getContractNumber(), contractFile);
-        contractMapper.sendRevisedContract(contractUrl, contract);
+        contractStateValidator.validateTransition(contract.getStatus(), ContractStatus.SENT);
+        if (Objects.isNull(request.getDepositPercentChanged())) {
+            request.setDepositPercentChanged(PaymentPolicy.DEPOSIT_PERCENT);
+        }
+
+        String contractUrl = uploadContractImageToS3(contract.getContractNumber(), request.getContactFile());
+        contractMapper.sendRevisedContract(request.getDepositPercentChanged(), contractUrl, contract);
         contractRepository.save(contract);
 
         orderService.updateOrderStatus(orderId, OrderStatus.CONTRACT_SENT);

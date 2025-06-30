@@ -5,7 +5,7 @@ public class S3ImageDuration {
     public static final Integer DESIGN_TEMPLATE_IMAGE_DURATION = 30;
     public static final Integer AVATAR_IMAGE_DURATION = 30;
     public static final Integer CUSTOM_DESIGN_DURATION = 40;
-
+    public static final Integer FEEDBACK_DURATION = 30;
     private S3ImageDuration() {
     }
 }

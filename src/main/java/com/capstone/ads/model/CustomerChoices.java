@@ -35,8 +35,8 @@ public class CustomerChoices {
 
     @OneToMany(
             mappedBy = "customerChoices",
-            cascade = CascadeType.ALL,  // Tự động lan truyền thao tác (bao gồm xóa)
-            orphanRemoval = true       // Xóa các bản ghi con không còn tham chiếu
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     List<CustomerChoiceDetails> customerChoiceDetails;
 
@@ -46,4 +46,11 @@ public class CustomerChoices {
             orphanRemoval = true
     )
     List<CustomerChoiceSizes> customerChoiceSizes;
+
+    @OneToMany(
+            mappedBy = "customerChoices",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    List<CustomerChoiceCosts> customerChoiceCosts;
 }

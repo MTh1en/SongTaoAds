@@ -13,6 +13,7 @@ import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.repository.internal.CustomDesignRequestsRepository;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.CustomDesignRequestStateValidator;
+import com.capstone.ads.utils.CustomOrderLogicUtils;
 import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ import java.util.List;
 public class CustomDesignRequestServiceImpl implements CustomDesignRequestService {
     private final S3Service s3Service;
     private final CustomerChoicesService customerChoicesService;
+    private final CustomOrderLogicUtils customOrderLogicUtils;
     private final UserService userService;
     private final CustomerDetailService customerDetailService;
     private final CustomDesignRequestsRepository customDesignRequestsRepository;
@@ -99,13 +101,19 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     @Transactional
     public CustomDesignRequestDTO designerUploadFinalDesignImage(String customDesignRequestId, MultipartFile finalDesignImage) {
         CustomDesignRequests customDesignRequest = getCustomDesignRequestById(customDesignRequestId);
+        customDesignRequestStateValidator.validateTransition(
+                customDesignRequest.getStatus(),
+                CustomDesignRequestStatus.COMPLETED
+        );
 
         var finalDesignImageUrl = uploadCustomDesignRequestImageToS3(customDesignRequestId, finalDesignImage);
-        customDesignRequestStateValidator.validateTransition(customDesignRequest.getStatus(), CustomDesignRequestStatus.COMPLETED);
         customDesignRequest.setFinalDesignImage(finalDesignImageUrl);
         customDesignRequest.setStatus(CustomDesignRequestStatus.COMPLETED);
         customDesignRequestsRepository.save(customDesignRequest);
 
+        if (customDesignRequest.getHasOrder()) {
+            customOrderLogicUtils.updateOrderPendingContractAfterCustomDesignRequestCompleted(customDesignRequestId);
+        }
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 
@@ -176,8 +184,9 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequest.setTotalPrice(totalPrice);
         customDesignRequest.setDepositAmount(depositAmount);
         customDesignRequest.setRemainingAmount(totalPrice - depositAmount);
-        customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
         customDesignRequest.setStatus(CustomDesignRequestStatus.APPROVED_PRICING);
+        customDesignRequestsRepository.save(customDesignRequest);
+
     }
 
     @Override

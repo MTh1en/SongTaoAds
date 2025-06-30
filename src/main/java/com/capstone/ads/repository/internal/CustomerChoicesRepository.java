@@ -12,12 +12,4 @@ import java.util.Optional;
 @Repository
 public interface CustomerChoicesRepository extends JpaRepository<CustomerChoices, String> {
     Optional<CustomerChoices> findByUsers_IdOrderByUpdatedAtDesc(String id);
-
-    @EntityGraph(attributePaths = {
-            "productTypes",
-            "productTypes.attributes", // Quan trọng: load cả attributes
-            "customerChoiceDetails",
-            "customerChoiceSizes"
-    })
-    Optional<CustomerChoices> findWithDetailsById(String id);
 }
