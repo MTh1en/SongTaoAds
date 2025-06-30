@@ -3,15 +3,16 @@ package com.capstone.ads.repository.internal;
 import com.capstone.ads.model.Tickets;
 import com.capstone.ads.model.enums.TicketSeverity;
 import com.capstone.ads.model.enums.TicketStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Tickets, String> {
-    List<Tickets> findByCustomerId(String customerId);
+    Page<Tickets> findByCustomerId(String customerId, Pageable pageable);
 
-    List<Tickets> findByStatus(TicketStatus status);
+    Page<Tickets> findByStatus(TicketStatus status, Pageable pageable);
 
-    List<Tickets> findBySeverity(TicketSeverity severity);
-
+    Page<Tickets> findBySeverity(TicketSeverity severity, Pageable pageable);
 }
