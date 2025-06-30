@@ -1,11 +1,7 @@
 package com.capstone.ads.dto.chatBot;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 @Data

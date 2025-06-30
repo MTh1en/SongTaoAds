@@ -25,8 +25,10 @@ public interface ChatBotService {
     List<FineTuningJobResponse> getAllFineTuneJobs();
 
     FineTuningJobResponse getFineTuningJob(String jobId);
+
     FineTuningJobResponse cancelFineTuningJob(String fineTuningJobId);
 
     File uploadFileExcel(MultipartFile file, String fileName);
+
     ModelChatBotDTO setModeChatBot(String jobId);
 }
