@@ -8,6 +8,7 @@ import com.capstone.ads.dto.ticket.TicketRequest;
 import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.service.TicketService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class TicketController {
     private final TicketService ticketService;
 
     @PostMapping("/orders/{orderId}/tickets")
+    @Operation(summary = "Customer gửi ticket")
     public ApiResponse<TicketDTO> sendOrderTicket(
             @RequestBody TicketRequest request,
             @PathVariable String orderId) {
@@ -31,6 +33,7 @@ public class TicketController {
     }
 
     @PostMapping("/tickets/{ticketId}/report/sale-staff")
+    @Operation(summary = "Sale-Staff gửi report cho ticket")
     public ApiResponse<TicketDTO> reportTicketBySaleStaff(
             @PathVariable("ticketId") String ticketId,
             @RequestBody TicketReport reportDetails) {
@@ -38,6 +41,7 @@ public class TicketController {
         return ApiResponseBuilder.buildSuccessResponse("Ticket reported successfully", ticket);
     }
     @PostMapping("/tickets/{ticketId}/report/staff")
+    @Operation(summary = "Staff gửi report cho ticket")
     public ApiResponse<TicketDTO> reportTicketByStaff(
             @PathVariable String ticketId,
             @RequestBody TicketReport reportDetails) {
@@ -46,6 +50,7 @@ public class TicketController {
     }
 
     @PostMapping("/tickets/{ticketId}/deliveryTicket")
+    @Operation(summary = "Sale chuyển ticket cho staff")
     public ApiResponse<TicketDTO> deliveryTicket(
             @PathVariable String ticketId) {
         TicketDTO ticket = ticketService.deliveryTicket(ticketId);
@@ -53,6 +58,7 @@ public class TicketController {
     }
 
     @GetMapping("/tickets")
+    @Operation(summary = "Sale xem tất cả ticket ")
     public ApiPagingResponse<TicketDTO> viewAllTickets(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
                                                      @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var tickets = ticketService.viewAllTickets(page, size);
@@ -60,24 +66,28 @@ public class TicketController {
     }
 
     @GetMapping("/tickets/{ticketId}")
+    @Operation(summary = "Xem chi tiết ticket")
     public ApiResponse<TicketDTO> viewTicketDetails(@PathVariable String ticketId) {
         TicketDTO ticket = ticketService.viewTicketDetails(ticketId);
         return ApiResponseBuilder.buildSuccessResponse("Ticket details retrieved successfully", ticket);
     }
 
     @GetMapping("/tickets/customer")
+    @Operation(summary = "Xem tất cả ticket open")
     public ApiResponse<List<TicketDTO>> viewTicketsSentByCustomer() {
         List<TicketDTO> tickets = ticketService.viewTicketsSentByCustomer();
         return ApiResponseBuilder.buildSuccessResponse("Tickets sent by customer retrieved successfully", tickets);
     }
 
     @GetMapping("/tickets/staff")
+    @Operation(summary = "Staff xem tất cả ticket liên quan production")
     public ApiResponse<List<TicketDTO>> viewTicketsOfStaff() {
         List<TicketDTO> tickets = ticketService.viewTicketsOfStaff();
         return ApiResponseBuilder.buildSuccessResponse("Tickets for staff retrieved successfully", tickets);
     }
 
     @GetMapping("/users/{userId}/tickets")
+    @Operation(summary = "Customer xem tickets")
     public ApiResponse<List<TicketDTO>> viewTicketsOfUserId(@PathVariable String userId) {
         List<TicketDTO> tickets = ticketService.viewTicketsByUserId(userId);
         return ApiResponseBuilder.buildSuccessResponse("Tickets for staff retrieved successfully", tickets);
