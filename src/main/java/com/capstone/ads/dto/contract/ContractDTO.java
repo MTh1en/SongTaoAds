@@ -1,7 +1,5 @@
 package com.capstone.ads.dto.contract;
 
-import com.capstone.ads.dto.order.OrderDTO;
-import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.model.enums.ContractStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

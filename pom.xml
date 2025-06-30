@@ -122,7 +122,12 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-common</artifactId>
-            <version>4.1.120.Final</version> <!-- Hoặc phiên bản mới nhất -->
+            <version>4.1.120.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.4.0</version>
         </dependency>
     </dependencies>
     <dependencyManagement>
