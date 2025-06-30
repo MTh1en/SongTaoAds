@@ -141,7 +141,7 @@ public class ChatBotServiceImpl implements ChatBotService {
     public FineTuningJobResponse getFineTuningJob(String jobId) {
         return chatBotRepository.getFineTuningJobById(
                 "Bearer " + openaiApiKey
-                                , jobId);
+                , jobId);
     }
 
     public ModelChatBotDTO setModeChatBot(String jobId) {
@@ -151,24 +151,23 @@ public class ChatBotServiceImpl implements ChatBotService {
             throw new AppException(ErrorCode.EXTERNAL_SERVICE_ERROR);
         }
         String newModelName = fineTuningJob.getFineTunedModel();
-            // Deactivate the current active model, if any
-            modelChatBotRepository.findByActiveTrue().ifPresent(currentActiveModel -> {
-                currentActiveModel.setActive(false);
-                modelChatBotRepository.save(currentActiveModel);
-            });
+        // Deactivate the current active model, if any
+        modelChatBotRepository.findByActiveTrue().ifPresent(currentActiveModel -> {
+            currentActiveModel.setActive(false);
+            modelChatBotRepository.save(currentActiveModel);
+        });
 
-            // Create and save the new model
-            ModelChatBotDTO modelChatBotDTO = new ModelChatBotDTO();
-            modelChatBotDTO.setModelName(newModelName);
-            modelChatBotDTO.setPreviousModelName(modelName); // Current modelName from @Value
-            modelChatBotDTO.setActive(true);
+        // Create and save the new model
+        ModelChatBotDTO modelChatBotDTO = new ModelChatBotDTO();
+        modelChatBotDTO.setModelName(newModelName);
+        modelChatBotDTO.setPreviousModelName(modelName); // Current modelName from @Value
+        modelChatBotDTO.setActive(true);
 
-            ModelChatBot modelChatBot = modelChatBotMapper.toEntity(modelChatBotDTO);
-            modelChatBotRepository.save(modelChatBot);
+        ModelChatBot modelChatBot = modelChatBotMapper.toEntity(modelChatBotDTO);
+        modelChatBotRepository.save(modelChatBot);
 
-            return modelChatBotDTO;
-        }
-
+        return modelChatBotDTO;
+    }
 
 
     @Override
