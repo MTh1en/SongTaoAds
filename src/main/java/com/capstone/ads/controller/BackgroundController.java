@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -46,6 +48,13 @@ public class BackgroundController {
                                                             @RequestPart MultipartFile backgroundImage) {
         var response = backgroundService.updateBackgroundImage(backgroundId, backgroundImage);
         return ApiResponseBuilder.buildSuccessResponse("Update background image successfully", response);
+    }
+
+    @GetMapping("customer-choices/{customerChoiceId}/suggestion")
+    @Operation(summary = "Xem background theo lựa chọn của khách hàng")
+    public ApiResponse<List<BackgroundDTO>> suggestedBackgrounds(@PathVariable String customerChoiceId) {
+        var response = backgroundService.suggestedBackgrounds(customerChoiceId);
+        return ApiResponseBuilder.buildSuccessResponse("Suggested backgrounds", response);
     }
 
     @GetMapping("/attribute-values/{attributeValueId}/backgrounds")

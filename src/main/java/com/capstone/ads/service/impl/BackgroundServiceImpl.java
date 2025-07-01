@@ -8,9 +8,11 @@ import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.BackgroundMapper;
 import com.capstone.ads.model.AttributeValues;
 import com.capstone.ads.model.Backgrounds;
+import com.capstone.ads.model.CustomerChoices;
 import com.capstone.ads.repository.internal.BackgroundsRepository;
 import com.capstone.ads.service.AttributeValuesService;
 import com.capstone.ads.service.BackgroundService;
+import com.capstone.ads.service.CustomerChoicesService;
 import com.capstone.ads.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +23,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class BackgroundServiceImpl implements BackgroundService {
+    private final CustomerChoicesService customerChoicesService;
     private final AttributeValuesService attributeValuesService;
     private final S3Service s3Service;
     private final BackgroundMapper backgroundMapper;
@@ -67,6 +73,30 @@ public class BackgroundServiceImpl implements BackgroundService {
         backgrounds = backgroundsRepository.save(backgrounds);
 
         return backgroundMapper.toDTO(backgrounds);
+    }
+
+    @Override
+    public List<BackgroundDTO> suggestedBackgrounds(String customerChoiceId) {
+        CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoiceId);
+
+        Set<String> attributeValueIds = customerChoices.getCustomerChoiceDetails().stream()
+                .map(detail -> detail.getAttributeValues().getId())
+                .collect(Collectors.toSet());
+
+        return backgroundsRepository.findByAttributeValues_IdInAndIsAvailable(attributeValueIds, true)
+                .stream()
+                .map(backgroundMapper::toDTO)
+                .collect(Collectors.toList());
+//        return customerChoices.getCustomerChoiceDetails().stream()
+//                .filter(detail -> {
+//                    String attributeValueId = detail.getAttributeValues().getId();
+//                    return backgroundsRepository.existsByAttributeValues_IdAndIsAvailable(attributeValueId, true);
+//                })
+//                .flatMap(detail -> {
+//                    String attributeValueId = detail.getAttributeValues().getId();
+//                    var response = backgroundsRepository.findBackgroundsByAttributeValues_IdAndIsAvailable(attributeValueId, true);
+//                    return response.stream().map(backgroundMapper::toDTO);
+//                }).toList();
     }
 
     @Override
