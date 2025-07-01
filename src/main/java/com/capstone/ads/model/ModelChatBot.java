@@ -1,7 +1,9 @@
 package com.capstone.ads.model;
 
-import com.capstone.ads.model.enums.CustomDesignRequestStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,17 +17,15 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class ChatBotLog {
+public class ModelChatBot {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    String question;
-    String answer;
+    String modelName;
+    String previousModelName;
+    boolean active;
 
     @CreationTimestamp
     LocalDateTime createdAt;
-
-    @ManyToOne
-    Users users;
 }

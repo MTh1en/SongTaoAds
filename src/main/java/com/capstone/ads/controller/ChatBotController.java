@@ -11,9 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chat-bot")
@@ -23,6 +23,7 @@ public class ChatBotController {
     private final ChatBotService chatBotService;
 
     @PostMapping("/chat")
+    @Operation(summary = "Chat với chatbot")
     public ApiResponse<String> chat(@RequestBody ChatRequest request) {
         String reply = chatBotService.chat(request);
         return ApiResponseBuilder.buildSuccessResponse("Chat response retrieved successfully.", reply);
@@ -35,6 +36,7 @@ public class ChatBotController {
     }
 
     @PostMapping(value = "/upload-file-finetune", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload file để fine-tune")
     public ApiResponse<FileUploadResponse> uploadFileToFinetune(
             @RequestParam MultipartFile file) {
         FileUploadResponse response = chatBotService.uploadFileToFinetune(file);
@@ -42,12 +44,14 @@ public class ChatBotController {
     }
 
     @PostMapping("/finetune-model")
+    @Operation(summary = "File-tune model hiện tại")
     public ApiResponse<FineTuningJobResponse> finetuneModel(@RequestBody FineTuningJobRequest request) {
         FineTuningJobResponse response = chatBotService.fineTuningJob(request);
         return ApiResponseBuilder.buildSuccessResponse("Fine-tuning job created successfully", response);
     }
 
     @GetMapping("/files/{fileId}")
+    @Operation(summary = "Xem chi tiết file")
     public ApiResponse<FileUploadResponse> getFileById(
             @PathVariable String fileId) {
         FileUploadResponse response = chatBotService.getUploadedFileById(fileId);
@@ -55,12 +59,14 @@ public class ChatBotController {
     }
 
     @GetMapping("/files")
+    @Operation(summary = "Xem tất cả file uploaded để fine-tune")
     public ApiResponse<List<FileUploadResponse>> getFineTuningFiles() {
         List<FileUploadResponse> response = chatBotService.getAllUploadedFiles();
         return ApiResponseBuilder.buildSuccessResponse("Fine-tuning files retrieved successfully", response);
     }
 
     @DeleteMapping("/files/{fileId}")
+    @Operation(summary = "Xóa file đã upload")
     public ApiResponse<FileDeletionResponse> deleteFile(
             @PathVariable String fileId) {
         FileDeletionResponse response = chatBotService.deleteUploadedFile(fileId);
@@ -68,16 +74,41 @@ public class ChatBotController {
     }
 
     @GetMapping("/fine-tune-jobs")
+    @Operation(summary = "Xem tất cả các job đã fine-tune")
     public ApiResponse<List<FineTuningJobResponse>> getFineTuningJobs() {
         List<FineTuningJobResponse> response = chatBotService.getAllFineTuneJobs();
         return ApiResponseBuilder.buildSuccessResponse("Fine tuning jobs retrieved successfully", response);
     }
 
-    @PostMapping("/fine-tuning-jobs/{fineTuningJobId}/cancel")
+    @GetMapping("/{fineTuneJobId}/fine-tune-jobs")
+    @Operation(summary = "Xem chi tiết job đã fine-tune")
+    public ApiResponse<FineTuningJobResponse> getFineTuningJobById(@PathVariable String fineTuneJobId) {
+        FineTuningJobResponse response = chatBotService.getFineTuningJob(fineTuneJobId);
+        return ApiResponseBuilder.buildSuccessResponse("Fine tuning job retrieved successfully", response);
+    }
+
+    @PostMapping("/{fineTuningJobId}/fine-tuning-jobs/cancel")
+    @Operation(summary = "Hủy 1 job đang fine-tune")
     public ApiResponse<FineTuningJobResponse> cancelFineTuningJob(
             @PathVariable String fineTuningJobId) {
         FineTuningJobResponse response = chatBotService.cancelFineTuningJob(fineTuningJobId);
         return ApiResponseBuilder.buildSuccessResponse("Fine tuning job cancelled successfully", response);
+    }
+
+    @PostMapping("/{fineTuningJobId}/fine-tuning-jobs/select-model")
+    @Operation(summary = "Chọn model để chat từ list job")
+    public ApiResponse<ModelChatBotDTO> selectModelChat(
+            @PathVariable String fineTuningJobId) {
+        ModelChatBotDTO response = chatBotService.setModeChatBot(fineTuningJobId);
+        return ApiResponseBuilder.buildSuccessResponse("Fine tuning job cancelled successfully", response);
+    }
+
+    @PostMapping(value = "/upload-file-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Convert từ file excel thành file jsonl")
+    public ApiResponse<File> uploadFileExcel(@RequestParam("file") MultipartFile file,
+                                             @RequestParam("fileName") String fileName) {
+        File resposne = chatBotService.uploadFileExcel(file, fileName);
+        return ApiResponseBuilder.buildSuccessResponse(("Uploaded file successfully"), resposne);
     }
 
 }

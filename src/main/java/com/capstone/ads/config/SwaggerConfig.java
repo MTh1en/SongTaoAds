@@ -43,6 +43,7 @@ public class SwaggerConfig {
                 .addTagsItem(new Tag().name("ORDER").description("Đơn hàng"))
                 .addTagsItem(new Tag().name("CONTRACT").description("Hợp đồng"))
                 .addTagsItem(new Tag().name("PAYMENT").description("Thanh toán"))
+                .addTagsItem(new Tag().name("TICKET").description("Yêu cầu hỗ trợ"))
                 .addTagsItem(new Tag().name("FEEDBACK").description("Đánh giá"))
                 .addTagsItem(new Tag().name("PRODUCT TYPE").description("Loại sản phẩm"))
                 .addTagsItem(new Tag().name("COST TYPE").description("Loại chi phí"))

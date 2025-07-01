@@ -121,8 +121,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDTO customerProvideAddress(String orderId, OrderUpdateAddressRequest request) {
-        Orders orders = orderRepository.findByIdAndStatus(orderId, OrderStatus.PENDING_CONTRACT)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        Orders orders = getOrderById(orderId);
 
         orderMapper.updateEntityFromUpdateInformationRequest(request, orders);
         orders = orderRepository.save(orders);
