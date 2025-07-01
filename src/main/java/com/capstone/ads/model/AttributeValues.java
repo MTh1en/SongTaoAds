@@ -28,9 +28,9 @@ public class AttributeValues {
     Boolean isAvailable;
 
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
     @UpdateTimestamp
-    LocalDateTime updateAt;
+    LocalDateTime updatedAt;
 
     @ManyToOne
     Attributes attributes;

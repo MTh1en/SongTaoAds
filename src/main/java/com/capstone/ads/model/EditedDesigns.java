@@ -15,17 +15,17 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class AIDesigns {
+public class EditedDesigns {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String image;
+    String editedImage;
     String customerNote;
 
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
     @UpdateTimestamp
-    LocalDateTime updateAt;
+    LocalDateTime updatedAt;
     @ManyToOne
     CustomerDetail customerDetail;
     @ManyToOne

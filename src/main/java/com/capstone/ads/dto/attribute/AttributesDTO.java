@@ -16,7 +16,7 @@ public class AttributesDTO {
     String calculateFormula;
     Boolean isAvailable;
     Boolean isCore;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
     String productTypeId;
 }

@@ -19,7 +19,7 @@ public class CostTypeDTO {
     Integer priority;
     Boolean isCore;
     Boolean isAvailable;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
     ProductTypeDTO productTypes;
 }

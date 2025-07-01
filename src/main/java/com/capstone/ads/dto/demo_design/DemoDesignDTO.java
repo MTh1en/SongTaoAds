@@ -18,8 +18,8 @@ public class DemoDesignDTO {
     String customerNote;
     String customerFeedbackImage;
     Integer version;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
     DemoDesignStatus status;
     String customDesignRequests;
 }

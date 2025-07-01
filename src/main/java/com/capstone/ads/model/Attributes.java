@@ -26,9 +26,9 @@ public class Attributes {
     Boolean isCore;
 
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
     @UpdateTimestamp
-    LocalDateTime updateAt;
+    LocalDateTime updatedAt;
 
     @ManyToOne
     ProductTypes productTypes;

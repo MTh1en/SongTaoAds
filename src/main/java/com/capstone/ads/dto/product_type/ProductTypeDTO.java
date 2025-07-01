@@ -16,6 +16,6 @@ public class ProductTypeDTO {
     String name;
     String calculateFormula;
     Boolean isAvailable;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
 }

@@ -91,7 +91,7 @@ public class PriceProposalServiceImpl implements PriceProposalService {
 
     @Override
     public List<PriceProposalDTO> findPriceProposalByCustomerDesignRequestId(String customerDesignRequestId) {
-        return priceProposalRepository.findByCustomDesignRequests_IdOrderByCreateAtDescUpdateAtDesc(customerDesignRequestId).stream()
+        return priceProposalRepository.findByCustomDesignRequests_IdOrderByCreatedAtDescUpdatedAtDesc(customerDesignRequestId).stream()
                 .map(priceProposalMapper::toDTO)
                 .collect(Collectors.toList());
     }

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface PriceProposalRepository extends JpaRepository<PriceProposal, String> {
-    List<PriceProposal> findByCustomDesignRequests_IdOrderByCreateAtDescUpdateAtDesc(String id);
+    List<PriceProposal> findByCustomDesignRequests_IdOrderByCreatedAtDescUpdatedAtDesc(String id);
 
     boolean existsByCustomDesignRequests_IdAndStatus(String id, PriceProposalStatus status);
 }

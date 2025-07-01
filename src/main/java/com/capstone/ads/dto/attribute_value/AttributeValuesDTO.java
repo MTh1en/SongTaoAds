@@ -18,7 +18,7 @@ public class AttributeValuesDTO {
     Long unitPrice;
     Boolean isMultiplier;
     Boolean isAvailable;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
     String attributesId;
 }

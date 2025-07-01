@@ -31,9 +31,9 @@ public class PriceProposal {
     PriceProposalStatus status;
 
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
     @UpdateTimestamp
-    LocalDateTime updateAt;
+    LocalDateTime updatedAt;
 
     @ManyToOne
     CustomDesignRequests customDesignRequests;

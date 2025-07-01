@@ -22,8 +22,8 @@ public class CustomDesignRequestDTO {
     Boolean isNeedSupport;
     Boolean hasOrder;
     CustomerChoiceHistories customerChoiceHistories;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
     CustomDesignRequestStatus status;
     String customerDetail;
     String assignDesigner;

@@ -41,5 +41,5 @@ public class DesignTemplates {
     ProductTypes productTypes;
 
     @OneToMany(mappedBy = "designTemplates")
-    List<AIDesigns> aiDesigns;
+    List<EditedDesigns> editedDesigns;
 }

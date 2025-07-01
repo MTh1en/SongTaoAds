@@ -28,9 +28,9 @@ public class Payments {
     PaymentMethod method;
 
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
     @UpdateTimestamp
-    LocalDateTime updateAt;
+    LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
     PaymentStatus status;
