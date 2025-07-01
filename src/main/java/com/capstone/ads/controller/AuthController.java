@@ -24,6 +24,11 @@ public class AuthController {
     private final AuthService authService;
     private final VerificationService verificationService;
 
+    @GetMapping("/name")
+    public String getThreadName() {
+        return Thread.currentThread().toString();
+    }
+
 
     @PostMapping("/login")
     @Operation(summary = "Đăng nhập")
