@@ -1,5 +1,8 @@
 package com.capstone.ads.dto.edited_design;
 
+import com.capstone.ads.dto.CoreDTO;
+import com.capstone.ads.dto.customer_detail.CustomerDetailDTO;
+import com.capstone.ads.dto.design_template.DesignTemplateDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -16,6 +19,7 @@ public class EditedDesignDTO {
     String customerNote;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    String customerDetail;
-    String designTemplates;
+    CustomerDetailDTO customerDetail;
+    CoreDTO designTemplates;
+    CoreDTO backgrounds;
 }

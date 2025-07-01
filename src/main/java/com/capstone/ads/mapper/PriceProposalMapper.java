@@ -13,15 +13,11 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface PriceProposalMapper {
-    @Mapping(target = "customDesignRequestId", source = "customDesignRequests.id")
     PriceProposalDTO toDTO(PriceProposal priceProposal);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", expression = "java(initStatus())")
-    @Mapping(target = "customDesignRequests", expression = "java(customDesignRequests)")
-    @Mapping(target = "totalPrice", source = "createRequest.totalPrice")
-    @Mapping(target = "depositAmount", source = "createRequest.depositAmount")
-    PriceProposal mapCreateRequestToEntity(PriceProposalCreateRequest createRequest, CustomDesignRequests customDesignRequests);
+    PriceProposal mapCreateRequestToEntity(PriceProposalCreateRequest createRequest);
 
     void mapUpdatePricingRequestToEntity(PriceProposalUpdatePricingRequest request, @MappingTarget PriceProposal priceProposal);
 

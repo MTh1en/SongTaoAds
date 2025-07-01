@@ -12,27 +12,9 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface DesignTemplatesMapper {
-    @Mapping(target = "userId", source = "users.id")
-    @Mapping(target = "productTypeId", source = "productTypes.id")
     DesignTemplateDTO toDTO(DesignTemplates designTemplates);
 
-    @Mapping(target = "users", expression = "java(mapUsers(userId))")
-    @Mapping(target = "productTypes", expression = "java(mapProductTypes(productTypeId))")
-    DesignTemplates toEntity(DesignTemplateCreateRequest request, String userId, String productTypeId);
+    DesignTemplates mapCreateRequestToEntity(DesignTemplateCreateRequest request);
 
     void updateEntityFromRequest(DesignTemplateUpdateRequest request, @MappingTarget DesignTemplates designTemplates);
-
-    default Users mapUsers(String userId) {
-        if (userId == null) return null;
-        Users users = new Users();
-        users.setId(userId);
-        return users;
-    }
-
-    default ProductTypes mapProductTypes(String productTypeId) {
-        if (productTypeId == null) return null;
-        ProductTypes productType = new ProductTypes();
-        productType.setId(productTypeId);
-        return productType;
-    }
 }

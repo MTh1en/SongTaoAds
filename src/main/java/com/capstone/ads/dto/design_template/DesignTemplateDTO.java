@@ -1,5 +1,7 @@
 package com.capstone.ads.dto.design_template;
 
+import com.capstone.ads.dto.CoreDTO;
+import com.capstone.ads.dto.user.UserDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -21,6 +23,6 @@ public class DesignTemplateDTO {
     Boolean isAvailable;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    String userId;
-    String productTypeId;
+    UserDTO users;
+    CoreDTO productTypes;
 }

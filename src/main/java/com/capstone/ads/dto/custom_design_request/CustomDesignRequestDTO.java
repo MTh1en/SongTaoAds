@@ -1,5 +1,7 @@
 package com.capstone.ads.dto.custom_design_request;
 
+import com.capstone.ads.dto.customer_detail.CustomerDetailDTO;
+import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.model.json.CustomerChoiceHistories;
 import lombok.*;
@@ -25,6 +27,6 @@ public class CustomDesignRequestDTO {
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     CustomDesignRequestStatus status;
-    String customerDetail;
-    String assignDesigner;
+    CustomerDetailDTO customerDetail;
+    UserDTO assignDesigner;
 }

@@ -2,6 +2,7 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
+import com.capstone.ads.dto.edited_design.EditedDesignCreateRequest;
 import com.capstone.ads.dto.edited_design.EditedDesignDTO;
 import com.capstone.ads.service.EditedDesignService;
 import com.capstone.ads.utils.ApiResponseBuilder;
@@ -15,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@Tag(name = "AI DESIGN")
+@Tag(name = "EDITED DESIGN")
 public class EditedDesignsController {
     private final EditedDesignService service;
 
@@ -24,12 +25,24 @@ public class EditedDesignsController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @Operation(summary = "Lưu ảnh sau khi chỉnh sửa")
-    public ApiResponse<EditedDesignDTO> createEditedDesign(
+    public ApiResponse<EditedDesignDTO> createEditedDesignFromDesignTemplate(
             @PathVariable String customerDetailId,
             @PathVariable String designTemplateId,
-            @RequestPart String customerNote,
-            @RequestPart MultipartFile editedImage) {
-        var response = service.createEditedDesign(customerDetailId, designTemplateId, customerNote, editedImage);
+            @ModelAttribute EditedDesignCreateRequest request) {
+        var response = service.createEditedDesignFromDesignTemplate(customerDetailId, designTemplateId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Create Edited Design successfully", response);
+    }
+
+    @PostMapping(
+            value = "/customer-details/{customerDetailId}/backgrounds/{backgroundId}/edited-designs",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @Operation(summary = "Lưu ảnh sau khi chỉnh sửa")
+    public ApiResponse<EditedDesignDTO> createEditedDesignFromBackground(
+            @PathVariable String customerDetailId,
+            @PathVariable String backgroundId,
+            @ModelAttribute EditedDesignCreateRequest request) {
+        var response = service.createEditedDesignFromBackground(customerDetailId, backgroundId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create Edited Design successfully", response);
     }
 

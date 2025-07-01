@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.customer_choice_detail;
 
+import com.capstone.ads.dto.CoreDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -16,7 +17,7 @@ public class CustomerChoicesDetailsDTO {
     Boolean isMultiplier;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    String customerChoicesId;
-    String attributeValuesId;
+    CoreDTO customerChoices;
+    CoreDTO attributeValues;
 }
 

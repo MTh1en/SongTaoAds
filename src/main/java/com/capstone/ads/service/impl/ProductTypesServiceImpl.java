@@ -82,13 +82,6 @@ public class ProductTypesServiceImpl implements ProductTypesService {
     }
 
     @Override
-    public void validateProductTypeExistsAndAvailable(String productTypeId) {
-        if (!productTypesRepository.existsByIdAndIsAvailable(productTypeId, true)) {
-            throw new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND);
-        }
-    }
-
-    @Override
     public ProductTypes getProductTypeByIdAndAvailable(String productTypeId) {
         return productTypesRepository.findByIdAndIsAvailable(productTypeId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));

@@ -34,12 +34,16 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
     @Override
     @Transactional
     public CustomerChoicesDTO createCustomerChoice(String customerId, String productTypeId) {
-        userService.validateUserExistsAndIsActive(customerId);
-        productTypesService.validateProductTypeExistsAndAvailable(productTypeId);
+        Users users = userService.getUserByIdAndIsActive(customerId);
+        ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
 
-        CustomerChoices customerChoices = customerChoicesMapper.toEntity(customerId, productTypeId);
-        customerChoices.setTotalAmount(0L);
+        CustomerChoices customerChoices = CustomerChoices.builder()
+                .users(users)
+                .productTypes(productTypes)
+                .totalAmount(0L)
+                .build();
         customerChoices = customerChoicesRepository.save(customerChoices);
+
         return customerChoicesMapper.toDTO(customerChoices);
     }
 

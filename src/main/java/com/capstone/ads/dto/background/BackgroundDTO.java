@@ -1,4 +1,4 @@
-package com.capstone.ads.dto.customer_choice_size;
+package com.capstone.ads.dto.background;
 
 import com.capstone.ads.dto.CoreDTO;
 import lombok.*;
@@ -11,11 +11,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CustomerChoicesSizeDTO {
+public class BackgroundDTO {
     String id;
-    Float sizeValue;
+    String name;
+    String description;
+    String backgroundUrl;
+    Boolean isAvailable;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    CoreDTO customerChoices;
-    CoreDTO sizes;
+    CoreDTO attributeValues;
 }

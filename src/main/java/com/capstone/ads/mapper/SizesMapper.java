@@ -11,7 +11,7 @@ import org.mapstruct.MappingTarget;
 public interface SizesMapper {
     SizeDTO toDTO(Sizes sizes);
 
-    Sizes toEntity(SizeCreateRequest request);
+    Sizes mapCreateRequestToEntity(SizeCreateRequest request);
 
     void updateEntityFromRequest(SizeUpdateRequest request, @MappingTarget Sizes sizes);
 }

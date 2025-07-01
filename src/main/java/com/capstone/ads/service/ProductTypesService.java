@@ -21,7 +21,5 @@ public interface ProductTypesService {
     ProductTypeDTO uploadProductTypeImage(String productTypeId, MultipartFile file);
 
     //INTERNAL FUNCTION
-    void validateProductTypeExistsAndAvailable(String productTypeId);
-
     ProductTypes getProductTypeByIdAndAvailable(String productTypeId);
 }

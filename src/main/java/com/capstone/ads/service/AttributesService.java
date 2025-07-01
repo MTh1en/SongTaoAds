@@ -20,5 +20,5 @@ public interface AttributesService {
     void hardDeleteAttribute(String attributeId);
 
     //INTERNAL FUNCTION
-    void validateAttributeExistsAndIsAvailable(String attributeId);
+    Attributes getAttributeByIdAndIsAvailable(String attributeId);
 }

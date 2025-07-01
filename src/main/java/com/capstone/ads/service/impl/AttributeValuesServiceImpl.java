@@ -7,6 +7,7 @@ import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.AttributeValuesMapper;
 import com.capstone.ads.model.AttributeValues;
+import com.capstone.ads.model.Attributes;
 import com.capstone.ads.repository.internal.AttributeValuesRepository;
 import com.capstone.ads.service.AttributeValuesService;
 import com.capstone.ads.service.AttributesService;
@@ -27,10 +28,12 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
     @Override
     @Transactional
     public AttributeValuesDTO createAttributeValue(String attributesId, AttributeValuesCreateRequest request) {
-        attributesService.validateAttributeExistsAndIsAvailable(attributesId);
+        Attributes attributes = attributesService.getAttributeByIdAndIsAvailable(attributesId);
 
-        AttributeValues attributeValues = attributeValuesMapper.toEntity(request, attributesId);
+        AttributeValues attributeValues = attributeValuesMapper.mapCreateRequestToEntity(request);
+        attributeValues.setAttributes(attributes);
         attributeValues = attributeValuesRepository.save(attributeValues);
+
         return attributeValuesMapper.toDTO(attributeValues);
     }
 
@@ -54,8 +57,6 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
 
     @Override
     public Page<AttributeValuesDTO> findAllAttributeValueByAttributesId(String attributesId, int page, int size) {
-        attributesService.validateAttributeExistsAndIsAvailable(attributesId);
-
         Pageable pageable = PageRequest.of(page - 1, size);
 
         return attributeValuesRepository.findByAttributes_Id(attributesId, pageable)

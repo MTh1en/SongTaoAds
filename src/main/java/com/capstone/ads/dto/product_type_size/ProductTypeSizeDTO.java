@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.product_type_size;
 
+import com.capstone.ads.dto.CoreDTO;
 import com.capstone.ads.dto.size.SizeDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -15,6 +16,6 @@ public class ProductTypeSizeDTO {
     String id;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    String productTypeId;
+    CoreDTO productTypes;
     SizeDTO sizes;
 }

@@ -7,6 +7,7 @@ import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.AttributesMapper;
 import com.capstone.ads.model.Attributes;
+import com.capstone.ads.model.ProductTypes;
 import com.capstone.ads.repository.internal.AttributesRepository;
 import com.capstone.ads.service.AttributesService;
 import com.capstone.ads.service.ProductTypesService;
@@ -16,8 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,10 +28,12 @@ public class AttributesServiceImpl implements AttributesService {
     @Override
     @Transactional
     public AttributesDTO createAttribute(String productTypeId, AttributesCreateRequest request) {
-        productTypesService.validateProductTypeExistsAndAvailable(productTypeId);
+        ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
 
-        Attributes attributes = attributesMapper.toEntity(productTypeId, request);
+        Attributes attributes = attributesMapper.mapCreateRequestToEntity(productTypeId, request);
+        attributes.setProductTypes(productTypes);
         attributes = attributesRepository.save(attributes);
+
         return attributesMapper.toDTO(attributes);
     }
 
@@ -56,8 +57,6 @@ public class AttributesServiceImpl implements AttributesService {
 
     @Override
     public Page<AttributesDTO> findAllAttributeByProductTypeId(String productTypeId, int page, int size) {
-        productTypesService.validateProductTypeExistsAndAvailable(productTypeId);
-
         Pageable pageable = PageRequest.of(page - 1, size);
         return attributesRepository.findByProductTypes_Id(productTypeId, pageable)
                 .map(attributesMapper::toDTO);
@@ -73,10 +72,8 @@ public class AttributesServiceImpl implements AttributesService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public void validateAttributeExistsAndIsAvailable(String attributeId) {
-        if (!attributesRepository.existsByIdAndIsAvailable(attributeId, true)) {
-            throw new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND);
-        }
+    public Attributes getAttributeByIdAndIsAvailable(String attributeId) {
+        return attributesRepository.findByIdAndIsAvailable(attributeId, true)
+                .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
     }
 }

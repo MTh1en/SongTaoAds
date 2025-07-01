@@ -49,7 +49,11 @@ public class OrderServiceImpl implements OrderService {
         CustomDesignRequests customDesignRequests = customDesignRequestService.getCustomDesignRequestById(customDesignRequestId);
         Users users = securityContextUtils.getCurrentUser();
 
-        Orders orders = orderMapper.toEntityFromCreateOrderByCustomDesign(customDesignRequests, users);
+        Orders orders = Orders.builder()
+                .customDesignRequests(customDesignRequests)
+                .users(users)
+                .status(OrderStatus.PENDING_DESIGN)
+                .build();
         orders.setCustomerChoiceHistories(customDesignRequests.getCustomerChoiceHistories());
         orders.setTotalAmount(customDesignRequests.getCustomerChoiceHistories().getTotalAmount());
 
@@ -64,7 +68,11 @@ public class OrderServiceImpl implements OrderService {
         CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoiceId);
         Users users = securityContextUtils.getCurrentUser();
 
-        Orders orders = orderMapper.toEntityFromCreateOrderByAIDesign(editedDesigns, users);
+        Orders orders = Orders.builder()
+                .editedDesigns(editedDesigns)
+                .users(users)
+                .status(OrderStatus.PENDING_CONTRACT)
+                .build();
         orders.setTotalAmount(customerChoices.getTotalAmount());
         orders.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
 
