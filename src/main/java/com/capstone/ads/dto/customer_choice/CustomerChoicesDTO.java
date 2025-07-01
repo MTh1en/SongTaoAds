@@ -1,5 +1,8 @@
 package com.capstone.ads.dto.customer_choice;
 
+import com.capstone.ads.dto.CoreDTO;
+import com.capstone.ads.dto.user.UserDTO;
+import com.capstone.ads.model.Users;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -15,6 +18,6 @@ public class CustomerChoicesDTO {
     Long totalAmount;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    String userId;
-    String productTypeId;
+    UserDTO users;
+    CoreDTO productTypes;
 }

@@ -1,6 +1,7 @@
 package com.capstone.ads.mapper;
 
 import com.capstone.ads.dto.demo_design.CustomerRejectCustomDesignRequest;
+import com.capstone.ads.dto.demo_design.DemoDesignCreateRequest;
 import com.capstone.ads.dto.demo_design.DemoDesignDTO;
 import com.capstone.ads.dto.demo_design.DesignerUpdateDescriptionCustomDesignRequest;
 import com.capstone.ads.model.CustomDesignRequests;
@@ -12,24 +13,11 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface DemoDesignsMapper {
-    @Mapping(target = "customDesignRequests", source = "customDesignRequests.id")
     DemoDesignDTO toDTO(DemoDesigns demoDesigns);
 
-    @Mapping(target = "customDesignRequests", expression = "java(mapToCustomDesignRequests(customerDesignRequestId))")
-    @Mapping(target = "status", expression = "java(initStatus())")
-    @Mapping(target = "designerDescription", expression = "java(designerDescription)")
-    DemoDesigns toEntity(String designerDescription, String customerDesignRequestId);
+    DemoDesigns mapCreateRequestToEntity(DemoDesignCreateRequest request);
 
     void updateEntityFromCustomerRequest(CustomerRejectCustomDesignRequest request, @MappingTarget DemoDesigns demoDesigns);
 
     void updateEntityFromDesignerRequest(DesignerUpdateDescriptionCustomDesignRequest request, @MappingTarget DemoDesigns demoDesigns);
-
-    default CustomDesignRequests mapToCustomDesignRequests(String customerDesignRequestId) {
-        if (customerDesignRequestId == null) return null;
-        return CustomDesignRequests.builder().id(customerDesignRequestId).build();
-    }
-
-    default DemoDesignStatus initStatus() {
-        return DemoDesignStatus.PENDING;
-    }
 }

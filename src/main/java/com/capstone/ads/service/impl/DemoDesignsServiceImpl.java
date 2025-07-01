@@ -1,6 +1,7 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.S3ImageDuration;
+import com.capstone.ads.dto.demo_design.DemoDesignCreateRequest;
 import com.capstone.ads.dto.demo_design.DemoDesignDTO;
 import com.capstone.ads.dto.demo_design.CustomerRejectCustomDesignRequest;
 import com.capstone.ads.dto.demo_design.DesignerUpdateDescriptionCustomDesignRequest;
@@ -39,18 +40,19 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
 
     @Override
     @Transactional
-    public DemoDesignDTO designerCreateCustomDesign(String customDesignRequestId, String designerDescription, MultipartFile customDesignImage) {
+    public DemoDesignDTO designerCreateCustomDesign(String customDesignRequestId, DemoDesignCreateRequest request) {
         customDesignRequestService.validateCreateCustomDesign(customDesignRequestId);
 
-        DemoDesigns demoDesigns = demoDesignsMapper.toEntity(designerDescription, customDesignRequestId);
+        DemoDesigns demoDesigns = demoDesignsMapper.mapCreateRequestToEntity(request);
 
         //Kiểm tra phiên bản nếu có n bản thiết kế thì lúc tạo sẽ là bản thứ n + 1
         int versionNumber = demoDesignsRepository.countByCustomDesignRequests_Id(customDesignRequestId) + 1;
 
         //Lấy đường dẫn hình ảnh được lưu trữ ở S3
-        String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, customDesignImage);
+        String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, request.getCustomDesignImage());
 
         demoDesigns.setDemoImage(customDesignImageKey);
+        demoDesigns.setStatus(DemoDesignStatus.PENDING);
         demoDesigns.setVersion(versionNumber);
         demoDesigns = demoDesignsRepository.save(demoDesigns);
 

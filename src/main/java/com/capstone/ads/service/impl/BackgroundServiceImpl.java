@@ -87,16 +87,6 @@ public class BackgroundServiceImpl implements BackgroundService {
                 .stream()
                 .map(backgroundMapper::toDTO)
                 .collect(Collectors.toList());
-//        return customerChoices.getCustomerChoiceDetails().stream()
-//                .filter(detail -> {
-//                    String attributeValueId = detail.getAttributeValues().getId();
-//                    return backgroundsRepository.existsByAttributeValues_IdAndIsAvailable(attributeValueId, true);
-//                })
-//                .flatMap(detail -> {
-//                    String attributeValueId = detail.getAttributeValues().getId();
-//                    var response = backgroundsRepository.findBackgroundsByAttributeValues_IdAndIsAvailable(attributeValueId, true);
-//                    return response.stream().map(backgroundMapper::toDTO);
-//                }).toList();
     }
 
     @Override

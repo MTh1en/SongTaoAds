@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CustomerDetailRequest {
+public class CustomerDetailUpdateRequest {
     String companyName;
     String address;
     String contactInfo;

@@ -7,12 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AttributesRepository extends JpaRepository<Attributes, String> {
     Page<Attributes> findByProductTypes_Id(String id, Pageable pageable);
 
-    boolean existsByIdAndIsAvailable(String id, Boolean isAvailable);
-
-    List<Attributes> findAttributesByProductTypes_Id(String id);
+    Optional<Attributes> findByIdAndIsAvailable(String id, Boolean isAvailable);
 }

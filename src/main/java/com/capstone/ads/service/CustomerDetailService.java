@@ -1,13 +1,15 @@
 package com.capstone.ads.service;
 
+import com.capstone.ads.dto.customer_detail.CustomerDetailCreateRequest;
 import com.capstone.ads.dto.customer_detail.CustomerDetailDTO;
-import com.capstone.ads.dto.customer_detail.CustomerDetailRequest;
+import com.capstone.ads.dto.customer_detail.CustomerDetailUpdateRequest;
+import com.capstone.ads.model.CustomerDetail;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface CustomerDetailService {
-    CustomerDetailDTO createCustomerDetail(String companyName, String address, String contactInfo, MultipartFile customerDetailLogo);
+    CustomerDetailDTO createCustomerDetail(CustomerDetailCreateRequest request);
 
     CustomerDetailDTO findCustomerDetailById(String customerDetailId);
 
@@ -15,12 +17,12 @@ public interface CustomerDetailService {
 
     List<CustomerDetailDTO> findAllCustomerDetails();
 
-    CustomerDetailDTO updateCustomerDetailInformation(String customerDetailId, CustomerDetailRequest request);
+    CustomerDetailDTO updateCustomerDetailInformation(String customerDetailId, CustomerDetailUpdateRequest request);
 
     CustomerDetailDTO updateCustomerDetailLogoImage(String customerDetailId, MultipartFile logoImage);
 
     void hardDeleteCustomerDetail(String customerDetailId);
 
     //INTERNAL FUNCTION
-    void validateCustomerDetailExists(String customerDetailId);
+    CustomerDetail getCustomerChoiceDetailById(String customerDetailId);
 }

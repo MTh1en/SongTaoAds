@@ -15,5 +15,6 @@ public class ProductTypeUpdateRequest {
     String name;
     @NotBlank(message = "Product Type Calculate Formula is Required")
     String calculateFormula;
+    Boolean isAiGenerated;
     Boolean isAvailable;
 }

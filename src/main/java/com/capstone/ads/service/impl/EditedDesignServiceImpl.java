@@ -1,16 +1,17 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.S3ImageDuration;
+import com.capstone.ads.dto.edited_design.EditedDesignCreateRequest;
 import com.capstone.ads.dto.edited_design.EditedDesignDTO;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.EditedDesignMapper;
+import com.capstone.ads.model.Backgrounds;
+import com.capstone.ads.model.CustomerDetail;
+import com.capstone.ads.model.DesignTemplates;
 import com.capstone.ads.model.EditedDesigns;
 import com.capstone.ads.repository.internal.EditedDesignsRepository;
-import com.capstone.ads.service.EditedDesignService;
-import com.capstone.ads.service.CustomerDetailService;
-import com.capstone.ads.service.DesignTemplatesService;
-import com.capstone.ads.service.S3Service;
+import com.capstone.ads.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,18 +30,39 @@ import java.util.UUID;
 public class EditedDesignServiceImpl implements EditedDesignService {
     private final CustomerDetailService customerDetailService;
     private final DesignTemplatesService designTemplatesService;
+    private final BackgroundService backgroundService;
     private final S3Service s3Service;
     private final EditedDesignsRepository editedDesignsRepository;
     private final EditedDesignMapper editedDesignMapper;
 
     @Override
     @Transactional
-    public EditedDesignDTO createEditedDesign(String customerDetailId, String designTemplateId, String customerNote, MultipartFile aiImage) {
-        customerDetailService.validateCustomerDetailExists(customerDetailId);
-        designTemplatesService.validateDesignTemplateExistsAndAvailable(designTemplateId);
+    public EditedDesignDTO createEditedDesignFromDesignTemplate(String customerDetailId, String designTemplateId,
+                                                                EditedDesignCreateRequest request) {
+        CustomerDetail customerDetail = customerDetailService.getCustomerChoiceDetailById(customerDetailId);
+        DesignTemplates designTemplates = designTemplatesService.getDesignTemplateById(designTemplateId);
+        String aiDesignImageUrl = uploadAIDesignImageToS3(customerDetailId, request.getEditedImage());
 
-        EditedDesigns editedDesigns = editedDesignMapper.toEntity(customerDetailId, designTemplateId, customerNote);
-        String aiDesignImageUrl = uploadAIDesignImageToS3(customerDetailId, aiImage);
+        EditedDesigns editedDesigns = editedDesignMapper.mapCreateRequestToEntity(request);
+        editedDesigns.setCustomerDetail(customerDetail);
+        editedDesigns.setDesignTemplates(designTemplates);
+        editedDesigns.setEditedImage(aiDesignImageUrl);
+
+        editedDesigns = editedDesignsRepository.save(editedDesigns);
+        return editedDesignMapper.toDTO(editedDesigns);
+    }
+
+    @Override
+    @Transactional
+    public EditedDesignDTO createEditedDesignFromBackground(String customerDetailId, String backgroundId,
+                                                            EditedDesignCreateRequest request) {
+        CustomerDetail customerDetail = customerDetailService.getCustomerChoiceDetailById(customerDetailId);
+        Backgrounds backgrounds = backgroundService.getAvailableBackgroundById(backgroundId);
+        String aiDesignImageUrl = uploadAIDesignImageToS3(customerDetailId, request.getEditedImage());
+
+        EditedDesigns editedDesigns = editedDesignMapper.mapCreateRequestToEntity(request);
+        editedDesigns.setCustomerDetail(customerDetail);
+        editedDesigns.setBackgrounds(backgrounds);
         editedDesigns.setEditedImage(aiDesignImageUrl);
 
         editedDesigns = editedDesignsRepository.save(editedDesigns);

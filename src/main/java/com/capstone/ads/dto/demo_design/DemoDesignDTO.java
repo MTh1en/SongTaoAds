@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.demo_design;
 
+import com.capstone.ads.dto.CoreDTO;
 import com.capstone.ads.model.enums.DemoDesignStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -21,5 +22,5 @@ public class DemoDesignDTO {
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     DemoDesignStatus status;
-    String customDesignRequests;
+    CoreDTO customDesignRequests;
 }

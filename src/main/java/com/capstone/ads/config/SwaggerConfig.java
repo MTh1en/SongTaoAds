@@ -37,7 +37,7 @@ public class SwaggerConfig {
                 .addTagsItem(new Tag().name("CUSTOMER CHOICE DETAIL").description("Thuộc tính sản phẩm khách hàng chọn"))
                 .addTagsItem(new Tag().name("DESIGN TEMPLATE").description("Thiết kế mẫu dùng cho AI"))
                 .addTagsItem(new Tag().name("BACKGROUND").description("Background mẫu khi không dùng AI"))
-                .addTagsItem(new Tag().name("AI DESIGN").description("Hình ảnh chỉnh sửa từ ảnh AI tạo"))
+                .addTagsItem(new Tag().name("EDITED DESIGN").description("Hình ảnh sau khi khách hàng chỉnh sửa"))
                 .addTagsItem(new Tag().name("CUSTOM DESIGN REQUEST").description("Yêu cầu thiết kế riêng"))
                 .addTagsItem(new Tag().name("PRICE PROPOSAL").description("Báo giá thiết kế"))
                 .addTagsItem(new Tag().name("DEMO DESIGN").description("Demo cho yêu cầu thiết kế"))

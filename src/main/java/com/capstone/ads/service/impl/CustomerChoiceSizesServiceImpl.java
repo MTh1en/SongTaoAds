@@ -8,6 +8,7 @@ import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerChoiceSizesMapper;
 import com.capstone.ads.model.CustomerChoiceSizes;
 import com.capstone.ads.model.CustomerChoices;
+import com.capstone.ads.model.Sizes;
 import com.capstone.ads.repository.internal.*;
 import com.capstone.ads.service.*;
 import lombok.RequiredArgsConstructor;
@@ -33,14 +34,16 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
     @Override
     @Transactional
     public CustomerChoicesSizeDTO createCustomerChoiceSize(String customerChoicesId, String sizeId, CustomerChoicesSizeCreateRequest request) {
-        var customerChoice = customerChoicesService.getCustomerChoiceById(customerChoicesId);
-        sizeService.validateSizeExistsAndIsAvailable(sizeId);
+        CustomerChoices customerChoice = customerChoicesService.getCustomerChoiceById(customerChoicesId);
+        Sizes sizes = sizeService.getSizeByIdAndIsAvailable(sizeId);
         productTypeSizesService.validateProductTypeSizeExist(customerChoice.getProductTypes().getId(), sizeId);
 
         if (customerChoiceSizesRepository.existsByCustomerChoices_IdAndSizes_Id(customerChoicesId, sizeId))
             throw new AppException(ErrorCode.CUSTOMER_CHOICE_SIZE_EXISTED);
 
-        CustomerChoiceSizes customerChoiceSizes = customerChoiceSizesMapper.toEntity(request, customerChoicesId, sizeId);
+        CustomerChoiceSizes customerChoiceSizes = customerChoiceSizesMapper.mapCreateRequestToEntity(request);
+        customerChoiceSizes.setCustomerChoices(customerChoice);
+        customerChoiceSizes.setSizes(sizes);
         customerChoiceSizes = customerChoiceSizesRepository.save(customerChoiceSizes);
 
         return customerChoiceSizesMapper.toDTO(customerChoiceSizes);

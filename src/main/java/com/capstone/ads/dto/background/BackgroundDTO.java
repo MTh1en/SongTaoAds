@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.background;
 
+import com.capstone.ads.dto.CoreDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,5 +19,5 @@ public class BackgroundDTO {
     Boolean isAvailable;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    BackgroundAttributeValueDTO attributeValues;
+    CoreDTO attributeValues;
 }

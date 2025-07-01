@@ -38,7 +38,8 @@ public class PriceProposalServiceImpl implements PriceProposalService {
         CustomDesignRequests customDesignRequests = customDesignRequestService.getCustomDesignRequestById(customerDesignRequestId);
 
         validateCreatedDuplicatedPriceProposal(customerDesignRequestId);
-        PriceProposal priceProposal = priceProposalMapper.mapCreateRequestToEntity(request, customDesignRequests);
+        PriceProposal priceProposal = priceProposalMapper.mapCreateRequestToEntity(request);
+        priceProposal.setCustomDesignRequests(customDesignRequests);
         priceProposal = priceProposalRepository.save(priceProposal);
 
         customDesignRequestService.updateCustomDesignRequestStatus(customerDesignRequestId, CustomDesignRequestStatus.PRICING_NOTIFIED);
