@@ -10,7 +10,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       minimum-idle: 5
-      maximum-pool-size: 10
+      maximum-pool-size: 50
       idle-timeout: 30000
       max-lifetime: 1800000
       connection-timeout: 20000
@@ -44,13 +44,16 @@ spring:
       chat:
         options:
           model: ${MODEL_CHAT}
+  threads:
+    virtual:
+      enabled: true
 server:
   port: 8080
   tomcat:
     threads:
-      max: 75
+      max: 500
       min-spare: 15
-
+    accept-count: 200
 app:
   base:
     url: ${BASE_URL}
@@ -75,7 +78,3 @@ brevo:
   sender-name: ${SENDER_NAME}
   sender-email: ${SENDER_EMAIL}
   verify-url: ${VERIFY_URL}
-
-
-
-

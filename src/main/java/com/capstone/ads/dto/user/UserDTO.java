@@ -18,7 +18,7 @@ public class UserDTO {
     String phone;
     String avatar;
     Boolean isActive;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
     RoleDTO roles;
 }

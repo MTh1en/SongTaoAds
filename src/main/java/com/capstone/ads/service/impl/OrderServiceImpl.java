@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private final ContractStateValidator contractStateValidator;
     private final CustomDesignRequestService customDesignRequestService;
     private final CustomerChoicesService customerChoicesService;
-    private final AIDesignsService aiDesignsService;
+    private final EditedDesignService editedDesignService;
 
     @Override
     @Transactional
@@ -60,11 +60,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDTO createOrderByAIDesign(String aiDesignId, String customerChoiceId) {
-        AIDesigns aiDesigns = aiDesignsService.getAIDesignById(aiDesignId);
+        EditedDesigns editedDesigns = editedDesignService.getEditedDesignById(aiDesignId);
         CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoiceId);
         Users users = securityContextUtils.getCurrentUser();
 
-        Orders orders = orderMapper.toEntityFromCreateOrderByAIDesign(aiDesigns, users);
+        Orders orders = orderMapper.toEntityFromCreateOrderByAIDesign(editedDesigns, users);
         orders.setTotalAmount(customerChoices.getTotalAmount());
         orders.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
 

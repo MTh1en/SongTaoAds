@@ -36,10 +36,10 @@ public class CustomDesignRequests {
     CustomerChoiceHistories customerChoiceHistories;
 
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
 
     @UpdateTimestamp
-    LocalDateTime updateAt;
+    LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
     CustomDesignRequestStatus status;

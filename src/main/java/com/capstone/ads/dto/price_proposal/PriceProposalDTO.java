@@ -19,7 +19,7 @@ public class PriceProposalDTO {
     Long totalPriceOffer;
     Long depositAmountOffer;
     PriceProposalStatus status;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
     String customDesignRequestId;
 }

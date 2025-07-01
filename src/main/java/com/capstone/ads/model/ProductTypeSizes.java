@@ -21,9 +21,9 @@ public class ProductTypeSizes {
     String id;
 
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
     @UpdateTimestamp
-    LocalDateTime updateAt;
+    LocalDateTime updatedAt;
 
     @ManyToOne
     ProductTypes productTypes;

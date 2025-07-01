@@ -19,7 +19,7 @@ public interface CustomDesignRequestsMapper {
 
     @Mapping(target = "assignDesigner", ignore = true)
     @Mapping(target = "customerDetail", expression = "java(mapToCustomerDetail(customerDetailId))")
-    @Mapping(target = "createAt", expression = "java(initCreateAt())")
+    @Mapping(target = "createdAt", expression = "java(initCreateAt())")
     @Mapping(target = "status", expression = "java(initStatus())")
     CustomDesignRequests toEntity(CustomDesignRequestCreateRequest request, String customerDetailId);
 

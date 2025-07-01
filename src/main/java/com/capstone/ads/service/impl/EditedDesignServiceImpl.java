@@ -1,13 +1,13 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.S3ImageDuration;
-import com.capstone.ads.dto.aidesign.AIDesignDTO;
+import com.capstone.ads.dto.edited_design.EditedDesignDTO;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
-import com.capstone.ads.mapper.AIDesignsMapper;
-import com.capstone.ads.model.AIDesigns;
-import com.capstone.ads.repository.internal.AIDesignsRepository;
-import com.capstone.ads.service.AIDesignsService;
+import com.capstone.ads.mapper.EditedDesignMapper;
+import com.capstone.ads.model.EditedDesigns;
+import com.capstone.ads.repository.internal.EditedDesignsRepository;
+import com.capstone.ads.service.EditedDesignService;
 import com.capstone.ads.service.CustomerDetailService;
 import com.capstone.ads.service.DesignTemplatesService;
 import com.capstone.ads.service.S3Service;
@@ -26,55 +26,55 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AIDesignsServiceImpl implements AIDesignsService {
+public class EditedDesignServiceImpl implements EditedDesignService {
     private final CustomerDetailService customerDetailService;
     private final DesignTemplatesService designTemplatesService;
     private final S3Service s3Service;
-    private final AIDesignsRepository aiDesignsRepository;
-    private final AIDesignsMapper aiDesignsMapper;
+    private final EditedDesignsRepository editedDesignsRepository;
+    private final EditedDesignMapper editedDesignMapper;
 
     @Override
     @Transactional
-    public AIDesignDTO createAIDesign(String customerDetailId, String designTemplateId, String customerNote, MultipartFile aiImage) {
+    public EditedDesignDTO createEditedDesign(String customerDetailId, String designTemplateId, String customerNote, MultipartFile aiImage) {
         customerDetailService.validateCustomerDetailExists(customerDetailId);
         designTemplatesService.validateDesignTemplateExistsAndAvailable(designTemplateId);
 
-        AIDesigns aiDesigns = aiDesignsMapper.toEntity(customerDetailId, designTemplateId, customerNote);
+        EditedDesigns editedDesigns = editedDesignMapper.toEntity(customerDetailId, designTemplateId, customerNote);
         String aiDesignImageUrl = uploadAIDesignImageToS3(customerDetailId, aiImage);
-        aiDesigns.setImage(aiDesignImageUrl);
+        editedDesigns.setEditedImage(aiDesignImageUrl);
 
-        aiDesigns = aiDesignsRepository.save(aiDesigns);
-        return aiDesignsMapper.toDTO(aiDesigns);
+        editedDesigns = editedDesignsRepository.save(editedDesigns);
+        return editedDesignMapper.toDTO(editedDesigns);
     }
 
     @Override
-    public Page<AIDesignDTO> findAIDesignByCustomerDetailId(String customerDetailId, int page, int size) {
+    public Page<EditedDesignDTO> findEditedDesignByCustomerDetailId(String customerDetailId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        return aiDesignsRepository.findByCustomerDetail_Id(customerDetailId, pageable)
-                .map(aiDesignsMapper::toDTO);
+        return editedDesignsRepository.findByCustomerDetail_Id(customerDetailId, pageable)
+                .map(editedDesignMapper::toDTO);
     }
 
     @Override
     @Transactional
-    public void hardDeleteAIDesign(String AIDesignId) {
-        if (!aiDesignsRepository.existsById(AIDesignId)) {
+    public void hardDeleteEditedDesign(String AIDesignId) {
+        if (!editedDesignsRepository.existsById(AIDesignId)) {
             throw new AppException(ErrorCode.AI_DESIGN_NOT_FOUND);
         }
-        aiDesignsRepository.deleteById(AIDesignId);
+        editedDesignsRepository.deleteById(AIDesignId);
     }
 
     @Override
-    public AIDesigns getAIDesignById(String AIDesignId) {
-        return aiDesignsRepository.findById(AIDesignId)
+    public EditedDesigns getEditedDesignById(String AIDesignId) {
+        return editedDesignsRepository.findById(AIDesignId)
                 .orElseThrow(() -> new AppException(ErrorCode.AI_DESIGN_NOT_FOUND));
     }
 
-    private AIDesignDTO convertToAIDesignDTOWithImageIsPresignedURL(AIDesigns aiDesigns) {
-        var aiDesignDTOResponse = aiDesignsMapper.toDTO(aiDesigns);
-        if (!Objects.isNull(aiDesigns.getImage())) {
-            var designTemplateImagePresigned = s3Service.getPresignedUrl(aiDesigns.getImage(), S3ImageDuration.CUSTOM_DESIGN_DURATION);
-            aiDesignDTOResponse.setImage(designTemplateImagePresigned);
+    private EditedDesignDTO convertToAIDesignDTOWithImageIsPresignedURL(EditedDesigns editedDesigns) {
+        var aiDesignDTOResponse = editedDesignMapper.toDTO(editedDesigns);
+        if (!Objects.isNull(editedDesigns.getEditedImage())) {
+            var designTemplateImagePresigned = s3Service.getPresignedUrl(editedDesigns.getEditedImage(), S3ImageDuration.CUSTOM_DESIGN_DURATION);
+            aiDesignDTOResponse.setEditedImage(designTemplateImagePresigned);
         }
         return aiDesignDTOResponse;
     }

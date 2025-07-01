@@ -26,9 +26,9 @@ public class ProductTypes {
     Boolean isAvailable;
 
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
     @UpdateTimestamp
-    LocalDateTime updateAt;
+    LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "productTypes")
     List<Attributes> attributes;

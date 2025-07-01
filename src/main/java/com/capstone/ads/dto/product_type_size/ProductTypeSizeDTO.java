@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductTypeSizeDTO {
     String id;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
     String productTypeId;
     SizeDTO sizes;
 }

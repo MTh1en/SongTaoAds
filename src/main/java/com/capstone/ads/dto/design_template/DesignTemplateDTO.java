@@ -19,8 +19,8 @@ public class DesignTemplateDTO {
     Integer width;
     Integer height;
     Boolean isAvailable;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
     String userId;
     String productTypeId;
 }

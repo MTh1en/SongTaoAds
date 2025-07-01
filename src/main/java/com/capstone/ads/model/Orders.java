@@ -68,7 +68,7 @@ public class Orders {
     Contract contract;
 
     @OneToOne
-    AIDesigns aiDesigns;
+    EditedDesigns editedDesigns;
 
     @OneToOne
     CustomDesignRequests customDesignRequests;

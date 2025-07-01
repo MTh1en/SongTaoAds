@@ -29,9 +29,9 @@ public class DemoDesigns {
     Integer version;
 
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
     @UpdateTimestamp
-    LocalDateTime updateAt;
+    LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
     DemoDesignStatus status;
