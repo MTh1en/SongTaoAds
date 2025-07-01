@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,8 +27,13 @@ public class EditedDesigns {
     LocalDateTime createdAt;
     @UpdateTimestamp
     LocalDateTime updatedAt;
+
     @ManyToOne
     CustomerDetail customerDetail;
+
     @ManyToOne
     DesignTemplates designTemplates;
+
+    @ManyToOne
+    Backgrounds backgrounds;
 }

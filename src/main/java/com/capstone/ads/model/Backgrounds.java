@@ -16,15 +16,13 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class AttributeValues {
+public class Backgrounds {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String name;
-    String unit;
-    Long materialPrice;
-    Long unitPrice;
-    Boolean isMultiplier;
+    String description;
+    String backgroundUrl;
     Boolean isAvailable;
 
     @CreationTimestamp
@@ -33,11 +31,8 @@ public class AttributeValues {
     LocalDateTime updatedAt;
 
     @ManyToOne
-    Attributes attributes;
+    AttributeValues attributeValues;
 
-    @OneToMany(mappedBy = "attributeValues")
-    List<CustomerChoiceDetails> customerChoiceDetails;
-
-    @OneToMany(mappedBy = "attributeValues")
-    List<Backgrounds> backgrounds;
+    @OneToMany(mappedBy = "backgrounds")
+    List<EditedDesigns> editedDesigns;
 }

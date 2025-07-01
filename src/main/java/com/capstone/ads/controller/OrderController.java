@@ -57,14 +57,16 @@ public class OrderController {
 
     @PatchMapping("/orders/{orderId}/address")
     @Operation(summary = "Khách hàng cung cấp địa chỉ giao hàng")
-    public ApiResponse<OrderDTO> customerProvideAddress(@PathVariable String orderId, @RequestBody OrderUpdateAddressRequest request) {
+    public ApiResponse<OrderDTO> customerProvideAddress(@PathVariable String orderId,
+                                                        @RequestBody OrderUpdateAddressRequest request) {
         var response = orderService.customerProvideAddress(orderId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update order information successful", response);
     }
 
     @PatchMapping("/orders/{orderId}/estimate-delivery-date")
     @Operation(summary = "Sale báo ngày giao dự tính")
-    public ApiResponse<OrderDTO> saleNotifyEstimateDeliveryDate(@PathVariable String orderId, @RequestBody OrderConfirmRequest request) {
+    public ApiResponse<OrderDTO> saleNotifyEstimateDeliveryDate(@PathVariable String orderId,
+                                                                @RequestBody OrderConfirmRequest request) {
         var response = orderService.saleNotifyEstimateDeliveryDate(orderId, request);
         return ApiResponseBuilder.buildSuccessResponse("Confirm order successful", response);
     }
@@ -110,18 +112,20 @@ public class OrderController {
 
     @GetMapping("/users/{userId}/orders")
     @Operation(summary = "Xem order theo ID người dùng")
-    public ApiPagingResponse<OrderDTO> findOrderByUserId(@PathVariable String userId,
-                                                         @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                         @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+    public ApiPagingResponse<OrderDTO> findOrderByUserId(
+            @PathVariable String userId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = orderService.findOrderByUserId(userId, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find Order by Users", response, page);
     }
 
     @GetMapping("/orders")
     @Operation(summary = "Xem order theo status")
-    public ApiPagingResponse<OrderDTO> findOrderByStatus(@RequestParam OrderStatus orderStatus,
-                                                         @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                         @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+    public ApiPagingResponse<OrderDTO> findOrderByStatus(
+            @RequestParam OrderStatus orderStatus,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = orderService.findOrderByStatus(orderStatus, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find Order By Status", response, page);
     }

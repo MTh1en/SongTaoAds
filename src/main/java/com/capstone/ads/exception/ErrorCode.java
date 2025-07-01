@@ -105,6 +105,8 @@ public enum ErrorCode {
     FEEDBACK_NOT_FOUND("Feedback not found", HttpStatus.NOT_FOUND),
 
     COST_TYPE_NOT_FOUND("Cost type not found", HttpStatus.NOT_FOUND),
+
+    BACKGROUND_NOT_FOUND("Background not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

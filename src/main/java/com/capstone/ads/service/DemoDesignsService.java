@@ -1,5 +1,6 @@
 package com.capstone.ads.service;
 
+import com.capstone.ads.dto.demo_design.DemoDesignCreateRequest;
 import com.capstone.ads.dto.demo_design.DemoDesignDTO;
 import com.capstone.ads.dto.demo_design.CustomerRejectCustomDesignRequest;
 import com.capstone.ads.dto.demo_design.DesignerUpdateDescriptionCustomDesignRequest;
@@ -7,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface DemoDesignsService {
-    DemoDesignDTO designerCreateCustomDesign(String customDesignRequestId, String designerDescription, MultipartFile customDesignImage);
+    DemoDesignDTO designerCreateCustomDesign(String customDesignRequestId, DemoDesignCreateRequest request);
 
     DemoDesignDTO customerApproveCustomDesign(String customDesignId);
 

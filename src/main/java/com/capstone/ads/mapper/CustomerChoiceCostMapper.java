@@ -8,9 +8,5 @@ import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring")
 public interface CustomerChoiceCostMapper {
-    @Mappings({
-            @Mapping(target = "customerChoiceId", source = "customerChoices.id"),
-            @Mapping(target = "costTypeId", source = "costTypes.id")
-    })
     CustomerChoiceCostDTO toDTO(CustomerChoiceCosts customerChoiceCosts);
 }

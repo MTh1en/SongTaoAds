@@ -23,6 +23,7 @@ public class ProductTypes {
     String name;
     String image;
     String calculateFormula;
+    Boolean isAiGenerated;
     Boolean isAvailable;
 
     @CreationTimestamp

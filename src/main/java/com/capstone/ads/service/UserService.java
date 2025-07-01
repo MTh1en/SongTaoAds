@@ -32,5 +32,7 @@ public interface UserService {
     //INTERNAL FUNCTION
     void validateUserExistsAndIsActive(String userId);
 
+    Users getUserByIdAndIsActive(String userId);
+
     Users getUsersByIdAndIsActiveAndRoleName(String userId, boolean isActive, String roleName);
 }

@@ -8,6 +8,7 @@ import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomDesignRequestsMapper;
 import com.capstone.ads.model.CustomDesignRequests;
 import com.capstone.ads.model.CustomerChoices;
+import com.capstone.ads.model.CustomerDetail;
 import com.capstone.ads.model.Users;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.repository.internal.CustomDesignRequestsRepository;
@@ -45,11 +46,13 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     @Transactional
     public CustomDesignRequestDTO createCustomDesignRequest(String customerDetailId, String customerChoicesId,
                                                             CustomDesignRequestCreateRequest request) {
-        customerDetailService.validateCustomerDetailExists(customerDetailId);
+        CustomerDetail customerDetail = customerDetailService.getCustomerChoiceDetailById(customerDetailId);
         CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoicesId);
 
-        var customDesignRequest = customDesignRequestsMapper.toEntity(request, customerDetailId);
+        var customDesignRequest = customDesignRequestsMapper.mapCreateRequestToEntity(request);
         customDesignRequest.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
+        customDesignRequest.setCustomerDetail(customerDetail);
+        customDesignRequest.setStatus(CustomDesignRequestStatus.PENDING);
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
 
 //        customerChoicesService.hardDeleteCustomerChoice(customerChoicesId);
@@ -63,6 +66,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         List<CustomDesignRequestStatus> allowedStatus = Arrays.asList(
                 CustomDesignRequestStatus.DEPOSITED,
                 CustomDesignRequestStatus.DESIGNER_REJECTED);
+
         var customerDesignRequest = customDesignRequestsRepository.findByIdAndStatusIn(customDesignRequestId, allowedStatus)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_DEPOSITED_NOT_FOUND));
 

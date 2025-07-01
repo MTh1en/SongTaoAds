@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.customer_choice_cost;
 
+import com.capstone.ads.dto.CoreDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,6 +12,6 @@ import lombok.experimental.FieldDefaults;
 public class CustomerChoiceCostDTO {
     String id;
     Long value;
-    String customerChoiceId;
-    String costTypeId;
+    CoreDTO customerChoices;
+    CoreDTO costTypes;
 }

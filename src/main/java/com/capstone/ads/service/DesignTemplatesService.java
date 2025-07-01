@@ -23,7 +23,5 @@ public interface DesignTemplatesService {
     void hardDeleteDesignTemplate(String designTemplateId);
 
     //INTERNAL FUNCTION
-    void validateDesignTemplateExistsAndAvailable(String designTemplateId);
-
     DesignTemplates getDesignTemplateById(String designTemplateId);
 }

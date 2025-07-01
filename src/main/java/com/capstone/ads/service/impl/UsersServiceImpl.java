@@ -83,7 +83,7 @@ public class UsersServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO updateUserProfile(String userId, UserProfileUpdateRequest request) {
-        Users user = findUserByIdAndActive(userId);
+        Users user = getUserByIdAndIsActive(userId);
 
         // Use MapStruct to updateProductTypeInformation entity fields
         usersMapper.updateUserUpdateRequestToEntity(request, user);
@@ -110,7 +110,7 @@ public class UsersServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO uploadUserAvatar(String userId, MultipartFile file) {
-        Users user = findUserByIdAndActive(userId);
+        Users user = getUserByIdAndIsActive(userId);
         String avatarName = generateAvatarName(user.getId());
         s3Service.uploadSingleFile(avatarName, file);
         user.setAvatar(avatarName);
@@ -120,7 +120,7 @@ public class UsersServiceImpl implements UserService {
 
     @Override
     public UserDTO changePassword(String userId, ChangePasswordRequest request) {
-        Users user = findUserByIdAndActive(userId);
+        Users user = getUserByIdAndIsActive(userId);
         if (passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         }
@@ -134,6 +134,12 @@ public class UsersServiceImpl implements UserService {
         if (!usersRepository.existsByIdAndIsActive(userId, true)) {
             throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
+    }
+
+    @Override
+    public Users getUserByIdAndIsActive(String userId) {
+        return usersRepository.findByIdAndIsActive(userId, true)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
     @Override
@@ -153,11 +159,6 @@ public class UsersServiceImpl implements UserService {
             userResponse.setAvatar(avatarImageDownloadFromS3);
         }
         return userResponse;
-    }
-
-    private Users findUserByIdAndActive(String userId) {
-        return usersRepository.findByIdAndIsActive(userId, true)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
     private boolean isValidRole(String role) {
