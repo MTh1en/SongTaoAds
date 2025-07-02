@@ -25,9 +25,9 @@ public class FileData {
     String name;
     String description;
     String imageUrl;
-
+    String contentType;
     String fileType;
-    String fileSize;
+    Long fileSize;
 
     @CreationTimestamp
     LocalDateTime createdAt;

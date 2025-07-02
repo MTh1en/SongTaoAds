@@ -54,6 +54,7 @@ public class SwaggerConfig {
                 .addTagsItem(new Tag().name("ATTRIBUTE VALUE").description("Giá trị thuộc tính"))
                 .addTagsItem(new Tag().name("CHAT BOT").description("Ai chat"))
                 .addTagsItem(new Tag().name("STABLE DIFFUSION").description("Ai image"))
+                .addTagsItem(new Tag().name("FILE DATA").description("Thông tin tất cả các file trên hệ thống"))
                 .addTagsItem(new Tag().name("AWS S3").description("Xử lý file với S3"))
                 ;
     }
