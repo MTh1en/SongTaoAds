@@ -108,6 +108,8 @@ public enum ErrorCode {
     COST_TYPE_NOT_FOUND("Cost type not found", HttpStatus.NOT_FOUND),
 
     BACKGROUND_NOT_FOUND("Background not found", HttpStatus.NOT_FOUND),
+
+    ICON_NOT_FOUND("Icon not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
