@@ -33,7 +33,7 @@ public class S3RepositoryImpl implements S3Repository {
                     .key(key)
                     .contentType(file.getContentType() != null ? file.getContentType() : "application/octet-stream")
                     .build();
-
+            log.info("content type: {}", file.getContentType());
             // Stream file trực tiếp, không nạp vào RAM
             s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
             return key;

@@ -16,6 +16,7 @@ import com.capstone.ads.service.S3Service;
 import com.capstone.ads.utils.SecurityContextUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +36,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatBotServiceImpl implements ChatBotService {
     @Value("${spring.ai.openai.api-key}")
     private String openaiApiKey;
@@ -264,10 +267,10 @@ public class ChatBotServiceImpl implements ChatBotService {
 
                 String jsonlFileName = fileName.endsWith(".jsonl") ? fileName : fileName + ".jsonl";
                 MultipartFile jsonlFile = convertToJsonl(rowsResult, headers, jsonlFileName);
-
+                log.info("content type: {}", jsonlFile.getContentType());
                 // Generate UUID and construct S3 key
                 String uuid = UUID.randomUUID().toString();
-                String s3Key = "uploadJsonlFile/" + uuid + "/" + jsonlFileName; // Include UUID in the path
+                String s3Key = "uploadJsonlFile/" + uuid;
 
                 return s3Service.uploadSingleFile(s3Key, jsonlFile);
             } catch (Exception e) {
@@ -306,7 +309,7 @@ public class ChatBotServiceImpl implements ChatBotService {
 
                 // Create MultipartFile directly from byte array
                 byte[] byteArray = baos.toByteArray();
-                return new ByteArrayMultipartFile(fileName, byteArray);
+                return new MockMultipartFile(fileName, byteArray);
             } catch (IOException e) {
                 throw new AppException(ErrorCode.INVALID_INPUT);
             }
