@@ -1,18 +1,20 @@
 package com.capstone.ads.service;
 
 import com.capstone.ads.dto.chatBot.*;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 public interface ChatBotService {
     String chat(ChatRequest request);
 
+    String TestChat(TestChatRequest request);
+
     String translateToTextToImagePrompt(String prompt);
 
-    FileUploadResponse uploadFileToFinetune(MultipartFile file);
+    FileUploadResponse uploadFileToFineTune(MultipartFile file);
 
     FineTuningJobResponse fineTuningJob(FineTuningJobRequest request);
 
@@ -28,7 +30,11 @@ public interface ChatBotService {
 
     FineTuningJobResponse cancelFineTuningJob(String fineTuningJobId);
 
-    File uploadFileExcel(MultipartFile file, String fileName);
+    String uploadFileExcel(MultipartFile file, String fileName);
+
+    ListModelsResponse getModels();
+
+    Page<ModelChatBotDTO> getModelChatBots(int page, int size);
 
     ModelChatBotDTO setModeChatBot(String jobId);
 }
