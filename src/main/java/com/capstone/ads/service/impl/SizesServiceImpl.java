@@ -10,7 +10,6 @@ import com.capstone.ads.model.Sizes;
 import com.capstone.ads.repository.internal.SizesRepository;
 import com.capstone.ads.service.SizeService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.engine.jdbc.Size;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +25,7 @@ public class SizesServiceImpl implements SizeService {
     @Override
     @Transactional
     public SizeDTO createSize(SizeCreateRequest request) {
-        Sizes sizes = sizesMapper.toEntity(request);
+        Sizes sizes = sizesMapper.mapCreateRequestToEntity(request);
         sizes = sizesRepository.save(sizes);
         return sizesMapper.toDTO(sizes);
     }
@@ -65,10 +64,8 @@ public class SizesServiceImpl implements SizeService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public void validateSizeExistsAndIsAvailable(String sizeId) {
-        if (!sizesRepository.existsByIdAndIsAvailable(sizeId, true)) {
-            throw new AppException(ErrorCode.SIZE_NOT_FOUND);
-        }
+    public Sizes getSizeByIdAndIsAvailable(String sizeId) {
+        return sizesRepository.findByIdAndIsAvailable(sizeId, true)
+                .orElseThrow(() -> new AppException(ErrorCode.SIZE_NOT_FOUND));
     }
 }

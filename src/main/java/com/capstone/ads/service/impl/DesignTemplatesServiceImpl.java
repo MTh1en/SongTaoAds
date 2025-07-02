@@ -8,6 +8,8 @@ import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.DesignTemplatesMapper;
 import com.capstone.ads.model.DesignTemplates;
+import com.capstone.ads.model.ProductTypes;
+import com.capstone.ads.model.Users;
 import com.capstone.ads.repository.internal.DesignTemplatesRepository;
 import com.capstone.ads.service.DesignTemplatesService;
 import com.capstone.ads.service.ProductTypesService;
@@ -37,12 +39,15 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     @Override
     @Transactional
     public DesignTemplateDTO createDesignTemplate(String productTypeId, DesignTemplateCreateRequest request) {
-        productTypesService.validateProductTypeExistsAndAvailable(productTypeId);
-        String currentUserId = securityContextUtils.getCurrentUserId();
+        ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
+        Users currentUser = securityContextUtils.getCurrentUser();
 
-        DesignTemplates designTemplates = designTemplatesMapper.toEntity(request, currentUserId, productTypeId);
+        DesignTemplates designTemplates = designTemplatesMapper.mapCreateRequestToEntity(request);
+        designTemplates.setProductTypes(productTypes);
+        designTemplates.setUsers(currentUser);
         designTemplates.setIsAvailable(true);
         designTemplatesRepository.save(designTemplates);
+
         return designTemplatesMapper.toDTO(designTemplates);
     }
 
@@ -97,13 +102,6 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
             throw new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND);
         }
         designTemplatesRepository.deleteById(designTemplateId);
-    }
-
-    @Override
-    public void validateDesignTemplateExistsAndAvailable(String designTemplateId) {
-        if (!designTemplatesRepository.existsByIdAndIsAvailable(designTemplateId, true)) {
-            throw new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND);
-        }
     }
 
     @Override

@@ -23,12 +23,13 @@ public class ProductTypes {
     String name;
     String image;
     String calculateFormula;
+    Boolean isAiGenerated;
     Boolean isAvailable;
 
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
     @UpdateTimestamp
-    LocalDateTime updateAt;
+    LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "productTypes")
     List<Attributes> attributes;

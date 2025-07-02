@@ -18,4 +18,7 @@ public interface AttributeValuesService {
     void hardDeleteAttributeValue(String attributeValueId);
 
     AttributeValues getAttributeValueById(String attributeValueId);
+
+    //INTERNAL FUNCTION
+
 }

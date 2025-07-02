@@ -1,4 +1,4 @@
-package com.capstone.ads.dto.aidesign;
+package com.capstone.ads.dto.demo_design;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AIDesignCreateRequest {
-    String customerNote;
-    MultipartFile image;
+public class DemoDesignCreateRequest {
+    String designerDescription;
+    MultipartFile customDesignImage;
 }

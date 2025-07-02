@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.user;
 
+import com.capstone.ads.dto.CoreDTO;
 import com.capstone.ads.dto.role.RoleDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,7 +19,7 @@ public class UserDTO {
     String phone;
     String avatar;
     Boolean isActive;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
-    RoleDTO roles;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+    CoreDTO roles;
 }

@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.customer_choice_size;
 
+import com.capstone.ads.dto.CoreDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -15,6 +16,6 @@ public class CustomerChoicesSizeDTO {
     Float sizeValue;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    String customerChoicesId;
-    String sizeId;
+    CoreDTO customerChoices;
+    CoreDTO sizes;
 }

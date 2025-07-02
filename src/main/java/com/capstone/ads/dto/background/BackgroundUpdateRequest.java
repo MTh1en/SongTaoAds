@@ -1,4 +1,4 @@
-package com.capstone.ads.dto.customer_detail;
+package com.capstone.ads.dto.background;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,8 +8,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CustomerDetailRequest {
-    String companyName;
-    String address;
-    String contactInfo;
+public class BackgroundUpdateRequest {
+    String name;
+    String description;
+    Boolean isAvailable;
 }

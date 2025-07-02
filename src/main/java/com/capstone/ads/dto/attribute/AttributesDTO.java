@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.attribute;
 
+import com.capstone.ads.dto.CoreDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -16,7 +17,7 @@ public class AttributesDTO {
     String calculateFormula;
     Boolean isAvailable;
     Boolean isCore;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
-    String productTypeId;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+    CoreDTO productTypeId;
 }

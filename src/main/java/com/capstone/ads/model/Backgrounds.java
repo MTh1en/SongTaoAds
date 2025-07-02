@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,19 +16,23 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class AIDesigns {
+public class Backgrounds {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String image;
-    String customerNote;
+    String name;
+    String description;
+    String backgroundUrl;
+    Boolean isAvailable;
 
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
     @UpdateTimestamp
-    LocalDateTime updateAt;
+    LocalDateTime updatedAt;
+
     @ManyToOne
-    CustomerDetail customerDetail;
-    @ManyToOne
-    DesignTemplates designTemplates;
+    AttributeValues attributeValues;
+
+    @OneToMany(mappedBy = "backgrounds")
+    List<EditedDesigns> editedDesigns;
 }

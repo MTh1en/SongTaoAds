@@ -28,13 +28,16 @@ public class AttributeValues {
     Boolean isAvailable;
 
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
     @UpdateTimestamp
-    LocalDateTime updateAt;
+    LocalDateTime updatedAt;
 
     @ManyToOne
     Attributes attributes;
 
     @OneToMany(mappedBy = "attributeValues")
     List<CustomerChoiceDetails> customerChoiceDetails;
+
+    @OneToMany(mappedBy = "attributeValues")
+    List<Backgrounds> backgrounds;
 }

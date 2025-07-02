@@ -3,6 +3,7 @@ package com.capstone.ads.controller;
 import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.demo_design.CustomerRejectCustomDesignRequest;
+import com.capstone.ads.dto.demo_design.DemoDesignCreateRequest;
 import com.capstone.ads.dto.demo_design.DemoDesignDTO;
 import com.capstone.ads.dto.demo_design.DesignerUpdateDescriptionCustomDesignRequest;
 import com.capstone.ads.service.DemoDesignsService;
@@ -27,9 +28,8 @@ public class DemoDesignsController {
     )
     @Operation(summary = "Designer gửi bản demo cho khách hàng")
     public ApiResponse<DemoDesignDTO> designerCreateCustomDesign(@PathVariable String customDesignRequestId,
-                                                                 @RequestPart String designerDescription,
-                                                                 @RequestPart MultipartFile customDesignImage) {
-        var response = demoDesignsService.designerCreateCustomDesign(customDesignRequestId, designerDescription, customDesignImage);
+                                                                 @ModelAttribute DemoDesignCreateRequest request) {
+        var response = demoDesignsService.designerCreateCustomDesign(customDesignRequestId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create custom design successful", response);
     }
 

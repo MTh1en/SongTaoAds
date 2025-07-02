@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private final ContractStateValidator contractStateValidator;
     private final CustomDesignRequestService customDesignRequestService;
     private final CustomerChoicesService customerChoicesService;
-    private final AIDesignsService aiDesignsService;
+    private final EditedDesignService editedDesignService;
 
     @Override
     @Transactional
@@ -49,7 +49,11 @@ public class OrderServiceImpl implements OrderService {
         CustomDesignRequests customDesignRequests = customDesignRequestService.getCustomDesignRequestById(customDesignRequestId);
         Users users = securityContextUtils.getCurrentUser();
 
-        Orders orders = orderMapper.toEntityFromCreateOrderByCustomDesign(customDesignRequests, users);
+        Orders orders = Orders.builder()
+                .customDesignRequests(customDesignRequests)
+                .users(users)
+                .status(OrderStatus.PENDING_DESIGN)
+                .build();
         orders.setCustomerChoiceHistories(customDesignRequests.getCustomerChoiceHistories());
         orders.setTotalAmount(customDesignRequests.getCustomerChoiceHistories().getTotalAmount());
 
@@ -60,11 +64,15 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDTO createOrderByAIDesign(String aiDesignId, String customerChoiceId) {
-        AIDesigns aiDesigns = aiDesignsService.getAIDesignById(aiDesignId);
+        EditedDesigns editedDesigns = editedDesignService.getEditedDesignById(aiDesignId);
         CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoiceId);
         Users users = securityContextUtils.getCurrentUser();
 
-        Orders orders = orderMapper.toEntityFromCreateOrderByAIDesign(aiDesigns, users);
+        Orders orders = Orders.builder()
+                .editedDesigns(editedDesigns)
+                .users(users)
+                .status(OrderStatus.PENDING_CONTRACT)
+                .build();
         orders.setTotalAmount(customerChoices.getTotalAmount());
         orders.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
 

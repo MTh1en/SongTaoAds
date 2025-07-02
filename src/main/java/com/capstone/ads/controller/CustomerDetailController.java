@@ -1,8 +1,9 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
+import com.capstone.ads.dto.customer_detail.CustomerDetailCreateRequest;
 import com.capstone.ads.dto.customer_detail.CustomerDetailDTO;
-import com.capstone.ads.dto.customer_detail.CustomerDetailRequest;
+import com.capstone.ads.dto.customer_detail.CustomerDetailUpdateRequest;
 import com.capstone.ads.service.CustomerDetailService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,11 +26,8 @@ public class CustomerDetailController {
 
     @PostMapping(value = "/customer-details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Tạo thông tin doanh nghiệp")
-    public ApiResponse<CustomerDetailDTO> createCustomerDetail(@RequestPart String companyName,
-                                                               @RequestPart String address,
-                                                               @RequestPart String contactInfo,
-                                                               @RequestPart MultipartFile customerDetailLogo) {
-        var response = customerDetailService.createCustomerDetail(companyName, address, contactInfo, customerDetailLogo);
+    public ApiResponse<CustomerDetailDTO> createCustomerDetail(@ModelAttribute CustomerDetailCreateRequest request) {
+        var response = customerDetailService.createCustomerDetail(request);
         return ApiResponseBuilder.buildSuccessResponse("Create customer detail successful", response);
     }
 
@@ -62,15 +60,19 @@ public class CustomerDetailController {
 
     @PatchMapping("/customer-details/{customerDetailId}/information")
     @Operation(summary = "Cập nhật thông tin doanh nghiệp")
-    public ApiResponse<CustomerDetailDTO> updateCustomerDetailInformation(@Valid @PathVariable("customerDetailId") String customerDetailId,
-                                                                          @RequestBody CustomerDetailRequest request) {
+    public ApiResponse<CustomerDetailDTO> updateCustomerDetailInformation(
+            @Valid @PathVariable("customerDetailId") String customerDetailId,
+            @RequestBody CustomerDetailUpdateRequest request) {
         return ApiResponseBuilder.buildSuccessResponse(
                 "Update customer detail successful",
                 customerDetailService.updateCustomerDetailInformation(customerDetailId, request)
         );
     }
 
-    @PatchMapping(value = "/customer-details/{customerDetailId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(
+            value = "/customer-details/{customerDetailId}/image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     @Operation(summary = "Cập nhât logo doanh nghiệp")
     public ApiResponse<CustomerDetailDTO> updateCustomerDetailImage(@PathVariable("customerDetailId") String customerDetailId,
                                                                     @RequestPart MultipartFile image) {

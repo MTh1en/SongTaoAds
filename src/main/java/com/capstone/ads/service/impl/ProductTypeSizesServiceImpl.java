@@ -5,6 +5,8 @@ import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ProductTypeSizesMapper;
 import com.capstone.ads.model.ProductTypeSizes;
+import com.capstone.ads.model.ProductTypes;
+import com.capstone.ads.model.Sizes;
 import com.capstone.ads.repository.internal.ProductTypeSizesRepository;
 import com.capstone.ads.service.ProductTypeSizesService;
 import com.capstone.ads.service.ProductTypesService;
@@ -27,11 +29,15 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
     @Override
     @Transactional
     public ProductTypeSizeDTO createProductTypeSize(String productTypeId, String sizeId) {
-        productTypesService.validateProductTypeExistsAndAvailable(productTypeId);
-        sizeService.validateSizeExistsAndIsAvailable(sizeId);
+        ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
+        Sizes sizes = sizeService.getSizeByIdAndIsAvailable(sizeId);
 
-        ProductTypeSizes productTypeSizes = productTypeSizesMapper.toEntity(productTypeId, sizeId);
+        ProductTypeSizes productTypeSizes = ProductTypeSizes.builder()
+                .productTypes(productTypes)
+                .sizes(sizes)
+                .build();
         productTypeSizes = productTypeSizesRepository.save(productTypeSizes);
+
         return productTypeSizesMapper.toDTO(productTypeSizes);
     }
 

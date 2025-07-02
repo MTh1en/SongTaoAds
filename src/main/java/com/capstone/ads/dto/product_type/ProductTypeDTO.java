@@ -15,7 +15,8 @@ public class ProductTypeDTO {
     String image;
     String name;
     String calculateFormula;
+    Boolean isAiGenerated;
     Boolean isAvailable;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
 }

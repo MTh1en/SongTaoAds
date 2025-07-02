@@ -94,7 +94,8 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public Page<FeedbackDTO> findAllFeedback(int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sort = Sort.by("sendAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return feedbacksRepository.findAll(pageable)
                 .map(this::convertToFeedbackDTOWithImageIsPresignedURL);
     }

@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.attribute_value;
 
+import com.capstone.ads.dto.CoreDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,7 +19,7 @@ public class AttributeValuesDTO {
     Long unitPrice;
     Boolean isMultiplier;
     Boolean isAvailable;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
-    String attributesId;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+    CoreDTO attributesId;
 }

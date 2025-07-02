@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.cost_type;
 
+import com.capstone.ads.dto.CoreDTO;
 import com.capstone.ads.dto.product_type.ProductTypeDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -19,7 +20,7 @@ public class CostTypeDTO {
     Integer priority;
     Boolean isCore;
     Boolean isAvailable;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
-    ProductTypeDTO productTypes;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
+    CoreDTO productTypes;
 }

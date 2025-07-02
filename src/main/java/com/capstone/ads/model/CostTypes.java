@@ -28,9 +28,9 @@ public class CostTypes {
     Boolean isAvailable;
 
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
     @UpdateTimestamp
-    LocalDateTime updateAt;
+    LocalDateTime updatedAt;
 
     @ManyToOne
     ProductTypes productTypes;
