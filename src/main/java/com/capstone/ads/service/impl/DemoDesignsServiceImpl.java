@@ -8,6 +8,7 @@ import com.capstone.ads.dto.demo_design.DesignerUpdateDescriptionCustomDesignReq
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.DemoDesignsMapper;
+import com.capstone.ads.model.CustomDesignRequests;
 import com.capstone.ads.model.DemoDesigns;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.model.enums.DemoDesignStatus;
@@ -41,7 +42,7 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
     @Override
     @Transactional
     public DemoDesignDTO designerCreateCustomDesign(String customDesignRequestId, DemoDesignCreateRequest request) {
-        customDesignRequestService.validateCreateCustomDesign(customDesignRequestId);
+        CustomDesignRequests customDesignRequests = customDesignRequestService.getCustomDesignRequestById(customDesignRequestId);
 
         DemoDesigns demoDesigns = demoDesignsMapper.mapCreateRequestToEntity(request);
 
@@ -51,6 +52,7 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
         //Lấy đường dẫn hình ảnh được lưu trữ ở S3
         String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, request.getCustomDesignImage());
 
+        demoDesigns.setCustomDesignRequests(customDesignRequests);
         demoDesigns.setDemoImage(customDesignImageKey);
         demoDesigns.setStatus(DemoDesignStatus.PENDING);
         demoDesigns.setVersion(versionNumber);
