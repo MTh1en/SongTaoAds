@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.chatBot;
 
+import com.capstone.ads.model.ChatBotLog;
 import com.capstone.ads.model.Users;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +25,8 @@ public class ChatBotDTO {
     @ManyToOne
     Users users;
 
+    @ManyToOne
+    ChatBotLog chatBotLog;
 
     String question;
     String answer;

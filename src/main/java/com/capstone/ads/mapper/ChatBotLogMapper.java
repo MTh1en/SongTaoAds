@@ -11,13 +11,6 @@ public interface ChatBotLogMapper {
     ChatBotDTO toDTO(ChatBotLog chatBotLog);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "users", expression = "java(mapUsers(userId))")
-    ChatBotLog toEntity(String question, String answer, String userId);
+    ChatBotLog toEntity(String question, String answer);
 
-    default Users mapUsers(String userId) {
-        if (userId == null) return null;
-        Users users = new Users();
-        users.setId(userId);
-        return users;
-    }
 }
