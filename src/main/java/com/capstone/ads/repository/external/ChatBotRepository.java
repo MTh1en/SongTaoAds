@@ -55,6 +55,9 @@ public interface ChatBotRepository {
             @RequestHeader("Authorization") String authorization,
             @PathVariable("fine_tuning_job_id") String fineTuningJobId);
 
+    @GetMapping(value = "/models")
+    ListModelsResponse getModels(
+            @RequestHeader("Authorization") String authorization);
 }
 
 

@@ -1,5 +1,6 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.chatBot.*;
 import com.capstone.ads.service.ChatBotService;
@@ -13,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chat-bot")
@@ -29,6 +29,14 @@ public class ChatBotController {
         return ApiResponseBuilder.buildSuccessResponse("Chat response retrieved successfully.", reply);
     }
 
+    @PostMapping("/test-chat")
+    @Operation(summary = "Staff Test Model Chat")
+    public ApiResponse<String> chat(@RequestBody TestChatRequest request) {
+        String reply = chatBotService.TestChat(request);
+        return ApiResponseBuilder.buildSuccessResponse("Chat response retrieved successfully.", reply);
+    }
+
+
     @PostMapping("/translate-to-txt2img-prompt")
     public ApiResponse<String> translate(@RequestBody ChatRequest request) {
         String reply = chatBotService.translateToTextToImagePrompt(request.getPrompt());
@@ -39,7 +47,7 @@ public class ChatBotController {
     @Operation(summary = "Upload file để fine-tune")
     public ApiResponse<FileUploadResponse> uploadFileToFinetune(
             @RequestParam MultipartFile file) {
-        FileUploadResponse response = chatBotService.uploadFileToFinetune(file);
+        FileUploadResponse response = chatBotService.uploadFileToFineTune(file);
         return ApiResponseBuilder.buildSuccessResponse("File uploaded successfully for fine-tuning", response);
     }
 
@@ -105,10 +113,25 @@ public class ChatBotController {
 
     @PostMapping(value = "/upload-file-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Convert từ file excel thành file jsonl")
-    public ApiResponse<File> uploadFileExcel(@RequestParam("file") MultipartFile file,
+    public ApiResponse<String> uploadFileExcel(@RequestParam("file") MultipartFile file,
                                              @RequestParam("fileName") String fileName) {
-        File resposne = chatBotService.uploadFileExcel(file, fileName);
+        String resposne = chatBotService.uploadFileExcel(file, fileName);
         return ApiResponseBuilder.buildSuccessResponse(("Uploaded file successfully"), resposne);
     }
 
+    @GetMapping("/models")
+    @Operation(summary = "Xem tất cả các model open-ai")
+    public ApiResponse<ListModelsResponse> getModels() {
+        ListModelsResponse response = chatBotService.getModels();
+        return ApiResponseBuilder.buildSuccessResponse("Models retrieved successfully", response);
+    }
+
+    @GetMapping("/models-fine-tune")
+    @Operation(summary = "Xem tất cả các model đã fine-tune")
+    public ApiPagingResponse<ModelChatBotDTO> viewAllModelFineTune(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var models = chatBotService.getModelChatBots(page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Tickets retrieved successfully", models, page);
+    }
 }
