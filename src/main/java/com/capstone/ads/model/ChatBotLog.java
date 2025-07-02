@@ -23,6 +23,8 @@ public class ChatBotLog {
     String question;
     String answer;
 
+    @ManyToOne
+    ModelChatBot modelChatBot;
     @CreationTimestamp
     LocalDateTime createdAt;
 

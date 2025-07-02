@@ -90,6 +90,7 @@ public enum ErrorCode {
     //CHAT BOT
     EXTERNAL_SERVICE_ERROR("External service error", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_INPUT("Invalid input", HttpStatus.BAD_REQUEST),
+    MODEL_CHAT_NOT_FOUND("Model chat not found", HttpStatus.NOT_FOUND),
 
     //Ticket
     TICKET_NOT_FOUND("Ticket not found", HttpStatus.NOT_FOUND),
