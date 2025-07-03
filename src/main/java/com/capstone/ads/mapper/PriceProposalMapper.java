@@ -4,7 +4,6 @@ import com.capstone.ads.dto.price_proposal.PriceProposalCreateRequest;
 import com.capstone.ads.dto.price_proposal.PriceProposalDTO;
 import com.capstone.ads.dto.price_proposal.PriceProposalOfferPricingRequest;
 import com.capstone.ads.dto.price_proposal.PriceProposalUpdatePricingRequest;
-import com.capstone.ads.model.CustomDesignRequests;
 import com.capstone.ads.model.PriceProposal;
 import com.capstone.ads.model.enums.PriceProposalStatus;
 import org.mapstruct.Mapper;

@@ -55,7 +55,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequest.setStatus(CustomDesignRequestStatus.PENDING);
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
 
-//        customerChoicesService.hardDeleteCustomerChoice(customerChoicesId);
+        customerChoicesService.hardDeleteCustomerChoice(customerChoicesId);
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 
@@ -148,16 +148,6 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     public CustomDesignRequests getCustomDesignRequestById(String customDesignRequestId) {
         return customDesignRequestsRepository.findById(customDesignRequestId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
-    }
-
-    @Override
-    public void validateCreateCustomDesign(String customDesignRequestId) {
-        List<CustomDesignRequestStatus> allowedStatus = Arrays.asList(
-                CustomDesignRequestStatus.PROCESSING,
-                CustomDesignRequestStatus.REVISION_REQUESTED
-        );
-        if (!customDesignRequestsRepository.existsByIdAndStatusIn(customDesignRequestId, allowedStatus))
-            throw new AppException(ErrorCode.DEMO_DESIGN_IN_WAITING_DECISION_FROM_CUSTOMER);
     }
 
     @Override

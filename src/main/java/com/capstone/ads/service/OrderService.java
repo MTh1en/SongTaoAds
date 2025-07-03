@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface OrderService {
     OrderDTO createOrderByCustomDesign(String customDesignRequestId);
 
-    OrderDTO createOrderByAIDesign(String aiDesignId, String customerChoiceId);
+    OrderDTO createOrderByEditedDesign(String editedDesignId, String customerChoiceId);
 
     OrderDTO saleRequestCustomerResignContract(String orderId);
 
