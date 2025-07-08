@@ -28,7 +28,7 @@ public class VerificationController {
         return ApiResponseBuilder.buildSuccessResponse("Resend email verified successfully", response);
     }
 
-    @GetMapping("/verification/verify")
+    @GetMapping("/verifications/verify")
     public ModelAndView verifyAccount(@RequestParam String email, @RequestParam String code) {
         if (verificationService.validateVerificationCode(email, code)) {
             authService.verifyUser(email);
