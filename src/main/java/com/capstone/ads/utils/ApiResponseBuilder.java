@@ -5,8 +5,6 @@ import com.capstone.ads.dto.ApiResponse;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.domain.Page;
 
-import java.util.List;
-
 /**
  * Utility class to build standardized API responses.
  */
@@ -33,7 +31,6 @@ public class ApiResponseBuilder {
      *
      * @param message The success message.
      * @param page The Page object containing data and metadata.
-     * @param result The list of result data (mapped DTOs).
      * @param pageNumber The current page number (1-based).
      * @param <T> The type of the result data.
      * @return A built ApiPagingResponse instance.
@@ -57,11 +54,11 @@ public class ApiResponseBuilder {
      * @param <T> The type of the result data.
      * @return A built ApiResponse instance.
      */
-    public static <T> ApiResponse<T> buildErrorResponse(String message) {
+    public static <T> ApiResponse<T> buildErrorResponse(String message, T result) {
         return ApiResponse.<T>builder()
                 .success(false)
                 .message(message)
-                .result(null)
+                .result(result)
                 .build();
     }
 
