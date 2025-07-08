@@ -18,7 +18,8 @@ public class CustomerChoicesController {
 
     @PostMapping("/customers/{customerId}/product-types/{productTypeId}")
     @Operation(summary = "Tạo loại sản phẩm khách hàng chọn")
-    public ApiResponse<CustomerChoicesDTO> createCustomerChoice(@PathVariable String customerId, @PathVariable String productTypeId) {
+    public ApiResponse<CustomerChoicesDTO> createCustomerChoice(@PathVariable String customerId,
+                                                                @PathVariable String productTypeId) {
         var response = service.createCustomerChoice(customerId, productTypeId);
         return ApiResponseBuilder.buildSuccessResponse("Create customer choices successful", response);
     }

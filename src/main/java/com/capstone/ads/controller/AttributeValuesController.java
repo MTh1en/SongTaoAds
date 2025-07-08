@@ -22,16 +22,16 @@ public class AttributeValuesController {
 
     @PostMapping("/attributes/{attributeId}/attribute-values")
     @Operation(summary = "Tạo giá trị thuộc tính")
-    public ApiResponse<AttributeValuesDTO> createAttributeValue(@Valid @PathVariable String attributeId,
-                                                  @RequestBody AttributeValuesCreateRequest request) {
+    public ApiResponse<AttributeValuesDTO> createAttributeValue(@PathVariable String attributeId,
+                                                                @Valid @RequestBody AttributeValuesCreateRequest request) {
         var response = service.createAttributeValue(attributeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create attribute value successful", response);
     }
 
     @PutMapping("/attribute-values/{attributeValueId}")
     @Operation(summary = "Cập nhật lại giá trị thuộc tính")
-    public ApiResponse<AttributeValuesDTO> updateAttributeValueInformation(@Valid @PathVariable String attributeValueId,
-                                                  @RequestBody AttributeValuesUpdateRequest request) {
+    public ApiResponse<AttributeValuesDTO> updateAttributeValueInformation(@PathVariable String attributeValueId,
+                                                                           @Valid @RequestBody AttributeValuesUpdateRequest request) {
         var response = service.updateAttributeValueInformation(attributeValueId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update attribute value successful", response);
     }

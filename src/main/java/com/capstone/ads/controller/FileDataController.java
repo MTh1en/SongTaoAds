@@ -9,6 +9,7 @@ import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class FileDataController {
 
     @PostMapping(value = "/icons", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload icon")
-    public ApiResponse<FileDataDTO> uploadIconSystem(@ModelAttribute IconCreateRequest request) {
+    public ApiResponse<FileDataDTO> uploadIconSystem(@Valid @ModelAttribute IconCreateRequest request) {
         var response = fileDataService.uploadIconSystem(request);
         return ApiResponseBuilder.buildSuccessResponse("Successfully uploaded file", response);
     }
@@ -31,7 +32,7 @@ public class FileDataController {
     @PatchMapping("/icons/{iconId}/information")
     @Operation(summary = "Cập nhật thông tin của icon")
     public ApiResponse<FileDataDTO> updateIconSystemInformation(@PathVariable String iconId,
-                                                                @RequestBody IconUpdateInfoRequest request) {
+                                                                @Valid @RequestBody IconUpdateInfoRequest request) {
         var response = fileDataService.updateIconSystemInformation(iconId, request);
         return ApiResponseBuilder.buildSuccessResponse("Successfully updated icon", response);
     }

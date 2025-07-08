@@ -9,6 +9,7 @@ import com.capstone.ads.service.DesignTemplatesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class DesignTemplatesController {
     @PostMapping("/product-types/{productTypeId}/design-templates")
     @Operation(summary = "Tạo thiết kế mẫu theo loại sản phẩm")
     public ApiResponse<DesignTemplateDTO> createDesignTemplate(@PathVariable("productTypeId") String productTypeId,
-                                                               @RequestBody DesignTemplateCreateRequest request) {
+                                                               @Valid @RequestBody DesignTemplateCreateRequest request) {
         var response = designTemplatesService.createDesignTemplate(productTypeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create Design Template successful!", response);
     }
@@ -32,7 +33,7 @@ public class DesignTemplatesController {
     @PatchMapping("/design-templates/{designTemplateId}/information")
     @Operation(summary = "Cập nhật lại thông tin thiết kế mẫu")
     public ApiResponse<DesignTemplateDTO> updateDesignTemplateInformation(@PathVariable String designTemplateId,
-                                                                          @RequestBody DesignTemplateUpdateRequest request) {
+                                                                          @Valid @RequestBody DesignTemplateUpdateRequest request) {
         var response = designTemplatesService.updateDesignTemplateInformation(designTemplateId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update Design Template information successful!", response);
     }

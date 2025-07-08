@@ -26,7 +26,7 @@ public class CustomerDetailController {
 
     @PostMapping(value = "/customer-details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Tạo thông tin doanh nghiệp")
-    public ApiResponse<CustomerDetailDTO> createCustomerDetail(@ModelAttribute CustomerDetailCreateRequest request) {
+    public ApiResponse<CustomerDetailDTO> createCustomerDetail(@Valid @ModelAttribute CustomerDetailCreateRequest request) {
         var response = customerDetailService.createCustomerDetail(request);
         return ApiResponseBuilder.buildSuccessResponse("Create customer detail successful", response);
     }
@@ -61,8 +61,8 @@ public class CustomerDetailController {
     @PatchMapping("/customer-details/{customerDetailId}/information")
     @Operation(summary = "Cập nhật thông tin doanh nghiệp")
     public ApiResponse<CustomerDetailDTO> updateCustomerDetailInformation(
-            @Valid @PathVariable("customerDetailId") String customerDetailId,
-            @RequestBody CustomerDetailUpdateRequest request) {
+            @PathVariable("customerDetailId") String customerDetailId,
+            @Valid @RequestBody CustomerDetailUpdateRequest request) {
         return ApiResponseBuilder.buildSuccessResponse(
                 "Update customer detail successful",
                 customerDetailService.updateCustomerDetailInformation(customerDetailId, request)

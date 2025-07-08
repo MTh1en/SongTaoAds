@@ -8,6 +8,7 @@ import com.capstone.ads.service.EditedDesignService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class EditedDesignsController {
     public ApiResponse<EditedDesignDTO> createEditedDesignFromDesignTemplate(
             @PathVariable String customerDetailId,
             @PathVariable String designTemplateId,
-            @ModelAttribute EditedDesignCreateRequest request) {
+            @Valid @ModelAttribute EditedDesignCreateRequest request) {
         var response = service.createEditedDesignFromDesignTemplate(customerDetailId, designTemplateId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create Edited Design successfully", response);
     }
@@ -41,7 +42,7 @@ public class EditedDesignsController {
     public ApiResponse<EditedDesignDTO> createEditedDesignFromBackground(
             @PathVariable String customerDetailId,
             @PathVariable String backgroundId,
-            @ModelAttribute EditedDesignCreateRequest request) {
+            @Valid @ModelAttribute EditedDesignCreateRequest request) {
         var response = service.createEditedDesignFromBackground(customerDetailId, backgroundId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create Edited Design successfully", response);
     }

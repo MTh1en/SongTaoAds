@@ -10,6 +10,7 @@ import com.capstone.ads.service.TicketService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,34 +24,32 @@ public class TicketController {
     @PostMapping("/orders/{orderId}/tickets")
     @Operation(summary = "Customer gửi ticket theo đơn hàng")
     public ApiResponse<TicketDTO> sendOrderTicket(
-            @RequestBody TicketRequest request,
-            @PathVariable String orderId) {
+            @PathVariable String orderId,
+            @Valid @RequestBody TicketRequest request
+    ) {
         var ticket = ticketService.sendOrderTicket(request, orderId);
         return ApiResponseBuilder.buildSuccessResponse("Order ticket sent successfully", ticket);
     }
 
     @PatchMapping("/tickets/{ticketId}/report/sale")
     @Operation(summary = "Sale gửi phản hồi cho ticket")
-    public ApiResponse<TicketDTO> reportTicketBySaleStaff(
-            @PathVariable("ticketId") String ticketId,
-            @RequestBody TicketReport reportDetails) {
+    public ApiResponse<TicketDTO> reportTicketBySaleStaff(@PathVariable("ticketId") String ticketId,
+                                                          @Valid @RequestBody TicketReport reportDetails) {
         var ticket = ticketService.reportTicketBySaleStaff(ticketId, reportDetails);
         return ApiResponseBuilder.buildSuccessResponse("Ticket reported successfully", ticket);
     }
 
     @PatchMapping("/tickets/{ticketId}/report/staff")
     @Operation(summary = "Staff gửi phản hồi cho ticket")
-    public ApiResponse<TicketDTO> reportTicketByStaff(
-            @PathVariable String ticketId,
-            @RequestBody TicketReport reportDetails) {
+    public ApiResponse<TicketDTO> reportTicketByStaff(@PathVariable String ticketId,
+                                                      @Valid @RequestBody TicketReport reportDetails) {
         var ticket = ticketService.reportTicketByStaff(ticketId, reportDetails);
         return ApiResponseBuilder.buildSuccessResponse("Ticket reported successfully", ticket);
     }
 
     @PatchMapping("/tickets/{ticketId}/deliveryTicket")
     @Operation(summary = "Sale chuyển ticket cho staff")
-    public ApiResponse<TicketDTO> deliveryTicket(
-            @PathVariable String ticketId) {
+    public ApiResponse<TicketDTO> deliveryTicket(@PathVariable String ticketId) {
         var ticket = ticketService.deliveryTicket(ticketId);
         return ApiResponseBuilder.buildSuccessResponse("Ticket delivered successfully", ticket);
     }

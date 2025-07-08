@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.design_template;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DesignTemplateUpdateRequest {
+    @NotBlank(message = "Name is Required")
     String name;
     String description;
     String negativePrompt;

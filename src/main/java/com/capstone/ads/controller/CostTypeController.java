@@ -9,6 +9,7 @@ import com.capstone.ads.service.CostTypesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class CostTypeController {
     @PostMapping("/product-types/{productTypeId}/cost-types")
     @Operation(summary = "Tạo chi phí theo loại sản phẩm")
     public ApiResponse<CostTypeDTO> createCostType(@PathVariable String productTypeId,
-                                                   @RequestBody CostTypeCreateRequest request) {
+                                                   @Valid @RequestBody CostTypeCreateRequest request) {
         var response = costTypesService.createCostTypeByProductType(productTypeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create cost type successful", response);
     }
@@ -32,7 +33,7 @@ public class CostTypeController {
     @PutMapping("/cost-types/{costTypeId}")
     @Operation(summary = "Cập nhật thông tin chi phí")
     public ApiResponse<CostTypeDTO> updateCostTypeInformation(@PathVariable String costTypeId,
-                                                              @RequestBody CostTypeUpdateRequest request) {
+                                                              @Valid @RequestBody CostTypeUpdateRequest request) {
         var response = costTypesService.updateCostTypeInformation(costTypeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update cost type successful", response);
     }
