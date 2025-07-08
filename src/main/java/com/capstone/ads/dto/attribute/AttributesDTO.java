@@ -19,5 +19,5 @@ public class AttributesDTO {
     Boolean isCore;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    CoreDTO productTypeId;
+    CoreDTO productTypes;
 }
