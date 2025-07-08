@@ -36,6 +36,7 @@
         <nimbus-jose-jwt>10.3</nimbus-jose-jwt>
         <dotenv-java>3.2.0</dotenv-java>
         <aws.java.sdk.version>2.31.50</aws.java.sdk.version>
+        <postgre-version>42.7.5</postgre-version>
     </properties>
     <dependencies>
         <dependency>
@@ -61,7 +62,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
+            <version>${postgre-version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

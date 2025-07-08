@@ -3,6 +3,8 @@ package com.capstone.ads.exception;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.postgresql.util.PSQLException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -60,5 +62,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(ApiResponseBuilder.buildErrorResponse(ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(value = DataAccessException.class)
+    public ResponseEntity<ApiResponse<Object>> handleDataAccessException(PSQLException ex) {
+        // Xử lý chung cho cả SQLException và PSQLException
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiResponseBuilder.buildErrorResponse("Database Error", ex.getServerErrorMessage()));
     }
 }
