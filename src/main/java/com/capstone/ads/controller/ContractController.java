@@ -43,7 +43,7 @@ public class ContractController {
     @Operation(summary = "Sale gửi lại bản hợp đồng đã chỉnh sửa")
     public ApiResponse<ContractDTO> saleSendRevisedContract(
             @PathVariable String contractId,
-            @ModelAttribute ContractRevisedRequest request) {
+            @Valid @ModelAttribute ContractRevisedRequest request) {
         var response = contractService.saleSendRevisedContract(contractId, request);
         return ApiResponseBuilder.buildSuccessResponse("Sale sent revised contract successfully", response);
     }

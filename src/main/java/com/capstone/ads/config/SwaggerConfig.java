@@ -28,7 +28,7 @@ public class SwaggerConfig {
                                 .scheme("bearer")
                                 .bearerFormat("JWT")))
                 .addTagsItem(new Tag().name("AUTH").description("Xác thực người dùng"))
-                .addTagsItem(new Tag().name("VERIFICATION").description("Xác minh người dùng"))
+                .addTagsItem(new Tag().name("RECOVERY").description("Khôi phục hoặc xác nhận tài khoản"))
                 .addTagsItem(new Tag().name("USER").description("Tài khoản hệ thống"))
                 .addTagsItem(new Tag().name("CUSTOMER DETAIL").description("Thông tin doanh nghiệp"))
                 .addTagsItem(new Tag().name("CUSTOMER CHOICE").description("Loại sản phẩm khách hàng chọn"))

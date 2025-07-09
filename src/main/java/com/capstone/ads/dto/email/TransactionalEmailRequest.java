@@ -1,6 +1,5 @@
 package com.capstone.ads.dto.email;
 
-import com.capstone.ads.dto.email.transactional.Params;
 import com.capstone.ads.dto.email.transactional.Recipient;
 import com.capstone.ads.dto.email.transactional.Sender;
 import lombok.*;
@@ -16,7 +15,6 @@ import java.util.List;
 public class TransactionalEmailRequest {
     Sender sender;
     List<Recipient> to;
-    Params params;
     String subject;
     String htmlContent;
 }

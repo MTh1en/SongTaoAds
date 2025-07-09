@@ -42,8 +42,8 @@ public class FeedbackController {
 
     @PatchMapping("/feedbacks/{feedbackId}/response")
     @Operation(summary = "Phản hồi feedback của khách hàng")
-    public ApiResponse<FeedbackDTO> responseFeedback(@Valid @PathVariable String feedbackId,
-                                                     @RequestBody FeedbackResponseRequest request) {
+    public ApiResponse<FeedbackDTO> responseFeedback(@PathVariable String feedbackId,
+                                                     @Valid @RequestBody FeedbackResponseRequest request) {
         var response = feedbackService.responseFeedback(feedbackId, request);
         return ApiResponseBuilder.buildSuccessResponse("Response feedback successful", response);
     }

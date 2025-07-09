@@ -9,6 +9,7 @@ import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -28,7 +29,7 @@ public class CustomDesignRequestsController {
     public ApiResponse<CustomDesignRequestDTO> createCustomDesignRequest(
             @PathVariable String customerDetailId,
             @PathVariable String customerChoiceId,
-            @RequestBody CustomDesignRequestCreateRequest request) {
+            @Valid @RequestBody CustomDesignRequestCreateRequest request) {
         var response = service.createCustomDesignRequest(customerDetailId, customerChoiceId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create custom design request successful", response);
     }

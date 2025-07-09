@@ -1,8 +1,7 @@
-package com.capstone.ads.utils;
+package com.capstone.ads.validator;
 
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
-import com.capstone.ads.model.enums.DemoDesignStatus;
 import com.capstone.ads.model.enums.PriceProposalStatus;
 import org.springframework.stereotype.Component;
 

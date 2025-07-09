@@ -1,5 +1,7 @@
 package com.capstone.ads.dto.user;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,6 +11,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserProfileUpdateRequest {
+    @NotBlank(message = "Full name is required")
     String fullName;
+    @Size(min = 10, message = "Phone must be at least 10 characters")
     String phone;
 }

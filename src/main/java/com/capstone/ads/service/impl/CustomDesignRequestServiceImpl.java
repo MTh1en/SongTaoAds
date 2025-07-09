@@ -13,7 +13,7 @@ import com.capstone.ads.model.Users;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.repository.internal.CustomDesignRequestsRepository;
 import com.capstone.ads.service.*;
-import com.capstone.ads.utils.CustomDesignRequestStateValidator;
+import com.capstone.ads.validator.CustomDesignRequestStateValidator;
 import com.capstone.ads.utils.CustomOrderLogicUtils;
 import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
 import lombok.RequiredArgsConstructor;

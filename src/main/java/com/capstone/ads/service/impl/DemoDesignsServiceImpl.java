@@ -16,7 +16,7 @@ import com.capstone.ads.repository.internal.DemoDesignsRepository;
 import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.service.DemoDesignsService;
 import com.capstone.ads.service.S3Service;
-import com.capstone.ads.utils.DemoDesignStateValidator;
+import com.capstone.ads.validator.DemoDesignStateValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

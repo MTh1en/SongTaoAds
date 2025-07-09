@@ -20,7 +20,8 @@ public class ProductTypeSizeController {
 
     @PostMapping("/product-types/{productTypeId}/sizes/{sizeId}")
     @Operation(summary = "Tạo kích thước sử dụng trong loại biển")
-    public ApiResponse<ProductTypeSizeDTO> createProductTypeSize(@PathVariable String productTypeId, @PathVariable String sizeId) {
+    public ApiResponse<ProductTypeSizeDTO> createProductTypeSize(@PathVariable String productTypeId,
+                                                                 @PathVariable String sizeId) {
         var response = service.createProductTypeSize(productTypeId, sizeId);
         return ApiResponseBuilder.buildSuccessResponse("Create product type successful", response);
     }

@@ -16,8 +16,8 @@ public class AttributeValuesCreateRequest {
     String name;
     @NotBlank(message = "Attribute Value Unit is Required")
     String unit;
-    Double materialPrice;
+    Long materialPrice;
     @Positive(message = "Unit Price must be greater than 0")
-    Double unitPrice;
+    Long unitPrice;
     Boolean isAvailable;
 }

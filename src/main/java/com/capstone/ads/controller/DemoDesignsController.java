@@ -10,6 +10,7 @@ import com.capstone.ads.service.DemoDesignsService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,7 @@ public class DemoDesignsController {
     @PatchMapping("/demo-designs/{customDesignId}/reject")
     @Operation(summary = "Khách hàng từ chối bản demo")
     public ApiResponse<DemoDesignDTO> customerRejectCustomDesign(@PathVariable String customDesignId,
-                                                                 @RequestBody CustomerRejectCustomDesignRequest request) {
+                                                                 @Valid @RequestBody CustomerRejectCustomDesignRequest request) {
         var response = demoDesignsService.customerRejectCustomDesign(customDesignId, request);
         return ApiResponseBuilder.buildSuccessResponse("Custom design decision successful", response);
     }
@@ -77,9 +78,10 @@ public class DemoDesignsController {
 
     @GetMapping("/custom-design-requests/{customDesignRequestId}/demo-designs")
     @Operation(summary = "Xem lịch sử bạn demo theo request")
-    public ApiPagingResponse<DemoDesignDTO> findCustomDesignByCustomDesignRequest(@PathVariable String customDesignRequestId,
-                                                                                  @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                                                  @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+    public ApiPagingResponse<DemoDesignDTO> findCustomDesignByCustomDesignRequest(
+            @PathVariable String customDesignRequestId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = demoDesignsService.findCustomDesignByCustomDesignRequest(customDesignRequestId, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find Custom Design by Custom Design Request successful", response, page);
     }

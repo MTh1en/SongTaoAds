@@ -14,7 +14,7 @@ import com.capstone.ads.model.enums.PriceProposalStatus;
 import com.capstone.ads.repository.internal.PriceProposalRepository;
 import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.service.PriceProposalService;
-import com.capstone.ads.utils.PriceProposalStateValidator;
+import com.capstone.ads.validator.PriceProposalStateValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

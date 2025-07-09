@@ -27,7 +27,9 @@ public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/api/**",
+            "/api/auth/**",
+            "/api/verifications/**",
+            "/api/password-reset/**",
             "/css/**",
             "/js/**"
     };
@@ -67,20 +69,24 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/api/webhook/**", webhookConfig);
 
         // Cấu hình CORS cho các endpoint khác (FE)
+        CorsConfiguration defaultConfig = getCorsConfiguration();
+        source.registerCorsConfiguration("/**", defaultConfig);
+
+        return new CorsFilter(source);
+    }
+
+    private static CorsConfiguration getCorsConfiguration() {
         CorsConfiguration defaultConfig = new CorsConfiguration();
         defaultConfig.setAllowedOrigins(Arrays.asList(
                 "http://localhost:8080",
                 "http://localhost:5173",
                 "https://songtaoads.online",
-                "https://songtaoads.io.vn",
-                "https://balanced-globally-macaque.ngrok-free.app"
+                "https://songtaoads.io.vn"
         ));
         defaultConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         defaultConfig.setAllowedHeaders(Arrays.asList("Authorization", "X-XSRF-TOKEN", "Content-Type"));
         defaultConfig.setAllowCredentials(true); // Hỗ trợ cookie cho FE
-        source.registerCorsConfiguration("/**", defaultConfig);
-
-        return new CorsFilter(source);
+        return defaultConfig;
     }
 
     @Bean

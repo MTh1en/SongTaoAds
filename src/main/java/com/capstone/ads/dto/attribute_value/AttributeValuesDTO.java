@@ -21,5 +21,5 @@ public class AttributeValuesDTO {
     Boolean isAvailable;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    CoreDTO attributesId;
+    CoreDTO attributes;
 }
