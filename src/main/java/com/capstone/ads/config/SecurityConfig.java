@@ -29,6 +29,7 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/api/auth/**",
             "/api/verifications/**",
+            "/api/password-reset/**",
             "/css/**",
             "/js/**"
     };

@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ResendVerificationEmailRequest {
+public class SendResetPasswordEmailRequest {
     @NotBlank(message = "Email is required")
     String email;
 }

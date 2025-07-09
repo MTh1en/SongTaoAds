@@ -41,7 +41,7 @@ public class AuthController {
     @Operation(summary = "Đăng ký")
     public ApiResponse<Void> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
-        verificationService.sendVerifyEmail(request.getFullName(), request.getEmail());
+        verificationService.sendVerifyEmail(request.getEmail());
         return ApiResponseBuilder.buildSuccessResponse("Registration successful", null);
     }
 

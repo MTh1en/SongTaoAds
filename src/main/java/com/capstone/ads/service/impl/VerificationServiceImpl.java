@@ -3,7 +3,6 @@ package com.capstone.ads.service.impl;
 import com.capstone.ads.constaint.RedisKeyNaming;
 import com.capstone.ads.dto.email.TransactionalEmailRequest;
 import com.capstone.ads.dto.email.TransactionalEmailResponse;
-import com.capstone.ads.dto.email.transactional.Params;
 import com.capstone.ads.dto.email.transactional.Recipient;
 import com.capstone.ads.dto.email.transactional.Sender;
 import com.capstone.ads.mapper.VerificationMapper;
@@ -34,7 +33,8 @@ public class VerificationServiceImpl implements VerificationService {
     private String senderName;
     @Value("${brevo.verify-url}")
     private String verifyUrl;
-
+    @Value("${brevo.password-reset-url}")
+    private String passwordResetUrl;
 
     private final BrevoRepository brevoRepository;
     private final VerificationMapper verificationMapper;
@@ -42,35 +42,42 @@ public class VerificationServiceImpl implements VerificationService {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public TransactionalEmailResponse sendVerifyEmail(String fullName, String email) {
+    public TransactionalEmailResponse sendVerifyEmail(String email) {
         Sender sender = verificationMapper.toSender(senderName, senderEmail);
 
-        List<Recipient> to = new ArrayList<>(List.of(new Recipient(fullName, email)));
-
-        Params params = verificationMapper.toParams(fullName, verifyUrl);
+        List<Recipient> to = new ArrayList<>(List.of(
+                verificationMapper.toRecipient(email))
+        );
 
         String subject = "Xác minh tài khoản";
         String verificationCode = generateVerificationCode(email);
 
         Context context = new Context();
-        context.setVariable("fullName", fullName);
         context.setVariable("url", String.format(verifyUrl, email, verificationCode));
         String htmlContent = templateEngine.process("VerificationEmail", context);
 
-        TransactionalEmailRequest emailRequest = verificationMapper.toTransactionalEmailRequest(sender, to, params, subject, htmlContent);
+        TransactionalEmailRequest emailRequest = verificationMapper.toTransactionalEmailRequest(sender, to, subject, htmlContent);
         return brevoRepository.sendTransactionalEmail(brevoKey, emailRequest);
     }
 
     @Override
-    public String generateVerificationCode(String email) {
-        String verificationCode = UUID.randomUUID().toString();
-        if (redisTemplate.hasKey(email)) {
-            redisTemplate.delete(email);
-        }
+    public TransactionalEmailResponse sendResetPasswordEmail(String email) {
+        Sender sender = verificationMapper.toSender(senderName, senderEmail);
 
-        String verificationEmailKey = RedisKeyNaming.VERIFICATION_EMAIL + email;
-        redisTemplate.opsForValue().set(verificationEmailKey, verificationCode, 15, TimeUnit.MINUTES);
-        return verificationCode;
+        List<Recipient> to = new ArrayList<>(List.of(
+                verificationMapper.toRecipient(email))
+        );
+
+        String subject = "Đặt lại mật khẩu";
+        String resetCode = generateResetCode(email);
+        String resetLink = String.format(passwordResetUrl, email, resetCode);
+
+        Context context = new Context();
+        context.setVariable("url", resetLink);
+        String htmlContent = templateEngine.process("PasswordResetEmail", context);
+
+        TransactionalEmailRequest emailRequest = verificationMapper.toTransactionalEmailRequest(sender, to, subject, htmlContent);
+        return brevoRepository.sendTransactionalEmail(brevoKey, emailRequest);
     }
 
     @Override
@@ -84,5 +91,39 @@ public class VerificationServiceImpl implements VerificationService {
         boolean isValid = verificationCode.equals(storedCode);
         if (isValid) redisTemplate.delete(verificationEmailKey);
         return isValid;
+    }
+
+    @Override
+    public Boolean validateResetCode(String email, String resetCode, Boolean isDeleted) {
+        String resetEmailKey = RedisKeyNaming.PASSWORD_RESET_EMAIL + email;
+
+        String storedCode = redisTemplate.opsForValue().get(resetEmailKey);
+        if (storedCode == null) {
+            return false;
+        }
+        boolean isValid = resetCode.equals(storedCode);
+        if (isValid && isDeleted) redisTemplate.delete(resetEmailKey);
+        return isValid;
+    }
+
+    public String generateVerificationCode(String email) {
+        String verificationCode = UUID.randomUUID().toString();
+        if (redisTemplate.hasKey(email)) {
+            redisTemplate.delete(email);
+        }
+
+        String verificationEmailKey = RedisKeyNaming.VERIFICATION_EMAIL + email;
+        redisTemplate.opsForValue().set(verificationEmailKey, verificationCode, 15, TimeUnit.MINUTES);
+        return verificationCode;
+    }
+
+    public String generateResetCode(String email) {
+        String resetCode = UUID.randomUUID().toString();
+        if (redisTemplate.hasKey(email)) {
+            redisTemplate.delete(email);
+        }
+        String resetKey = RedisKeyNaming.PASSWORD_RESET_EMAIL + email;
+        redisTemplate.opsForValue().set(resetKey, resetCode, 15, TimeUnit.MINUTES);
+        return resetCode;
     }
 }

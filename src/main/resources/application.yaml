@@ -78,3 +78,4 @@ brevo:
   sender-name: ${SENDER_NAME}
   sender-email: ${SENDER_EMAIL}
   verify-url: ${VERIFY_URL}
+  password-reset-url: ${PASSWORD_RESET_URL}

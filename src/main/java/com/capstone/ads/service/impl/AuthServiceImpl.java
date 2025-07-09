@@ -114,6 +114,13 @@ public class AuthServiceImpl implements AuthService {
         usersRepository.save(verificationUser);
     }
 
+    @Override
+    public void resetPassword(String email, String newPassword) {
+        Users resetPasswordUser = findUserByEmail(email);
+        resetPasswordUser.setPassword(passwordEncoder.encode(newPassword));
+        usersRepository.save(resetPasswordUser);
+    }
+
     private Users findUserByEmail(String email) {
         return usersRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
