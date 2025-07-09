@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.order;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderUpdateAddressRequest {
+    @NotBlank(message = "Address is required")
     String address;
     String note;
 }

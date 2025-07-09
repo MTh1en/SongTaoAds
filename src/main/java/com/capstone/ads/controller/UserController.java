@@ -43,24 +43,27 @@ public class UserController {
 
     @GetMapping("/users/role")
     @Operation(summary = "Xem thông tin người dùng theo role")
-    public ApiPagingResponse<UserDTO> getUsersByRole(@RequestParam(value = "roleName", defaultValue = "CUSTOMER") String roleName,
-                                                     @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                     @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+    public ApiPagingResponse<UserDTO> getUsersByRole(
+            @RequestParam(value = "roleName", defaultValue = "CUSTOMER") String roleName,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = usersService.findUsersByRoleName(roleName, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Users retrieved successfully", response, page);
     }
 
     @GetMapping("/users")
     @Operation(summary = "Xem tất cả thông tin người dùng")
-    public ApiPagingResponse<UserDTO> getAllUsers(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                  @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+    public ApiPagingResponse<UserDTO> getAllUsers(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = usersService.findAllUsers(page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Users retrieved successfully", response, page);
     }
 
     @PatchMapping("/users/{userId}/profile")
     @Operation(summary = "Xem profile của tài khoản theo ID")
-    public ApiResponse<UserDTO> updateUserProfile(@Valid @PathVariable String userId, @RequestBody UserProfileUpdateRequest request) {
+    public ApiResponse<UserDTO> updateUserProfile(@PathVariable String userId,
+                                                  @Valid @RequestBody UserProfileUpdateRequest request) {
         var response = usersService.updateUserProfile(userId, request);
         return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
     }
@@ -76,7 +79,7 @@ public class UserController {
     @PatchMapping("/users/{userId}/password")
     @Operation(summary = "Cập nhật mật khẩu")
     public ApiResponse<UserDTO> updateUserPassword(@PathVariable String userId,
-                                                   @RequestBody ChangePasswordRequest request) {
+                                                   @Valid @RequestBody ChangePasswordRequest request) {
         var response = usersService.changePassword(userId, request);
         return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
     }

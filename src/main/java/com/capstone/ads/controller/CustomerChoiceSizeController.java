@@ -23,17 +23,19 @@ public class CustomerChoiceSizeController {
 
     @PostMapping("/customer-choices/{customerChoicesId}/sizes/{sizeId}")
     @Operation(summary = "Nhập kích thước cho đơn hàng")
-    public ApiResponse<CustomerChoicesSizeDTO> createCustomerChoiceSize(@Valid @PathVariable String customerChoicesId,
-                                                                        @PathVariable String sizeId,
-                                                                        @RequestBody CustomerChoicesSizeCreateRequest request) {
+    public ApiResponse<CustomerChoicesSizeDTO> createCustomerChoiceSize(
+            @PathVariable String customerChoicesId,
+            @PathVariable String sizeId,
+            @Valid @RequestBody CustomerChoicesSizeCreateRequest request) {
         var response = service.createCustomerChoiceSize(customerChoicesId, sizeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create customer choices size successful", response);
     }
 
     @PutMapping("/customer-choice-sizes/{customerChoiceSizeId}")
     @Operation(summary = "Cập nhật lại kích thước đã chọn")
-    public ApiResponse<CustomerChoicesSizeDTO> updateValueInCustomerChoiceSize(@Valid @PathVariable String customerChoiceSizeId,
-                                                                               @RequestBody CustomerChoicesSizeUpdateRequest request) {
+    public ApiResponse<CustomerChoicesSizeDTO> updateValueInCustomerChoiceSize(
+            @PathVariable String customerChoiceSizeId,
+            @Valid @RequestBody CustomerChoicesSizeUpdateRequest request) {
         var response = service.updateValueInCustomerChoiceSize(customerChoiceSizeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update customer choices size successful", response);
     }

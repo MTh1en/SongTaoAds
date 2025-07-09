@@ -1,4 +1,4 @@
-package com.capstone.ads.utils;
+package com.capstone.ads.validator;
 
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;

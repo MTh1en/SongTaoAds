@@ -15,7 +15,7 @@ import com.capstone.ads.repository.internal.ContractRepository;
 import com.capstone.ads.service.ContractService;
 import com.capstone.ads.service.OrderService;
 import com.capstone.ads.service.S3Service;
-import com.capstone.ads.utils.ContractStateValidator;
+import com.capstone.ads.validator.ContractStateValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

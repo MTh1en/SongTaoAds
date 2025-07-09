@@ -29,8 +29,8 @@ public class SizeController {
 
     @PutMapping("/{sizeId}")
     @Operation(summary = "Cập nhật kích thước")
-    public ApiResponse<SizeDTO> updateSizeInformation(@Valid @PathVariable String sizeId,
-                                                      @RequestBody SizeUpdateRequest request) {
+    public ApiResponse<SizeDTO> updateSizeInformation(@PathVariable String sizeId,
+                                                      @Valid @RequestBody SizeUpdateRequest request) {
         var response = service.updateSizeInformation(sizeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update size successful", response);
     }
@@ -44,8 +44,9 @@ public class SizeController {
 
     @GetMapping
     @Operation(summary = "Xem tất cả kích thước")
-    public ApiPagingResponse<SizeDTO> findAllSize(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                  @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+    public ApiPagingResponse<SizeDTO> findAllSize(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findAllSize(page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find all size", response, page);
     }

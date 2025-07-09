@@ -3,9 +3,11 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.email.TransactionalEmailResponse;
 
 public interface VerificationService {
-    TransactionalEmailResponse sendVerifyEmail(String fullName, String email);
+    TransactionalEmailResponse sendVerifyEmail(String email);
 
-    String generateVerificationCode(String email);
+    TransactionalEmailResponse sendResetPasswordEmail(String email);
 
     Boolean validateVerificationCode(String email, String verificationCode);
+
+    Boolean validateResetCode(String email, String resetCode, Boolean isDeleted);
 }

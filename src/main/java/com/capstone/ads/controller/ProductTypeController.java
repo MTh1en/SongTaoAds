@@ -9,6 +9,7 @@ import com.capstone.ads.service.ProductTypesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class ProductTypeController {
 
     @PostMapping
     @Operation(summary = "Tạo loại sản phẩm")
-    public ApiResponse<ProductTypeDTO> createProductType(@RequestBody ProductTypeCreateRequest request) {
+    public ApiResponse<ProductTypeDTO> createProductType(@Valid @RequestBody ProductTypeCreateRequest request) {
         var response = service.createProductType(request);
         return ApiResponseBuilder.buildSuccessResponse("Create product type successful", response);
     }
@@ -31,7 +32,7 @@ public class ProductTypeController {
     @PatchMapping("/{productTypeId}/information")
     @Operation(summary = "Cập nhập thông tin loại sản phẩm")
     public ApiResponse<ProductTypeDTO> updateProductTypeInformation(@PathVariable String productTypeId,
-                                                                    @RequestBody ProductTypeUpdateRequest request) {
+                                                                    @Valid @RequestBody ProductTypeUpdateRequest request) {
         var response = service.updateProductTypeInformation(productTypeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update product type information successful", response);
     }
@@ -53,8 +54,9 @@ public class ProductTypeController {
 
     @GetMapping
     @Operation(summary = "Xem tất cả các loại sản phẩm")
-    public ApiPagingResponse<ProductTypeDTO> findAllProductType(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                                @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+    public ApiPagingResponse<ProductTypeDTO> findAllProductType(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findAllProductType(page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find all product type", response, page);
     }
