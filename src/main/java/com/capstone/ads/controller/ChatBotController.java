@@ -113,9 +113,9 @@ public class ChatBotController {
 
     @PostMapping(value = "/upload-file-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Convert từ file excel thành file jsonl")
-    public ApiResponse<String> uploadFileExcel(@RequestParam("file") MultipartFile file,
+    public ApiResponse<FileUploadResponse> uploadFileExcel(@RequestParam("file") MultipartFile file,
                                              @RequestParam("fileName") String fileName) {
-        String resposne = chatBotService.uploadFileExcel(file, fileName);
+        FileUploadResponse resposne = chatBotService.uploadFileExcel(file, fileName);
         return ApiResponseBuilder.buildSuccessResponse(("Uploaded file successfully"), resposne);
     }
 

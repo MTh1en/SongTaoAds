@@ -94,7 +94,10 @@ public enum ErrorCode {
 
     // ============ EXTERNAL SERVICES ============
     EXTERNAL_SERVICE_ERROR("External service error", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_INPUT("Invalid input", HttpStatus.BAD_REQUEST)
+    INVALID_INPUT("Invalid input", HttpStatus.BAD_REQUEST),
+
+    // ============ AI ============
+    MODEL_CHAT_NOT_FOUND("Model chat not fount", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

@@ -44,6 +44,7 @@ public class RecoveryController {
     // ==== FORGOT PASSWORD ====== //
 
     @PostMapping("/password-reset/resend")
+    @Operation(summary = "Gửi email đặt lại mật khẩu")
     public ApiResponse<TransactionalEmailResponse> sendResetPasswordEmail(@Valid @RequestBody SendResetPasswordEmailRequest request) {
         var response = verificationService.sendResetPasswordEmail(request.getEmail());
         return ApiResponseBuilder.buildSuccessResponse("Reset password email verified successfully", response);

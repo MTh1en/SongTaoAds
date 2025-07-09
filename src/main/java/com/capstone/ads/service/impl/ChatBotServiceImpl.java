@@ -8,7 +8,6 @@ import com.capstone.ads.mapper.ModelChatBotMapper;
 import com.capstone.ads.model.ChatBotLog;
 import com.capstone.ads.model.ModelChatBot;
 import com.capstone.ads.repository.external.ChatBotRepository;
-import com.capstone.ads.repository.external.S3Repository;
 import com.capstone.ads.repository.internal.ChatBotLogRepository;
 import com.capstone.ads.repository.internal.ModelChatBotRepository;
 import com.capstone.ads.service.ChatBotService;
@@ -40,8 +39,6 @@ import java.util.*;
 public class ChatBotServiceImpl implements ChatBotService {
     @Value("${spring.ai.openai.api-key}")
     private String openaiApiKey;
-    @Value("${spring.ai.openai.chat.options.model}")
-    private String modelName;
 
     private final ChatBotLogRepository chatBotLogRepository;
     private final SecurityContextUtils securityContextUtils;
@@ -55,7 +52,9 @@ public class ChatBotServiceImpl implements ChatBotService {
     @Override
     public String chat(ChatRequest request) {
         ChatCompletionRequest completionRequest = new ChatCompletionRequest();
-        String modelChat = modelChatBotRepository.getModelChatBotByActive(true).get().getModelName();
+        ModelChatBot modelChatBot = modelChatBotRepository.getModelChatBotByActive(true)
+                .orElseThrow(()->new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
+        String modelChat = modelChatBot.getModelName();
         completionRequest.setModel(modelChat);
         completionRequest.setMessages(List.of(
                 new ChatCompletionRequest.Message("system", "Bạn là trợ lý AI tư vấn về thiết kế và in ấn biển quảng cáo."),
@@ -64,14 +63,14 @@ public class ChatBotServiceImpl implements ChatBotService {
         ChatCompletionResponse response = chatBotRepository.getChatCompletions(
                 "Bearer " + openaiApiKey,
                 completionRequest);
-        saveResponse(response, request.getPrompt());
+        saveResponse(response, request.getPrompt(), modelChatBot);
         return response.getChoices().getFirst().getMessage().getContent();
     }
 
     @Override
     public String TestChat(TestChatRequest request) {
         ChatCompletionRequest completionRequest = new ChatCompletionRequest();
-        completionRequest.setModel(modelName);
+        completionRequest.setModel(request.getModel());
         completionRequest.setMessages(List.of(
                 new ChatCompletionRequest.Message("system", "Bạn là trợ lý AI tư vấn về thiết kế và in ấn biển quảng cáo."),
                 new ChatCompletionRequest.Message("user", request.getPrompt())
@@ -79,14 +78,15 @@ public class ChatBotServiceImpl implements ChatBotService {
         ChatCompletionResponse response = chatBotRepository.getChatCompletions(
                 "Bearer " + openaiApiKey,
                 completionRequest);
-        saveResponse(response, request.getPrompt());
         return response.getChoices().getFirst().getMessage().getContent();
     }
 
     @Override
     public String translateToTextToImagePrompt(String prompt) {
         ChatCompletionRequest completionRequest = new ChatCompletionRequest();
-        completionRequest.setModel(modelName);
+        ModelChatBot modelChatBot = modelChatBotRepository.getModelChatBotByActive(true)
+                .orElseThrow(()->new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
+        completionRequest.setModel(modelChatBot.getModelName());
         completionRequest.setMessages(List.of(
                 new ChatCompletionRequest.Message("system", "Based on the customer's request, let write a prompt in English to createAttribute an image of the billboard. Note: Do not createAttribute an image, only the prompt in English in the answer in one line and no prefix like the answer is: ..."),
                 new ChatCompletionRequest.Message("user", "The customer request is:" + prompt)
@@ -99,11 +99,6 @@ public class ChatBotServiceImpl implements ChatBotService {
 
     @Override
     public FileUploadResponse uploadFileToFineTune(MultipartFile file) {
-        // Validate inputs
-        if (file == null || file.isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_INPUT);
-        }
-        // Validate file type
         String fileName = file.getOriginalFilename();
         if (fileName == null || !fileName.toLowerCase().endsWith(".jsonl")) {
             throw new AppException(ErrorCode.INVALID_INPUT);
@@ -168,7 +163,7 @@ public class ChatBotServiceImpl implements ChatBotService {
             String newModelName = response.getFineTunedModel();
             ModelChatBotDTO modelChatBotDTO = new ModelChatBotDTO();
             modelChatBotDTO.setModelName(newModelName);
-            modelChatBotDTO.setPreviousModelName(modelName);
+            modelChatBotDTO.setPreviousModelName(response.getModel());
             modelChatBotDTO.setActive(false);
 
             ModelChatBot modelChatBot = modelChatBotMapper.toEntity(modelChatBotDTO);
@@ -193,29 +188,13 @@ public class ChatBotServiceImpl implements ChatBotService {
     }
 
     @Override
-    public ModelChatBotDTO setModeChatBot(String jobId) {
-        // Retrieve fine-tuning job details to get the model name
-        FineTuningJobResponse fineTuningJob = getFineTuningJob(jobId);
-        if (!"succeeded".equalsIgnoreCase(fineTuningJob.getStatus())) {
-            throw new AppException(ErrorCode.EXTERNAL_SERVICE_ERROR);
-        }
-        String newModelName = fineTuningJob.getFineTunedModel();
-        // Deactivate the current active model, if any
-        modelChatBotRepository.findByActiveTrue().ifPresent(currentActiveModel -> {
-            currentActiveModel.setActive(false);
-            modelChatBotRepository.save(currentActiveModel);
-        });
-
-        // Create and save the new model
-        ModelChatBotDTO modelChatBotDTO = new ModelChatBotDTO();
-        modelChatBotDTO.setModelName(newModelName);
-        modelChatBotDTO.setPreviousModelName(modelName); // Current modelName from @Value
-        modelChatBotDTO.setActive(true);
-
-        ModelChatBot modelChatBot = modelChatBotMapper.toEntity(modelChatBotDTO);
-        modelChatBotRepository.save(modelChatBot);
-
-        return modelChatBotDTO;
+    public ModelChatBotDTO setModeChatBot(String modelChatId) {
+        ModelChatBot modelChatBotActive= modelChatBotRepository.getModelChatBotByActive(true)
+                .orElseThrow(()->new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
+        modelChatBotActive.setActive(false);
+        ModelChatBot modelChatBot= modelChatBotRepository.getById(modelChatId);
+        modelChatBot.setActive(true);
+        return modelChatBotMapper.toDTO(modelChatBot);
     }
 
 
@@ -233,7 +212,7 @@ public class ChatBotServiceImpl implements ChatBotService {
 
 
         @Override
-        public String uploadFileExcel(MultipartFile file, String fileName) {
+        public FileUploadResponse uploadFileExcel(MultipartFile file, String fileName) {
             try (XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream())) {
                 int sheetIndex = workbook.getActiveSheetIndex();
                 Sheet sheetToProcess = workbook.getSheetAt(sheetIndex);
@@ -264,15 +243,14 @@ public class ChatBotServiceImpl implements ChatBotService {
                 if (rowsResult.isEmpty()) {
                     throw new AppException(ErrorCode.INVALID_INPUT);
                 }
-
                 String jsonlFileName = fileName.endsWith(".jsonl") ? fileName : fileName + ".jsonl";
                 MultipartFile jsonlFile = convertToJsonl(rowsResult, headers, jsonlFileName);
-                log.info("content type: {}", jsonlFile.getContentType());
-                // Generate UUID and construct S3 key
-                String uuid = UUID.randomUUID().toString();
-                String s3Key = "uploadJsonlFile/" + uuid;
-
-                return s3Service.uploadSingleFile(s3Key, jsonlFile);
+                String s3Key = String.format("uploadJsonlFile/%s_%s", UUID.randomUUID(), jsonlFileName);
+                String awsLink = s3Service.uploadSingleFile(s3Key, jsonlFile);
+                return chatBotRepository.uploadFile(
+                        "Bearer " + openaiApiKey,
+                        "fine-tune",
+                        jsonlFile);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -307,7 +285,6 @@ public class ChatBotServiceImpl implements ChatBotService {
                     baos.write("\n".getBytes());
                 }
 
-                // Create MultipartFile directly from byte array
                 byte[] byteArray = baos.toByteArray();
                 return new MockMultipartFile(fileName, byteArray);
             } catch (IOException e) {
@@ -334,8 +311,8 @@ public class ChatBotServiceImpl implements ChatBotService {
     }
 
 
-    private void saveResponse(ChatCompletionResponse response, String question) {
-        var userId = securityContextUtils.getCurrentUserId();
+    private void saveResponse(ChatCompletionResponse response, String question, ModelChatBot modelChat) {
+        var user = securityContextUtils.getCurrentUser();
         // Extract answer from response
         String answer = (response.getChoices() != null && !response.getChoices().isEmpty())
                 ? response.getChoices().getFirst().getMessage().getContent()
@@ -343,7 +320,9 @@ public class ChatBotServiceImpl implements ChatBotService {
         if (answer == null || answer.trim().isEmpty()) {
             throw new AppException(ErrorCode.EXTERNAL_SERVICE_ERROR);
         }
-        ChatBotLog log = chatBotLogMapper.toEntity(question, answer, userId);
+        ChatBotLog log = chatBotLogMapper.toEntity(question, answer);
+        log.setModelChatBot(modelChat);
+        log.setUsers(user);
         chatBotLogRepository.save(log);
     }
 
