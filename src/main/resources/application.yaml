@@ -33,6 +33,8 @@ spring:
           min-idle: 0
           max-wait: 2000
         shutdown-timeout: 1000
+  cache:
+    type: redis
   servlet:
     multipart:
       enabled: true
