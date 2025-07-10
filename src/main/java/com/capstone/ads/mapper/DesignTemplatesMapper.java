@@ -4,10 +4,7 @@ import com.capstone.ads.dto.design_template.DesignTemplateCreateRequest;
 import com.capstone.ads.dto.design_template.DesignTemplateDTO;
 import com.capstone.ads.dto.design_template.DesignTemplateUpdateRequest;
 import com.capstone.ads.model.DesignTemplates;
-import com.capstone.ads.model.ProductTypes;
-import com.capstone.ads.model.Users;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")

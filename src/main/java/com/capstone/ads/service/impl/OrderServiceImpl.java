@@ -63,8 +63,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO createOrderByAIDesign(String aiDesignId, String customerChoiceId) {
-        EditedDesigns editedDesigns = editedDesignService.getEditedDesignById(aiDesignId);
+    public OrderDTO createOrderByEditedDesign(String editedDesignId, String customerChoiceId) {
+        EditedDesigns editedDesigns = editedDesignService.getEditedDesignById(editedDesignId);
         CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoiceId);
         Users users = securityContextUtils.getCurrentUser();
 
@@ -77,6 +77,7 @@ public class OrderServiceImpl implements OrderService {
         orders.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
 
         orders = orderRepository.save(orders);
+        customerChoicesService.hardDeleteCustomerChoice(customerChoiceId);
         return orderMapper.toDTO(orders);
     }
 

@@ -34,11 +34,11 @@ public class OrderController {
         return ApiResponseBuilder.buildSuccessResponse("Create order successful", response);
     }
 
-    @PostMapping("/ai-designs/{aiDesignId}/customer-choices/{customerChoiceId}/orders")
-    @Operation(summary = "Tạo đơn hàng theo thiết kế AI")
-    public ApiResponse<OrderDTO> createOrderByAIDesign(@PathVariable String aiDesignId,
+    @PostMapping("/edited-designs/{editedDesignId}/customer-choices/{customerChoiceId}/orders")
+    @Operation(summary = "Tạo đơn hàng theo thiết kế")
+    public ApiResponse<OrderDTO> createOrderByEditedDesign(@PathVariable String editedDesignId,
                                                        @PathVariable String customerChoiceId) {
-        var response = orderService.createOrderByAIDesign(aiDesignId, customerChoiceId);
+        var response = orderService.createOrderByEditedDesign(editedDesignId, customerChoiceId);
         return ApiResponseBuilder.buildSuccessResponse("Create order successful", response);
     }
 

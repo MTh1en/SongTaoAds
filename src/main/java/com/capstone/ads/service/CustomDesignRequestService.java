@@ -28,8 +28,6 @@ public interface CustomDesignRequestService {
     //INTERNAL FUNCTION
     CustomDesignRequests getCustomDesignRequestById(String customDesignRequestId);
 
-    void validateCreateCustomDesign(String customDesignRequestId);
-
     void updateCustomDesignRequestStatus(String customDesignRequestId, CustomDesignRequestStatus status);
 
     void updateCustomDesignRequestByCustomDesign(String customDesignRequestId, boolean isNeedSupport);
