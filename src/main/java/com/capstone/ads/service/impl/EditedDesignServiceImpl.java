@@ -1,6 +1,5 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.constaint.S3ImageDuration;
 import com.capstone.ads.dto.edited_design.EditedDesignCreateRequest;
 import com.capstone.ads.dto.edited_design.EditedDesignDTO;
 import com.capstone.ads.exception.AppException;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -31,7 +29,7 @@ public class EditedDesignServiceImpl implements EditedDesignService {
     private final CustomerDetailService customerDetailService;
     private final DesignTemplatesService designTemplatesService;
     private final BackgroundService backgroundService;
-    private final S3Service s3Service;
+    private final FileDataService fileDataService;
     private final EditedDesignsRepository editedDesignsRepository;
     private final EditedDesignMapper editedDesignMapper;
 
@@ -92,15 +90,6 @@ public class EditedDesignServiceImpl implements EditedDesignService {
                 .orElseThrow(() -> new AppException(ErrorCode.AI_DESIGN_NOT_FOUND));
     }
 
-    private EditedDesignDTO convertToAIDesignDTOWithImageIsPresignedURL(EditedDesigns editedDesigns) {
-        var aiDesignDTOResponse = editedDesignMapper.toDTO(editedDesigns);
-        if (!Objects.isNull(editedDesigns.getEditedImage())) {
-            var designTemplateImagePresigned = s3Service.getPresignedUrl(editedDesigns.getEditedImage(), S3ImageDuration.CUSTOM_DESIGN_DURATION);
-            aiDesignDTOResponse.setEditedImage(designTemplateImagePresigned);
-        }
-        return aiDesignDTOResponse;
-    }
-
     private String generateAIDesignKey(String customerDetailId) {
         return String.format("ai-designs/%s/%s", customerDetailId, UUID.randomUUID());
     }
@@ -110,7 +99,7 @@ public class EditedDesignServiceImpl implements EditedDesignService {
         if (file.isEmpty()) {
             throw new AppException(ErrorCode.FILE_REQUIRED);
         }
-        s3Service.uploadSingleFile(AIDesignImageKey, file);
+        fileDataService.uploadSingleFile(AIDesignImageKey, file);
         return AIDesignImageKey;
     }
 }

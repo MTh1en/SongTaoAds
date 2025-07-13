@@ -1,7 +1,7 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.file.FileData;
+import com.capstone.ads.dto.file.FileInformation;
 import com.capstone.ads.dto.stable_diffusion.pendingtask.PendingTaskResponse;
 import com.capstone.ads.dto.stable_diffusion.progress.ProgressResponse;
 import com.capstone.ads.service.ChatBotService;
@@ -33,7 +33,7 @@ public class StableDiffusionController {
     @Operation(summary = "Tạo hình ảnh từ thiết kế mẫu")
     public ResponseEntity<?> generateImageFromDesignTemplate(@PathVariable String designTemplateId,
                                                              @RequestPart(required = false) String prompt) {
-        FileData response = null;
+        FileInformation response = null;
         if (!Strings.isBlank(prompt)) {
             var translatedResponse = chatBotService.translateToTextToImagePrompt(prompt);
             log.info("Translated response: {}", translatedResponse);

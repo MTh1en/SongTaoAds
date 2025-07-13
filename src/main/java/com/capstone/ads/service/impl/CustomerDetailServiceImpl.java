@@ -1,6 +1,5 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.constaint.S3ImageDuration;
 import com.capstone.ads.dto.customer_detail.CustomerDetailCreateRequest;
 import com.capstone.ads.dto.customer_detail.CustomerDetailDTO;
 import com.capstone.ads.dto.customer_detail.CustomerDetailUpdateRequest;
@@ -11,21 +10,19 @@ import com.capstone.ads.model.CustomerDetail;
 import com.capstone.ads.model.Users;
 import com.capstone.ads.repository.internal.CustomerDetailRepository;
 import com.capstone.ads.service.CustomerDetailService;
-import com.capstone.ads.service.S3Service;
+import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerDetailServiceImpl implements CustomerDetailService {
-    private final S3Service s3Service;
+    private final FileDataService fileDataService;
     private final CustomerDetailRepository customerDetailRepository;
     private final CustomerDetailMapper customerDetailMapper;
     private final SecurityContextUtils securityContextUtils;
@@ -46,7 +43,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
     @Override
     public CustomerDetailDTO findCustomerDetailById(String customerDetailId) {
         CustomerDetail customerDetail = getCustomerChoiceDetailById(customerDetailId);
-        return convertToCustomerDetailDTOWithLogoUrlIsPresignedURL(customerDetail);
+        return customerDetailMapper.toDTO(customerDetail);
     }
 
     @Override
@@ -59,7 +56,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
     @Override
     public List<CustomerDetailDTO> findAllCustomerDetails() {
         return customerDetailRepository.findAll().stream()
-                .map(this::convertToCustomerDetailDTOWithLogoUrlIsPresignedURL)
+                .map(customerDetailMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -99,7 +96,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
     }
 
     private String generateCustomerDetailImageKey(String userId) {
-        return String.format("customer-detail/%s/%s", userId, UUID.randomUUID());
+        return String.format("customer-detail/%s", userId);
     }
 
     private String uploadCustomDesignImageToS3(String userId, MultipartFile logo) {
@@ -107,18 +104,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
         if (logo.isEmpty()) {
             throw new AppException(ErrorCode.FILE_REQUIRED);
         }
-        s3Service.uploadSingleFile(customerDetailImageKey, logo);
+        fileDataService.uploadSingleFile(customerDetailImageKey, logo);
         return customerDetailImageKey;
-    }
-
-    private CustomerDetailDTO convertToCustomerDetailDTOWithLogoUrlIsPresignedURL(CustomerDetail customerDetail) {
-        var customerDetailDTOResponse = customerDetailMapper.toDTO(customerDetail);
-
-        if (!Objects.isNull(customerDetail.getLogoUrl())) {
-            var designTemplateImagePresigned = s3Service.getPresignedUrl(customerDetail.getLogoUrl(), S3ImageDuration.CUSTOM_DESIGN_DURATION);
-            customerDetailDTOResponse.setLogoUrl(designTemplateImagePresigned);
-        }
-
-        return customerDetailDTOResponse;
     }
 }

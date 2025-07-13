@@ -1,6 +1,5 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.constaint.S3ImageDuration;
 import com.capstone.ads.dto.design_template.DesignTemplateCreateRequest;
 import com.capstone.ads.dto.design_template.DesignTemplateDTO;
 import com.capstone.ads.dto.design_template.DesignTemplateUpdateRequest;
@@ -12,8 +11,8 @@ import com.capstone.ads.model.ProductTypes;
 import com.capstone.ads.model.Users;
 import com.capstone.ads.repository.internal.DesignTemplatesRepository;
 import com.capstone.ads.service.DesignTemplatesService;
+import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.service.ProductTypesService;
-import com.capstone.ads.service.S3Service;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,14 +23,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     private final ProductTypesService productTypesService;
-    private final S3Service s3Service;
+    private final FileDataService fileDataService;
     private final DesignTemplatesRepository designTemplatesRepository;
     private final DesignTemplatesMapper designTemplatesMapper;
     private final SecurityContextUtils securityContextUtils;
@@ -67,7 +64,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
         DesignTemplates designTemplates = findDesignTemplateByIdAndAvailable(designTemplateId);
         String designTemplateImageKey = generateDesignTemplateKey(designTemplates.getProductTypes().getId(), designTemplateId);
 
-        s3Service.uploadSingleFile(designTemplateImageKey, file);
+        fileDataService.uploadSingleFile(designTemplateImageKey, file);
         designTemplates.setImage(designTemplateImageKey);
         designTemplatesRepository.save(designTemplates);
         return designTemplatesMapper.toDTO(designTemplates);
@@ -76,7 +73,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     @Override
     public DesignTemplateDTO findDesignTemplateById(String designTemplateId) {
         var designTemplates = findById(designTemplateId);
-        return convertToDesignTemplateDTOWithImageIsPresignedURL(designTemplates);
+        return designTemplatesMapper.toDTO(designTemplates);
     }
 
     @Override
@@ -84,7 +81,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
         Pageable pageable = PageRequest.of(page - 1, size);
 
         return designTemplatesRepository.findByProductTypes_IdAndIsAvailable(productTypeId, true, pageable)
-                .map(this::convertToDesignTemplateDTOWithImageIsPresignedURL);
+                .map(designTemplatesMapper::toDTO);
     }
 
     @Override
@@ -92,7 +89,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
         Pageable pageable = PageRequest.of(page - 1, size);
 
         return designTemplatesRepository.findAll(pageable)
-                .map(this::convertToDesignTemplateDTOWithImageIsPresignedURL);
+                .map(designTemplatesMapper::toDTO);
     }
 
     @Override
@@ -122,15 +119,5 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
 
     private String generateDesignTemplateKey(String productTypeId, String designTemplateId) {
         return String.format("design-template/%s/%s", productTypeId, designTemplateId);
-    }
-
-    private DesignTemplateDTO convertToDesignTemplateDTOWithImageIsPresignedURL(DesignTemplates designTemplates) {
-        var designTemplateDTOResponse = designTemplatesMapper.toDTO(designTemplates);
-        if (!Objects.isNull(designTemplates.getImage())) {
-            String designTemplateImageKey = designTemplates.getImage();
-            var designTemplateImagePresigned = s3Service.getPresignedUrl(designTemplateImageKey, S3ImageDuration.DESIGN_TEMPLATE_IMAGE_DURATION);
-            designTemplateDTOResponse.setImage(designTemplateImagePresigned);
-        }
-        return designTemplateDTOResponse;
     }
 }

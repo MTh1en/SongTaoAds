@@ -1,9 +1,7 @@
 package com.capstone.ads.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.capstone.ads.model.enums.FileTypeEnum;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,13 +22,25 @@ public class FileData {
     String id;
     String name;
     String description;
-    String imageUrl;
     String contentType;
-    String fileType;
+    String imageUrl;
+
+    @Enumerated(EnumType.STRING)
+    FileTypeEnum fileType;
+
     Long fileSize;
 
     @CreationTimestamp
     LocalDateTime createdAt;
     @UpdateTimestamp
     LocalDateTime updatedAt;
+
+    @ManyToOne
+    Orders orders;
+
+    @ManyToOne
+    CustomDesignRequests customDesignRequests;
+
+    @ManyToOne
+    DemoDesigns demoDesigns;
 }

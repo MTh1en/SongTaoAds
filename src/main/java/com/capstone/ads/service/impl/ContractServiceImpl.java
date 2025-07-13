@@ -13,8 +13,8 @@ import com.capstone.ads.model.enums.ContractStatus;
 import com.capstone.ads.model.enums.OrderStatus;
 import com.capstone.ads.repository.internal.ContractRepository;
 import com.capstone.ads.service.ContractService;
+import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.service.OrderService;
-import com.capstone.ads.service.S3Service;
 import com.capstone.ads.validator.ContractStateValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class ContractServiceImpl implements ContractService {
-    private final S3Service s3Service;
+    private final FileDataService fileDataService;
     private final OrderService orderService;
     private final ContractMapper contractMapper;
     private final ContractRepository contractRepository;
@@ -58,6 +58,7 @@ public class ContractServiceImpl implements ContractService {
         Contract contract = getContractById(contractId);
         String orderId = contract.getOrders().getId();
         contractStateValidator.validateTransition(contract.getStatus(), ContractStatus.SIGNED);
+        fileDataService.hardDeleteFileDataByImageUrl(contract.getSignedContractUrl());
 
         String singedContractUrl = uploadContractImageToS3(contract.getContractNumber(), singedContractFile);
         contractMapper.sendSingedContract(singedContractUrl, contract);
@@ -72,8 +73,9 @@ public class ContractServiceImpl implements ContractService {
     public ContractDTO saleSendRevisedContract(String contractId, ContractRevisedRequest request) {
         Contract contract = getContractById(contractId);
         String orderId = contract.getOrders().getId();
-
         contractStateValidator.validateTransition(contract.getStatus(), ContractStatus.SENT);
+        fileDataService.hardDeleteFileDataByImageUrl(contract.getContractUrl());
+
         if (Objects.isNull(request.getDepositPercentChanged())) {
             request.setDepositPercentChanged(PaymentPolicy.DEPOSIT_PERCENT);
         }
@@ -122,7 +124,7 @@ public class ContractServiceImpl implements ContractService {
         if (file.isEmpty()) {
             throw new AppException(ErrorCode.FILE_REQUIRED);
         }
-        s3Service.uploadSingleFile(customDesignImageKey, file);
+        fileDataService.uploadSingleFile(customDesignImageKey, file);
         return customDesignImageKey;
     }
 }

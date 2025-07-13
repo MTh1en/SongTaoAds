@@ -10,10 +10,7 @@ import com.capstone.ads.model.AttributeValues;
 import com.capstone.ads.model.Backgrounds;
 import com.capstone.ads.model.CustomerChoices;
 import com.capstone.ads.repository.internal.BackgroundsRepository;
-import com.capstone.ads.service.AttributeValuesService;
-import com.capstone.ads.service.BackgroundService;
-import com.capstone.ads.service.CustomerChoicesService;
-import com.capstone.ads.service.S3Service;
+import com.capstone.ads.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,7 +31,7 @@ import java.util.stream.Collectors;
 public class BackgroundServiceImpl implements BackgroundService {
     private final CustomerChoicesService customerChoicesService;
     private final AttributeValuesService attributeValuesService;
-    private final S3Service s3Service;
+    private final FileDataService fileDataService;
     private final BackgroundMapper backgroundMapper;
     private final BackgroundsRepository backgroundsRepository;
 
@@ -67,11 +64,12 @@ public class BackgroundServiceImpl implements BackgroundService {
     @Transactional
     public BackgroundDTO updateBackgroundImage(String backgroundId, MultipartFile backgroundImage) {
         Backgrounds backgrounds = getAvailableBackgroundById(backgroundId);
+        fileDataService.hardDeleteFileDataByImageUrl(backgrounds.getBackgroundUrl());
 
         String backgroundImageUrl = uploadBackgroundImageToS3(backgrounds.getAttributeValues().getId(), backgroundImage);
         backgrounds.setBackgroundUrl(backgroundImageUrl);
         backgrounds = backgroundsRepository.save(backgrounds);
-
+        
         return backgroundMapper.toDTO(backgrounds);
     }
 
@@ -129,7 +127,7 @@ public class BackgroundServiceImpl implements BackgroundService {
         if (file.isEmpty()) {
             throw new AppException(ErrorCode.FILE_REQUIRED);
         }
-        s3Service.uploadSingleFile(backgroundImageKey, file);
+        fileDataService.uploadSingleFile(backgroundImageKey, file);
         return backgroundImageKey;
     }
 }

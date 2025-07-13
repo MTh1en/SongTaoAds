@@ -53,6 +53,9 @@ public class CustomDesignRequests {
     @OneToMany(mappedBy = "customDesignRequests")
     List<Payments> payments;
 
+    @OneToMany(mappedBy = "customDesignRequests")
+    List<FileData> fileData;
+
     @ManyToOne
     CustomerDetail customerDetail;
 

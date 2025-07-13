@@ -64,6 +64,9 @@ public class Orders {
     @OneToMany(mappedBy = "orders")
     List<Feedbacks> feedbacks;
 
+    @OneToMany(mappedBy = "orders")
+    List<FileData> fileDatas;
+
     @OneToOne(mappedBy = "orders", cascade = CascadeType.ALL)
     Contract contract;
 

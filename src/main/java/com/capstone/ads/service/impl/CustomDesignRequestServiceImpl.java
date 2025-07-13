@@ -3,14 +3,14 @@ package com.capstone.ads.service.impl;
 import com.capstone.ads.constaint.PredefinedRole;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestCreateRequest;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestDTO;
+import com.capstone.ads.dto.file.FileDataDTO;
+import com.capstone.ads.dto.file.UploadMultipleFileRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomDesignRequestsMapper;
-import com.capstone.ads.model.CustomDesignRequests;
-import com.capstone.ads.model.CustomerChoices;
-import com.capstone.ads.model.CustomerDetail;
-import com.capstone.ads.model.Users;
+import com.capstone.ads.model.*;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
+import com.capstone.ads.model.enums.FileTypeEnum;
 import com.capstone.ads.repository.internal.CustomDesignRequestsRepository;
 import com.capstone.ads.service.*;
 import com.capstone.ads.validator.CustomDesignRequestStateValidator;
@@ -25,14 +25,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CustomDesignRequestServiceImpl implements CustomDesignRequestService {
-    private final S3Service s3Service;
+    private final FileDataService fileDataService;
     private final CustomerChoicesService customerChoicesService;
     private final CustomOrderLogicUtils customOrderLogicUtils;
     private final UserService userService;
@@ -122,6 +125,18 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
+    public List<FileDataDTO> uploadCustomDesignRequestSubImages(String customDesignRequestId, UploadMultipleFileRequest request) {
+        CustomDesignRequests customDesignRequests = getCustomDesignRequestById(customDesignRequestId);
+        return fileDataService.uploadMultipleFiles(
+                request.getFiles(),
+                FileTypeEnum.CUSTOM_DESIGN_REQUEST,
+                customDesignRequests,
+                FileData::setCustomDesignRequests,
+                (id, size) -> generateCustomDesignRequestSubImagesKey(customDesignRequestId, size)
+        );
+    }
+
+    @Override
     public Page<CustomDesignRequestDTO> findCustomerDesignRequestByCustomerDetailId(String customerDetailId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         return customDesignRequestsRepository.findByCustomerDetail_Id(customerDetailId, pageable)
@@ -194,12 +209,19 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         return String.format("custom-design/%s/final", customDesignRequestId);
     }
 
+    private List<String> generateCustomDesignRequestSubImagesKey(String customDesignRequestId, Integer amountKey) {
+        List<String> keys = new ArrayList<>();
+        IntStream.range(0, amountKey)
+                .forEach(i -> keys.add(String.format("custom-design/%s/sub-final/%s", customDesignRequestId, UUID.randomUUID())));
+        return keys;
+    }
+
     private String uploadCustomDesignRequestImageToS3(String customDesignRequestId, MultipartFile file) {
         String customDesignImageKey = generateCustomDesignRequestKey(customDesignRequestId);
         if (file.isEmpty()) {
             throw new AppException(ErrorCode.FILE_REQUIRED);
         }
-        s3Service.uploadSingleFile(customDesignImageKey, file);
+        fileDataService.uploadSingleFile(customDesignImageKey, file);
         return customDesignImageKey;
     }
 }
