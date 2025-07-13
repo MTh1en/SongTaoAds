@@ -12,6 +12,5 @@ public interface ProductTypeSizesService {
     void hardDeleteProductTypeSize(String productTypeSizeId);
 
     //INTERNAL FUNCTION
-
     void validateProductTypeSizeExist(String productTypeId, String sizeId);
 }

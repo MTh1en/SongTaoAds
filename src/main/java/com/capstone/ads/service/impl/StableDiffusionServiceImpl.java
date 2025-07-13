@@ -1,6 +1,6 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.dto.file.FileData;
+import com.capstone.ads.dto.file.FileInformation;
 import com.capstone.ads.dto.stable_diffusion.TextToImageRequest;
 import com.capstone.ads.dto.stable_diffusion.controlnet.AlwaysonScripts;
 import com.capstone.ads.dto.stable_diffusion.controlnet.Args;
@@ -35,7 +35,7 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
     private final SecurityContextUtils securityContextUtils;
 
     @Override
-    public FileData generateImage(String designTemplateId, String prompt) {
+    public FileInformation generateImage(String designTemplateId, String prompt) {
         String bearerStableDiffusionToken = generateBearerStableDiffusionToken();
         String userId = securityContextUtils.getCurrentUserId();
 
@@ -54,7 +54,7 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
         String base64OutputImage = response.getImages().getFirst();
         byte[] outputImageBytes = DataConverter.convertBase64ToByteArray(base64OutputImage);
 
-        return FileData.builder()
+        return FileInformation.builder()
                 .content(outputImageBytes)
                 .contentType(MediaType.IMAGE_PNG_VALUE)
                 .build();
@@ -83,7 +83,7 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
 
     private String getImageBytesFromDesignTemplate(String designTemplateId) {
         var designTemplate = designTemplatesService.getDesignTemplateById(designTemplateId);
-        FileData imageFileData = s3Service.downloadFile(designTemplate.getImage());
-        return DataConverter.convertByteArrayToBase64(imageFileData.getContent());
+        FileInformation imageFileInformation = s3Service.downloadFile(designTemplate.getImage());
+        return DataConverter.convertByteArrayToBase64(imageFileInformation.getContent());
     }
 }

@@ -1,6 +1,5 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.constaint.S3ImageDuration;
 import com.capstone.ads.dto.product_type.ProductTypeCreateRequest;
 import com.capstone.ads.dto.product_type.ProductTypeDTO;
 import com.capstone.ads.dto.product_type.ProductTypeUpdateRequest;
@@ -9,8 +8,8 @@ import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ProductTypesMapper;
 import com.capstone.ads.model.ProductTypes;
 import com.capstone.ads.repository.internal.ProductTypesRepository;
+import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.service.ProductTypesService;
-import com.capstone.ads.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +23,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ProductTypesServiceImpl implements ProductTypesService {
-    private final S3Service s3Service;
+    private final FileDataService fileDataService;
     private final ProductTypesRepository productTypesRepository;
     private final ProductTypesMapper productTypesMapper;
 
@@ -48,7 +47,7 @@ public class ProductTypesServiceImpl implements ProductTypesService {
     @Override
     public ProductTypeDTO findProductTypeByProductTypeId(String productTypeId) {
         ProductTypes productTypes = getProductTypeByIdAndAvailable(productTypeId);
-        return convertProductTypeToProductTypeDTOWithImageUrl(productTypes);
+        return productTypesMapper.toDTO(productTypes);
     }
 
     @Override
@@ -74,7 +73,7 @@ public class ProductTypesServiceImpl implements ProductTypesService {
 
         String productTypeKey = generateProductTypeImageKey(productTypeId);
 
-        s3Service.uploadSingleFile(productTypeKey, file);
+        fileDataService.uploadSingleFile(productTypeKey, file);
         productTypes.setImage(productTypeKey);
         productTypesRepository.save(productTypes);
 
@@ -88,15 +87,6 @@ public class ProductTypesServiceImpl implements ProductTypesService {
     }
 
     private String generateProductTypeImageKey(String productTypeId) {
-        return String.format("product-type/%s/%s", productTypeId, UUID.randomUUID());
-    }
-
-    private ProductTypeDTO convertProductTypeToProductTypeDTOWithImageUrl(ProductTypes productTypes) {
-        var productTypeDTOResponse = productTypesMapper.toDTO(productTypes);
-
-        var productTypeImage = s3Service.getPresignedUrl(productTypes.getImage(), S3ImageDuration.PRODUCT_TYPE_IMAGE_DURATION);
-        productTypeDTOResponse.setImage(productTypeImage);
-
-        return productTypeDTOResponse;
+        return String.format("product-type/%s", productTypeId);
     }
 }

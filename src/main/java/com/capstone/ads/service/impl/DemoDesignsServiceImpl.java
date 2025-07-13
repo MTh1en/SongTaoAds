@@ -1,21 +1,24 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.constaint.S3ImageDuration;
 import com.capstone.ads.dto.demo_design.DemoDesignCreateRequest;
 import com.capstone.ads.dto.demo_design.DemoDesignDTO;
 import com.capstone.ads.dto.demo_design.CustomerRejectCustomDesignRequest;
 import com.capstone.ads.dto.demo_design.DesignerUpdateDescriptionCustomDesignRequest;
+import com.capstone.ads.dto.file.FileDataDTO;
+import com.capstone.ads.dto.file.UploadMultipleFileRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.DemoDesignsMapper;
 import com.capstone.ads.model.CustomDesignRequests;
 import com.capstone.ads.model.DemoDesigns;
+import com.capstone.ads.model.FileData;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.model.enums.DemoDesignStatus;
+import com.capstone.ads.model.enums.FileTypeEnum;
 import com.capstone.ads.repository.internal.DemoDesignsRepository;
 import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.service.DemoDesignsService;
-import com.capstone.ads.service.S3Service;
+import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.validator.DemoDesignStateValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,15 +29,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class DemoDesignsServiceImpl implements DemoDesignsService {
     private final CustomDesignRequestService customDesignRequestService;
-    private final S3Service s3Service;
+    private final FileDataService fileDataService;
     private final DemoDesignsRepository demoDesignsRepository;
     private final DemoDesignsMapper demoDesignsMapper;
     private final DemoDesignStateValidator demoDesignStateValidator;
@@ -121,6 +126,7 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
     public DemoDesignDTO designerUploadImage(String customDesignId, MultipartFile file) {
         DemoDesigns demoDesigns = findCustomDesignByIdAndPendingStatus(customDesignId);
         String customDesignRequestId = demoDesigns.getCustomDesignRequests().getId();
+        fileDataService.hardDeleteFileDataByImageUrl(demoDesigns.getDemoImage());
 
         String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, file);
         demoDesigns.setDemoImage(customDesignImageKey);
@@ -130,10 +136,22 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
     }
 
     @Override
+    public List<FileDataDTO> uploadDemoDesignSubImages(String demoDesignId, UploadMultipleFileRequest request) {
+        DemoDesigns demoDesigns = getDemoDesignsById(demoDesignId);
+        return fileDataService.uploadMultipleFiles(
+                request.getFiles(),
+                FileTypeEnum.DEMO_DESIGN,
+                demoDesigns,
+                FileData::setDemoDesigns,
+                (id, size) -> generateDemoDesignSumImageKey(demoDesigns.getCustomDesignRequests().getId(), demoDesignId, size)
+        );
+    }
+
+    @Override
     public Page<DemoDesignDTO> findCustomDesignByCustomDesignRequest(String customDesignRequestId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         return demoDesignsRepository.findByCustomDesignRequests_Id(customDesignRequestId, pageable)
-                .map(this::convertToCustomDesignDTOWithImageIsPresignedURL);
+                .map(demoDesignsMapper::toDTO);
     }
 
     @Override
@@ -145,6 +163,12 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
         demoDesignsRepository.deleteById(customDesignId);
     }
 
+    @Override
+    public DemoDesigns getDemoDesignsById(String customDesignId) {
+        return demoDesignsRepository.findById(customDesignId)
+                .orElseThrow(() -> new AppException(ErrorCode.DEMO_DESIGN_NOT_FOUND));
+    }
+
     private DemoDesigns findCustomDesignByIdAndPendingStatus(String customDesignId) {
         return demoDesignsRepository.findByIdAndStatus(customDesignId, DemoDesignStatus.PENDING)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_NOT_FOUND));
@@ -154,14 +178,12 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
         return String.format("custom-design/%s/%s", customDesignRequestId, UUID.randomUUID());
     }
 
-
-    private DemoDesignDTO convertToCustomDesignDTOWithImageIsPresignedURL(DemoDesigns demoDesigns) {
-        var customDesignDTOResponse = demoDesignsMapper.toDTO(demoDesigns);
-        if (!Objects.isNull(demoDesigns.getDemoImage())) {
-            var designTemplateImagePresigned = s3Service.getPresignedUrl(demoDesigns.getDemoImage(), S3ImageDuration.CUSTOM_DESIGN_DURATION);
-            customDesignDTOResponse.setDemoImage(designTemplateImagePresigned);
-        }
-        return customDesignDTOResponse;
+    private List<String> generateDemoDesignSumImageKey(String customDesignRequestId, String demoDesignId, Integer amountKey) {
+        List<String> keys = new ArrayList<>();
+        IntStream.range(0, amountKey)
+                .forEach(i -> keys.add(String.format("custom-design/%s/sub-demo/%s/%s",
+                        customDesignRequestId, demoDesignId, UUID.randomUUID())));
+        return keys;
     }
 
     private String uploadCustomDesignImageToS3(String customDesignRequestId, MultipartFile file) {
@@ -169,7 +191,7 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
         if (file.isEmpty()) {
             throw new AppException(ErrorCode.FILE_REQUIRED);
         }
-        s3Service.uploadSingleFile(customDesignImageKey, file);
+        fileDataService.uploadSingleFile(customDesignImageKey, file);
         return customDesignImageKey;
     }
 }

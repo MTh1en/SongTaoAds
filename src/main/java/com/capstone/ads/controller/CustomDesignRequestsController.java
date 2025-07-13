@@ -4,6 +4,8 @@ import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestCreateRequest;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestDTO;
+import com.capstone.ads.dto.file.FileDataDTO;
+import com.capstone.ads.dto.file.UploadMultipleFileRequest;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.utils.ApiResponseBuilder;
@@ -15,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -65,6 +69,17 @@ public class CustomDesignRequestsController {
                                                                               @RequestPart MultipartFile finalDesignImage) {
         var response = service.designerUploadFinalDesignImage(customDesignRequestId, finalDesignImage);
         return ApiResponseBuilder.buildSuccessResponse("Designer rejected custom design request assigned", response);
+    }
+
+    @PostMapping(
+            value = "/custom-design-requests/{customDesignRequestId}/final-design-sub-images",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @Operation(summary = "Design gửi hình ảnh phụ của bản thiết kế chính thức")
+    public ApiResponse<List<FileDataDTO>> uploadCustomDesignRequestSubImages(@PathVariable String customDesignRequestId,
+                                                                             @ModelAttribute UploadMultipleFileRequest request) {
+        var response = service.uploadCustomDesignRequestSubImages(customDesignRequestId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Upload sub images successfully", response);
     }
 
     @GetMapping("/customer-details/{customerDetailId}/custom-design-requests")

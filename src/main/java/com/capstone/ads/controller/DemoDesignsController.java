@@ -6,6 +6,8 @@ import com.capstone.ads.dto.demo_design.CustomerRejectCustomDesignRequest;
 import com.capstone.ads.dto.demo_design.DemoDesignCreateRequest;
 import com.capstone.ads.dto.demo_design.DemoDesignDTO;
 import com.capstone.ads.dto.demo_design.DesignerUpdateDescriptionCustomDesignRequest;
+import com.capstone.ads.dto.file.FileDataDTO;
+import com.capstone.ads.dto.file.UploadMultipleFileRequest;
 import com.capstone.ads.service.DemoDesignsService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -74,6 +78,14 @@ public class DemoDesignsController {
                                                           @RequestPart("file") MultipartFile file) {
         var response = demoDesignsService.designerUploadImage(customDesignId, file);
         return ApiResponseBuilder.buildSuccessResponse("Upload image successful", response);
+    }
+
+    @PostMapping(value = "/demo-designs/{customDesignId}/sub-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Design cập nhật những hình ảnh phụ cho bản demo củ mình")
+    public ApiResponse<List<FileDataDTO>> uploadDemoDesignSubImage(@PathVariable String customDesignId,
+                                                                   @ModelAttribute UploadMultipleFileRequest request) {
+        var response = demoDesignsService.uploadDemoDesignSubImages(customDesignId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Upload sub image successfully", response);
     }
 
     @GetMapping("/custom-design-requests/{customDesignRequestId}/demo-designs")

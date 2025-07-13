@@ -1,6 +1,8 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.PaymentPolicy;
+import com.capstone.ads.dto.file.FileDataDTO;
+import com.capstone.ads.dto.file.UploadMultipleOrderFileRequest;
 import com.capstone.ads.dto.order.OrderConfirmRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
@@ -9,6 +11,7 @@ import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.OrdersMapper;
 import com.capstone.ads.model.*;
 import com.capstone.ads.model.enums.ContractStatus;
+import com.capstone.ads.model.enums.FileTypeEnum;
 import com.capstone.ads.model.enums.OrderStatus;
 import com.capstone.ads.repository.internal.OrdersRepository;
 import com.capstone.ads.service.*;
@@ -26,13 +29,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class OrderServiceImpl implements OrderService {
-    private final S3Service s3Service;
+    private final FileDataService fileDataService;
     private final OrdersRepository orderRepository;
     private final OrdersMapper orderMapper;
     private final SecurityContextUtils securityContextUtils;
@@ -211,6 +217,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<FileDataDTO> uploadOrderSubImages(String orderId, UploadMultipleOrderFileRequest request) {
+        Orders orders = getOrderById(orderId);
+        return fileDataService.uploadMultipleFiles(
+                request.getFiles(),
+                request.getFileType(),
+                orders,
+                FileData::setOrders,
+                (id, size) -> generateOrderSumImageKey(orderId, request.getFileType(), size)
+        );
+    }
+
+    @Override
     @Transactional
     public void hardDeleteOrder(String orderId) {
         if (!orderRepository.existsById(orderId)) {
@@ -259,12 +277,20 @@ public class OrderServiceImpl implements OrderService {
         return String.format("order/%s/%s", orderId, UUID.randomUUID());
     }
 
+    private List<String> generateOrderSumImageKey(String orderId, FileTypeEnum fileType, Integer amountKey) {
+        List<String> keys = new ArrayList<>();
+        IntStream.range(0, amountKey)
+                .forEach(i -> keys.add(String.format("order/%s/%s/%s", orderId, fileType, UUID.randomUUID())));
+        return keys;
+    }
+
+
     private String uploadOrderImageToS3(String orderId, MultipartFile file) {
         String customDesignImageKey = generateOrderImageKey(orderId);
         if (file.isEmpty()) {
             throw new AppException(ErrorCode.FILE_REQUIRED);
         }
-        s3Service.uploadSingleFile(customDesignImageKey, file);
+        fileDataService.uploadSingleFile(customDesignImageKey, file);
         return customDesignImageKey;
     }
 }

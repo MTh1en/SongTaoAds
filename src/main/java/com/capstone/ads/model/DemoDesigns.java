@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -35,6 +36,9 @@ public class DemoDesigns {
 
     @Enumerated(EnumType.STRING)
     DemoDesignStatus status;
+
+    @OneToMany(mappedBy = "demoDesigns")
+    List<FileData> fileData;
 
     @ManyToOne
     CustomDesignRequests customDesignRequests;

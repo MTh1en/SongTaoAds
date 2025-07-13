@@ -55,6 +55,7 @@ public enum ErrorCode {
     CUSTOM_DESIGN_NOT_FOUND("Custom design not found", HttpStatus.NOT_FOUND),
     INVALID_CUSTOM_DESIGN_REQUEST_STATUS_TRANSITION("Invalid custom design request status transition", HttpStatus.BAD_REQUEST),
     INVALID_CUSTOM_DESIGN_STATUS_TRANSITION("Invalid custom design status transition", HttpStatus.BAD_REQUEST),
+    DEMO_DESIGN_NOT_FOUND("Demo design not found", HttpStatus.NOT_FOUND),
     DEMO_DESIGN_IN_WAITING_DECISION_FROM_CUSTOMER("Demo design in waiting decision from customer", HttpStatus.BAD_REQUEST),
     BACKGROUND_NOT_FOUND("Background not found", HttpStatus.NOT_FOUND),
     ICON_NOT_FOUND("Icon not found", HttpStatus.NOT_FOUND),
@@ -79,6 +80,7 @@ public enum ErrorCode {
     // ============ FILE PROCESSING ============
     FILE_PROCESSING_FAILED("File processing failed", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_REQUIRED("File required", HttpStatus.BAD_REQUEST),
+    FILE_NOT_FOUND("File not found", HttpStatus.NOT_FOUND),
 
     // ============ TICKET SYSTEM ============
     TICKET_NOT_FOUND("Ticket not found", HttpStatus.NOT_FOUND),

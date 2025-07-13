@@ -2,6 +2,8 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
+import com.capstone.ads.dto.file.FileDataDTO;
+import com.capstone.ads.dto.file.UploadMultipleOrderFileRequest;
 import com.capstone.ads.dto.order.OrderConfirmRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
@@ -15,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -37,7 +41,7 @@ public class OrderController {
     @PostMapping("/edited-designs/{editedDesignId}/customer-choices/{customerChoiceId}/orders")
     @Operation(summary = "Tạo đơn hàng theo thiết kế")
     public ApiResponse<OrderDTO> createOrderByEditedDesign(@PathVariable String editedDesignId,
-                                                       @PathVariable String customerChoiceId) {
+                                                           @PathVariable String customerChoiceId) {
         var response = orderService.createOrderByEditedDesign(editedDesignId, customerChoiceId);
         return ApiResponseBuilder.buildSuccessResponse("Create order successful", response);
     }
@@ -102,6 +106,14 @@ public class OrderController {
                                                             @RequestPart MultipartFile installedImage) {
         var response = orderService.staffUpdateOrderInstalled(orderId, installedImage);
         return ApiResponseBuilder.buildSuccessResponse("Manager update Order Installed", response);
+    }
+
+    @PostMapping(value = "/orders/{orderId}/sub-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload hình ảnh phụ theo từng tiến trình")
+    public ApiResponse<List<FileDataDTO>> uploadSubImages(@PathVariable String orderId,
+                                                          @ModelAttribute UploadMultipleOrderFileRequest request) {
+        var response = orderService.uploadOrderSubImages(orderId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Upload sub images successfully", response);
     }
 
     @GetMapping("/orders/{orderId}")

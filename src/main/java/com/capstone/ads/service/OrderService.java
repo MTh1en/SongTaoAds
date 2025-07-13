@@ -1,5 +1,7 @@
 package com.capstone.ads.service;
 
+import com.capstone.ads.dto.file.FileDataDTO;
+import com.capstone.ads.dto.file.UploadMultipleOrderFileRequest;
 import com.capstone.ads.dto.order.OrderConfirmRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
@@ -7,6 +9,8 @@ import com.capstone.ads.model.Orders;
 import com.capstone.ads.model.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface OrderService {
     OrderDTO createOrderByCustomDesign(String customDesignRequestId);
@@ -28,6 +32,8 @@ public interface OrderService {
     OrderDTO staffUpdateOrderDelivering(String orderId, MultipartFile deliveryImage);
 
     OrderDTO staffUpdateOrderInstalled(String orderId, MultipartFile installedImage);
+
+    List<FileDataDTO> uploadOrderSubImages(String orderId, UploadMultipleOrderFileRequest request);
 
     OrderDTO findOrderById(String orderId);
 
