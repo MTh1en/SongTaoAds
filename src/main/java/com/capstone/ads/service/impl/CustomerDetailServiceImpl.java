@@ -12,7 +12,9 @@ import com.capstone.ads.repository.internal.CustomerDetailRepository;
 import com.capstone.ads.service.CustomerDetailService;
 import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.utils.SecurityContextUtils;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,11 +23,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomerDetailServiceImpl implements CustomerDetailService {
-    private final FileDataService fileDataService;
-    private final CustomerDetailRepository customerDetailRepository;
-    private final CustomerDetailMapper customerDetailMapper;
-    private final SecurityContextUtils securityContextUtils;
+    FileDataService fileDataService;
+    CustomerDetailRepository customerDetailRepository;
+    CustomerDetailMapper customerDetailMapper;
+    SecurityContextUtils securityContextUtils;
 
     @Override
     public CustomerDetailDTO createCustomerDetail(CustomerDetailCreateRequest request) {

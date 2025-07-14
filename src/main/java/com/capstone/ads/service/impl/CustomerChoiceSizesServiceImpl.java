@@ -11,7 +11,9 @@ import com.capstone.ads.model.CustomerChoices;
 import com.capstone.ads.model.Sizes;
 import com.capstone.ads.repository.internal.*;
 import com.capstone.ads.service.*;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,14 +24,15 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesService {
-    private final CustomerChoicesService customerChoicesService;
-    private final CustomerChoiceCostsService customerChoiceCostsService;
-    private final SizeService sizeService;
-    private final ProductTypeSizesService productTypeSizesService;
-    private final CustomerChoiceDetailsService customerChoiceDetailsService;
-    private final CustomerChoiceSizesRepository customerChoiceSizesRepository;
-    private final CustomerChoiceSizesMapper customerChoiceSizesMapper;
+    CustomerChoicesService customerChoicesService;
+    CustomerChoiceCostsService customerChoiceCostsService;
+    SizeService sizeService;
+    ProductTypeSizesService productTypeSizesService;
+    CustomerChoiceDetailsService customerChoiceDetailsService;
+    CustomerChoiceSizesRepository customerChoiceSizesRepository;
+    CustomerChoiceSizesMapper customerChoiceSizesMapper;
 
     @Override
     @Transactional

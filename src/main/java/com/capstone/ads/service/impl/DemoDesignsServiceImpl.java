@@ -20,7 +20,9 @@ import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.service.DemoDesignsService;
 import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.validator.DemoDesignStateValidator;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,12 +39,13 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DemoDesignsServiceImpl implements DemoDesignsService {
-    private final CustomDesignRequestService customDesignRequestService;
-    private final FileDataService fileDataService;
-    private final DemoDesignsRepository demoDesignsRepository;
-    private final DemoDesignsMapper demoDesignsMapper;
-    private final DemoDesignStateValidator demoDesignStateValidator;
+    CustomDesignRequestService customDesignRequestService;
+    FileDataService fileDataService;
+    DemoDesignsRepository demoDesignsRepository;
+    DemoDesignsMapper demoDesignsMapper;
+    DemoDesignStateValidator demoDesignStateValidator;
 
     @Override
     @Transactional

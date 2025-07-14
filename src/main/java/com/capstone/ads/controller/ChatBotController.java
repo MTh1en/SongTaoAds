@@ -7,20 +7,22 @@ import com.capstone.ads.service.ChatBotService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/chat-bot")
 @RequiredArgsConstructor
 @Tag(name = "CHAT BOT")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ChatBotController {
-    private final ChatBotService chatBotService;
+    ChatBotService chatBotService;
 
     @PostMapping("/chat")
     @Operation(summary = "Chat với chatbot")

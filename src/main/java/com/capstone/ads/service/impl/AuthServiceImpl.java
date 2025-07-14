@@ -3,6 +3,7 @@ package com.capstone.ads.service.impl;
 import com.capstone.ads.constaint.PredefinedRole;
 import com.capstone.ads.constaint.TokenNaming;
 import com.capstone.ads.dto.auth.AuthResponse;
+import com.capstone.ads.dto.auth.ExchangeTokenRequest;
 import com.capstone.ads.dto.auth.LoginRequest;
 import com.capstone.ads.dto.auth.RegisterRequest;
 import com.capstone.ads.exception.AppException;
@@ -10,6 +11,8 @@ import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.UsersMapper;
 import com.capstone.ads.model.Roles;
 import com.capstone.ads.model.Users;
+import com.capstone.ads.repository.external.OutboundIdentityClient;
+import com.capstone.ads.repository.external.OutboundUserClient;
 import com.capstone.ads.repository.internal.RolesRepository;
 import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.service.AccessTokenService;
@@ -17,7 +20,10 @@ import com.capstone.ads.service.AuthService;
 import com.capstone.ads.service.RefreshTokenService;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -28,17 +34,70 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthServiceImpl implements AuthService {
-    private final UsersRepository usersRepository;
-    private final UsersMapper usersMapper;
-    private final AccessTokenService accessTokenService;
-    private final RefreshTokenService refreshTokenService;
-    private final RolesRepository rolesRepository;
+    UsersRepository usersRepository;
+    UsersMapper usersMapper;
+    AccessTokenService accessTokenService;
+    RefreshTokenService refreshTokenService;
+    RolesRepository rolesRepository;
+    OutboundIdentityClient outboundIdentityClient;
+    OutboundUserClient outboundUserClient;
 
+    @NonFinal
     @Value("${app.jwt.refresh-token-ttl}")
     private int REFRESH_TOKEN_TTL;
 
+    @NonFinal
+    @Value("${app.outbound.identity.client-id}")
+    private String CLIENT_ID;
+
+    @NonFinal
+    @Value("${app.outbound.identity.client-secret}")
+    private String CLIENT_SECRET;
+
+    @NonFinal
+    @Value("${app.outbound.identity.redirect-uri}")
+    private String REDIRECT_URI;
+
+    @NonFinal
+    private final String GRANT_TYPE = "authorization_code";
+
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+
+    @Override
+    public AuthResponse outboundAuthenticate(String code, HttpServletResponse response) {
+        var exchangeToken = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
+                .code(code)
+                .clientId(CLIENT_ID)
+                .clientSecret(CLIENT_SECRET)
+                .redirectUri(REDIRECT_URI)
+                .grantType(GRANT_TYPE)
+                .build());
+
+        var userInfo = outboundUserClient.getUserInfo("json", exchangeToken.getAccessToken());
+        Roles roles = rolesRepository.findById(PredefinedRole.CUSTOMER_ROLE)
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+
+        var user = usersRepository.findByEmail(userInfo.getEmail())
+                .orElseGet(() -> usersRepository.save(Users.builder()
+                        .fullName(userInfo.getName())
+                        .email(userInfo.getEmail())
+                        .avatar(userInfo.getPicture())
+                        .roles(roles)
+                        .build()));
+
+        String accessToken = accessTokenService.generateAccessToken(user);
+        String refreshToken = refreshTokenService.generateRefreshToken();
+        refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
+
+        setRefreshTokenCookie(refreshToken, response);
+
+        return AuthResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
 
     @Override
     public AuthResponse login(LoginRequest request, HttpServletResponse response) {

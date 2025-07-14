@@ -27,10 +27,9 @@ public class Users {
     @Column(nullable = false, unique = true)
     String email;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     String phone;
 
-    @Column(nullable = false)
     String password;
 
     @Column(unique = true, length = 512)

@@ -14,7 +14,9 @@ import com.capstone.ads.service.DesignTemplatesService;
 import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.service.ProductTypesService;
 import com.capstone.ads.utils.SecurityContextUtils;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,24 +25,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DesignTemplatesServiceImpl implements DesignTemplatesService {
-    private final ProductTypesService productTypesService;
-    private final FileDataService fileDataService;
-    private final DesignTemplatesRepository designTemplatesRepository;
-    private final DesignTemplatesMapper designTemplatesMapper;
-    private final SecurityContextUtils securityContextUtils;
+    ProductTypesService productTypesService;
+    FileDataService fileDataService;
+    DesignTemplatesRepository designTemplatesRepository;
+    DesignTemplatesMapper designTemplatesMapper;
+    SecurityContextUtils securityContextUtils;
 
     @Override
     @Transactional
     public DesignTemplateDTO createDesignTemplate(String productTypeId, DesignTemplateCreateRequest request) {
         ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
         Users currentUser = securityContextUtils.getCurrentUser();
+        String imageUrl = uploadDesignTemplateImageToS3(productTypeId, request.getDesignTemplateImage());
 
         DesignTemplates designTemplates = designTemplatesMapper.mapCreateRequestToEntity(request);
         designTemplates.setProductTypes(productTypes);
+        designTemplates.setImage(imageUrl);
         designTemplates.setUsers(currentUser);
         designTemplates.setIsAvailable(true);
         designTemplatesRepository.save(designTemplates);
@@ -62,10 +69,12 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     @Transactional
     public DesignTemplateDTO uploadDesignTemplateImage(String designTemplateId, MultipartFile file) {
         DesignTemplates designTemplates = findDesignTemplateByIdAndAvailable(designTemplateId);
-        String designTemplateImageKey = generateDesignTemplateKey(designTemplates.getProductTypes().getId(), designTemplateId);
+        String productTypeId = designTemplates.getProductTypes().getId();
+        fileDataService.hardDeleteFileDataByImageUrl(designTemplates.getImage());
 
-        fileDataService.uploadSingleFile(designTemplateImageKey, file);
-        designTemplates.setImage(designTemplateImageKey);
+        String imageUrl = uploadDesignTemplateImageToS3(productTypeId, file);
+        designTemplates.setImage(imageUrl);
+
         designTemplatesRepository.save(designTemplates);
         return designTemplatesMapper.toDTO(designTemplates);
     }
@@ -117,7 +126,13 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
                 .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
     }
 
-    private String generateDesignTemplateKey(String productTypeId, String designTemplateId) {
-        return String.format("design-template/%s/%s", productTypeId, designTemplateId);
+    private String generateDesignTemplateKey(String productTypeId) {
+        return String.format("design-template/%s/%s", productTypeId, UUID.randomUUID());
+    }
+
+    private String uploadDesignTemplateImageToS3(String productTypeId, MultipartFile file) {
+        String designTemplateImageKey = generateDesignTemplateKey(productTypeId);
+        fileDataService.uploadSingleFile(designTemplateImageKey, file);
+        return designTemplateImageKey;
     }
 }

@@ -5,7 +5,9 @@ import com.capstone.ads.service.PaymentService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -18,8 +20,9 @@ import vn.payos.type.WebhookData;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "PAYMENT")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentController {
-    private final PaymentService paymentService;
+    PaymentService paymentService;
 
     @PostMapping("/orders/{orderId}/deposit")
     @Operation(summary = "Đặt cọc theo đơn hàng")

@@ -11,7 +11,9 @@ import com.capstone.ads.repository.internal.ProductTypeSizesRepository;
 import com.capstone.ads.service.ProductTypeSizesService;
 import com.capstone.ads.service.ProductTypesService;
 import com.capstone.ads.service.SizeService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,11 +22,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
-    private final ProductTypesService productTypesService;
-    private final SizeService sizeService;
-    private final ProductTypeSizesRepository productTypeSizesRepository;
-    private final ProductTypeSizesMapper productTypeSizesMapper;
+    ProductTypesService productTypesService;
+    SizeService sizeService;
+    ProductTypeSizesRepository productTypeSizesRepository;
+    ProductTypeSizesMapper productTypeSizesMapper;
 
     @Override
     @Transactional

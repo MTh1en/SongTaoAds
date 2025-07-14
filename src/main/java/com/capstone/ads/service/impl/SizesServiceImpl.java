@@ -9,7 +9,9 @@ import com.capstone.ads.mapper.SizesMapper;
 import com.capstone.ads.model.Sizes;
 import com.capstone.ads.repository.internal.SizesRepository;
 import com.capstone.ads.service.SizeService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SizesServiceImpl implements SizeService {
-    private final SizesRepository sizesRepository;
-    private final SizesMapper sizesMapper;
+    SizesRepository sizesRepository;
+    SizesMapper sizesMapper;
 
     @Override
     @Transactional

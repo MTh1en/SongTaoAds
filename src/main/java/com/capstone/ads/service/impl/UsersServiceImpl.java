@@ -16,7 +16,9 @@ import com.capstone.ads.repository.internal.RolesRepository;
 import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.service.UserService;
 import com.capstone.ads.utils.SecurityContextUtils;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,12 +29,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UsersServiceImpl implements UserService {
-    private final FileDataService fileDataService;
-    private final RolesRepository rolesRepository;
-    private final UsersRepository usersRepository;
-    private final UsersMapper usersMapper;
-    private final SecurityContextUtils securityContextUtils;
+    FileDataService fileDataService;
+    RolesRepository rolesRepository;
+    UsersRepository usersRepository;
+    UsersMapper usersMapper;
+    SecurityContextUtils securityContextUtils;
 
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 

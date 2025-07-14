@@ -11,7 +11,9 @@ import com.capstone.ads.model.DesignTemplates;
 import com.capstone.ads.model.EditedDesigns;
 import com.capstone.ads.repository.internal.EditedDesignsRepository;
 import com.capstone.ads.service.*;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,13 +27,14 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EditedDesignServiceImpl implements EditedDesignService {
-    private final CustomerDetailService customerDetailService;
-    private final DesignTemplatesService designTemplatesService;
-    private final BackgroundService backgroundService;
-    private final FileDataService fileDataService;
-    private final EditedDesignsRepository editedDesignsRepository;
-    private final EditedDesignMapper editedDesignMapper;
+    CustomerDetailService customerDetailService;
+    DesignTemplatesService designTemplatesService;
+    BackgroundService backgroundService;
+    FileDataService fileDataService;
+    EditedDesignsRepository editedDesignsRepository;
+    EditedDesignMapper editedDesignMapper;
 
     @Override
     @Transactional

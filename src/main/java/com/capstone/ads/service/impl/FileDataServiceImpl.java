@@ -12,7 +12,9 @@ import com.capstone.ads.model.enums.FileTypeEnum;
 import com.capstone.ads.repository.internal.FileDataRepository;
 import com.capstone.ads.service.*;
 import io.micrometer.common.util.StringUtils;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,10 +34,11 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FileDataServiceImpl implements FileDataService {
-    private final S3Service s3Service;
-    private final FileDataMapper fileDataMapper;
-    private final FileDataRepository fileDataRepository;
+    S3Service s3Service;
+    FileDataMapper fileDataMapper;
+    FileDataRepository fileDataRepository;
 
     @Override
     public FileDataDTO uploadSingleFile(String key, MultipartFile file) {

@@ -15,7 +15,9 @@ import com.capstone.ads.repository.internal.PriceProposalRepository;
 import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.service.PriceProposalService;
 import com.capstone.ads.validator.PriceProposalStateValidator;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,11 +28,12 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PriceProposalServiceImpl implements PriceProposalService {
-    private final CustomDesignRequestService customDesignRequestService;
-    private final PriceProposalRepository priceProposalRepository;
-    private final PriceProposalMapper priceProposalMapper;
-    private final PriceProposalStateValidator priceProposalStateValidator;
+    CustomDesignRequestService customDesignRequestService;
+    PriceProposalRepository priceProposalRepository;
+    PriceProposalMapper priceProposalMapper;
+    PriceProposalStateValidator priceProposalStateValidator;
 
     @Override
     @Transactional

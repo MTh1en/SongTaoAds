@@ -35,15 +35,15 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 @Slf4j
 public class CustomDesignRequestServiceImpl implements CustomDesignRequestService {
-    private final FileDataService fileDataService;
-    private final CustomerChoicesService customerChoicesService;
-    private final CustomOrderLogicUtils customOrderLogicUtils;
-    private final UserService userService;
-    private final CustomerDetailService customerDetailService;
-    private final CustomDesignRequestsRepository customDesignRequestsRepository;
-    private final CustomDesignRequestsMapper customDesignRequestsMapper;
-    private final CustomerChoiceHistoriesConverter customerChoiceHistoriesConverter;
-    private final CustomDesignRequestStateValidator customDesignRequestStateValidator;
+    FileDataService fileDataService;
+    CustomerChoicesService customerChoicesService;
+    CustomOrderLogicUtils customOrderLogicUtils;
+    UserService userService;
+    CustomerDetailService customerDetailService;
+    CustomDesignRequestsRepository customDesignRequestsRepository;
+    CustomDesignRequestsMapper customDesignRequestsMapper;
+    CustomerChoiceHistoriesConverter customerChoiceHistoriesConverter;
+    CustomDesignRequestStateValidator customDesignRequestStateValidator;
 
     @Override
     @Transactional
