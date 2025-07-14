@@ -8,7 +8,10 @@ import com.capstone.ads.dto.email.transactional.Sender;
 import com.capstone.ads.mapper.VerificationMapper;
 import com.capstone.ads.repository.external.BrevoRepository;
 import com.capstone.ads.service.VerificationService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,22 +27,32 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class VerificationServiceImpl implements VerificationService {
+    @NonFinal
     @Value("${brevo.key}")
     private String brevoKey;
+
+    @NonFinal
     @Value("${brevo.sender-email}")
     private String senderEmail;
+
+    @NonFinal
     @Value("${brevo.sender-name}")
     private String senderName;
+
+    @NonFinal
     @Value("${brevo.verify-url}")
     private String verifyUrl;
+
+    @NonFinal
     @Value("${brevo.password-reset-url}")
     private String passwordResetUrl;
 
-    private final BrevoRepository brevoRepository;
-    private final VerificationMapper verificationMapper;
-    private final SpringTemplateEngine templateEngine;
-    private final RedisTemplate<String, String> redisTemplate;
+    BrevoRepository brevoRepository;
+    VerificationMapper verificationMapper;
+    SpringTemplateEngine templateEngine;
+    RedisTemplate<String, String> redisTemplate;
 
     @Override
     public TransactionalEmailResponse sendVerifyEmail(String email) {

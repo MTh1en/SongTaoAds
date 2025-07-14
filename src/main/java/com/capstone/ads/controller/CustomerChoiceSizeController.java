@@ -9,7 +9,9 @@ import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,8 +20,9 @@ import java.util.List;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "CUSTOMER CHOICE SIZE")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomerChoiceSizeController {
-    private final CustomerChoiceSizesService service;
+    CustomerChoiceSizesService service;
 
     @PostMapping("/customer-choices/{customerChoicesId}/sizes/{sizeId}")
     @Operation(summary = "Nhập kích thước cho đơn hàng")

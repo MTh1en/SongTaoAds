@@ -10,7 +10,9 @@ import com.capstone.ads.model.ProductTypes;
 import com.capstone.ads.repository.internal.ProductTypesRepository;
 import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.service.ProductTypesService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,10 +24,11 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductTypesServiceImpl implements ProductTypesService {
-    private final FileDataService fileDataService;
-    private final ProductTypesRepository productTypesRepository;
-    private final ProductTypesMapper productTypesMapper;
+    FileDataService fileDataService;
+    ProductTypesRepository productTypesRepository;
+    ProductTypesMapper productTypesMapper;
 
     @Override
     @Transactional

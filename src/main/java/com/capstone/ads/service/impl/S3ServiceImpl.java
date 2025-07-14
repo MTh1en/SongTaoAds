@@ -3,7 +3,10 @@ package com.capstone.ads.service.impl;
 import com.capstone.ads.dto.file.FileInformation;
 import com.capstone.ads.repository.external.S3Repository;
 import com.capstone.ads.service.S3Service;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,7 +15,9 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class S3ServiceImpl implements S3Service {
+    @NonFinal
     @Value("${aws.bucket.name}")
     private String bucketName;
 

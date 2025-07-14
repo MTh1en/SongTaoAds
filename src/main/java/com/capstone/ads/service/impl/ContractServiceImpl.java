@@ -16,7 +16,9 @@ import com.capstone.ads.service.ContractService;
 import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.service.OrderService;
 import com.capstone.ads.validator.ContractStateValidator;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,12 +30,13 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ContractServiceImpl implements ContractService {
-    private final FileDataService fileDataService;
-    private final OrderService orderService;
-    private final ContractMapper contractMapper;
-    private final ContractRepository contractRepository;
-    private final ContractStateValidator contractStateValidator;
+    FileDataService fileDataService;
+    OrderService orderService;
+    ContractMapper contractMapper;
+    ContractRepository contractRepository;
+    ContractStateValidator contractStateValidator;
 
     @Override
     @Transactional

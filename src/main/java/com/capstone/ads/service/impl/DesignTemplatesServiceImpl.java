@@ -14,7 +14,9 @@ import com.capstone.ads.service.DesignTemplatesService;
 import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.service.ProductTypesService;
 import com.capstone.ads.utils.SecurityContextUtils;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,12 +28,13 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DesignTemplatesServiceImpl implements DesignTemplatesService {
-    private final ProductTypesService productTypesService;
-    private final FileDataService fileDataService;
-    private final DesignTemplatesRepository designTemplatesRepository;
-    private final DesignTemplatesMapper designTemplatesMapper;
-    private final SecurityContextUtils securityContextUtils;
+    ProductTypesService productTypesService;
+    FileDataService fileDataService;
+    DesignTemplatesRepository designTemplatesRepository;
+    DesignTemplatesMapper designTemplatesMapper;
+    SecurityContextUtils securityContextUtils;
 
     @Override
     @Transactional

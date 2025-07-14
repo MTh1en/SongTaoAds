@@ -24,11 +24,11 @@ public class AuthController {
     private final AuthService authService;
     private final VerificationService verificationService;
 
-    @GetMapping("/name")
-    public String getThreadName() {
-        return Thread.currentThread().toString();
+    @PostMapping("/outbound/authentication")
+    public ApiResponse<AuthResponse> outboundAuthentication(@RequestParam String code, HttpServletResponse response) {
+        var result = authService.outboundAuthenticate(code, response);
+        return ApiResponseBuilder.buildSuccessResponse("Login successful", result);
     }
-
 
     @PostMapping("/login")
     @Operation(summary = "Đăng nhập")

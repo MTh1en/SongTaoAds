@@ -6,7 +6,9 @@ import com.capstone.ads.service.CustomerChoiceDetailsService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,8 +17,9 @@ import java.util.List;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "CUSTOMER CHOICE DETAIL")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomerChoiceDetailsController {
-    private final CustomerChoiceDetailsService service;
+    CustomerChoiceDetailsService service;
 
     @PostMapping("/customer-choices/{customerChoiceId}/attribute-values/{attributeValueId}")
     @Operation(summary = "Chọn giá trị thuộc tính")

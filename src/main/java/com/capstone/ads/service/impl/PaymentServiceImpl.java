@@ -12,7 +12,10 @@ import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.service.OrderService;
 import com.capstone.ads.service.PaymentService;
 import com.capstone.ads.utils.DataConverter;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,23 +29,28 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentServiceImpl implements PaymentService {
+    @NonFinal
     @Value("${payos.CLIENT_ID}")
     private String CLIENT_ID;
 
+    @NonFinal
     @Value("${payos.API_KEY}")
     private String API_KEY;
 
+    @NonFinal
     @Value("${payos.CHECKSUM_KEY}")
     private String CHECKSUM_KEY;
 
+    @NonFinal
     @Value("${app.base.url}")
     private String BASE_URL;
 
-    private final SecureRandom random = new SecureRandom();
-    private final PaymentsRepository paymentRepository;
-    private final OrderService orderService;
-    private final CustomDesignRequestService customDesignRequestService;
+    SecureRandom random = new SecureRandom();
+    PaymentsRepository paymentRepository;
+    OrderService orderService;
+    CustomDesignRequestService customDesignRequestService;
 
     @Override
     public CheckoutResponseData createOrderDepositPaymentLink(String orderId) throws Exception {

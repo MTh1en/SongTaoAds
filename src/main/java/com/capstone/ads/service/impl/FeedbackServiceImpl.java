@@ -14,7 +14,9 @@ import com.capstone.ads.service.FeedbackService;
 import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.service.OrderService;
 import com.capstone.ads.utils.SecurityContextUtils;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,12 +33,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FeedbackServiceImpl implements FeedbackService {
-    private final OrderService orderService;
-    private final FileDataService fileDataService;
-    private final FeedbacksRepository feedbacksRepository;
-    private final FeedbackMapper feedbackMapper;
-    private final SecurityContextUtils securityContextUtils;
+    OrderService orderService;
+    FileDataService fileDataService;
+    FeedbacksRepository feedbacksRepository;
+    FeedbackMapper feedbackMapper;
+    SecurityContextUtils securityContextUtils;
 
     @Override
     @Transactional

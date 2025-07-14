@@ -10,7 +10,9 @@ import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,8 +21,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Tag(name = "COST TYPE")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CostTypeController {
-    private final CostTypesService costTypesService;
+    CostTypesService costTypesService;
 
     @PostMapping("/product-types/{productTypeId}/cost-types")
     @Operation(summary = "Tạo chi phí theo loại sản phẩm")

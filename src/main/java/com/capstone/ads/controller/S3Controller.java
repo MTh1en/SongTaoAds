@@ -4,7 +4,9 @@ import com.capstone.ads.dto.file.FileInformation;
 import com.capstone.ads.service.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,8 +22,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "AWS S3")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class S3Controller {
-    private final S3Service s3Service;
+    S3Service s3Service;
 
     @PostMapping(value = "/upload-single", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload 1 file lên AWS S3")

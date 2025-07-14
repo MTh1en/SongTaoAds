@@ -11,7 +11,9 @@ import com.capstone.ads.model.Backgrounds;
 import com.capstone.ads.model.CustomerChoices;
 import com.capstone.ads.repository.internal.BackgroundsRepository;
 import com.capstone.ads.service.*;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,12 +30,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BackgroundServiceImpl implements BackgroundService {
-    private final CustomerChoicesService customerChoicesService;
-    private final AttributeValuesService attributeValuesService;
-    private final FileDataService fileDataService;
-    private final BackgroundMapper backgroundMapper;
-    private final BackgroundsRepository backgroundsRepository;
+    CustomerChoicesService customerChoicesService;
+    AttributeValuesService attributeValuesService;
+    FileDataService fileDataService;
+    BackgroundMapper backgroundMapper;
+    BackgroundsRepository backgroundsRepository;
 
     @Override
     @Transactional
@@ -69,7 +72,7 @@ public class BackgroundServiceImpl implements BackgroundService {
         String backgroundImageUrl = uploadBackgroundImageToS3(backgrounds.getAttributeValues().getId(), backgroundImage);
         backgrounds.setBackgroundUrl(backgroundImageUrl);
         backgrounds = backgroundsRepository.save(backgrounds);
-        
+
         return backgroundMapper.toDTO(backgrounds);
     }
 

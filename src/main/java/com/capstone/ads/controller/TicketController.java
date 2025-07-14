@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "TICKET")
 public class TicketController {
-    private final TicketService ticketService;
+    TicketService ticketService;
 
     @PostMapping("/orders/{orderId}/tickets")
     @Operation(summary = "Customer gửi ticket theo đơn hàng")

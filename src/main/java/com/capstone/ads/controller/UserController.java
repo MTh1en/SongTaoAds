@@ -23,6 +23,7 @@ import java.io.IOException;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "USER")
+
 public class UserController {
 
     private final UserService usersService;

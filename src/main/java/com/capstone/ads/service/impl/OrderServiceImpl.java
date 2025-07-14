@@ -19,7 +19,9 @@ import com.capstone.ads.validator.ContractStateValidator;
 import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
 import com.capstone.ads.validator.OrderStateValidator;
 import com.capstone.ads.utils.SecurityContextUtils;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,17 +39,18 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderServiceImpl implements OrderService {
-    private final FileDataService fileDataService;
-    private final OrdersRepository orderRepository;
-    private final OrdersMapper orderMapper;
-    private final SecurityContextUtils securityContextUtils;
-    private final CustomerChoiceHistoriesConverter customerChoiceHistoriesConverter;
-    private final OrderStateValidator orderStateValidator;
-    private final ContractStateValidator contractStateValidator;
-    private final CustomDesignRequestService customDesignRequestService;
-    private final CustomerChoicesService customerChoicesService;
-    private final EditedDesignService editedDesignService;
+    FileDataService fileDataService;
+    OrdersRepository orderRepository;
+    OrdersMapper orderMapper;
+    SecurityContextUtils securityContextUtils;
+    CustomerChoiceHistoriesConverter customerChoiceHistoriesConverter;
+    OrderStateValidator orderStateValidator;
+    ContractStateValidator contractStateValidator;
+    CustomDesignRequestService customDesignRequestService;
+    CustomerChoicesService customerChoicesService;
+    EditedDesignService editedDesignService;
 
     @Override
     @Transactional

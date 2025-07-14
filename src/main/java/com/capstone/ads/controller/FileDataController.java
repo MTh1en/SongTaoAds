@@ -9,7 +9,9 @@ import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,8 +22,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Tag(name = "FILE DATA")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FileDataController {
-    private final FileDataService fileDataService;
+    FileDataService fileDataService;
 
     @PostMapping(value = "file-data", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload 1 File và lưu xuống FileData")

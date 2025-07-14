@@ -49,6 +49,7 @@ spring:
   threads:
     virtual:
       enabled: true
+
 server:
   port: 8080
   tomcat:
@@ -56,6 +57,7 @@ server:
       max: 500
       min-spare: 15
     accept-count: 200
+
 app:
   base:
     url: ${BASE_URL}
@@ -63,18 +65,26 @@ app:
     signature: ${JWT_SIGNATURE}
     access-token-ttl: ${ACCESS_TOKEN_TTL}
     refresh-token-ttl: ${REFRESH_TOKEN_TTL}
+  outbound:
+    identity:
+      client-id: ${CLIENT_ID}
+      client-secret: ${CLIENT_SECRET}
+      redirect-uri: ${REDIRECT_URI}
 
 payos:
   CLIENT_ID: ${CLIENT_ID}
   API_KEY: ${API_KEY}
   CHECKSUM_KEY: ${CHECKSUM_KEY}
+
 aws:
   region: ap-southeast-1
   bucket:
     name: songtaoads
+
 stable-diffusion:
   url: ${STABLE_DIFFUSION_URL}
   token: ${STABLE_DIFFUSION_TOKEN}
+
 brevo:
   key: ${BREVO_KEY}
   sender-name: ${SENDER_NAME}
