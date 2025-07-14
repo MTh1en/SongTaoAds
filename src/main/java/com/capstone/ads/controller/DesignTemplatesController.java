@@ -25,10 +25,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class DesignTemplatesController {
     DesignTemplatesService designTemplatesService;
 
-    @PostMapping("/product-types/{productTypeId}/design-templates")
     @Operation(summary = "Tạo thiết kế mẫu theo loại sản phẩm")
+    @PostMapping(
+            value = "/product-types/{productTypeId}/design-templates",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ApiResponse<DesignTemplateDTO> createDesignTemplate(@PathVariable("productTypeId") String productTypeId,
-                                                               @Valid @RequestBody DesignTemplateCreateRequest request) {
+                                                               @Valid @ModelAttribute DesignTemplateCreateRequest request) {
         var response = designTemplatesService.createDesignTemplate(productTypeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create Design Template successful!", response);
     }
