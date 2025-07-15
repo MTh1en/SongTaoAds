@@ -36,7 +36,7 @@ public class StableDiffusionController {
     @Operation(summary = "Tạo hình ảnh từ thiết kế mẫu")
     public ResponseEntity<?> generateImageFromDesignTemplate(@PathVariable String designTemplateId,
                                                              @RequestPart(required = false) String prompt) {
-        FileInformation response = null;
+        FileInformation response;
         if (!Strings.isBlank(prompt)) {
             var translatedResponse = chatBotService.translateToTextToImagePrompt(prompt);
             log.info("Translated response: {}", translatedResponse);
