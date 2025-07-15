@@ -17,5 +17,5 @@ public class ProductTypeSizeDTO {
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     CoreDTO productTypes;
-    SizeDTO sizes;
+    CoreDTO sizes;
 }

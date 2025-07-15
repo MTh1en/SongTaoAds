@@ -6,9 +6,7 @@ import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeUpdateReques
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerChoiceSizesMapper;
-import com.capstone.ads.model.CustomerChoiceSizes;
-import com.capstone.ads.model.CustomerChoices;
-import com.capstone.ads.model.Sizes;
+import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.*;
 import com.capstone.ads.service.*;
 import lombok.AccessLevel;
@@ -39,8 +37,10 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
     public CustomerChoicesSizeDTO createCustomerChoiceSize(String customerChoicesId, String sizeId, CustomerChoicesSizeCreateRequest request) {
         CustomerChoices customerChoice = customerChoicesService.getCustomerChoiceById(customerChoicesId);
         Sizes sizes = sizeService.getSizeByIdAndIsAvailable(sizeId);
-        productTypeSizesService.validateProductTypeSizeExist(customerChoice.getProductTypes().getId(), sizeId);
+        String productTypeId = customerChoice.getProductTypes().getId();
 
+        productTypeSizesService.validateProductTypeSizeExist(productTypeId, sizeId);
+        productTypeSizesService.validateProductTypeSizeMaxValueAndMinValue(productTypeId, sizeId, request.getSizeValue());
         if (customerChoiceSizesRepository.existsByCustomerChoices_IdAndSizes_Id(customerChoicesId, sizeId))
             throw new AppException(ErrorCode.CUSTOMER_CHOICE_SIZE_EXISTED);
 
@@ -57,7 +57,10 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
     public CustomerChoicesSizeDTO updateValueInCustomerChoiceSize(String customerChoiceSizeId, CustomerChoicesSizeUpdateRequest request) {
         var customerChoicesSize = getCustomerChoiceSizesById(customerChoiceSizeId);
         CustomerChoices customerChoice = customerChoicesSize.getCustomerChoices();
+        String productTypeId = customerChoice.getProductTypes().getId();
+        String sizeId = customerChoicesSize.getSizes().getId();
 
+        productTypeSizesService.validateProductTypeSizeMaxValueAndMinValue(productTypeId, sizeId, request.getSizeValue());
         customerChoiceSizesMapper.updateEntityFromRequest(request, customerChoicesSize);
         customerChoicesSize = customerChoiceSizesRepository.save(customerChoicesSize);
 

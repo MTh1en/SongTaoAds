@@ -19,6 +19,8 @@ public class ProductTypeSizes {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+    Float maxValue;
+    Float minValue;
 
     @CreationTimestamp
     LocalDateTime createdAt;
