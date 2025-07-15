@@ -79,11 +79,15 @@ payos:
 aws:
   region: ap-southeast-1
   bucket:
-    name: songtaoads
+    name: ${AWS_S3_BUCKET}
 
 stable-diffusion:
   url: ${STABLE_DIFFUSION_URL}
   token: ${STABLE_DIFFUSION_TOKEN}
+  model-checkpoint: ${MODEL_CHECKPOINT}
+  controlnet:
+    module: ${CONTROLNET_MODEL}
+    model: ${CONTROLNET_MODULE}
 
 brevo:
   key: ${BREVO_KEY}

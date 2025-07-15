@@ -11,7 +11,9 @@ import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,10 +25,9 @@ import java.io.IOException;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "USER")
-
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
-
-    private final UserService usersService;
+    UserService usersService;
 
     @PostMapping("/users")
     @Operation(summary = "Tạo tài khoản hệ thống")

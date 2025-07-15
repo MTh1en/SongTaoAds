@@ -16,7 +16,9 @@ import com.capstone.ads.service.*;
 import com.capstone.ads.validator.CustomDesignRequestStateValidator;
 import com.capstone.ads.utils.CustomOrderLogicUtils;
 import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +36,7 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomDesignRequestServiceImpl implements CustomDesignRequestService {
     FileDataService fileDataService;
     CustomerChoicesService customerChoicesService;

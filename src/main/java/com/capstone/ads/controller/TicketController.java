@@ -11,13 +11,16 @@ import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "TICKET")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TicketController {
     TicketService ticketService;
 

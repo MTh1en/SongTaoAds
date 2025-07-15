@@ -20,9 +20,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 @Tag(name = "AUTH")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthController {
-    private final AuthService authService;
-    private final VerificationService verificationService;
+    AuthService authService;
+    VerificationService verificationService;
 
     @PostMapping("/outbound/authentication")
     public ApiResponse<AuthResponse> outboundAuthentication(@RequestParam String code, HttpServletResponse response) {

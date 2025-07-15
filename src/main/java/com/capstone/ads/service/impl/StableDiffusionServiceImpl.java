@@ -24,6 +24,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -32,6 +35,18 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
     @NonFinal
     @Value("${stable-diffusion.token}")
     private String stableDiffusionToken;
+
+    @NonFinal
+    @Value("${stable-diffusion.model-checkpoint}")
+    String modelCheckpoint;
+
+    @NonFinal
+    @Value("${stable-diffusion.controlnet.module}")
+    String controlnetModule;
+
+    @NonFinal
+    @Value("${stable-diffusion.controlnet.model}")
+    String controlnetModel;
 
     DesignTemplatesService designTemplatesService;
     S3Service s3Service;
@@ -45,16 +60,22 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
         String userId = securityContextUtils.getCurrentUserId();
 
         String imageBase64 = getImageBytesFromDesignTemplate(designTemplateId);
-        Args controlNetArgs = stableDiffusionMapper.mapArgs(imageBase64);
-        // Xây dựng AlwaysonScripts
+        Args controlNetArgs = stableDiffusionMapper.mapArgs(imageBase64, controlnetModule, controlnetModel);
+
         AlwaysonScripts alwaysonScripts = stableDiffusionMapper.mapAlwaysonScripts(controlNetArgs);
+
+        Map<String, Object> overrideSettings = new HashMap<>() {
+            {
+                put("sd_model_checkpoint", modelCheckpoint);
+            }
+        };
 
         // Xây dựng TextToImageRequest
         if (Strings.isBlank(prompt)) {
             prompt = "A simple advertising 2d background";
         }
-        TextToImageRequest request = stableDiffusionMapper.mapTextToImageRequest(prompt, alwaysonScripts, userId);
 
+        TextToImageRequest request = stableDiffusionMapper.mapTextToImageRequest(prompt, alwaysonScripts, userId, overrideSettings);
         var response = stableDiffusionRepository.textToImage(bearerStableDiffusionToken, request);
         String base64OutputImage = response.getImages().getFirst();
         byte[] outputImageBytes = DataConverter.convertBase64ToByteArray(base64OutputImage);
