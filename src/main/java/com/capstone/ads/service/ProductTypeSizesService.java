@@ -13,4 +13,6 @@ public interface ProductTypeSizesService {
 
     //INTERNAL FUNCTION
     void validateProductTypeSizeExist(String productTypeId, String sizeId);
+
+    void validateProductTypeSizeMaxValueAndMinValue(String productTypeId, String sizeId, Float sizeValue);
 }

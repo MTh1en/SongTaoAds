@@ -88,6 +88,9 @@ stable-diffusion:
   controlnet:
     module: ${CONTROLNET_MODEL}
     model: ${CONTROLNET_MODULE}
+  pixel:
+    max: ${STABLE_DIFFUSION_MAX_PIXEL}
+    min: ${STABLE_DIFFUSION_MIN_PIXEL}
 
 brevo:
   key: ${BREVO_KEY}

@@ -30,7 +30,7 @@ public enum ErrorCode {
     SIZE_NOT_FOUND("Size not found", HttpStatus.NOT_FOUND),
     SIZE_NOT_BELONG_PRODUCT_TYPE("Size not belong to product type", HttpStatus.BAD_REQUEST),
     UNIT_PRICE_NOT_FOUND("Unit price not enough", HttpStatus.BAD_REQUEST),
-
+    SIZE_VALUE_OUT_OF_RANGE("Size value out of range", HttpStatus.BAD_REQUEST),
     // ============ ATTRIBUTE RELATED ============
     ATTRIBUTE_NOT_FOUND("Attribute not found", HttpStatus.NOT_FOUND),
     ATTRIBUTE_VALUE_NOT_FOUND("Attribute value not found", HttpStatus.NOT_FOUND),

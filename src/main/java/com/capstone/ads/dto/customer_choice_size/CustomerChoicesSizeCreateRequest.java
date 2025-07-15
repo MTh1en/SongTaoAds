@@ -11,5 +11,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerChoicesSizeCreateRequest {
     @Positive(message = "Size Value must greater than 0")
-    Double sizeValue;
+    Float sizeValue;
 }

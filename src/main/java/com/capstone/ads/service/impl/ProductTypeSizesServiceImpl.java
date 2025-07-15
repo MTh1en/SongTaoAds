@@ -66,4 +66,16 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
             throw new AppException(ErrorCode.SIZE_NOT_BELONG_PRODUCT_TYPE);
         }
     }
+
+    @Override
+    public void validateProductTypeSizeMaxValueAndMinValue(String productTypeId, String sizeId, Float sizeValue) {
+        var productTypeSize = productTypeSizesRepository.findByProductTypes_IdAndSizes_Id(productTypeId, sizeId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_SIZE_NOT_FOUND));
+        Float maxValue = productTypeSize.getMaxValue();
+        Float minValue = productTypeSize.getMinValue();
+
+        if (sizeValue > maxValue && sizeValue < minValue) {
+            throw new AppException(ErrorCode.SIZE_VALUE_OUT_OF_RANGE);
+        }
+    }
 }
