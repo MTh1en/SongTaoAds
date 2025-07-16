@@ -14,6 +14,7 @@ import com.capstone.ads.service.SizeService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
     ProductTypesService productTypesService;
     SizeService sizeService;
@@ -73,9 +75,11 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_SIZE_NOT_FOUND));
         Float maxValue = productTypeSize.getMaxValue();
         Float minValue = productTypeSize.getMinValue();
-
-        if (sizeValue > maxValue && sizeValue < minValue) {
+        log.info("sizeValue: {}", sizeValue);
+        log.info("maxValue: {}, minValue: {}", maxValue, minValue);
+        if (sizeValue > maxValue || sizeValue < minValue) {
             throw new AppException(ErrorCode.SIZE_VALUE_OUT_OF_RANGE);
         }
+        log.info("result: {}, result: {}", sizeValue > maxValue, sizeValue < minValue);
     }
 }
