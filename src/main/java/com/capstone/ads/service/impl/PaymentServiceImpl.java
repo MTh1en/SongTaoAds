@@ -32,15 +32,15 @@ import java.util.Objects;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentServiceImpl implements PaymentService {
     @NonFinal
-    @Value("${payos.CLIENT_ID}")
+    @Value("${payos.client-id}")
     private String CLIENT_ID;
 
     @NonFinal
-    @Value("${payos.API_KEY}")
+    @Value("${payos.api-key}")
     private String API_KEY;
 
     @NonFinal
-    @Value("${payos.CHECKSUM_KEY}")
+    @Value("${payos.checksum-key}")
     private String CHECKSUM_KEY;
 
     @NonFinal

@@ -45,7 +45,7 @@ spring:
       api-key: ${OPEN_AI_KEY}
       chat:
         options:
-          model: ${MODEL_CHAT}
+          model: ${OPEN_AI_MODEL_CHAT}
   threads:
     virtual:
       enabled: true
@@ -67,14 +67,14 @@ app:
     refresh-token-ttl: ${REFRESH_TOKEN_TTL}
   outbound:
     identity:
-      client-id: ${CLIENT_ID}
-      client-secret: ${CLIENT_SECRET}
-      redirect-uri: ${REDIRECT_URI}
+      client-id: ${GOOGLE_CLIENT_ID}
+      client-secret: ${GOOGLE_CLIENT_SECRET}
+      redirect-uri: ${GOOGLE_REDIRECT_URI}
 
 payos:
-  CLIENT_ID: ${CLIENT_ID}
-  API_KEY: ${API_KEY}
-  CHECKSUM_KEY: ${CHECKSUM_KEY}
+  client-id: ${PAYOS_CLIENT_ID}
+  api-key: ${PAYOS_API_KEY}
+  checksum-key: ${PAYOS_CHECKSUM_KEY}
 
 aws:
   region: ap-southeast-1
@@ -94,7 +94,7 @@ stable-diffusion:
 
 brevo:
   key: ${BREVO_KEY}
-  sender-name: ${SENDER_NAME}
-  sender-email: ${SENDER_EMAIL}
-  verify-url: ${VERIFY_URL}
-  password-reset-url: ${PASSWORD_RESET_URL}
+  sender-name: ${BREVO_SENDER_NAME}
+  sender-email: ${BREVO_SENDER_EMAIL}
+  verify-url: ${BREVO_VERIFY_URL}
+  password-reset-url: ${BREVO_PASSWORD_RESET_URL}
