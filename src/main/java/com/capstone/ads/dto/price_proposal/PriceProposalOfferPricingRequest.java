@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.validator.constraints.Range;
 
 @Data
 @Builder
@@ -13,8 +14,8 @@ import lombok.experimental.FieldDefaults;
 public class PriceProposalOfferPricingRequest {
     @NotBlank(message = "Rejection Reason is Required")
     String rejectionReason;
-    @Size(min = 1000, message = "Total price offer must be greater than 1.000VNĐ")
+    @Range(min = 1000, message = "Total price offer must be greater than 1.000VNĐ")
     Integer totalPriceOffer;
-    @Size(min = 1000, message = "Deposit amount offer must be greater than 1.000VNĐ")
+    @Range(min = 1000, message = "Deposit amount offer must be greater than 1.000VNĐ")
     Integer depositAmountOffer;
 }
