@@ -115,6 +115,7 @@ public class OrderServiceImpl implements OrderService {
         long remainingAmount = orders.getTotalAmount() - depositAmount;
 
         orders.setStatus(OrderStatus.CONTRACT_CONFIRMED);
+        orders.getContract().setStatus(ContractStatus.CONFIRMED);
         orders.setDepositAmount(depositAmount);
         orders.setRemainingAmount(remainingAmount);
         orderRepository.save(orders);
