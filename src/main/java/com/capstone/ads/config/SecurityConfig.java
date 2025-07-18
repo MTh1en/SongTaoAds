@@ -31,6 +31,8 @@ public class SecurityConfig {
             "/api/auth/**",
             "/api/verifications/**",
             "/api/password-reset/**",
+            "/api/payments/**",
+            "/api/webhook/**",
             "/css/**",
             "/js/**"
     };
