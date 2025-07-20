@@ -5,4 +5,5 @@ public enum ContractStatus {
     SIGNED,
     NEED_DISCUSS,
     NEED_RESIGNED,
+    CONFIRMED,
 }
