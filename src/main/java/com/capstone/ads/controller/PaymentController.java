@@ -38,14 +38,14 @@ public class PaymentController {
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
-    @PostMapping("/orders/{orderId}/design-full-deposit")
+    @PostMapping("/orders/{orderId}/design-deposit")
     @Operation(summary = "Đặt cọc theo thiết kế")
     public ApiResponse<CheckoutResponseData> createCustomDesignFullDepositPaymentLink(@PathVariable String orderId) throws Exception {
         CheckoutResponseData response = paymentService.createCustomDesignFullDepositPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
-    @PostMapping("/orders/{orderId}/design-full-remaining")
+    @PostMapping("/orders/{orderId}/design-remaining")
     @Operation(summary = "Thanh toán hết thiết kế")
     public ApiResponse<CheckoutResponseData> createCustomDesignFullRemainingPaymentLink(@PathVariable String orderId) throws Exception {
         CheckoutResponseData response = paymentService.createCustomDesignFullRemainingPaymentLink(orderId);

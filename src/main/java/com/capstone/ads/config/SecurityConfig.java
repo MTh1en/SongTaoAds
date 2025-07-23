@@ -35,7 +35,6 @@ public class SecurityConfig {
             "/api/webhook/**",
             "/css/**",
             "/js/**",
-            "/api/**"
     };
     private final CustomJwtDecoder customJwtDecoder;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -86,8 +85,7 @@ public class SecurityConfig {
                 "http://localhost:8080",
                 "http://localhost:5173",
                 "https://songtaoads.online",
-                "https://songtaoads.io.vn",
-                "https://67333abf87b7.ngrok-free.app"
+                "https://songtaoads.io.vn"
         ));
         defaultConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         defaultConfig.setAllowedHeaders(Arrays.asList("Authorization", "X-XSRF-TOKEN", "Content-Type"));

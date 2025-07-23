@@ -74,6 +74,7 @@ public enum ErrorCode {
     SIGNATURE_GENERATION_FAILED("Failed to generate signature", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_SIGNATURE("Invalid callback signature", HttpStatus.BAD_REQUEST),
     INVALID_STATUS_PAYMENT("Invalid status payment", HttpStatus.BAD_REQUEST),
+    INVALID_PROGRESS_LOG_STATUS("Invalid progress log (status only in PRODUCTION, PRODUCTION COMPLETED, DELIVERING, INSTALLED", HttpStatus.BAD_REQUEST),
 
     // ============ CALCULATION & FORMULA ============
     INVALID_FORMULA("Invalid formula", HttpStatus.BAD_REQUEST),

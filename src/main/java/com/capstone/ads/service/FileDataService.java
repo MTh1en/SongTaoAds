@@ -42,6 +42,9 @@ public interface FileDataService {
     // ===== CUSTOM DESIGN REQUEST ===== //
     List<FileDataDTO> findFileDataByCustomDesignRequestId(String customDesignRequestId);
 
+    // ===== PROGRESS LOG ===== //
+    List<FileDataDTO> findFileDataByProgressLogId(String progressLogId);
+
     //INTERNAL FUNCTION//
     FileData getFileDataById(String fileId);
 }

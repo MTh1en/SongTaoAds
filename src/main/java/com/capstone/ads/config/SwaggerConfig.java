@@ -43,6 +43,7 @@ public class SwaggerConfig {
                 .addTagsItem(new Tag().name("DEMO DESIGN").description("Demo cho yêu cầu thiết kế"))
                 .addTagsItem(new Tag().name("ORDER").description("Đơn hàng"))
                 .addTagsItem(new Tag().name("ORDER DETAIL").description("Chi tiết đơn hàng"))
+                .addTagsItem(new Tag().name("PROGRESS LOG").description("Tiến trình đơn hàng"))
                 .addTagsItem(new Tag().name("CONTRACT").description("Hợp đồng"))
                 .addTagsItem(new Tag().name("CONTRACTOR").description("Đơn vị thi công"))
                 .addTagsItem(new Tag().name("PAYMENT").description("Thanh toán"))

@@ -137,6 +137,13 @@ public class FileDataServiceImpl implements FileDataService {
     }
 
     @Override
+    public List<FileDataDTO> findFileDataByProgressLogId(String progressLogId) {
+        return fileDataRepository.findByProgressLogs_Id(progressLogId).stream()
+                .map(fileDataMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public FileData getFileDataById(String fileId) {
         return fileDataRepository.findById(fileId)
                 .orElseThrow(() -> new AppException(ErrorCode.FILE_NOT_FOUND));

@@ -1,5 +1,6 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.progress_log.ProgressLogCreateRequest;
 import com.capstone.ads.dto.progress_log.ProgressLogDTO;
@@ -20,9 +21,19 @@ import org.springframework.web.bind.annotation.*;
 public class ProgressLogController {
     ProgressLogService progressLogService;
 
-    @PostMapping(value = "/progress-logs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<ProgressLogDTO> createProgressLog(@ModelAttribute ProgressLogCreateRequest request) {
-        var response = progressLogService.createProgressLog(request);
+    @PostMapping(value = "/orders/{orderId}/progress-logs", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<ProgressLogDTO> createProgressLog(@PathVariable String orderId,
+                                                         @ModelAttribute ProgressLogCreateRequest request) {
+        var response = progressLogService.createProgressLog(orderId, request);
         return ApiResponseBuilder.buildSuccessResponse("Progress log created", response);
+    }
+
+    @GetMapping(value = "/orders/{orderId}/progress-logs")
+    public ApiPagingResponse<ProgressLogDTO> findProgressLogByOrderId(
+            @PathVariable String orderId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = progressLogService.findProgressLogByOrderId(orderId, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Progress log by orderId", response, page);
     }
 }

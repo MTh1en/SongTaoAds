@@ -13,7 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProgressLogCreateRequest {
-    String orderId;
     String description;
     OrderStatus status;
     List<MultipartFile> progressLogImages;

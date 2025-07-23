@@ -3,7 +3,6 @@ package com.capstone.ads.controller;
 import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.file.*;
-import com.capstone.ads.model.enums.FileTypeEnum;
 import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -94,5 +93,13 @@ public class FileDataController {
     public ApiResponse<List<FileDataDTO>> findFileDataByCustomDesignRequestId(@PathVariable String customDesignRequestId) {
         var response = fileDataService.findFileDataByCustomDesignRequestId(customDesignRequestId);
         return ApiResponseBuilder.buildSuccessResponse("Find custom design request sub images successful", response);
+    }
+
+    // ===== PROGRESS LOG ===== //
+    @GetMapping("/progress-logs/{progressLogId}/images")
+    @Operation(summary = "Xem những hình ảnh trong tiến trình của đơn hàng")
+    public ApiResponse<List<FileDataDTO>> findFileDataByProgressLogId(@PathVariable String progressLogId) {
+        var response = fileDataService.findFileDataByProgressLogId(progressLogId);
+        return ApiResponseBuilder.buildSuccessResponse("Find progress logs images successful", response);
     }
 }

@@ -18,6 +18,8 @@ public interface FileDataRepository extends JpaRepository<FileData, String> {
 
     List<FileData> findByCustomDesignRequests_Id(String id);
 
+    List<FileData> findByProgressLogs_Id(String id);
+
     Optional<FileData> findByImageUrl(String imageUrl);
 
     void deleteByImageUrl(String imageUrl);

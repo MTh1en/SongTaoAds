@@ -6,6 +6,7 @@ import com.capstone.ads.dto.order.OrderCreateRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
 import com.capstone.ads.event.CustomDesignPaymentEvent;
+import com.capstone.ads.event.OrderStatusChangedEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.OrdersMapper;
@@ -64,19 +65,33 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDTO saleRequestCustomerResignContract(String orderId) {
         Orders orders = getOrderById(orderId);
+        String userId = securityContextUtils.getCurrentUser().getId();
+
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.CONTRACT_RESIGNED);
         contractStateValidator.validateTransition(orders.getContract().getStatus(), ContractStatus.NEED_RESIGNED);
 
         orders.setStatus(OrderStatus.CONTRACT_RESIGNED);
         orders.getContract().setStatus(ContractStatus.NEED_RESIGNED);
         orderRepository.save(orders);
+
+        eventPublisher.publishEvent(new OrderStatusChangedEvent(
+                this,
+                orderId,
+                OrderStatus.CONTRACT_RESIGNED,
+                userId,
+                null
+        ));
+
         return orderMapper.toDTO(orders);
     }
 
     @Override
+    @Transactional
     public OrderDTO saleConfirmContractSigned(String orderId) {
         Orders orders = getOrderById(orderId);
         Contract contract = orders.getContract();
+        String userId = securityContextUtils.getCurrentUser().getId();
+
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.CONTRACT_CONFIRMED);
 
         long depositAmount = (long) ((!contract.getDepositPercentChanged().equals(PaymentPolicy.DEPOSIT_PERCENT))
@@ -89,6 +104,14 @@ public class OrderServiceImpl implements OrderService {
         orders.setDepositConstructionAmount(depositAmount);
         orders.setRemainingConstructionAmount(remainingAmount);
         orderRepository.save(orders);
+
+        eventPublisher.publishEvent(new OrderStatusChangedEvent(
+                this,
+                orderId,
+                OrderStatus.CONTRACT_CONFIRMED,
+                userId,
+                null
+        ));
 
         return orderMapper.toDTO(orders);
     }
@@ -109,6 +132,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO saleNotifyEstimateDeliveryDate(String orderId, OrderConfirmRequest request) {
         Orders orders = getOrderById(orderId);
         Contractors contractors = contractorService.getContractorById(request.getContractorId());
+        String userId = securityContextUtils.getCurrentUser().getId();
 
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.IN_PROGRESS);
 
@@ -116,6 +140,14 @@ public class OrderServiceImpl implements OrderService {
         orders.setStatus(OrderStatus.IN_PROGRESS);
         orders.setContractors(contractors);
         orders = orderRepository.save(orders);
+
+        eventPublisher.publishEvent(new OrderStatusChangedEvent(
+                this,
+                orderId,
+                OrderStatus.IN_PROGRESS,
+                userId,
+                null
+        ));
 
         return orderMapper.toDTO(orders);
     }
@@ -161,9 +193,19 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void updateOrderStatus(String orderId, OrderStatus status) {
         Orders orders = getOrderById(orderId);
+        String userId = securityContextUtils.getCurrentUser().getId();
+
         orderStateValidator.validateTransition(orders.getStatus(), status);
         orders.setStatus(status);
         orderRepository.save(orders);
+
+        eventPublisher.publishEvent(new OrderStatusChangedEvent(
+                this,
+                orderId,
+                status,
+                userId,
+                null
+        ));
     }
 
     @Override
@@ -230,8 +272,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void updateOrderFromWebhookResult(Orders orders, PaymentType paymentType) {
+        OrderStatus status = null;
         if (paymentType.equals(PaymentType.DEPOSIT_CONSTRUCTION)) {
-            orders.setStatus(OrderStatus.DEPOSITED);
+            status = OrderStatus.DEPOSITED;
+            orders.setStatus(status);
         } else if (paymentType.equals(PaymentType.REMAINING_CONSTRUCTION)) {
             orders.setStatus(OrderStatus.ORDER_COMPLETED);
         } else if (paymentType.equals(PaymentType.DEPOSIT_DESIGN)) {
@@ -244,7 +288,8 @@ public class OrderServiceImpl implements OrderService {
                                     true
                             ))
                     );
-            orders.setStatus(OrderStatus.DEPOSITED_DESIGN);
+            status = OrderStatus.DEPOSITED_DESIGN;
+            orders.setStatus(status);
         } else if (paymentType.equals(PaymentType.REMAINING_DESIGN)) {
             orders.getOrderDetails().stream()
                     .filter(orderDetails -> orderDetails.getCustomDesignRequests().getStatus().equals(CustomDesignRequestStatus.WAITING_FULL_PAYMENT))
@@ -255,9 +300,18 @@ public class OrderServiceImpl implements OrderService {
                                     false
                             ))
                     );
-            orders.setStatus(OrderStatus.WAITING_FINAL_DESIGN);
+            status = OrderStatus.WAITING_FINAL_DESIGN;
+            orders.setStatus(status);
         }
         orderRepository.save(orders);
+
+        eventPublisher.publishEvent(new OrderStatusChangedEvent(
+                this,
+                orders.getId(),
+                status,
+                "WEBHOOK",
+                null
+        ));
     }
 
     @Override
