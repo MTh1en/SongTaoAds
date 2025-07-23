@@ -40,7 +40,7 @@ public class EditedDesignServiceImpl implements EditedDesignService {
     @Transactional
     public EditedDesignDTO createEditedDesignFromDesignTemplate(String customerDetailId, String designTemplateId,
                                                                 EditedDesignCreateRequest request) {
-        CustomerDetail customerDetail = customerDetailService.getCustomerChoiceDetailById(customerDetailId);
+        CustomerDetail customerDetail = customerDetailService.getCustomerDetailById(customerDetailId);
         DesignTemplates designTemplates = designTemplatesService.getDesignTemplateById(designTemplateId);
         String aiDesignImageUrl = uploadAIDesignImageToS3(customerDetailId, request.getEditedImage());
 
@@ -57,7 +57,7 @@ public class EditedDesignServiceImpl implements EditedDesignService {
     @Transactional
     public EditedDesignDTO createEditedDesignFromBackground(String customerDetailId, String backgroundId,
                                                             EditedDesignCreateRequest request) {
-        CustomerDetail customerDetail = customerDetailService.getCustomerChoiceDetailById(customerDetailId);
+        CustomerDetail customerDetail = customerDetailService.getCustomerDetailById(customerDetailId);
         Backgrounds backgrounds = backgroundService.getAvailableBackgroundById(backgroundId);
         String aiDesignImageUrl = uploadAIDesignImageToS3(customerDetailId, request.getEditedImage());
 

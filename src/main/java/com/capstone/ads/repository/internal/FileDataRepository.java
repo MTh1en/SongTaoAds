@@ -14,11 +14,11 @@ import java.util.Optional;
 public interface FileDataRepository extends JpaRepository<FileData, String> {
     Page<FileData> findByFileType(FileTypeEnum fileType, Pageable pageable);
 
-    List<FileData> findByOrders_IdAndFileType(String id, FileTypeEnum fileType);
-
     List<FileData> findByDemoDesigns_Id(String id);
 
     List<FileData> findByCustomDesignRequests_Id(String id);
+
+    List<FileData> findByProgressLogs_Id(String id);
 
     Optional<FileData> findByImageUrl(String imageUrl);
 

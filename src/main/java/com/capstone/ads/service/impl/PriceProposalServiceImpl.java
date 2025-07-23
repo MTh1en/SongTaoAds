@@ -4,6 +4,8 @@ import com.capstone.ads.dto.price_proposal.PriceProposalCreateRequest;
 import com.capstone.ads.dto.price_proposal.PriceProposalDTO;
 import com.capstone.ads.dto.price_proposal.PriceProposalOfferPricingRequest;
 import com.capstone.ads.dto.price_proposal.PriceProposalUpdatePricingRequest;
+import com.capstone.ads.event.CustomDesignRequestChangeStatusEvent;
+import com.capstone.ads.event.PriceProposalApprovedEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.PriceProposalMapper;
@@ -14,11 +16,13 @@ import com.capstone.ads.model.enums.PriceProposalStatus;
 import com.capstone.ads.repository.internal.PriceProposalRepository;
 import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.service.PriceProposalService;
+import com.capstone.ads.validator.CustomDesignRequestStateValidator;
 import com.capstone.ads.validator.PriceProposalStateValidator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +38,8 @@ public class PriceProposalServiceImpl implements PriceProposalService {
     PriceProposalRepository priceProposalRepository;
     PriceProposalMapper priceProposalMapper;
     PriceProposalStateValidator priceProposalStateValidator;
+    CustomDesignRequestStateValidator customDesignRequestStateValidator;
+    ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -45,7 +51,16 @@ public class PriceProposalServiceImpl implements PriceProposalService {
         priceProposal.setCustomDesignRequests(customDesignRequests);
         priceProposal = priceProposalRepository.save(priceProposal);
 
-        customDesignRequestService.updateCustomDesignRequestStatus(customerDesignRequestId, CustomDesignRequestStatus.PRICING_NOTIFIED);
+        customDesignRequestStateValidator.validateTransition(
+                customDesignRequests.getStatus(),
+                CustomDesignRequestStatus.PRICING_NOTIFIED
+        );
+
+        eventPublisher.publishEvent(new CustomDesignRequestChangeStatusEvent(
+                this,
+                customerDesignRequestId,
+                CustomDesignRequestStatus.PRICING_NOTIFIED
+        ));
 
         return priceProposalMapper.toDTO(priceProposal);
     }
@@ -73,8 +88,16 @@ public class PriceProposalServiceImpl implements PriceProposalService {
         priceProposal.setStatus(PriceProposalStatus.REJECTED);
         priceProposal = priceProposalRepository.save(priceProposal);
 
-        customDesignRequestService.updateCustomDesignRequestStatus(customerDesignRequestId, CustomDesignRequestStatus.REJECTED_PRICING);
+        customDesignRequestStateValidator.validateTransition(
+                priceProposal.getCustomDesignRequests().getStatus(),
+                CustomDesignRequestStatus.REJECTED_PRICING
+        );
 
+        eventPublisher.publishEvent(new CustomDesignRequestChangeStatusEvent(
+                this,
+                customerDesignRequestId,
+                CustomDesignRequestStatus.REJECTED_PRICING
+        ));
         return priceProposalMapper.toDTO(priceProposal);
     }
 
@@ -88,8 +111,18 @@ public class PriceProposalServiceImpl implements PriceProposalService {
         priceProposal.setStatus(PriceProposalStatus.APPROVED);
         priceProposal = priceProposalRepository.save(priceProposal);
 
-        customDesignRequestService.updateCustomDesignRequestApprovedPricing(customerDesignRequestId, priceProposal.getTotalPrice(), priceProposal.getDepositAmount());
+        customDesignRequestStateValidator.validateTransition(
+                priceProposal.getCustomDesignRequests().getStatus(),
+                CustomDesignRequestStatus.APPROVED_PRICING
+        );
 
+        eventPublisher.publishEvent(new PriceProposalApprovedEvent(
+                this,
+                customerDesignRequestId,
+                priceProposal.getTotalPrice(),
+                priceProposal.getDepositAmount(),
+                priceProposal.getTotalPrice() - priceProposal.getDepositAmount()
+        ));
         return priceProposalMapper.toDTO(priceProposal);
     }
 

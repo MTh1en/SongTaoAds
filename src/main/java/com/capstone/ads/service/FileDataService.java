@@ -36,17 +36,14 @@ public interface FileDataService {
 
     Page<FileDataDTO> findAllIconSystem(int page, int size);
 
-
-    // ===== ORDER ===== //
-    List<FileDataDTO> findFileDataByOrderIdAndFileType(String orderId, FileTypeEnum fileType);
-
-
     // ===== DEMO DESIGN ===== //
     List<FileDataDTO> findFileDataByDemoDesignId(String demoDesignId);
 
     // ===== CUSTOM DESIGN REQUEST ===== //
     List<FileDataDTO> findFileDataByCustomDesignRequestId(String customDesignRequestId);
 
+    // ===== PROGRESS LOG ===== //
+    List<FileDataDTO> findFileDataByProgressLogId(String progressLogId);
 
     //INTERNAL FUNCTION//
     FileData getFileDataById(String fileId);

@@ -14,4 +14,5 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderConfirmRequest {
     LocalDateTime estimatedDeliveryDate;
+    String contractorId;
 }

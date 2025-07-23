@@ -2,16 +2,12 @@ package com.capstone.ads.service.impl;
 
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
-import com.capstone.ads.model.CustomDesignRequests;
 import com.capstone.ads.model.Orders;
 import com.capstone.ads.model.Payments;
-import com.capstone.ads.model.enums.PaymentMethod;
-import com.capstone.ads.model.enums.PaymentStatus;
+import com.capstone.ads.model.enums.*;
 import com.capstone.ads.repository.internal.PaymentsRepository;
-import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.service.OrderService;
 import com.capstone.ads.service.PaymentService;
-import com.capstone.ads.utils.DataConverter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -50,32 +46,36 @@ public class PaymentServiceImpl implements PaymentService {
     SecureRandom random = new SecureRandom();
     PaymentsRepository paymentRepository;
     OrderService orderService;
-    CustomDesignRequestService customDesignRequestService;
 
     @Override
-    public CheckoutResponseData createOrderDepositPaymentLink(String orderId) throws Exception {
+    public CheckoutResponseData createConstructionDepositPaymentLink(String orderId) throws Exception {
         Orders order = orderService.getOrderById(orderId);
         return createPaymentLinkForOrder(order, true);
     }
 
     @Override
-    public CheckoutResponseData createOrderRemainingPaymentLink(String orderId) throws Exception {
+    public CheckoutResponseData createConstructionRemainingPaymentLink(String orderId) throws Exception {
         Orders order = orderService.getOrderById(orderId);
         return createPaymentLinkForOrder(order, false);
     }
 
     @Override
-    public CheckoutResponseData createCustomDesignRequestDepositPaymentLink(String orderId) throws Exception {
-        CustomDesignRequests customDesignRequests = customDesignRequestService.getCustomDesignRequestById(orderId);
-        return createPaymentLinkForCustomDesignRequest(customDesignRequests, true);
+    public CheckoutResponseData createCustomDesignFullDepositPaymentLink(String orderId) throws Exception {
+        Orders order = orderService.getOrderById(orderId);
+        return createPaymentLinkForCustomDesign(order, true);
     }
 
     @Override
-    public CheckoutResponseData createCustomDesignRequestRemainingPaymentLink(String orderId) throws Exception {
-        CustomDesignRequests customDesignRequests = customDesignRequestService.getCustomDesignRequestById(orderId);
-        return createPaymentLinkForCustomDesignRequest(customDesignRequests, false);
+    public CheckoutResponseData createCustomDesignFullRemainingPaymentLink(String orderId) throws Exception {
+        Orders order = orderService.getOrderById(orderId);
+        return createPaymentLinkForCustomDesign(order, false);
     }
 
+    @Override
+    public CheckoutResponseData createFullOrderPaymentLink(String orderId) throws Exception {
+        Orders order = orderService.getOrderById(orderId);
+        return createPaymentLinkForFullPayment(order);
+    }
 
     @Override
     public WebhookData verifyPaymentWebhookData(Webhook Webhook) throws Exception {
@@ -87,22 +87,16 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public void updateStatusByWebhookData(Webhook Webhook) {
         Payments payment = paymentRepository.findByCode(Webhook.getData().getOrderCode())
-                .orElseThrow(() -> new AppException(ErrorCode.PAYMENT_NOT_FOUND));
-        boolean isDeposit = payment.getIsDeposit();
-        if (Webhook.getSuccess()) {
-            payment.setStatus(PaymentStatus.SUCCESS);
-            if (!Objects.isNull(payment.getCustomDesignRequests())) {
-                CustomDesignRequests customDesignRequests = payment.getCustomDesignRequests();
-                customDesignRequestService.updateCustomDesignRequestFromWebhookResult(customDesignRequests, isDeposit);
+                .orElse(null);
+        if (Objects.nonNull(payment)) {
+            if (Webhook.getSuccess()) {
+                payment.setStatus(PaymentStatus.SUCCESS);
+                orderService.updateOrderFromWebhookResult(payment.getOrders(), payment.getType());
+            } else {
+                payment.setStatus(PaymentStatus.FAILED);
             }
-            if (!Objects.isNull(payment.getOrders())) {
-                Orders orders = payment.getOrders();
-                orderService.updateOrderFromWebhookResult(orders, isDeposit);
-            }
-        } else {
-            payment.setStatus(PaymentStatus.FAILED);
+            paymentRepository.save(payment);
         }
-        paymentRepository.save(payment);
     }
 
     @Override
@@ -121,71 +115,92 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private CheckoutResponseData createPaymentLinkForOrder(Orders order, boolean isDeposit) throws Exception {
-        PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
         long paymentCode = generateOrderCode();
-        long expiredInSeconds = (System.currentTimeMillis() / 1000) + (60 * 60);
-        long amount = (isDeposit)
-                ? order.getDepositAmount()
-                : order.getRemainingAmount();
-        int payOsAmount = DataConverter.convertDoubleToInt(amount);
+        Long amount;
+        PaymentType paymentType;
+        if (isDeposit) {
+            amount = order.getDepositConstructionAmount();
+            paymentType = PaymentType.DEPOSIT_CONSTRUCTION;
+        } else {
+            amount = order.getRemainingConstructionAmount();
+            paymentType = PaymentType.REMAINING_CONSTRUCTION;
+        }
 
-        // Create PaymentData
-        PaymentData paymentData = PaymentData.builder()
-                .orderCode(paymentCode)
-                .description("Orders")
-                .amount(payOsAmount)
-                .expiredAt(expiredInSeconds)
-                .returnUrl(BASE_URL + "/api/payments/success")
-                .cancelUrl(BASE_URL + "/api/payments/fail/" + paymentCode)
-                .build();
-
-        // Create and save Payment entity
         Payments payment = Payments.builder()
                 .code(paymentCode)
                 .amount(amount)
                 .method(PaymentMethod.PAYOS)
                 .status(PaymentStatus.PENDING)
-                .isDeposit(isDeposit)
+                .type(paymentType)
                 .orders(order)
                 .build();
         paymentRepository.save(payment);
 
-        // Create payment link
-        return payOS.createPaymentLink(paymentData);
+        return createPaymentLinkFromPayOS(amount.intValue(), paymentCode);
     }
 
-    private CheckoutResponseData createPaymentLinkForCustomDesignRequest(CustomDesignRequests customDesignRequests, boolean isDeposit) throws Exception {
-        PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
-
+    private CheckoutResponseData createPaymentLinkForCustomDesign(Orders order, boolean isDeposit) throws Exception {
         long paymentCode = generateOrderCode();
-        long expiredInSeconds = (System.currentTimeMillis() / 1000) + (60 * 60);
+        long amount;
+        PaymentType paymentType;
+        if (isDeposit) {
+            amount = order.getDepositDesignAmount();
+            paymentType = PaymentType.DEPOSIT_DESIGN;
+        } else {
+            amount = order.getRemainingDesignAmount();
+            paymentType = PaymentType.REMAINING_DESIGN;
+        }
 
-        long amount = (isDeposit)
-                ? customDesignRequests.getDepositAmount()
-                : customDesignRequests.getRemainingAmount();
-        int payOsAmount = DataConverter.convertDoubleToInt(amount);
-        // Create PaymentData
-        PaymentData paymentData = PaymentData.builder()
-                .orderCode(paymentCode)
-                .description("Custom Design Request")
-                .expiredAt(expiredInSeconds)
-                .amount(payOsAmount)
-                .returnUrl(BASE_URL + "/api/payments/success")
-                .cancelUrl(BASE_URL + "/api/payments/fail/" + paymentCode)
-                .build();
-
-        // Create and save Payment entity
         Payments payment = Payments.builder()
                 .code(paymentCode)
                 .amount(amount)
                 .method(PaymentMethod.PAYOS)
                 .status(PaymentStatus.PENDING)
-                .isDeposit(isDeposit)
-                .customDesignRequests(customDesignRequests)
+                .type(paymentType)
+                .orders(order)
                 .build();
         paymentRepository.save(payment);
 
-        // Create payment link
+        return createPaymentLinkFromPayOS((int) amount, paymentCode);
+    }
+
+    private CheckoutResponseData createPaymentLinkForFullPayment(Orders orders) throws Exception {
+        long paymentCode = generateOrderCode();
+        Long amount;
+
+        if (orders.getOrderType().equals(OrderType.AI_DESIGN)) {
+            amount = orders.getTotalConstructionAmount();
+        } else {
+            amount = orders.getTotalDesignAmount() + orders.getTotalConstructionAmount();
+        }
+
+        Payments payment = Payments.builder()
+                .code(paymentCode)
+                .amount(amount)
+                .method(PaymentMethod.PAYOS)
+                .status(PaymentStatus.PENDING)
+                .type(PaymentType.FULLY_PAID)
+                .orders(orders)
+                .build();
+
+        paymentRepository.save(payment);
+        return createPaymentLinkFromPayOS(amount.intValue(), paymentCode);
+    }
+    // INTERNAL FUNCTION //
+
+    private CheckoutResponseData createPaymentLinkFromPayOS(Integer amount, Long paymentCode) throws Exception {
+        PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
+
+        long expiredInSeconds = (System.currentTimeMillis() / 1000) + (60 * 60);
+
+        PaymentData paymentData = PaymentData.builder()
+                .orderCode(paymentCode)
+                .description("SongTaoAds")
+                .amount(amount)
+                .expiredAt(expiredInSeconds)
+                .returnUrl(BASE_URL + "/api/payments/success")
+                .cancelUrl(BASE_URL + "/api/payments/fail/" + paymentCode)
+                .build();
         return payOS.createPaymentLink(paymentData);
     }
 

@@ -2,9 +2,8 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.file.FileDataDTO;
-import com.capstone.ads.dto.file.UploadMultipleOrderFileRequest;
 import com.capstone.ads.dto.order.OrderConfirmRequest;
+import com.capstone.ads.dto.order.OrderCreateRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
 import com.capstone.ads.model.enums.OrderStatus;
@@ -16,11 +15,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -30,23 +25,10 @@ import java.util.List;
 public class OrderController {
     OrderService orderService;
 
-    @PostMapping("/custom-design-request/{customDesignRequestId}/orders")
-    @Operation(
-            summary = "Tạo đơn hàng theo custom request",
-            description = "Sau khi khách hàng hoàn thành thiết kế tùy chỉnh làm màn hình cho khách hàng chọn," +
-                    "muốn tạo order thì call api này không thì thôi"
-    )
-    public ApiResponse<OrderDTO> createOrderByCustomDesign(@PathVariable String customDesignRequestId) {
-        var response = orderService.createOrderByCustomDesign(customDesignRequestId);
-        return ApiResponseBuilder.buildSuccessResponse("Create order successful", response);
-    }
-
-    @PostMapping("/edited-designs/{editedDesignId}/customer-choices/{customerChoiceId}/orders")
-    @Operation(summary = "Tạo đơn hàng theo thiết kế")
-    public ApiResponse<OrderDTO> createOrderByEditedDesign(@PathVariable String editedDesignId,
-                                                           @PathVariable String customerChoiceId) {
-        var response = orderService.createOrderByEditedDesign(editedDesignId, customerChoiceId);
-        return ApiResponseBuilder.buildSuccessResponse("Create order successful", response);
+    @PostMapping("/orders")
+    public ApiResponse<OrderDTO> createOrder(@RequestBody OrderCreateRequest request) {
+        var response = orderService.createOrder(request);
+        return ApiResponseBuilder.buildSuccessResponse("Order created", response);
     }
 
     @PatchMapping("/orders/{orderId}/contract-resign")
@@ -77,46 +59,6 @@ public class OrderController {
                                                                 @RequestBody OrderConfirmRequest request) {
         var response = orderService.saleNotifyEstimateDeliveryDate(orderId, request);
         return ApiResponseBuilder.buildSuccessResponse("Confirm order successful", response);
-    }
-
-    @PatchMapping(value = "/orders/{orderId}/producing", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Staff cập nhật đơn hàng bắt đầu làm")
-    public ApiResponse<OrderDTO> managerUpdateOrderProducing(@PathVariable String orderId,
-                                                             @RequestPart MultipartFile draftImage) {
-        var response = orderService.staffUpdateOrderProducing(orderId, draftImage);
-        return ApiResponseBuilder.buildSuccessResponse("Manager update Order Producing", response);
-    }
-
-    @PatchMapping(value = "/orders/{orderId}/production-completed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Staff cập nhật đơn hàng đã làm xong")
-    public ApiResponse<OrderDTO> managerUpdateOrderProductionComplete(@PathVariable String orderId,
-                                                                      @RequestPart MultipartFile productImage) {
-        var response = orderService.staffUpdateOrderProductionComplete(orderId, productImage);
-        return ApiResponseBuilder.buildSuccessResponse("Manager update Order Production Completed", response);
-    }
-
-    @PatchMapping(value = "/orders/{orderId}/delivering", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Staff cập nhật đơn hàng đang vận chuyển")
-    public ApiResponse<OrderDTO> managerUpdateOrderDelivering(@PathVariable String orderId,
-                                                              @RequestPart MultipartFile deliveryImage) {
-        var response = orderService.staffUpdateOrderDelivering(orderId, deliveryImage);
-        return ApiResponseBuilder.buildSuccessResponse("Manager update Order Delivering", response);
-    }
-
-    @PatchMapping(value = "/orders/{orderId}/installed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Staff cập nhật đơn hàng đã lắp đặt xong")
-    public ApiResponse<OrderDTO> manageUpdateOrderInstalled(@PathVariable String orderId,
-                                                            @RequestPart MultipartFile installedImage) {
-        var response = orderService.staffUpdateOrderInstalled(orderId, installedImage);
-        return ApiResponseBuilder.buildSuccessResponse("Manager update Order Installed", response);
-    }
-
-    @PostMapping(value = "/orders/{orderId}/sub-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload hình ảnh phụ theo từng tiến trình")
-    public ApiResponse<List<FileDataDTO>> uploadSubImages(@PathVariable String orderId,
-                                                          @ModelAttribute UploadMultipleOrderFileRequest request) {
-        var response = orderService.uploadOrderSubImages(orderId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Upload sub images successfully", response);
     }
 
     @GetMapping("/orders/{orderId}")

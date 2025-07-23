@@ -5,13 +5,15 @@ import vn.payos.type.Webhook;
 import vn.payos.type.WebhookData;
 
 public interface PaymentService {
-    CheckoutResponseData createOrderDepositPaymentLink(String orderId) throws Exception;
+    CheckoutResponseData createConstructionDepositPaymentLink(String orderId) throws Exception;
 
-    CheckoutResponseData createOrderRemainingPaymentLink(String orderId) throws Exception;
+    CheckoutResponseData createConstructionRemainingPaymentLink(String orderId) throws Exception;
 
-    CheckoutResponseData createCustomDesignRequestDepositPaymentLink(String orderId) throws Exception;
+    CheckoutResponseData createCustomDesignFullDepositPaymentLink(String orderId) throws Exception;
 
-    CheckoutResponseData createCustomDesignRequestRemainingPaymentLink(String orderId) throws Exception;
+    CheckoutResponseData createCustomDesignFullRemainingPaymentLink(String orderId) throws Exception;
+
+    CheckoutResponseData createFullOrderPaymentLink(String orderId) throws Exception;
 
     WebhookData verifyPaymentWebhookData(Webhook Webhook) throws Exception;
 

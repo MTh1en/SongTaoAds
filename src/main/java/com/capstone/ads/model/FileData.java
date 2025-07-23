@@ -36,11 +36,11 @@ public class FileData {
     LocalDateTime updatedAt;
 
     @ManyToOne
-    Orders orders;
-
-    @ManyToOne
     CustomDesignRequests customDesignRequests;
 
     @ManyToOne
     DemoDesigns demoDesigns;
+
+    @ManyToOne
+    ProgressLogs progressLogs;
 }

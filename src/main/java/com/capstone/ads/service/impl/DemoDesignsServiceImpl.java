@@ -6,6 +6,9 @@ import com.capstone.ads.dto.demo_design.CustomerRejectCustomDesignRequest;
 import com.capstone.ads.dto.demo_design.DesignerUpdateDescriptionCustomDesignRequest;
 import com.capstone.ads.dto.file.FileDataDTO;
 import com.capstone.ads.dto.file.UploadMultipleFileRequest;
+import com.capstone.ads.event.CustomDesignRequestChangeStatusEvent;
+import com.capstone.ads.event.DemoDesignApprovedEvent;
+import com.capstone.ads.event.DemoDesignCreateEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.DemoDesignsMapper;
@@ -19,11 +22,13 @@ import com.capstone.ads.repository.internal.DemoDesignsRepository;
 import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.service.DemoDesignsService;
 import com.capstone.ads.service.FileDataService;
+import com.capstone.ads.validator.CustomDesignRequestStateValidator;
 import com.capstone.ads.validator.DemoDesignStateValidator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +51,8 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
     DemoDesignsRepository demoDesignsRepository;
     DemoDesignsMapper demoDesignsMapper;
     DemoDesignStateValidator demoDesignStateValidator;
+    CustomDesignRequestStateValidator customDesignRequestStateValidator;
+    ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -66,8 +73,27 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
         demoDesigns.setVersion(versionNumber);
         demoDesigns = demoDesignsRepository.save(demoDesigns);
 
-        //Cập nhật lại trạng thái Request là đã gửi demo
-        customDesignRequestService.updateCustomDesignRequestByCustomDesign(customDesignRequestId, versionNumber > 3);
+        DemoDesigns finalDemoDesigns = demoDesigns;
+        if (request.getSubCustomDesignImage() != null && !request.getSubCustomDesignImage().isEmpty()) {
+            fileDataService.uploadMultipleFiles(
+                    request.getSubCustomDesignImage(),
+                    FileTypeEnum.DEMO_DESIGN,
+                    demoDesigns,
+                    FileData::setDemoDesigns,
+                    (id, size) -> generateDemoDesignSumImageKey(finalDemoDesigns.getCustomDesignRequests().getId(), size)
+            );
+        }
+
+        customDesignRequestStateValidator.validateTransition(
+                demoDesigns.getCustomDesignRequests().getStatus(),
+                CustomDesignRequestStatus.DEMO_SUBMITTED
+        );
+
+        eventPublisher.publishEvent(new DemoDesignCreateEvent(
+                this,
+                customDesignRequestId,
+                versionNumber > 3
+        ));
 
         return demoDesignsMapper.toDTO(demoDesigns);
     }
@@ -77,12 +103,19 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
     public DemoDesignDTO customerApproveCustomDesign(String customDesignId) {
         DemoDesigns demoDesigns = findCustomDesignByIdAndPendingStatus(customDesignId);
         String customDesignRequestId = demoDesigns.getCustomDesignRequests().getId();
-
         demoDesignStateValidator.validateTransition(demoDesigns.getStatus(), DemoDesignStatus.APPROVED);
         demoDesigns.setStatus(DemoDesignStatus.APPROVED);
         demoDesigns = demoDesignsRepository.save(demoDesigns);
 
-        customDesignRequestService.updateCustomDesignRequestStatus(customDesignRequestId, CustomDesignRequestStatus.WAITING_FULL_PAYMENT);
+        customDesignRequestStateValidator.validateTransition(
+                demoDesigns.getCustomDesignRequests().getStatus(),
+                CustomDesignRequestStatus.WAITING_FULL_PAYMENT
+        );
+        eventPublisher.publishEvent(new DemoDesignApprovedEvent(
+                this,
+                customDesignRequestId
+        ));
+
         return demoDesignsMapper.toDTO(demoDesigns);
     }
 
@@ -93,24 +126,26 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
         String customDesignRequestId = demoDesigns.getCustomDesignRequests().getId();
 
         demoDesignStateValidator.validateTransition(demoDesigns.getStatus(), DemoDesignStatus.REJECTED);
+
+        if (request.getFeedbackImage() != null && !request.getFeedbackImage().isEmpty()) {
+            String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, request.getFeedbackImage());
+            demoDesigns.setCustomerFeedbackImage(customDesignImageKey);
+        }
         demoDesignsMapper.updateEntityFromCustomerRequest(request, demoDesigns);
         demoDesigns.setStatus(DemoDesignStatus.REJECTED);
         demoDesigns = demoDesignsRepository.save(demoDesigns);
 
-        customDesignRequestService.updateCustomDesignRequestStatus(customDesignRequestId, CustomDesignRequestStatus.REVISION_REQUESTED);
-        return demoDesignsMapper.toDTO(demoDesigns);
-    }
+        customDesignRequestStateValidator.validateTransition(
+                demoDesigns.getCustomDesignRequests().getStatus(),
+                CustomDesignRequestStatus.REVISION_REQUESTED
+        );
 
-    @Override
-    @Transactional
-    public DemoDesignDTO customerUploadFeedbackImage(String customDesignId, MultipartFile customDesignImage) {
-        DemoDesigns demoDesigns = findCustomDesignByIdAndPendingStatus(customDesignId);
-        String customDesignRequestId = demoDesigns.getCustomDesignRequests().getId();
+        eventPublisher.publishEvent(new CustomDesignRequestChangeStatusEvent(
+                this,
+                customDesignRequestId,
+                CustomDesignRequestStatus.REVISION_REQUESTED
+        ));
 
-        String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, customDesignImage);
-        demoDesigns.setCustomerFeedbackImage(customDesignImageKey);
-
-        demoDesigns = demoDesignsRepository.save(demoDesigns);
         return demoDesignsMapper.toDTO(demoDesigns);
     }
 
@@ -146,7 +181,7 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
                 FileTypeEnum.DEMO_DESIGN,
                 demoDesigns,
                 FileData::setDemoDesigns,
-                (id, size) -> generateDemoDesignSumImageKey(demoDesigns.getCustomDesignRequests().getId(), demoDesignId, size)
+                (id, size) -> generateDemoDesignSumImageKey(demoDesigns.getCustomDesignRequests().getId(), size)
         );
     }
 
@@ -181,11 +216,11 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
         return String.format("custom-design/%s/%s", customDesignRequestId, UUID.randomUUID());
     }
 
-    private List<String> generateDemoDesignSumImageKey(String customDesignRequestId, String demoDesignId, Integer amountKey) {
+    private List<String> generateDemoDesignSumImageKey(String customDesignRequestId, Integer amountKey) {
         List<String> keys = new ArrayList<>();
         IntStream.range(0, amountKey)
-                .forEach(i -> keys.add(String.format("custom-design/%s/sub-demo/%s/%s",
-                        customDesignRequestId, demoDesignId, UUID.randomUUID())));
+                .forEach(i -> keys.add(String.format("custom-design/%s/sub-demo/%s",
+                        customDesignRequestId, UUID.randomUUID())));
         return keys;
     }
 

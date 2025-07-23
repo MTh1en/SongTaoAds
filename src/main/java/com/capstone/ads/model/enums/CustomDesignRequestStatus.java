@@ -14,5 +14,5 @@ public enum CustomDesignRequestStatus {
     WAITING_FULL_PAYMENT,
     FULLY_PAID,
     COMPLETED,
-    CANCEL,
+    CANCELLED,
 }

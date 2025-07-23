@@ -31,6 +31,7 @@ public enum ErrorCode {
     SIZE_NOT_BELONG_PRODUCT_TYPE("Size not belong to product type", HttpStatus.BAD_REQUEST),
     UNIT_PRICE_NOT_FOUND("Unit price not enough", HttpStatus.BAD_REQUEST),
     SIZE_VALUE_OUT_OF_RANGE("Size value out of range", HttpStatus.BAD_REQUEST),
+
     // ============ ATTRIBUTE RELATED ============
     ATTRIBUTE_NOT_FOUND("Attribute not found", HttpStatus.NOT_FOUND),
     ATTRIBUTE_VALUE_NOT_FOUND("Attribute value not found", HttpStatus.NOT_FOUND),
@@ -62,6 +63,9 @@ public enum ErrorCode {
 
     // ============ ORDER & PAYMENT ============
     ORDER_NOT_FOUND("Order not found", HttpStatus.NOT_FOUND),
+    ORDER_DETAIL_NOT_FOUND("Order detail not found", HttpStatus.NOT_FOUND),
+    ORDER_DETAIL_ALREADY_EXISTS("Order detail already exists", HttpStatus.BAD_REQUEST),
+    CONFLICTING_DESIGN_SOURCES("Order detail cannot be created from both a custom design request and a customer choice simultaneously.", HttpStatus.BAD_REQUEST),
     INVALID_ORDER_STATUS("Invalid order status", HttpStatus.BAD_REQUEST),
     INVALID_ORDER_STATUS_TRANSITION("Invalid order status transition", HttpStatus.BAD_REQUEST),
     PAYMENT_NOT_FOUND("Payment not found", HttpStatus.NOT_FOUND),
@@ -70,6 +74,7 @@ public enum ErrorCode {
     SIGNATURE_GENERATION_FAILED("Failed to generate signature", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_SIGNATURE("Invalid callback signature", HttpStatus.BAD_REQUEST),
     INVALID_STATUS_PAYMENT("Invalid status payment", HttpStatus.BAD_REQUEST),
+    INVALID_PROGRESS_LOG_STATUS("Invalid progress log (status only in PRODUCTION, PRODUCTION COMPLETED, DELIVERING, INSTALLED", HttpStatus.BAD_REQUEST),
 
     // ============ CALCULATION & FORMULA ============
     INVALID_FORMULA("Invalid formula", HttpStatus.BAD_REQUEST),
@@ -93,6 +98,7 @@ public enum ErrorCode {
     CONTRACT_NOT_FOUND("Contract not found", HttpStatus.NOT_FOUND),
     FEEDBACK_NOT_FOUND("Feedback not found", HttpStatus.NOT_FOUND),
     COST_TYPE_NOT_FOUND("Cost type not found", HttpStatus.NOT_FOUND),
+    CONTRACTOR_NOT_FOUND("Contractor not found", HttpStatus.NOT_FOUND),
 
     // ============ EXTERNAL SERVICES ============
     EXTERNAL_SERVICE_ERROR("External service error", HttpStatus.INTERNAL_SERVER_ERROR),

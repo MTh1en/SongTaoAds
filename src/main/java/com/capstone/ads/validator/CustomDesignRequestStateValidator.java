@@ -21,28 +21,28 @@ public class CustomDesignRequestStateValidator {
     private void initializeValidTransitions() {
         validTransitions.put(CustomDesignRequestStatus.PENDING, Set.of(
                 CustomDesignRequestStatus.PRICING_NOTIFIED,
-                CustomDesignRequestStatus.CANCEL
+                CustomDesignRequestStatus.CANCELLED
         ));
 
         validTransitions.put(CustomDesignRequestStatus.PRICING_NOTIFIED, Set.of(
                 CustomDesignRequestStatus.APPROVED_PRICING,
                 CustomDesignRequestStatus.REJECTED_PRICING,
-                CustomDesignRequestStatus.CANCEL
+                CustomDesignRequestStatus.CANCELLED
         ));
 
         validTransitions.put(CustomDesignRequestStatus.APPROVED_PRICING, Set.of(
                 CustomDesignRequestStatus.DEPOSITED,
-                CustomDesignRequestStatus.CANCEL
+                CustomDesignRequestStatus.CANCELLED
         ));
 
         validTransitions.put(CustomDesignRequestStatus.REJECTED_PRICING, Set.of(
                 CustomDesignRequestStatus.PRICING_NOTIFIED,
-                CustomDesignRequestStatus.CANCEL
+                CustomDesignRequestStatus.CANCELLED
         ));
 
         validTransitions.put(CustomDesignRequestStatus.DEPOSITED, Set.of(
                 CustomDesignRequestStatus.ASSIGNED_DESIGNER,
-                CustomDesignRequestStatus.CANCEL
+                CustomDesignRequestStatus.CANCELLED
         ));
 
         validTransitions.put(CustomDesignRequestStatus.ASSIGNED_DESIGNER, Set.of(
@@ -52,31 +52,31 @@ public class CustomDesignRequestStateValidator {
         validTransitions.put(CustomDesignRequestStatus.PROCESSING, Set.of(
                 CustomDesignRequestStatus.DEMO_SUBMITTED,
                 CustomDesignRequestStatus.REVISION_REQUESTED,
-                CustomDesignRequestStatus.CANCEL
+                CustomDesignRequestStatus.CANCELLED
         ));
 
         validTransitions.put(CustomDesignRequestStatus.REVISION_REQUESTED, Set.of(
                 CustomDesignRequestStatus.DEMO_SUBMITTED,
-                CustomDesignRequestStatus.CANCEL
+                CustomDesignRequestStatus.CANCELLED
         ));
 
         validTransitions.put(CustomDesignRequestStatus.DEMO_SUBMITTED, Set.of(
                 CustomDesignRequestStatus.WAITING_FULL_PAYMENT,
                 CustomDesignRequestStatus.REVISION_REQUESTED,
-                CustomDesignRequestStatus.CANCEL
+                CustomDesignRequestStatus.CANCELLED
         ));
 
         validTransitions.put(CustomDesignRequestStatus.WAITING_FULL_PAYMENT, Set.of(
                 CustomDesignRequestStatus.FULLY_PAID,
-                CustomDesignRequestStatus.CANCEL
+                CustomDesignRequestStatus.CANCELLED
         ));
 
         validTransitions.put(CustomDesignRequestStatus.FULLY_PAID, Set.of(
                 CustomDesignRequestStatus.COMPLETED,
-                CustomDesignRequestStatus.CANCEL
+                CustomDesignRequestStatus.CANCELLED
         ));
 
-        validTransitions.put(CustomDesignRequestStatus.CANCEL, Set.of());
+        validTransitions.put(CustomDesignRequestStatus.CANCELLED, Set.of());
         validTransitions.put(CustomDesignRequestStatus.COMPLETED, Set.of());
     }
 
