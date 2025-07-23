@@ -1,6 +1,7 @@
 package com.capstone.ads.dto.order;
 
 import com.capstone.ads.model.enums.OrderType;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,5 +12,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderCreateRequest {
+    @NotBlank(message = "Address is required")
+    String address;
     OrderType orderType;
 }

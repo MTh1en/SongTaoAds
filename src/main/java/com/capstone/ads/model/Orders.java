@@ -47,6 +47,9 @@ public class Orders {
     @ManyToOne
     Users users;
 
+    @ManyToOne
+    Contractors contractors;
+
     @OneToMany(mappedBy = "orders")
     List<Payments> payments;
 

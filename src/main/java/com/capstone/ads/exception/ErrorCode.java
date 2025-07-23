@@ -97,6 +97,7 @@ public enum ErrorCode {
     CONTRACT_NOT_FOUND("Contract not found", HttpStatus.NOT_FOUND),
     FEEDBACK_NOT_FOUND("Feedback not found", HttpStatus.NOT_FOUND),
     COST_TYPE_NOT_FOUND("Cost type not found", HttpStatus.NOT_FOUND),
+    CONTRACTOR_NOT_FOUND("Contractor not found", HttpStatus.NOT_FOUND),
 
     // ============ EXTERNAL SERVICES ============
     EXTERNAL_SERVICE_ERROR("External service error", HttpStatus.INTERNAL_SERVER_ERROR),
