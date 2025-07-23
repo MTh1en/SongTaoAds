@@ -28,7 +28,7 @@ public class FileData {
     String contentType;
     String fileType;
     Long fileSize;
-
+    
     @CreationTimestamp
     LocalDateTime createdAt;
     @UpdateTimestamp

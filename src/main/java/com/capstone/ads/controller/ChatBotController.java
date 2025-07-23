@@ -36,87 +36,10 @@ public class ChatBotController {
         return ApiResponseBuilder.buildSuccessResponse("Chat response retrieved successfully.", reply);
     }
 
-
     @PostMapping("/translate-to-txt2img-prompt")
     public ApiResponse<String> translate(@RequestBody ChatRequest request) {
         String reply = chatBotService.translateToTextToImagePrompt(request.getPrompt());
         return ApiResponseBuilder.buildSuccessResponse("Translate retrieved successfully.", reply);
-    }
-
-    @PostMapping(value = "/upload-file-finetune", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Upload file để fine-tune")
-    public ApiResponse<FileUploadResponse> uploadFileToFinetune(
-            @RequestParam MultipartFile file) {
-        FileUploadResponse response = chatBotService.uploadFileToFineTune(file);
-        return ApiResponseBuilder.buildSuccessResponse("File uploaded successfully for fine-tuning", response);
-    }
-
-    @PostMapping("/finetune-model")
-    @Operation(summary = "File-tune model hiện tại")
-    public ApiResponse<FineTuningJobResponse> finetuneModel(@RequestBody FineTuningJobRequest request) {
-        FineTuningJobResponse response = chatBotService.fineTuningJob(request);
-        return ApiResponseBuilder.buildSuccessResponse("Fine-tuning job created successfully", response);
-    }
-
-    @GetMapping("/files/{fileId}")
-    @Operation(summary = "Xem chi tiết file")
-    public ApiResponse<FileUploadResponse> getFileById(
-            @PathVariable String fileId) {
-        FileUploadResponse response = chatBotService.getUploadedFileById(fileId);
-        return ApiResponseBuilder.buildSuccessResponse("File retrieved successfully", response);
-    }
-
-    @GetMapping("/files")
-    @Operation(summary = "Xem tất cả file uploaded để fine-tune")
-    public ApiResponse<List<FileUploadResponse>> getFineTuningFiles() {
-        List<FileUploadResponse> response = chatBotService.getAllUploadedFiles();
-        return ApiResponseBuilder.buildSuccessResponse("Fine-tuning files retrieved successfully", response);
-    }
-
-    @DeleteMapping("/files/{fileId}")
-    @Operation(summary = "Xóa file đã upload")
-    public ApiResponse<FileDeletionResponse> deleteFile(
-            @PathVariable String fileId) {
-        FileDeletionResponse response = chatBotService.deleteUploadedFile(fileId);
-        return ApiResponseBuilder.buildSuccessResponse("File deleted successfully", response);
-    }
-
-    @GetMapping("/fine-tune-jobs")
-    @Operation(summary = "Xem tất cả các job đã fine-tune")
-    public ApiResponse<List<FineTuningJobResponse>> getFineTuningJobs() {
-        List<FineTuningJobResponse> response = chatBotService.getAllFineTuneJobs();
-        return ApiResponseBuilder.buildSuccessResponse("Fine tuning jobs retrieved successfully", response);
-    }
-
-    @GetMapping("/{fineTuneJobId}/fine-tune-jobs")
-    @Operation(summary = "Xem chi tiết job đã fine-tune")
-    public ApiResponse<FineTuningJobResponse> getFineTuningJobById(@PathVariable String fineTuneJobId) {
-        FineTuningJobResponse response = chatBotService.getFineTuningJob(fineTuneJobId);
-        return ApiResponseBuilder.buildSuccessResponse("Fine tuning job retrieved successfully", response);
-    }
-
-    @PostMapping("/{fineTuningJobId}/fine-tuning-jobs/cancel")
-    @Operation(summary = "Hủy 1 job đang fine-tune")
-    public ApiResponse<FineTuningJobResponse> cancelFineTuningJob(
-            @PathVariable String fineTuningJobId) {
-        FineTuningJobResponse response = chatBotService.cancelFineTuningJob(fineTuningJobId);
-        return ApiResponseBuilder.buildSuccessResponse("Fine tuning job cancelled successfully", response);
-    }
-
-    @PostMapping("/{fineTuningJobId}/fine-tuning-jobs/select-model")
-    @Operation(summary = "Chọn model để chat từ list job")
-    public ApiResponse<ModelChatBotDTO> selectModelChat(
-            @PathVariable String fineTuningJobId) {
-        ModelChatBotDTO response = chatBotService.setModeChatBot(fineTuningJobId);
-        return ApiResponseBuilder.buildSuccessResponse("Fine tuning job cancelled successfully", response);
-    }
-
-    @PostMapping(value = "/upload-file-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Convert từ file excel thành file jsonl")
-    public ApiResponse<FileUploadResponse> uploadFileExcel(@RequestParam("file") MultipartFile file,
-                                             @RequestParam("fileName") String fileName) {
-        FileUploadResponse resposne = chatBotService.uploadFileExcel(file, fileName);
-        return ApiResponseBuilder.buildSuccessResponse(("Uploaded file successfully"), resposne);
     }
 
     @GetMapping("/models")
@@ -126,12 +49,25 @@ public class ChatBotController {
         return ApiResponseBuilder.buildSuccessResponse("Models retrieved successfully", response);
     }
 
-    @GetMapping("/models-fine-tune")
-    @Operation(summary = "Xem tất cả các model đã fine-tune")
-    public ApiPagingResponse<ModelChatBotDTO> viewAllModelFineTune(
-            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var models = chatBotService.getModelChatBots(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Tickets retrieved successfully", models, page);
+    @PostMapping("/pricing/traditional")
+    @Operation(summary = "Báo giá bảng quảng cáo truyền thống bằng chatbot")
+    public ApiResponse<ResponsePricingChat> getTraditionalBillboardPricing(@RequestBody TraditionalBillboardRequest request) {
+        ResponsePricingChat reply = chatBotService.getTraditionalBillboardPricing(request);
+        return ApiResponseBuilder.buildSuccessResponse("Chat response retrieved successfully.", reply);
     }
+
+    @PostMapping("/pricing/modern")
+    @Operation(summary = "Báo giá bảng quảng cáo hiện đại bằng chatbot")
+    public ApiResponse<ResponsePricingChat> getModernBillboardPricing(@RequestBody ModernBillboardRequest request) {
+        ResponsePricingChat reply = chatBotService.getModernBillboardPricing(request);
+        return ApiResponseBuilder.buildSuccessResponse("Chat response retrieved successfully.", reply);
+    }
+
+    @GetMapping("/frequent-questions")
+    @Operation(summary = "Xem top 10 câu hỏi được hỏi nhiều nhất")
+    public ApiResponse<List<FrequentQuestion>> getTop10FrequentQuestions() {
+        List<FrequentQuestion> response = chatBotService.getTop10FrequentQuestions();
+        return ApiResponseBuilder.buildSuccessResponse("Questions retrieved successfully", response);
+    }
+
 }
