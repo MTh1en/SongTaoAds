@@ -12,5 +12,4 @@ import lombok.experimental.FieldDefaults;
 public class CustomDesignRequestCreateRequest {
     @NotBlank(message = "Requirement is Required")
     String requirements;
-    Boolean hasOrder;
 }

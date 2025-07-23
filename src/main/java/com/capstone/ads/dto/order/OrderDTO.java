@@ -2,6 +2,7 @@ package com.capstone.ads.dto.order;
 
 import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.model.enums.OrderStatus;
+import com.capstone.ads.model.enums.OrderType;
 import com.capstone.ads.model.json.CustomerChoiceHistories;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -16,31 +17,14 @@ import java.time.LocalDateTime;
 public class OrderDTO {
     String id;
     String address;
-    Long totalAmount;
-    Long depositAmount;
-    Long remainingAmount;
+    Long totalConstructionAmount;
+    Long depositConstructionAmount;
+    Long remainingConstructionAmount;
+    Long totalDesignAmount;
+    Long depositDesignAmount;
+    Long remainingDesignAmount;
     String note;
-
-    String draftImageUrl;
-    String productImageUrl;
-    String deliveryImageUrl;
-    String installationImageUrl;
-
-
-    LocalDateTime estimatedDeliveryDate;
-    LocalDateTime depositPaidDate;
-    LocalDateTime productionStartDate;
-    LocalDateTime productionEndDate;
-    LocalDateTime deliveryStartDate;
-    LocalDateTime actualDeliveryDate;
-    LocalDateTime completionDate;
-
-    LocalDateTime orderDate;
-    LocalDateTime updateDate;
-
-    CustomerChoiceHistories customerChoiceHistories;
+    OrderType orderType;
     OrderStatus status;
     UserDTO users;
-    OrderAIDesignDTO aiDesigns;
-    OrderCustomDesignDTO customDesignRequests;
 }

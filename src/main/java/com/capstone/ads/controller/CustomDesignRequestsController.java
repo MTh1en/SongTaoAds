@@ -31,13 +31,12 @@ import java.util.List;
 public class CustomDesignRequestsController {
     CustomDesignRequestService service;
 
-    @PostMapping("/customer-details/{customerDetailId}/customer-choices/{customerChoiceId}")
+    @PostMapping("/customer-details/{customerDetailId}/custom-design-requests")
     @Operation(summary = "Tạo thông yêu cầu thiết kế tùy chỉnh")
     public ApiResponse<CustomDesignRequestDTO> createCustomDesignRequest(
             @PathVariable String customerDetailId,
-            @PathVariable String customerChoiceId,
             @Valid @RequestBody CustomDesignRequestCreateRequest request) {
-        var response = service.createCustomDesignRequest(customerDetailId, customerChoiceId, request);
+        var response = service.createCustomDesignRequest(customerDetailId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create custom design request successful", response);
     }
 

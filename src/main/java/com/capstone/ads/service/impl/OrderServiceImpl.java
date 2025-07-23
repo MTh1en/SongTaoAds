@@ -1,92 +1,61 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.PaymentPolicy;
-import com.capstone.ads.dto.file.FileDataDTO;
-import com.capstone.ads.dto.file.UploadMultipleOrderFileRequest;
 import com.capstone.ads.dto.order.OrderConfirmRequest;
+import com.capstone.ads.dto.order.OrderCreateRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
+import com.capstone.ads.event.CustomDesignPaymentEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.OrdersMapper;
 import com.capstone.ads.model.*;
-import com.capstone.ads.model.enums.ContractStatus;
-import com.capstone.ads.model.enums.FileTypeEnum;
-import com.capstone.ads.model.enums.OrderStatus;
+import com.capstone.ads.model.enums.*;
 import com.capstone.ads.repository.internal.OrdersRepository;
 import com.capstone.ads.service.*;
 import com.capstone.ads.validator.ContractStateValidator;
-import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
 import com.capstone.ads.validator.OrderStateValidator;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.IntStream;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderServiceImpl implements OrderService {
-    FileDataService fileDataService;
     OrdersRepository orderRepository;
     OrdersMapper orderMapper;
     SecurityContextUtils securityContextUtils;
-    CustomerChoiceHistoriesConverter customerChoiceHistoriesConverter;
     OrderStateValidator orderStateValidator;
     ContractStateValidator contractStateValidator;
-    CustomDesignRequestService customDesignRequestService;
-    CustomerChoicesService customerChoicesService;
-    EditedDesignService editedDesignService;
+    ApplicationEventPublisher eventPublisher;
 
     @Override
-    @Transactional
-    public OrderDTO createOrderByCustomDesign(String customDesignRequestId) {
-        CustomDesignRequests customDesignRequests = customDesignRequestService.getCustomDesignRequestById(customDesignRequestId);
+    public OrderDTO createOrder(OrderCreateRequest request) {
         Users users = securityContextUtils.getCurrentUser();
 
-        Orders orders = Orders.builder()
-                .customDesignRequests(customDesignRequests)
-                .users(users)
-                .status(OrderStatus.PENDING_DESIGN)
-                .build();
-        orders.setCustomerChoiceHistories(customDesignRequests.getCustomerChoiceHistories());
-        orders.setTotalAmount(customDesignRequests.getCustomerChoiceHistories().getTotalAmount());
-
-        orderRepository.save(orders);
-        return orderMapper.toDTO(orders);
-    }
-
-    @Override
-    @Transactional
-    public OrderDTO createOrderByEditedDesign(String editedDesignId, String customerChoiceId) {
-        EditedDesigns editedDesigns = editedDesignService.getEditedDesignById(editedDesignId);
-        CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoiceId);
-        Users users = securityContextUtils.getCurrentUser();
-
-        Orders orders = Orders.builder()
-                .editedDesigns(editedDesigns)
-                .users(users)
-                .status(OrderStatus.PENDING_CONTRACT)
-                .build();
-        orders.setTotalAmount(customerChoices.getTotalAmount());
-        orders.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
-
+        Orders orders = orderMapper.mapCreateRequestToEntity(request);
+        orders.setUsers(users);
+        orders.setStatus(
+                (request.getOrderType().equals(OrderType.AI_DESIGN))
+                        ? OrderStatus.PENDING_CONTRACT
+                        : OrderStatus.PENDING_DESIGN
+        );
         orders = orderRepository.save(orders);
-        customerChoicesService.hardDeleteCustomerChoice(customerChoiceId);
+
         return orderMapper.toDTO(orders);
     }
 
@@ -110,14 +79,14 @@ public class OrderServiceImpl implements OrderService {
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.CONTRACT_CONFIRMED);
 
         long depositAmount = (long) ((!contract.getDepositPercentChanged().equals(PaymentPolicy.DEPOSIT_PERCENT))
-                ? orders.getTotalAmount() * ((double) contract.getDepositPercentChanged() / 100)
-                : orders.getTotalAmount() * ((double) PaymentPolicy.DEPOSIT_PERCENT / 100));
-        long remainingAmount = orders.getTotalAmount() - depositAmount;
+                ? orders.getTotalConstructionAmount() * ((double) contract.getDepositPercentChanged() / 100)
+                : orders.getTotalConstructionAmount() * ((double) PaymentPolicy.DEPOSIT_PERCENT / 100));
+        long remainingAmount = orders.getTotalConstructionAmount() - depositAmount;
 
         orders.setStatus(OrderStatus.CONTRACT_CONFIRMED);
         orders.getContract().setStatus(ContractStatus.CONFIRMED);
-        orders.setDepositAmount(depositAmount);
-        orders.setRemainingAmount(remainingAmount);
+        orders.setDepositConstructionAmount(depositAmount);
+        orders.setRemainingConstructionAmount(remainingAmount);
         orderRepository.save(orders);
 
         return orderMapper.toDTO(orders);
@@ -163,77 +132,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO staffUpdateOrderProducing(String orderId, MultipartFile draftImage) {
-        Orders orders = getOrderById(orderId);
-        orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.PRODUCING);
-
-        String draftImageUrl = uploadOrderImageToS3(orderId, draftImage);
-        orders.setDraftImageUrl(draftImageUrl);
-        orders.setStatus(OrderStatus.PRODUCING);
-        orders.setProductionStartDate(LocalDateTime.now());
-
-        orderRepository.save(orders);
-        return orderMapper.toDTO(orders);
-    }
-
-    @Override
-    @Transactional
-    public OrderDTO staffUpdateOrderProductionComplete(String orderId, MultipartFile productImage) {
-        Orders orders = getOrderById(orderId);
-        orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.PRODUCTION_COMPLETED);
-
-        String productImageUrl = uploadOrderImageToS3(orderId, productImage);
-        orders.setProductImageUrl(productImageUrl);
-        orders.setStatus(OrderStatus.PRODUCTION_COMPLETED);
-        orders.setProductionEndDate(LocalDateTime.now());
-
-
-        orderRepository.save(orders);
-        return orderMapper.toDTO(orders);
-    }
-
-    @Override
-    public OrderDTO staffUpdateOrderDelivering(String orderId, MultipartFile deliveryImage) {
-        Orders orders = getOrderById(orderId);
-        orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.DELIVERING);
-
-        String deliveryImageUrl = uploadOrderImageToS3(orderId, deliveryImage);
-        orders.setDeliveryImageUrl(deliveryImageUrl);
-        orders.setStatus(OrderStatus.DELIVERING);
-        orders.setDeliveryStartDate(LocalDateTime.now());
-
-        orderRepository.save(orders);
-        return orderMapper.toDTO(orders);
-    }
-
-    @Override
-    public OrderDTO staffUpdateOrderInstalled(String orderId, MultipartFile installedImage) {
-        Orders orders = getOrderById(orderId);
-        orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.INSTALLED);
-
-        String installedImageUrl = uploadOrderImageToS3(orderId, installedImage);
-        orders.setInstallationImageUrl(installedImageUrl);
-        orders.setStatus(OrderStatus.INSTALLED);
-        orders.setActualDeliveryDate(LocalDateTime.now());
-
-        orderRepository.save(orders);
-        return orderMapper.toDTO(orders);
-    }
-
-    @Override
-    public List<FileDataDTO> uploadOrderSubImages(String orderId, UploadMultipleOrderFileRequest request) {
-        Orders orders = getOrderById(orderId);
-        return fileDataService.uploadMultipleFiles(
-                request.getFiles(),
-                request.getFileType(),
-                orders,
-                FileData::setOrders,
-                (id, size) -> generateOrderSumImageKey(orderId, request.getFileType(), size)
-        );
-    }
-
-    @Override
-    @Transactional
     public void hardDeleteOrder(String orderId) {
         if (!orderRepository.existsById(orderId)) {
             throw new AppException(ErrorCode.ORDER_NOT_FOUND);
@@ -266,35 +164,132 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void updateOrderFromWebhookResult(Orders orders, boolean isDeposit) {
-        if (isDeposit) {
-            orders.setStatus(OrderStatus.DEPOSITED);
-            orders.setDepositPaidDate(LocalDateTime.now());
+    public boolean checkOrderNeedDepositDesign(String orderId) {
+        Orders orders = getOrderById(orderId);
+//        orders.getOrderDetails()
+//                .forEach(orderDetails ->
+//                        log.info("id: {}, status: {}",
+//                                orderDetails.getCustomDesignRequests().getId(),
+//                                orderDetails.getCustomDesignRequests().getStatus()));
+        return orders.getOrderDetails().stream()
+                .allMatch(orderDetails ->
+                        orderDetails.getCustomDesignRequests().getStatus().equals(CustomDesignRequestStatus.APPROVED_PRICING));
+    }
+
+    @Override
+    @Transactional
+    public boolean checkOrderNeedFullyPaidDesign(String orderId) {
+        Orders orders = getOrderById(orderId);
+//        orders.getOrderDetails()
+//                .forEach(orderDetails ->
+//                        log.info("status: {}, id: {}",
+//                                orderDetails.getCustomDesignRequests().getStatus(),
+//                                orderDetails.getCustomDesignRequests().getId()));
+
+        return orders.getOrderDetails().stream()
+                .allMatch(orderDetails ->
+                        orderDetails.getCustomDesignRequests().getStatus().equals(CustomDesignRequestStatus.WAITING_FULL_PAYMENT));
+    }
+
+    @Override
+    @Transactional
+    public boolean checkOrderCustomDesignSubmittedDesign(String orderId) {
+        Orders orders = getOrderById(orderId);
+//        orders.getOrderDetails()
+//                .forEach(orderDetails ->
+//                        log.info("status check: {}, id: {}",
+//                                orderDetails.getCustomDesignRequests().getStatus(),
+//                                orderDetails.getCustomDesignRequests().getId()));
+        return orders.getOrderDetails().stream()
+                .allMatch(orderDetails ->
+                        orderDetails.getCustomDesignRequests().getStatus().equals(CustomDesignRequestStatus.COMPLETED)
+                );
+    }
+
+    @Override
+    @Transactional
+    public void updateOrderStatusAfterCustomDesignCompleted(String orderId) {
+        Orders orders = getOrderById(orderId);
+//        orders.getOrderDetails()
+//                .forEach(orderDetails ->
+//                        log.info("status completed: {}, id: {}",
+//                                orderDetails.getCustomDesignRequests().getStatus(),
+//                                orderDetails.getCustomDesignRequests().getId()));
+        if (orders.getOrderType().equals(OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION)) {
+            orders.setStatus(OrderStatus.PENDING_CONTRACT);
         } else {
-            orders.setStatus(OrderStatus.COMPLETED);
-            orders.setCompletionDate(LocalDateTime.now());
+            orders.setStatus(OrderStatus.DESIGN_COMPLETED);
         }
         orderRepository.save(orders);
     }
 
-    private String generateOrderImageKey(String orderId) {
-        return String.format("order/%s/%s", orderId, UUID.randomUUID());
-    }
-
-    private List<String> generateOrderSumImageKey(String orderId, FileTypeEnum fileType, Integer amountKey) {
-        List<String> keys = new ArrayList<>();
-        IntStream.range(0, amountKey)
-                .forEach(i -> keys.add(String.format("order/%s/%s/%s", orderId, fileType, UUID.randomUUID())));
-        return keys;
-    }
-
-
-    private String uploadOrderImageToS3(String orderId, MultipartFile file) {
-        String customDesignImageKey = generateOrderImageKey(orderId);
-        if (file.isEmpty()) {
-            throw new AppException(ErrorCode.FILE_REQUIRED);
+    @Override
+    @Transactional
+    public void updateOrderFromWebhookResult(Orders orders, PaymentType paymentType) {
+        if (paymentType.equals(PaymentType.DEPOSIT_CONSTRUCTION)) {
+            orders.setStatus(OrderStatus.DEPOSITED);
+        } else if (paymentType.equals(PaymentType.REMAINING_CONSTRUCTION)) {
+            orders.setStatus(OrderStatus.ORDER_COMPLETED);
+        } else if (paymentType.equals(PaymentType.DEPOSIT_DESIGN)) {
+            orders.getOrderDetails().stream()
+                    .filter(orderDetails -> orderDetails.getCustomDesignRequests().getStatus().equals(CustomDesignRequestStatus.APPROVED_PRICING))
+                    .forEach(orderDetail ->
+                            eventPublisher.publishEvent(new CustomDesignPaymentEvent(
+                                    this,
+                                    orderDetail.getCustomDesignRequests().getId(),
+                                    true
+                            ))
+                    );
+            orders.setStatus(OrderStatus.DEPOSITED_DESIGN);
+        } else if (paymentType.equals(PaymentType.REMAINING_DESIGN)) {
+            orders.getOrderDetails().stream()
+                    .filter(orderDetails -> orderDetails.getCustomDesignRequests().getStatus().equals(CustomDesignRequestStatus.WAITING_FULL_PAYMENT))
+                    .forEach(orderDetail ->
+                            eventPublisher.publishEvent(new CustomDesignPaymentEvent(
+                                    this,
+                                    orderDetail.getCustomDesignRequests().getId(),
+                                    false
+                            ))
+                    );
+            orders.setStatus(OrderStatus.WAITING_FINAL_DESIGN);
         }
-        fileDataService.uploadSingleFile(customDesignImageKey, file);
-        return customDesignImageKey;
+        orderRepository.save(orders);
+    }
+
+    @Override
+    @Transactional
+    public void updateAllAmount(String orderId) {
+        Orders orders = getOrderById(orderId);
+        long totalConstructionAmount = 0L;
+        long depositConstructionAmount = 0L;
+        long totalDesignAmount = 0L;
+        long depositDesignAmount = 0L;
+
+        List<OrderDetails> orderDetails = Optional.ofNullable(orders.getOrderDetails()).orElse(Collections.emptyList());
+        totalConstructionAmount += orderDetails.stream()
+                .filter(detail -> detail.getDetailConstructionAmount() != null)
+                .mapToLong(detail -> detail.getDetailConstructionAmount() * detail.getQuantity())
+                .sum();
+        depositConstructionAmount += orderDetails.stream()
+                .filter(detail -> detail.getDetailConstructionAmount() != null)
+                .mapToLong(detail -> detail.getDetailConstructionAmount() * detail.getQuantity() * PaymentPolicy.DEPOSIT_PERCENT / 100)
+                .sum();
+        totalDesignAmount += orderDetails.stream()
+                .filter(detail -> detail.getDetailDesignAmount() != null)
+                .mapToLong(OrderDetails::getDetailDesignAmount)
+                .sum();
+        depositDesignAmount += orderDetails.stream()
+                .filter(detail -> detail.getDetailDepositDesignAmount() != null)
+                .mapToLong(OrderDetails::getDetailDepositDesignAmount)
+                .sum();
+
+        orders.setTotalConstructionAmount(totalConstructionAmount);
+        orders.setDepositConstructionAmount(depositConstructionAmount);
+        orders.setRemainingConstructionAmount(totalConstructionAmount - depositConstructionAmount);
+        orders.setTotalDesignAmount(totalDesignAmount);
+        orders.setDepositDesignAmount(depositDesignAmount);
+        orders.setRemainingDesignAmount(totalDesignAmount - depositDesignAmount);
+
+        orderRepository.save(orders);
     }
 }

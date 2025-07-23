@@ -80,17 +80,6 @@ public class FileDataController {
         return ApiResponseBuilder.buildPagingSuccessResponse("Find all icon successful", response, page);
     }
 
-    // ===== ORDER SUB IMAGE ===== /
-
-    @GetMapping("/orders/{orderId}/sub-images")
-    @Operation(summary = "Xem tất cả hình ảnh phụ trong Order theo từng trạng thái")
-    public ApiResponse<List<FileDataDTO>> findOrderSubImagesByOrderIdAndFileType(
-            @PathVariable String orderId,
-            @RequestParam FileTypeEnum fileType) {
-        var response = fileDataService.findFileDataByOrderIdAndFileType(orderId, fileType);
-        return ApiResponseBuilder.buildSuccessResponse("Find order sub images successful", response);
-    }
-
     // ==== DEMO DESIGN ===== //
     @GetMapping("/demo-designs/{demoDesignId}/sub-images")
     @Operation(summary = "Xem những hình ảnh phụ có trong bản demo")

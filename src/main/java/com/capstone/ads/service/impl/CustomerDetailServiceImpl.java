@@ -45,7 +45,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
 
     @Override
     public CustomerDetailDTO findCustomerDetailById(String customerDetailId) {
-        CustomerDetail customerDetail = getCustomerChoiceDetailById(customerDetailId);
+        CustomerDetail customerDetail = getCustomerDetailById(customerDetailId);
         return customerDetailMapper.toDTO(customerDetail);
     }
 
@@ -65,7 +65,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
 
     @Override
     public CustomerDetailDTO updateCustomerDetailInformation(String customerDetailId, CustomerDetailUpdateRequest request) {
-        CustomerDetail customerDetail = getCustomerChoiceDetailById(customerDetailId);
+        CustomerDetail customerDetail = getCustomerDetailById(customerDetailId);
 
         customerDetailMapper.updateEntityFromDTO(request, customerDetail);
         customerDetail = customerDetailRepository.save(customerDetail);
@@ -75,7 +75,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
 
     @Override
     public CustomerDetailDTO updateCustomerDetailLogoImage(String customerDetailId, MultipartFile logoImage) {
-        CustomerDetail customerDetail = getCustomerChoiceDetailById(customerDetailId);
+        CustomerDetail customerDetail = getCustomerDetailById(customerDetailId);
 
         String newImageLogoUrl = uploadCustomDesignImageToS3(customerDetailId, logoImage);
         customerDetail.setLogoUrl(newImageLogoUrl);
@@ -93,7 +93,7 @@ public class CustomerDetailServiceImpl implements CustomerDetailService {
     }
 
     @Override
-    public CustomerDetail getCustomerChoiceDetailById(String customerDetailId) {
+    public CustomerDetail getCustomerDetailById(String customerDetailId) {
         return customerDetailRepository.findById(customerDetailId)
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_DETAIL_NOT_FOUND));
     }

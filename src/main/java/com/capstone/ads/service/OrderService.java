@@ -1,21 +1,16 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.file.FileDataDTO;
-import com.capstone.ads.dto.file.UploadMultipleOrderFileRequest;
 import com.capstone.ads.dto.order.OrderConfirmRequest;
+import com.capstone.ads.dto.order.OrderCreateRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
 import com.capstone.ads.model.Orders;
 import com.capstone.ads.model.enums.OrderStatus;
+import com.capstone.ads.model.enums.PaymentType;
 import org.springframework.data.domain.Page;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 public interface OrderService {
-    OrderDTO createOrderByCustomDesign(String customDesignRequestId);
-
-    OrderDTO createOrderByEditedDesign(String editedDesignId, String customerChoiceId);
+    OrderDTO createOrder(OrderCreateRequest request);
 
     OrderDTO saleRequestCustomerResignContract(String orderId);
 
@@ -24,16 +19,6 @@ public interface OrderService {
     OrderDTO customerProvideAddress(String orderId, OrderUpdateAddressRequest request);
 
     OrderDTO saleNotifyEstimateDeliveryDate(String orderId, OrderConfirmRequest request);
-
-    OrderDTO staffUpdateOrderProducing(String orderId, MultipartFile draftImage);
-
-    OrderDTO staffUpdateOrderProductionComplete(String orderId, MultipartFile productImage);
-
-    OrderDTO staffUpdateOrderDelivering(String orderId, MultipartFile deliveryImage);
-
-    OrderDTO staffUpdateOrderInstalled(String orderId, MultipartFile installedImage);
-
-    List<FileDataDTO> uploadOrderSubImages(String orderId, UploadMultipleOrderFileRequest request);
 
     OrderDTO findOrderById(String orderId);
 
@@ -48,5 +33,15 @@ public interface OrderService {
 
     void updateOrderStatus(String orderId, OrderStatus status);
 
-    void updateOrderFromWebhookResult(Orders orders, boolean isDeposit);
+    boolean checkOrderNeedDepositDesign(String orderId);
+
+    boolean checkOrderNeedFullyPaidDesign(String orderId);
+
+    boolean checkOrderCustomDesignSubmittedDesign(String orderId);
+
+    void updateOrderStatusAfterCustomDesignCompleted(String orderId);
+
+    void updateAllAmount(String orderId);
+
+    void updateOrderFromWebhookResult(Orders orders, PaymentType paymentType);
 }

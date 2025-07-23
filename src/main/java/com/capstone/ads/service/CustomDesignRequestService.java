@@ -12,8 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface CustomDesignRequestService {
-    CustomDesignRequestDTO createCustomDesignRequest(String customerDetailId, String customerChoiceId,
-                                                     CustomDesignRequestCreateRequest request);
+    CustomDesignRequestDTO createCustomDesignRequest(String customerDetailId, CustomDesignRequestCreateRequest request);
 
     CustomDesignRequestDTO assignDesignerToCustomerRequest(String customDesignRequestId, String designerId);
 
@@ -33,12 +32,4 @@ public interface CustomDesignRequestService {
 
     //INTERNAL FUNCTION
     CustomDesignRequests getCustomDesignRequestById(String customDesignRequestId);
-
-    void updateCustomDesignRequestStatus(String customDesignRequestId, CustomDesignRequestStatus status);
-
-    void updateCustomDesignRequestByCustomDesign(String customDesignRequestId, boolean isNeedSupport);
-
-    void updateCustomDesignRequestApprovedPricing(String customDesignRequestId, Long totalPrice, Long depositAmount);
-
-    void updateCustomDesignRequestFromWebhookResult(CustomDesignRequests customDesignRequests, boolean isDeposit);
 }

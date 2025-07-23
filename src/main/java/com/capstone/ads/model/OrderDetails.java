@@ -1,11 +1,13 @@
 package com.capstone.ads.model;
 
-import com.capstone.ads.model.enums.FileTypeEnum;
+import com.capstone.ads.model.json.CustomerChoiceHistories;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -16,28 +18,32 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class FileData {
+public class OrderDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String name;
-    String description;
-    String contentType;
-    String imageUrl;
+    Long detailConstructionAmount;
+    Long quantity;
+    Long detailDesignAmount;
+    Long detailDepositDesignAmount;
+    Long detailRemainingDesignAmount;
 
-    @Enumerated(EnumType.STRING)
-    FileTypeEnum fileType;
 
-    Long fileSize;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb")
+    CustomerChoiceHistories customerChoiceHistories;
 
     @CreationTimestamp
     LocalDateTime createdAt;
     @UpdateTimestamp
     LocalDateTime updatedAt;
 
-    @ManyToOne
+    @OneToOne
+    EditedDesigns editedDesigns;
+
+    @OneToOne
     CustomDesignRequests customDesignRequests;
 
     @ManyToOne
-    DemoDesigns demoDesigns;
+    Orders orders;
 }

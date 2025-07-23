@@ -22,8 +22,6 @@ public class CustomDesignRequestDTO {
     Long remainingAmount;
     String finalDesignImage;
     Boolean isNeedSupport;
-    Boolean hasOrder;
-    CustomerChoiceHistories customerChoiceHistories;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     CustomDesignRequestStatus status;

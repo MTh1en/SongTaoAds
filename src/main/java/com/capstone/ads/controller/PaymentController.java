@@ -27,28 +27,28 @@ public class PaymentController {
     @PostMapping("/orders/{orderId}/deposit")
     @Operation(summary = "Đặt cọc theo đơn hàng")
     public ApiResponse<CheckoutResponseData> createOrderDepositPaymentLink(@PathVariable String orderId) throws Exception {
-        CheckoutResponseData response = paymentService.createOrderDepositPaymentLink(orderId);
+        CheckoutResponseData response = paymentService.createConstructionDepositPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
     @PostMapping("/orders/{orderId}/remaining")
     @Operation(summary = "Thanh toán hết đơn hàng")
     public ApiResponse<CheckoutResponseData> createOrderRemainingPaymentLink(@PathVariable String orderId) throws Exception {
-        CheckoutResponseData response = paymentService.createOrderRemainingPaymentLink(orderId);
+        CheckoutResponseData response = paymentService.createConstructionRemainingPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
-    @PostMapping("/custom-design-requests/{customDesignRequestId}/deposit")
-    @Operation(summary = "Đặt cọc yêu cầu thiết kế")
-    public ApiResponse<CheckoutResponseData> createCustomDesignRequestDepositPaymentLink(@PathVariable String customDesignRequestId) throws Exception {
-        CheckoutResponseData response = paymentService.createCustomDesignRequestDepositPaymentLink(customDesignRequestId);
+    @PostMapping("/orders/{orderId}/design-full-deposit")
+    @Operation(summary = "Đặt cọc theo thiết kế")
+    public ApiResponse<CheckoutResponseData> createCustomDesignFullDepositPaymentLink(@PathVariable String orderId) throws Exception {
+        CheckoutResponseData response = paymentService.createCustomDesignFullDepositPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
-    @PostMapping("/custom-design-requests/{customDesignRequestId}/remaining")
+    @PostMapping("/orders/{orderId}/design-full-remaining")
     @Operation(summary = "Thanh toán hết thiết kế")
-    public ApiResponse<CheckoutResponseData> createCustomDesignRequestRemainingPaymentLink(@PathVariable String customDesignRequestId) throws Exception {
-        CheckoutResponseData response = paymentService.createCustomDesignRequestRemainingPaymentLink(customDesignRequestId);
+    public ApiResponse<CheckoutResponseData> createCustomDesignFullRemainingPaymentLink(@PathVariable String orderId) throws Exception {
+        CheckoutResponseData response = paymentService.createCustomDesignFullRemainingPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 

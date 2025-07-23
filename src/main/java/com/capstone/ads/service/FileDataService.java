@@ -36,11 +36,6 @@ public interface FileDataService {
 
     Page<FileDataDTO> findAllIconSystem(int page, int size);
 
-
-    // ===== ORDER ===== //
-    List<FileDataDTO> findFileDataByOrderIdAndFileType(String orderId, FileTypeEnum fileType);
-
-
     // ===== DEMO DESIGN ===== //
     List<FileDataDTO> findFileDataByDemoDesignId(String demoDesignId);
 

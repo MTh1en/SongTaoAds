@@ -2,8 +2,8 @@ package com.capstone.ads.model;
 
 import com.capstone.ads.model.enums.PaymentMethod;
 import com.capstone.ads.model.enums.PaymentStatus;
+import com.capstone.ads.model.enums.PaymentType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.AssertTrue;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
@@ -35,16 +35,9 @@ public class Payments {
     @Enumerated(EnumType.STRING)
     PaymentStatus status;
 
-    Boolean isDeposit;
+    @Enumerated(EnumType.STRING)
+    PaymentType type;
 
     @ManyToOne
     Orders orders;
-
-    @ManyToOne
-    CustomDesignRequests customDesignRequests;
-
-    @AssertTrue(message = "Only one of order or customDesignRequest must be non-null")
-    private boolean isValidRelation() {
-        return (orders == null && customDesignRequests != null) || (orders != null && customDesignRequests == null);
-    }
 }

@@ -31,6 +31,7 @@ public enum ErrorCode {
     SIZE_NOT_BELONG_PRODUCT_TYPE("Size not belong to product type", HttpStatus.BAD_REQUEST),
     UNIT_PRICE_NOT_FOUND("Unit price not enough", HttpStatus.BAD_REQUEST),
     SIZE_VALUE_OUT_OF_RANGE("Size value out of range", HttpStatus.BAD_REQUEST),
+
     // ============ ATTRIBUTE RELATED ============
     ATTRIBUTE_NOT_FOUND("Attribute not found", HttpStatus.NOT_FOUND),
     ATTRIBUTE_VALUE_NOT_FOUND("Attribute value not found", HttpStatus.NOT_FOUND),
@@ -62,6 +63,9 @@ public enum ErrorCode {
 
     // ============ ORDER & PAYMENT ============
     ORDER_NOT_FOUND("Order not found", HttpStatus.NOT_FOUND),
+    ORDER_DETAIL_NOT_FOUND("Order detail not found", HttpStatus.NOT_FOUND),
+    ORDER_DETAIL_ALREADY_EXISTS("Order detail already exists", HttpStatus.BAD_REQUEST),
+    CONFLICTING_DESIGN_SOURCES("Order detail cannot be created from both a custom design request and a customer choice simultaneously.", HttpStatus.BAD_REQUEST),
     INVALID_ORDER_STATUS("Invalid order status", HttpStatus.BAD_REQUEST),
     INVALID_ORDER_STATUS_TRANSITION("Invalid order status transition", HttpStatus.BAD_REQUEST),
     PAYMENT_NOT_FOUND("Payment not found", HttpStatus.NOT_FOUND),

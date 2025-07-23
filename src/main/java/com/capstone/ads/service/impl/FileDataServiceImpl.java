@@ -126,13 +126,6 @@ public class FileDataServiceImpl implements FileDataService {
     }
 
     @Override
-    public List<FileDataDTO> findFileDataByOrderIdAndFileType(String orderId, FileTypeEnum fileType) {
-        return fileDataRepository.findByOrders_IdAndFileType(orderId, fileType).stream()
-                .map(fileDataMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<FileDataDTO> findFileDataByDemoDesignId(String demoDesignId) {
         return fileDataRepository.findByDemoDesigns_Id(demoDesignId).stream()
                 .map(fileDataMapper::toDTO)
