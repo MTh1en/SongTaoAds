@@ -108,7 +108,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     // HANDLE EVENT //
 
-    @Async
+    @Async("delegatingSecurityContextAsyncTaskExecutor")
     @EventListener
     @Transactional
     public void handlePriceProposalApprovedEvent(CustomDesignRequestPricingApprovedEvent event) {
@@ -128,7 +128,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
     }
 
-    @Async
+    @Async("delegatingSecurityContextAsyncTaskExecutor")
     @EventListener
     @Transactional
     public void handleDemoDesignApprovedEvent(CustomDesignRequestDemoSubmittedEvent event) {
@@ -143,7 +143,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
     }
 
-    @Async
+    @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCustomDesignRequestCompletedEvent(CustomDesignRequestCompletedEvent event) {
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
