@@ -25,6 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -77,6 +80,22 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         orderService.updateAllAmount(orderId);
         customerChoicesService.hardDeleteCustomerChoice(request.getCustomerChoiceId());
         return orderDetailMapper.toDTO(orderDetails);
+    }
+
+    @Override
+    public List<OrderDetailDTO> getOrderDetailsByOrderId(String orderId) {
+        return orderDetailsRepository.findByOrders_Id(orderId).stream()
+                .map(orderDetailMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void hardDeleteOrderDetail(String orderId) {
+        if (!orderDetailsRepository.existsById(orderId)) {
+            throw new AppException(ErrorCode.ORDER_DETAIL_NOT_FOUND);
+        }
+        orderDetailsRepository.deleteById(orderId);
     }
 
     // INTERNAL FUNCTION //

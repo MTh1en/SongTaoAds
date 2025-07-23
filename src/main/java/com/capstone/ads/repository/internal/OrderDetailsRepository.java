@@ -4,6 +4,7 @@ import com.capstone.ads.model.OrderDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -11,4 +12,6 @@ public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Stri
     Optional<OrderDetails> findByCustomDesignRequests_Id(String id);
 
     Optional<OrderDetails> findByEditedDesigns_Id(String id);
+
+    List<OrderDetails> findByOrders_Id(String id);
 }

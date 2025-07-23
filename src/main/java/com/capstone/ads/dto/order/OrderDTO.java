@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.order;
 
+import com.capstone.ads.dto.CoreDTO;
 import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.model.enums.OrderStatus;
 import com.capstone.ads.model.enums.OrderType;
@@ -26,5 +27,6 @@ public class OrderDTO {
     String note;
     OrderType orderType;
     OrderStatus status;
+    CoreDTO contractors;
     UserDTO users;
 }

@@ -37,6 +37,7 @@ import java.util.Optional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderServiceImpl implements OrderService {
     OrdersRepository orderRepository;
+    ContractorService contractorService;
     OrdersMapper orderMapper;
     SecurityContextUtils securityContextUtils;
     OrderStateValidator orderStateValidator;
@@ -93,20 +94,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO findOrderById(String orderId) {
-        Orders orders = orderRepository.findById(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
-        return orderMapper.toDTO(orders);
-    }
-
-    @Override
-    public Page<OrderDTO> findOrderByStatus(OrderStatus status, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        return orderRepository.findByStatus(status, pageable)
-                .map(orderMapper::toDTO);
-    }
-
-    @Override
     @Transactional
     public OrderDTO customerProvideAddress(String orderId, OrderUpdateAddressRequest request) {
         Orders orders = getOrderById(orderId);
@@ -121,13 +108,30 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDTO saleNotifyEstimateDeliveryDate(String orderId, OrderConfirmRequest request) {
         Orders orders = getOrderById(orderId);
+        Contractors contractors = contractorService.getContractorById(request.getContractorId());
+
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.IN_PROGRESS);
 
         orderMapper.updateEntityFromConfirmRequest(request, orders);
         orders.setStatus(OrderStatus.IN_PROGRESS);
+        orders.setContractors(contractors);
         orders = orderRepository.save(orders);
 
         return orderMapper.toDTO(orders);
+    }
+
+    @Override
+    public OrderDTO findOrderById(String orderId) {
+        Orders orders = orderRepository.findById(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        return orderMapper.toDTO(orders);
+    }
+
+    @Override
+    public Page<OrderDTO> findOrderByStatus(OrderStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return orderRepository.findByStatus(status, pageable)
+                .map(orderMapper::toDTO);
     }
 
     @Override
