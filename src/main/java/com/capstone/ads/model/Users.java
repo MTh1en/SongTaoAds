@@ -29,7 +29,7 @@ public class Users {
 
     @Column(unique = true)
     String phone;
-
+    String address;
     String password;
 
     @Column(unique = true, length = 512)

@@ -18,6 +18,7 @@ public class UserDTO {
     String email;
     String phone;
     String avatar;
+    String address;
     Boolean isActive;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
