@@ -46,7 +46,7 @@ public class ProgressLogServiceImpl implements ProgressLogService {
     ProgressLogsRepository progressLogsRepository;
     SecurityContextUtils securityContextUtils;
 
-    @Async
+    @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleOrderStatusChangedEvent(OrderStatusChangedEvent event) {
         ProgressLogs log = ProgressLogs.builder()

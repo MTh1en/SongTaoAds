@@ -205,7 +205,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequestsRepository.save(customDesignRequests);
     }
 
-    @Async
+    @Async("delegatingSecurityContextAsyncTaskExecutor")
     @EventListener
     @Transactional
     public void handleCustomDesignRequestChangeStatusEvent(CustomDesignRequestChangeStatusEvent event) {
@@ -214,7 +214,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequestsRepository.save(customDesignRequests);
     }
 
-    @Async
+    @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePriceProposalApprovedEvent(PriceProposalApprovedEvent event) {
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());
@@ -234,7 +234,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         ));
     }
 
-    @Async
+    @Async("delegatingSecurityContextAsyncTaskExecutor")
     @EventListener
     @Transactional
     public void handleDemoDesignCreateEvent(DemoDesignCreateEvent event) {
@@ -246,7 +246,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequestsRepository.save(customDesignRequest);
     }
 
-    @Async
+    @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleDemoDesignApprovedEvent(DemoDesignApprovedEvent event) {
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());
