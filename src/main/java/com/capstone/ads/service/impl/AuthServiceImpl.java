@@ -85,6 +85,7 @@ public class AuthServiceImpl implements AuthService {
                         .email(userInfo.getEmail())
                         .avatar(userInfo.getPicture())
                         .roles(roles)
+                        .isActive(true)
                         .build()));
 
         String accessToken = accessTokenService.generateAccessToken(user);
