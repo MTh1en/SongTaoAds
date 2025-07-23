@@ -4,10 +4,7 @@ import com.capstone.ads.dto.file.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.FileDataMapper;
-import com.capstone.ads.model.CustomDesignRequests;
-import com.capstone.ads.model.DemoDesigns;
-import com.capstone.ads.model.FileData;
-import com.capstone.ads.model.Orders;
+import com.capstone.ads.model.*;
 import com.capstone.ads.model.enums.FileTypeEnum;
 import com.capstone.ads.repository.internal.FileDataRepository;
 import com.capstone.ads.service.*;
@@ -167,10 +164,17 @@ public class FileDataServiceImpl implements FileDataService {
             throw new IllegalArgumentException("File list cannot be null or empty");
         }
 
+        String entityId = switch (entity) {
+            case Orders orders -> orders.getId();
+            case DemoDesigns demoDesigns -> demoDesigns.getId();
+            case CustomDesignRequests customDesignRequests -> customDesignRequests.getId();
+            case ProgressLogs progressLogs -> progressLogs.getId();
+            default ->
+                    throw new IllegalArgumentException("Unsupported entity type for file upload: " + entity.getClass().getName());
+        };
+
         List<FileData> savedFiles = new ArrayList<>();
-        List<String> formattedKeys = keyGenerator.apply(entity instanceof Orders ? ((Orders) entity).getId() :
-                entity instanceof DemoDesigns ? ((DemoDesigns) entity).getId() :
-                        ((CustomDesignRequests) entity).getId(), files.size());
+        List<String> formattedKeys = keyGenerator.apply(entityId, files.size());
         List<String> uploadedKeys = s3Service.uploadMultipleFiles(files, formattedKeys);
 
         IntStream.range(0, files.size()).forEach(i -> {

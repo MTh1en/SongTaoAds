@@ -73,6 +73,17 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
         demoDesigns.setVersion(versionNumber);
         demoDesigns = demoDesignsRepository.save(demoDesigns);
 
+        DemoDesigns finalDemoDesigns = demoDesigns;
+        if (request.getSubCustomDesignImage() != null && !request.getSubCustomDesignImage().isEmpty()) {
+            fileDataService.uploadMultipleFiles(
+                    request.getSubCustomDesignImage(),
+                    FileTypeEnum.DEMO_DESIGN,
+                    demoDesigns,
+                    FileData::setDemoDesigns,
+                    (id, size) -> generateDemoDesignSumImageKey(finalDemoDesigns.getCustomDesignRequests().getId(), size)
+            );
+        }
+
         customDesignRequestStateValidator.validateTransition(
                 demoDesigns.getCustomDesignRequests().getStatus(),
                 CustomDesignRequestStatus.DEMO_SUBMITTED
@@ -115,6 +126,11 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
         String customDesignRequestId = demoDesigns.getCustomDesignRequests().getId();
 
         demoDesignStateValidator.validateTransition(demoDesigns.getStatus(), DemoDesignStatus.REJECTED);
+
+        if (request.getFeedbackImage() != null && !request.getFeedbackImage().isEmpty()) {
+            String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, request.getFeedbackImage());
+            demoDesigns.setCustomerFeedbackImage(customDesignImageKey);
+        }
         demoDesignsMapper.updateEntityFromCustomerRequest(request, demoDesigns);
         demoDesigns.setStatus(DemoDesignStatus.REJECTED);
         demoDesigns = demoDesignsRepository.save(demoDesigns);
@@ -130,19 +146,6 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
                 CustomDesignRequestStatus.REVISION_REQUESTED
         ));
 
-        return demoDesignsMapper.toDTO(demoDesigns);
-    }
-
-    @Override
-    @Transactional
-    public DemoDesignDTO customerUploadFeedbackImage(String customDesignId, MultipartFile customDesignImage) {
-        DemoDesigns demoDesigns = findCustomDesignByIdAndPendingStatus(customDesignId);
-        String customDesignRequestId = demoDesigns.getCustomDesignRequests().getId();
-
-        String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, customDesignImage);
-        demoDesigns.setCustomerFeedbackImage(customDesignImageKey);
-
-        demoDesigns = demoDesignsRepository.save(demoDesigns);
         return demoDesignsMapper.toDTO(demoDesigns);
     }
 
@@ -178,7 +181,7 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
                 FileTypeEnum.DEMO_DESIGN,
                 demoDesigns,
                 FileData::setDemoDesigns,
-                (id, size) -> generateDemoDesignSumImageKey(demoDesigns.getCustomDesignRequests().getId(), demoDesignId, size)
+                (id, size) -> generateDemoDesignSumImageKey(demoDesigns.getCustomDesignRequests().getId(), size)
         );
     }
 
@@ -213,11 +216,11 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
         return String.format("custom-design/%s/%s", customDesignRequestId, UUID.randomUUID());
     }
 
-    private List<String> generateDemoDesignSumImageKey(String customDesignRequestId, String demoDesignId, Integer amountKey) {
+    private List<String> generateDemoDesignSumImageKey(String customDesignRequestId, Integer amountKey) {
         List<String> keys = new ArrayList<>();
         IntStream.range(0, amountKey)
-                .forEach(i -> keys.add(String.format("custom-design/%s/sub-demo/%s/%s",
-                        customDesignRequestId, demoDesignId, UUID.randomUUID())));
+                .forEach(i -> keys.add(String.format("custom-design/%s/sub-demo/%s",
+                        customDesignRequestId, UUID.randomUUID())));
         return keys;
     }
 

@@ -3,8 +3,7 @@ package com.capstone.ads.service.impl;
 import com.capstone.ads.constaint.PredefinedRole;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestCreateRequest;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestDTO;
-import com.capstone.ads.dto.file.FileDataDTO;
-import com.capstone.ads.dto.file.UploadMultipleFileRequest;
+import com.capstone.ads.dto.custom_design_request.CustomDesignRequestFinalDesignRequest;
 import com.capstone.ads.event.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
@@ -106,17 +105,27 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     @Override
     @Transactional
-    public CustomDesignRequestDTO designerUploadFinalDesignImage(String customDesignRequestId, MultipartFile finalDesignImage) {
+    public CustomDesignRequestDTO designerUploadFinalDesignImage(String customDesignRequestId, CustomDesignRequestFinalDesignRequest request) {
         CustomDesignRequests customDesignRequest = getCustomDesignRequestById(customDesignRequestId);
         customDesignRequestStateValidator.validateTransition(
                 customDesignRequest.getStatus(),
                 CustomDesignRequestStatus.COMPLETED
         );
 
-        var finalDesignImageUrl = uploadCustomDesignRequestImageToS3(customDesignRequestId, finalDesignImage);
+        var finalDesignImageUrl = uploadCustomDesignRequestImageToS3(customDesignRequestId, request.getFinalDesignImage());
         customDesignRequest.setFinalDesignImage(finalDesignImageUrl);
         customDesignRequest.setStatus(CustomDesignRequestStatus.COMPLETED);
         customDesignRequestsRepository.save(customDesignRequest);
+
+        if (request.getSubFinalDesignImages() != null && !request.getSubFinalDesignImages().isEmpty()) {
+            fileDataService.uploadMultipleFiles(
+                    request.getSubFinalDesignImages(),
+                    FileTypeEnum.CUSTOM_DESIGN_REQUEST,
+                    customDesignRequest,
+                    FileData::setCustomDesignRequests,
+                    (id, size) -> generateCustomDesignRequestSubImagesKey(customDesignRequestId, size)
+            );
+        }
 
         eventPublisher.publishEvent(new CustomDesignRequestCompletedEvent(
                 this,
@@ -124,18 +133,6 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         ));
 
         return customDesignRequestsMapper.toDTO(customDesignRequest);
-    }
-
-    @Override
-    public List<FileDataDTO> uploadCustomDesignRequestSubImages(String customDesignRequestId, UploadMultipleFileRequest request) {
-        CustomDesignRequests customDesignRequests = getCustomDesignRequestById(customDesignRequestId);
-        return fileDataService.uploadMultipleFiles(
-                request.getFiles(),
-                FileTypeEnum.CUSTOM_DESIGN_REQUEST,
-                customDesignRequests,
-                FileData::setCustomDesignRequests,
-                (id, size) -> generateCustomDesignRequestSubImagesKey(customDesignRequestId, size)
-        );
     }
 
     @Override

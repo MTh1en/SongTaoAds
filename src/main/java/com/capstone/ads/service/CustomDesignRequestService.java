@@ -2,6 +2,7 @@ package com.capstone.ads.service;
 
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestCreateRequest;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestDTO;
+import com.capstone.ads.dto.custom_design_request.CustomDesignRequestFinalDesignRequest;
 import com.capstone.ads.dto.file.FileDataDTO;
 import com.capstone.ads.dto.file.UploadMultipleFileRequest;
 import com.capstone.ads.model.CustomDesignRequests;
@@ -20,9 +21,7 @@ public interface CustomDesignRequestService {
 
     CustomDesignRequestDTO designerRejectCustomDesignRequest(String customDesignRequestId);
 
-    CustomDesignRequestDTO designerUploadFinalDesignImage(String customDesignRequestId, MultipartFile finalDesignImage);
-
-    List<FileDataDTO> uploadCustomDesignRequestSubImages(String customDesignRequestId, UploadMultipleFileRequest request);
+    CustomDesignRequestDTO designerUploadFinalDesignImage(String customDesignRequestId, CustomDesignRequestFinalDesignRequest request);
 
     Page<CustomDesignRequestDTO> findCustomerDesignRequestByCustomerDetailId(String customerDetailId, int page, int size);
 

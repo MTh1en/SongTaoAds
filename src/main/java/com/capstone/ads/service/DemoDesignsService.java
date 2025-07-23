@@ -19,8 +19,6 @@ public interface DemoDesignsService {
 
     DemoDesignDTO customerRejectCustomDesign(String customDesignId, CustomerRejectCustomDesignRequest request);
 
-    DemoDesignDTO customerUploadFeedbackImage(String customDesignId, MultipartFile customDesignImage);
-
     DemoDesignDTO designerUpdateDescriptionCustomDesign(String customDesignId, DesignerUpdateDescriptionCustomDesignRequest request);
 
     DemoDesignDTO designerUploadImage(String customDesignId, MultipartFile file);

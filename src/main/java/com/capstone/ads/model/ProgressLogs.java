@@ -1,13 +1,13 @@
 package com.capstone.ads.model;
 
-import com.capstone.ads.model.enums.FileTypeEnum;
+import com.capstone.ads.model.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,31 +16,22 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class FileData {
+public class ProgressLogs {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String name;
     String description;
-    String contentType;
-    String imageUrl;
 
     @Enumerated(EnumType.STRING)
-    FileTypeEnum fileType;
-
-    Long fileSize;
+    OrderStatus status;
 
     @CreationTimestamp
     LocalDateTime createdAt;
-    @UpdateTimestamp
-    LocalDateTime updatedAt;
+    String createdBy;
 
     @ManyToOne
-    CustomDesignRequests customDesignRequests;
+    Orders orders;
 
-    @ManyToOne
-    DemoDesigns demoDesigns;
-
-    @ManyToOne
-    ProgressLogs progressLogs;
+    @OneToMany(mappedBy = "progressLogs")
+    List<FileData> fileData;
 }

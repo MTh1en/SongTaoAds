@@ -1,4 +1,4 @@
-package com.capstone.ads.dto.demo_design;
+package com.capstone.ads.dto.custom_design_request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -11,8 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DemoDesignCreateRequest {
-    String designerDescription;
-    MultipartFile customDesignImage;
-    List<MultipartFile> subCustomDesignImage;
+public class CustomDesignRequestFinalDesignRequest {
+    MultipartFile finalDesignImage;
+    List<MultipartFile> subFinalDesignImages;
 }

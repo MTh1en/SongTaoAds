@@ -48,22 +48,11 @@ public class DemoDesignsController {
         return ApiResponseBuilder.buildSuccessResponse("Custom design decision successful", response);
     }
 
-    @PatchMapping("/demo-designs/{customDesignId}/reject")
+    @PatchMapping(value = "/demo-designs/{customDesignId}/reject", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Khách hàng từ chối bản demo")
     public ApiResponse<DemoDesignDTO> customerRejectCustomDesign(@PathVariable String customDesignId,
-                                                                 @Valid @RequestBody CustomerRejectCustomDesignRequest request) {
+                                                                 @Valid @ModelAttribute CustomerRejectCustomDesignRequest request) {
         var response = demoDesignsService.customerRejectCustomDesign(customDesignId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Custom design decision successful", response);
-    }
-
-    @PatchMapping(
-            value = "/demo-designs/{customDesignId}/feedback-images",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    @Operation(summary = "Khách hàng gửi hình ảnh feedback (Optional nếu khách hàng có ảnh feedback, ko thì chỉ reject thôi)")
-    public ApiResponse<DemoDesignDTO> customerUploadFeedbackImage(@PathVariable String customDesignId,
-                                                                  @RequestPart MultipartFile customDesignImage) {
-        var response = demoDesignsService.customerUploadFeedbackImage(customDesignId, customDesignImage);
         return ApiResponseBuilder.buildSuccessResponse("Custom design decision successful", response);
     }
 
@@ -84,7 +73,7 @@ public class DemoDesignsController {
     }
 
     @PostMapping(value = "/demo-designs/{customDesignId}/sub-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Design cập nhật những hình ảnh phụ cho bản demo củ mình")
+    @Operation(summary = "Design cập nhật những hình ảnh phụ cho bản demo của mình")
     public ApiResponse<List<FileDataDTO>> uploadDemoDesignSubImage(@PathVariable String customDesignId,
                                                                    @ModelAttribute UploadMultipleFileRequest request) {
         var response = demoDesignsService.uploadDemoDesignSubImages(customDesignId, request);
