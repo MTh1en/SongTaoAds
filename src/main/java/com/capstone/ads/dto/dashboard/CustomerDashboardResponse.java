@@ -16,5 +16,4 @@ public class CustomerDashboardResponse {
     int completeOrders;
     int closeTickets;
     long totalPayments;
-    long totalDeposits;
 }
