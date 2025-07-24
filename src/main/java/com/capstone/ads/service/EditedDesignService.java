@@ -14,6 +14,8 @@ public interface EditedDesignService {
 
     Page<EditedDesignDTO> findEditedDesignByCustomerDetailId(String customerDetailId, int page, int size);
 
+    EditedDesignDTO findEditedDesignById(String editedDesignId);
+
     void hardDeleteEditedDesign(String AIDesignId);
 
     //INTERNAL FUNCTION
