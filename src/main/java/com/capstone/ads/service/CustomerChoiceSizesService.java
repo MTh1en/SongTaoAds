@@ -17,5 +17,6 @@ public interface CustomerChoiceSizesService {
 
     void hardDeleteCustomerChoiceSize(String id);
 
+    Long convertToPixel(String customerChoiceSizeId);
     //INTERNAL FUNCTION
 }

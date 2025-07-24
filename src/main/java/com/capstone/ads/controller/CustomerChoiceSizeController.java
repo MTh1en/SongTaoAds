@@ -57,6 +57,13 @@ public class CustomerChoiceSizeController {
         return ApiResponseBuilder.buildSuccessResponse("Find all customer choices size by customer choices", response);
     }
 
+    @GetMapping("/customer-choice-sizes/{customerChoiceSizeId}/pixel-value")
+    @Operation(summary = "Chuyển kích thước khách hàng chọn sang giá trị pixel")
+    public ApiResponse<Long> convertToPixelValue(@PathVariable String customerChoiceSizeId) {
+        var response = service.convertToPixel(customerChoiceSizeId);
+        return ApiResponseBuilder.buildSuccessResponse("Convert pixel value successful", response);
+    }
+
     @DeleteMapping("/customer-choice-sizes/{customerChoiceSizeId}")
     @Operation(summary = "Xóa cứng kích thước đã chọn")
     public ApiResponse<Void> hardDeleteCustomerChoiceSize(@PathVariable String customerChoiceSizeId) {

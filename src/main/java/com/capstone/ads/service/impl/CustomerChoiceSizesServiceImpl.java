@@ -9,6 +9,7 @@ import com.capstone.ads.mapper.CustomerChoiceSizesMapper;
 import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.*;
 import com.capstone.ads.service.*;
+import com.capstone.ads.utils.DataConverter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,6 +32,7 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
     CustomerChoiceDetailsService customerChoiceDetailsService;
     CustomerChoiceSizesRepository customerChoiceSizesRepository;
     CustomerChoiceSizesMapper customerChoiceSizesMapper;
+    DataConverter dataConverter;
 
     @Override
     @Transactional
@@ -93,6 +95,23 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
         }
         customerChoiceSizesRepository.deleteById(id);
     }
+
+    @Override
+    public Long convertToPixel(String customerChoiceSizeId) {
+        CustomerChoiceSizes customerChoiceSizes = getCustomerChoiceSizesById(customerChoiceSizeId);
+        String sizeId = customerChoiceSizes.getSizes().getId();
+        String productTypeId = customerChoiceSizes.getCustomerChoices().getProductTypes().getId();
+
+        ProductTypeSizes productTypeSizes = productTypeSizesService.getProductTypeSizeByProductTypeIdAndSizeId(productTypeId, sizeId);
+
+        return dataConverter.convertSizeValueToPixelValue(
+                customerChoiceSizes.getSizeValue(),
+                productTypeSizes.getMinValue(),
+                productTypeSizes.getMaxValue()
+        );
+    }
+
+    // INTERNAL FUNCTION //
 
     private CustomerChoiceSizes getCustomerChoiceSizesById(String customerChoiceSizeId) {
         return customerChoiceSizesRepository.findById(customerChoiceSizeId)

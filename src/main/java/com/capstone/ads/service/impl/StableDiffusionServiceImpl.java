@@ -7,8 +7,11 @@ import com.capstone.ads.dto.stable_diffusion.controlnet.Args;
 import com.capstone.ads.dto.stable_diffusion.pendingtask.PendingTaskResponse;
 import com.capstone.ads.dto.stable_diffusion.progress.ProgressRequest;
 import com.capstone.ads.dto.stable_diffusion.progress.ProgressResponse;
+import com.capstone.ads.exception.AppException;
+import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.StableDiffusionMapper;
 import com.capstone.ads.repository.external.StableDiffusionRepository;
+import com.capstone.ads.service.ChatBotService;
 import com.capstone.ads.service.DesignTemplatesService;
 import com.capstone.ads.service.S3Service;
 import com.capstone.ads.service.StableDiffusionService;
@@ -50,15 +53,21 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
 
     DesignTemplatesService designTemplatesService;
     S3Service s3Service;
+    ChatBotService chatBotService;
     StableDiffusionRepository stableDiffusionRepository;
     StableDiffusionMapper stableDiffusionMapper;
     SecurityContextUtils securityContextUtils;
 
     @Override
-    public FileInformation generateImage(String designTemplateId, String prompt) {
+    public FileInformation generateImage(String designTemplateId, String prompt, Long width, Long height) {
         String bearerStableDiffusionToken = generateBearerStableDiffusionToken();
         String userId = securityContextUtils.getCurrentUserId();
 
+        if (prompt != null && !prompt.isEmpty()) {
+            prompt = chatBotService.translateToTextToImagePrompt(prompt);
+        } else {
+            throw new AppException(ErrorCode.PROMPT_CAN_NOT_BLANK);
+        }
         String imageBase64 = getImageBytesFromDesignTemplate(designTemplateId);
         Args controlNetArgs = stableDiffusionMapper.mapArgs(imageBase64, controlnetModule, controlnetModel);
 
@@ -75,7 +84,7 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
             prompt = "A simple advertising 2d background";
         }
 
-        TextToImageRequest request = stableDiffusionMapper.mapTextToImageRequest(prompt, alwaysonScripts, userId, overrideSettings);
+        TextToImageRequest request = stableDiffusionMapper.mapTextToImageRequest(prompt, width, height, alwaysonScripts, userId, overrideSettings);
         var response = stableDiffusionRepository.textToImage(bearerStableDiffusionToken, request);
         String base64OutputImage = response.getImages().getFirst();
         byte[] outputImageBytes = DataConverter.convertBase64ToByteArray(base64OutputImage);
