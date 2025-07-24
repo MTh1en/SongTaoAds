@@ -20,5 +20,4 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
 
     int countByStatus(OrderStatus status);
 
-
 }
