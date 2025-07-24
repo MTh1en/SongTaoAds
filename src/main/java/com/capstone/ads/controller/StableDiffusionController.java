@@ -36,8 +36,8 @@ public class StableDiffusionController {
     public ResponseEntity<?> generateImageFromDesignTemplate(
             @PathVariable String designTemplateId,
             @RequestPart(required = false) String prompt,
-            @RequestParam(required = false, defaultValue = "512L") Long width,
-            @RequestParam(required = false, defaultValue = "512L") Long height) {
+            @RequestParam(required = false, defaultValue = "512") Long width,
+            @RequestParam(required = false, defaultValue = "512") Long height) {
         var response = stableDiffusionService.generateImage(designTemplateId, prompt, width, height);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, response.getContentType())
