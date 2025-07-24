@@ -5,7 +5,9 @@ import com.capstone.ads.dto.stable_diffusion.pendingtask.PendingTaskResponse;
 import com.capstone.ads.dto.stable_diffusion.progress.ProgressResponse;
 
 public interface StableDiffusionService {
-    FileInformation generateImage(String designTemplateId, String prompt, Long width, Long height);
+    FileInformation generateImageFromDesignTemplate(String designTemplateId, String prompt, Integer width, Integer height);
+
+    FileInformation resizeImageFromBackground(String backgroundId, Integer width, Integer height);
 
     ProgressResponse checkProgressByTaskId();
 
