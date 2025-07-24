@@ -6,22 +6,29 @@ import com.capstone.ads.dto.demo_design.CustomerRejectCustomDesignRequest;
 import com.capstone.ads.dto.demo_design.DemoDesignCreateRequest;
 import com.capstone.ads.dto.demo_design.DemoDesignDTO;
 import com.capstone.ads.dto.demo_design.DesignerUpdateDescriptionCustomDesignRequest;
+import com.capstone.ads.dto.file.FileDataDTO;
+import com.capstone.ads.dto.file.UploadMultipleFileRequest;
 import com.capstone.ads.service.DemoDesignsService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "DEMO DESIGN")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DemoDesignsController {
-    private final DemoDesignsService demoDesignsService;
+    DemoDesignsService demoDesignsService;
 
     @PostMapping(
             value = "/custom-design-requests/{customDesignRequestId}/demo-designs",
@@ -41,22 +48,11 @@ public class DemoDesignsController {
         return ApiResponseBuilder.buildSuccessResponse("Custom design decision successful", response);
     }
 
-    @PatchMapping("/demo-designs/{customDesignId}/reject")
+    @PatchMapping(value = "/demo-designs/{customDesignId}/reject", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Khách hàng từ chối bản demo")
     public ApiResponse<DemoDesignDTO> customerRejectCustomDesign(@PathVariable String customDesignId,
-                                                                 @Valid @RequestBody CustomerRejectCustomDesignRequest request) {
+                                                                 @Valid @ModelAttribute CustomerRejectCustomDesignRequest request) {
         var response = demoDesignsService.customerRejectCustomDesign(customDesignId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Custom design decision successful", response);
-    }
-
-    @PatchMapping(
-            value = "/demo-designs/{customDesignId}/feedback-images",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
-    @Operation(summary = "Khách hàng gửi hình ảnh feedback (Optional nếu khách hàng có ảnh feedback, ko thì chỉ reject thôi)")
-    public ApiResponse<DemoDesignDTO> customerUploadFeedbackImage(@PathVariable String customDesignId,
-                                                                  @RequestPart MultipartFile customDesignImage) {
-        var response = demoDesignsService.customerUploadFeedbackImage(customDesignId, customDesignImage);
         return ApiResponseBuilder.buildSuccessResponse("Custom design decision successful", response);
     }
 
@@ -74,6 +70,14 @@ public class DemoDesignsController {
                                                           @RequestPart("file") MultipartFile file) {
         var response = demoDesignsService.designerUploadImage(customDesignId, file);
         return ApiResponseBuilder.buildSuccessResponse("Upload image successful", response);
+    }
+
+    @PostMapping(value = "/demo-designs/{customDesignId}/sub-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Design cập nhật những hình ảnh phụ cho bản demo của mình")
+    public ApiResponse<List<FileDataDTO>> uploadDemoDesignSubImage(@PathVariable String customDesignId,
+                                                                   @ModelAttribute UploadMultipleFileRequest request) {
+        var response = demoDesignsService.uploadDemoDesignSubImages(customDesignId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Upload sub image successfully", response);
     }
 
     @GetMapping("/custom-design-requests/{customDesignRequestId}/demo-designs")

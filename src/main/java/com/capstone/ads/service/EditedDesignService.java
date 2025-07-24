@@ -4,7 +4,6 @@ import com.capstone.ads.dto.edited_design.EditedDesignCreateRequest;
 import com.capstone.ads.dto.edited_design.EditedDesignDTO;
 import com.capstone.ads.model.EditedDesigns;
 import org.springframework.data.domain.Page;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface EditedDesignService {
     EditedDesignDTO createEditedDesignFromDesignTemplate(String customerDetailId, String designTemplateId,

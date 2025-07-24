@@ -6,7 +6,9 @@ import com.capstone.ads.service.ProductTypeSizesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,8 +17,9 @@ import java.util.List;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "PRODUCT TYPE SIZE")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductTypeSizeController {
-    private final ProductTypeSizesService service;
+    ProductTypeSizesService service;
 
     @PostMapping("/product-types/{productTypeId}/sizes/{sizeId}")
     @Operation(summary = "Tạo kích thước sử dụng trong loại biển")

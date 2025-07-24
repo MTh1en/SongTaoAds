@@ -2,14 +2,18 @@ package com.capstone.ads.service;
 
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestCreateRequest;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestDTO;
+import com.capstone.ads.dto.custom_design_request.CustomDesignRequestFinalDesignRequest;
+import com.capstone.ads.dto.file.FileDataDTO;
+import com.capstone.ads.dto.file.UploadMultipleFileRequest;
 import com.capstone.ads.model.CustomDesignRequests;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface CustomDesignRequestService {
-    CustomDesignRequestDTO createCustomDesignRequest(String customerDetailId, String customerChoiceId,
-                                                     CustomDesignRequestCreateRequest request);
+    CustomDesignRequestDTO createCustomDesignRequest(String customerDetailId, CustomDesignRequestCreateRequest request);
 
     CustomDesignRequestDTO assignDesignerToCustomerRequest(String customDesignRequestId, String designerId);
 
@@ -17,7 +21,7 @@ public interface CustomDesignRequestService {
 
     CustomDesignRequestDTO designerRejectCustomDesignRequest(String customDesignRequestId);
 
-    CustomDesignRequestDTO designerUploadFinalDesignImage(String customDesignRequestId, MultipartFile finalDesignImage);
+    CustomDesignRequestDTO designerUploadFinalDesignImage(String customDesignRequestId, CustomDesignRequestFinalDesignRequest request);
 
     Page<CustomDesignRequestDTO> findCustomerDesignRequestByCustomerDetailId(String customerDetailId, int page, int size);
 
@@ -27,12 +31,4 @@ public interface CustomDesignRequestService {
 
     //INTERNAL FUNCTION
     CustomDesignRequests getCustomDesignRequestById(String customDesignRequestId);
-
-    void updateCustomDesignRequestStatus(String customDesignRequestId, CustomDesignRequestStatus status);
-
-    void updateCustomDesignRequestByCustomDesign(String customDesignRequestId, boolean isNeedSupport);
-
-    void updateCustomDesignRequestApprovedPricing(String customDesignRequestId, Long totalPrice, Long depositAmount);
-
-    void updateCustomDesignRequestFromWebhookResult(CustomDesignRequests customDesignRequests, boolean isDeposit);
 }

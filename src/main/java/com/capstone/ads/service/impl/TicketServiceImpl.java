@@ -15,7 +15,9 @@ import com.capstone.ads.repository.internal.TicketRepository;
 import com.capstone.ads.service.OrderService;
 import com.capstone.ads.service.TicketService;
 import com.capstone.ads.utils.SecurityContextUtils;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,11 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TicketServiceImpl implements TicketService {
-    private final TicketRepository ticketRepository;
-    private final TicketsMapper ticketsMapper;
-    private final SecurityContextUtils securityContextUtils;
-    private final OrderService orderService;
+    TicketRepository ticketRepository;
+    TicketsMapper ticketsMapper;
+    SecurityContextUtils securityContextUtils;
+    OrderService orderService;
 
     @Override
     @Transactional

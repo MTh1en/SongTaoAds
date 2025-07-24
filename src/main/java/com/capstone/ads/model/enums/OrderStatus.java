@@ -2,6 +2,11 @@ package com.capstone.ads.model.enums;
 
 public enum OrderStatus {
     PENDING_DESIGN,
+    NEED_DEPOSIT_DESIGN,
+    DEPOSITED_DESIGN,
+    NEED_FULLY_PAID_DESIGN,
+    WAITING_FINAL_DESIGN,
+    DESIGN_COMPLETED,
     PENDING_CONTRACT,
     CONTRACT_SENT,
     CONTRACT_SIGNED,
@@ -14,6 +19,6 @@ public enum OrderStatus {
     PRODUCTION_COMPLETED,
     DELIVERING,
     INSTALLED,
-    COMPLETED,
+    ORDER_COMPLETED,
     CANCELLED
 }

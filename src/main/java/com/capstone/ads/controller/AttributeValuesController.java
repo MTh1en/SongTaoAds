@@ -10,15 +10,18 @@ import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "ATTRIBUTE VALUE")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AttributeValuesController {
-    private final AttributeValuesService service;
+    AttributeValuesService service;
 
     @PostMapping("/attributes/{attributeId}/attribute-values")
     @Operation(summary = "Tạo giá trị thuộc tính")

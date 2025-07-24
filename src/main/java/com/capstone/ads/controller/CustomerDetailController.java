@@ -9,7 +9,9 @@ import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,9 +22,9 @@ import java.util.List;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "CUSTOMER DETAIL")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomerDetailController {
-
-    private final CustomerDetailService customerDetailService;
+    CustomerDetailService customerDetailService;
 
     @PostMapping(value = "/customer-details", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Tạo thông tin doanh nghiệp")

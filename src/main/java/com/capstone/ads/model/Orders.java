@@ -1,14 +1,12 @@
 package com.capstone.ads.model;
 
 import com.capstone.ads.model.enums.OrderStatus;
-import com.capstone.ads.model.json.CustomerChoiceHistories;
+import com.capstone.ads.model.enums.OrderType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,33 +22,24 @@ public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String address;                         //Địa chỉ giao hàng
-    Long totalAmount;
-    Long depositAmount;
-    Long remainingAmount;
+    String orderCode;
+    String address;
+    Long totalConstructionAmount;
+    Long depositConstructionAmount;
+    Long remainingConstructionAmount;
+    Long totalDesignAmount;
+    Long depositDesignAmount;
+    Long remainingDesignAmount;
     String note;
-
-    String draftImageUrl;                   //Hình ảnh sản phẩm bắt đầu thi công
-    String productImageUrl;                 //Hình ảnh sản phẩm sau khi hoàn thành
-    String deliveryImageUrl;                //Hình ảnh chuẩn bị giao hàng
-    String installationImageUrl;            //Hình ảnh sau khi lắp đặt sau
-
-    LocalDateTime estimatedDeliveryDate;    //Ngày giao dự tính
-    LocalDateTime depositPaidDate;          //Ngày khách hàng đặt cọc
-    LocalDateTime productionStartDate;      //Ngày bắt đầu thi công
-    LocalDateTime productionEndDate;        //Ngày thi công xong
-    LocalDateTime deliveryStartDate;        //Ngày băt đầu vận chuyển
-    LocalDateTime actualDeliveryDate;       //Ngày giao hàng thực té
-    LocalDateTime completionDate;           //Ngày khách hàng thanhtoán phần còn lại
+    Boolean isPaymentCompleted;
 
     @CreationTimestamp
-    LocalDateTime orderDate;                //Ngày đặt hàng
+    LocalDateTime createdAt;
     @UpdateTimestamp
-    LocalDateTime updateDate;
+    LocalDateTime updatedAt;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
-    CustomerChoiceHistories customerChoiceHistories;
+    @Enumerated(EnumType.STRING)
+    OrderType orderType;
 
     @Enumerated(EnumType.STRING)
     OrderStatus status;
@@ -58,18 +47,21 @@ public class Orders {
     @ManyToOne
     Users users;
 
+    @ManyToOne
+    Contractors contractors;
+
     @OneToMany(mappedBy = "orders")
     List<Payments> payments;
 
     @OneToMany(mappedBy = "orders")
     List<Feedbacks> feedbacks;
 
+    @OneToMany(mappedBy = "orders")
+    List<ProgressLogs> progressLogs;
+
     @OneToOne(mappedBy = "orders", cascade = CascadeType.ALL)
     Contract contract;
 
-    @OneToOne
-    EditedDesigns editedDesigns;
-
-    @OneToOne
-    CustomDesignRequests customDesignRequests;
+    @OneToMany(mappedBy = "orders")
+    List<OrderDetails> orderDetails;
 }

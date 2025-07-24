@@ -14,8 +14,10 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductTypeSizeDTO {
     String id;
+    Float maxValue;
+    Float minValue;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     CoreDTO productTypes;
-    SizeDTO sizes;
+    CoreDTO sizes;
 }

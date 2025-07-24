@@ -31,8 +31,10 @@ public class SecurityConfig {
             "/api/auth/**",
             "/api/verifications/**",
             "/api/password-reset/**",
+            "/api/payments/**",
+            "/api/webhook/**",
             "/css/**",
-            "/js/**"
+            "/js/**",
     };
     private final CustomJwtDecoder customJwtDecoder;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;

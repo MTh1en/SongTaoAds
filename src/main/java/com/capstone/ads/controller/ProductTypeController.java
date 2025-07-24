@@ -10,7 +10,9 @@ import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,8 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/product-types")
 @RequiredArgsConstructor
 @Tag(name = "PRODUCT TYPE")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductTypeController {
-    private final ProductTypesService service;
+    ProductTypesService service;
 
     @PostMapping
     @Operation(summary = "Tạo loại sản phẩm")

@@ -11,7 +11,9 @@ import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -20,9 +22,10 @@ import org.springframework.web.servlet.ModelAndView;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Tag(name = "RECOVERY")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RecoveryController {
-    private final VerificationService verificationService;
-    private final AuthService authService;
+    VerificationService verificationService;
+    AuthService authService;
 
     @PostMapping("/verifications/resend")
     @Operation(summary = "Gửi lại email xác nhận tài khoản")

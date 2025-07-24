@@ -1,6 +1,5 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.constaint.S3ImageDuration;
 import com.capstone.ads.dto.edited_design.EditedDesignCreateRequest;
 import com.capstone.ads.dto.edited_design.EditedDesignDTO;
 import com.capstone.ads.exception.AppException;
@@ -12,7 +11,9 @@ import com.capstone.ads.model.DesignTemplates;
 import com.capstone.ads.model.EditedDesigns;
 import com.capstone.ads.repository.internal.EditedDesignsRepository;
 import com.capstone.ads.service.*;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,25 +22,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EditedDesignServiceImpl implements EditedDesignService {
-    private final CustomerDetailService customerDetailService;
-    private final DesignTemplatesService designTemplatesService;
-    private final BackgroundService backgroundService;
-    private final S3Service s3Service;
-    private final EditedDesignsRepository editedDesignsRepository;
-    private final EditedDesignMapper editedDesignMapper;
+    CustomerDetailService customerDetailService;
+    DesignTemplatesService designTemplatesService;
+    BackgroundService backgroundService;
+    FileDataService fileDataService;
+    EditedDesignsRepository editedDesignsRepository;
+    EditedDesignMapper editedDesignMapper;
 
     @Override
     @Transactional
     public EditedDesignDTO createEditedDesignFromDesignTemplate(String customerDetailId, String designTemplateId,
                                                                 EditedDesignCreateRequest request) {
-        CustomerDetail customerDetail = customerDetailService.getCustomerChoiceDetailById(customerDetailId);
+        CustomerDetail customerDetail = customerDetailService.getCustomerDetailById(customerDetailId);
         DesignTemplates designTemplates = designTemplatesService.getDesignTemplateById(designTemplateId);
         String aiDesignImageUrl = uploadAIDesignImageToS3(customerDetailId, request.getEditedImage());
 
@@ -56,7 +57,7 @@ public class EditedDesignServiceImpl implements EditedDesignService {
     @Transactional
     public EditedDesignDTO createEditedDesignFromBackground(String customerDetailId, String backgroundId,
                                                             EditedDesignCreateRequest request) {
-        CustomerDetail customerDetail = customerDetailService.getCustomerChoiceDetailById(customerDetailId);
+        CustomerDetail customerDetail = customerDetailService.getCustomerDetailById(customerDetailId);
         Backgrounds backgrounds = backgroundService.getAvailableBackgroundById(backgroundId);
         String aiDesignImageUrl = uploadAIDesignImageToS3(customerDetailId, request.getEditedImage());
 
@@ -92,15 +93,6 @@ public class EditedDesignServiceImpl implements EditedDesignService {
                 .orElseThrow(() -> new AppException(ErrorCode.AI_DESIGN_NOT_FOUND));
     }
 
-    private EditedDesignDTO convertToAIDesignDTOWithImageIsPresignedURL(EditedDesigns editedDesigns) {
-        var aiDesignDTOResponse = editedDesignMapper.toDTO(editedDesigns);
-        if (!Objects.isNull(editedDesigns.getEditedImage())) {
-            var designTemplateImagePresigned = s3Service.getPresignedUrl(editedDesigns.getEditedImage(), S3ImageDuration.CUSTOM_DESIGN_DURATION);
-            aiDesignDTOResponse.setEditedImage(designTemplateImagePresigned);
-        }
-        return aiDesignDTOResponse;
-    }
-
     private String generateAIDesignKey(String customerDetailId) {
         return String.format("ai-designs/%s/%s", customerDetailId, UUID.randomUUID());
     }
@@ -110,7 +102,7 @@ public class EditedDesignServiceImpl implements EditedDesignService {
         if (file.isEmpty()) {
             throw new AppException(ErrorCode.FILE_REQUIRED);
         }
-        s3Service.uploadSingleFile(AIDesignImageKey, file);
+        fileDataService.uploadSingleFile(AIDesignImageKey, file);
         return AIDesignImageKey;
     }
 }

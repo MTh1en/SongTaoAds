@@ -33,10 +33,9 @@ public class DashboardServiceImpl implements DashboardService {
         int contractConfirmedOrders = orderRepository.countByUsers_IdAndStatus(user.getId(), OrderStatus.CONTRACT_CONFIRMED);
         int depositedOrders = orderRepository.countByUsers_IdAndStatus(user.getId(), OrderStatus.DEPOSITED);
         int productionCompleteOrders = orderRepository.countByUsers_IdAndStatus(user.getId(), OrderStatus.PRODUCTION_COMPLETED);
-        int completeOrders = orderRepository.countByUsers_IdAndStatus(user.getId(), OrderStatus.COMPLETED);
+        int completeOrders = orderRepository.countByUsers_IdAndStatus(user.getId(), OrderStatus.ORDER_COMPLETED);
         int closeTickets = ticketRepository.countClosedByCustomer(user);
         long totalPayments = paymentRepository.countByOrders_Users_Id(user.getId());
-        long totalDeposits = paymentRepository.countByIsDepositTrueAndOrders_Users_Id(user.getId());
 
         return CustomerDashboardResponse.builder()
                 .totalOrders(totalOrders)
@@ -46,7 +45,6 @@ public class DashboardServiceImpl implements DashboardService {
                 .completeOrders(completeOrders)
                 .closeTickets(closeTickets)
                 .totalPayments(totalPayments)
-                .totalDeposits(totalDeposits)
                 .build();
     }
     @Override
@@ -55,7 +53,7 @@ public class DashboardServiceImpl implements DashboardService {
         long totalOrders = orderRepository.count();
         long totalUsers = usersRepository.count();
         long totalRevenue = paymentRepository.sumAmount();
-        int completedOrders = orderRepository.countByStatus(OrderStatus.COMPLETED);
+        int completedOrders = orderRepository.countByStatus(OrderStatus.ORDER_COMPLETED);
         int activeContracts = orderRepository.countByStatus(OrderStatus.CONTRACT_CONFIRMED);
 
         return AdminDashboardResponse.builder()
@@ -100,7 +98,7 @@ public class DashboardServiceImpl implements DashboardService {
         int productingOrders = orderRepository.countByStatus(OrderStatus.PRODUCING);
         int productionCompletedOrders= orderRepository.countByStatus(OrderStatus.PRODUCTION_COMPLETED);
         int inprogressTickets = ticketRepository.countByStatus(TicketStatus.IN_PROGRESS);
-        int completedOrders = orderRepository.countByStatus(OrderStatus.COMPLETED);
+        int completedOrders = orderRepository.countByStatus(OrderStatus.ORDER_COMPLETED);
 
         return StaffDashboardResponse.builder()
                 .productingOrders(productingOrders)

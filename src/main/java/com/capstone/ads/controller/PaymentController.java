@@ -5,7 +5,9 @@ import com.capstone.ads.service.PaymentService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -18,34 +20,35 @@ import vn.payos.type.WebhookData;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "PAYMENT")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentController {
-    private final PaymentService paymentService;
+    PaymentService paymentService;
 
     @PostMapping("/orders/{orderId}/deposit")
     @Operation(summary = "Đặt cọc theo đơn hàng")
     public ApiResponse<CheckoutResponseData> createOrderDepositPaymentLink(@PathVariable String orderId) throws Exception {
-        CheckoutResponseData response = paymentService.createOrderDepositPaymentLink(orderId);
+        CheckoutResponseData response = paymentService.createConstructionDepositPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
     @PostMapping("/orders/{orderId}/remaining")
     @Operation(summary = "Thanh toán hết đơn hàng")
     public ApiResponse<CheckoutResponseData> createOrderRemainingPaymentLink(@PathVariable String orderId) throws Exception {
-        CheckoutResponseData response = paymentService.createOrderRemainingPaymentLink(orderId);
+        CheckoutResponseData response = paymentService.createConstructionRemainingPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
-    @PostMapping("/custom-design-requests/{customDesignRequestId}/deposit")
-    @Operation(summary = "Đặt cọc yêu cầu thiết kế")
-    public ApiResponse<CheckoutResponseData> createCustomDesignRequestDepositPaymentLink(@PathVariable String customDesignRequestId) throws Exception {
-        CheckoutResponseData response = paymentService.createCustomDesignRequestDepositPaymentLink(customDesignRequestId);
+    @PostMapping("/orders/{orderId}/design-deposit")
+    @Operation(summary = "Đặt cọc theo thiết kế")
+    public ApiResponse<CheckoutResponseData> createCustomDesignFullDepositPaymentLink(@PathVariable String orderId) throws Exception {
+        CheckoutResponseData response = paymentService.createCustomDesignFullDepositPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 
-    @PostMapping("/custom-design-requests/{customDesignRequestId}/remaining")
+    @PostMapping("/orders/{orderId}/design-remaining")
     @Operation(summary = "Thanh toán hết thiết kế")
-    public ApiResponse<CheckoutResponseData> createCustomDesignRequestRemainingPaymentLink(@PathVariable String customDesignRequestId) throws Exception {
-        CheckoutResponseData response = paymentService.createCustomDesignRequestRemainingPaymentLink(customDesignRequestId);
+    public ApiResponse<CheckoutResponseData> createCustomDesignFullRemainingPaymentLink(@PathVariable String orderId) throws Exception {
+        CheckoutResponseData response = paymentService.createCustomDesignFullRemainingPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
     }
 

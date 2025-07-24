@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 
 public interface AuthService {
+    AuthResponse outboundAuthenticate(String code, HttpServletResponse httpServletResponse);
+
     AuthResponse login(LoginRequest request, HttpServletResponse response);
 
     void register(RegisterRequest request);
