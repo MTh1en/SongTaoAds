@@ -10,7 +10,9 @@ import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,13 +21,17 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Tag(name = "DESIGN TEMPLATE")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DesignTemplatesController {
-    private final DesignTemplatesService designTemplatesService;
+    DesignTemplatesService designTemplatesService;
 
-    @PostMapping("/product-types/{productTypeId}/design-templates")
     @Operation(summary = "Tạo thiết kế mẫu theo loại sản phẩm")
+    @PostMapping(
+            value = "/product-types/{productTypeId}/design-templates",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ApiResponse<DesignTemplateDTO> createDesignTemplate(@PathVariable("productTypeId") String productTypeId,
-                                                               @Valid @RequestBody DesignTemplateCreateRequest request) {
+                                                               @Valid @ModelAttribute DesignTemplateCreateRequest request) {
         var response = designTemplatesService.createDesignTemplate(productTypeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create Design Template successful!", response);
     }

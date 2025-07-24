@@ -6,7 +6,9 @@ import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.CustomerChoiceCostsRepository;
 import com.capstone.ads.service.CostTypesService;
 import com.capstone.ads.service.CustomerChoiceCostsService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
@@ -23,11 +25,12 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsService {
-    private final CostTypesService costTypesService;
-    private final CustomerChoiceCostMapper customerChoiceCostMapper;
-    private final CustomerChoiceCostsRepository customerChoiceCostsRepository;
-    private final ExpressionParser parser = new SpelExpressionParser();
+    CostTypesService costTypesService;
+    CustomerChoiceCostMapper customerChoiceCostMapper;
+    CustomerChoiceCostsRepository customerChoiceCostsRepository;
+    ExpressionParser parser = new SpelExpressionParser();
 
 
     @Override

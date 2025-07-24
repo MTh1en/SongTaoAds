@@ -17,18 +17,11 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
     Page<Orders> findByUsers_Id(String id, Pageable pageable);
 
     Page<Orders> findByStatus(OrderStatus status, Pageable pageable);
-
-    Optional<Orders> findByIdAndStatus(String id, OrderStatus status);
-
-    Optional<Orders> findByIdAndStatusIn(String id, Collection<OrderStatus> statuses);
-
-    Optional<Orders> findByCustomDesignRequests_Id(String id);
-
+  
     int countByUsers_IdAndStatus(String id, OrderStatus status);
 
     int countByUsers(Users users);
 
     int countByStatus(OrderStatus status);
-
 
 }

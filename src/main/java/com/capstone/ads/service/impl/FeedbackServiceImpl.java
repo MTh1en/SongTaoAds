@@ -1,6 +1,5 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.constaint.S3ImageDuration;
 import com.capstone.ads.dto.feedback.FeedbackDTO;
 import com.capstone.ads.dto.feedback.FeedbackResponseRequest;
 import com.capstone.ads.dto.feedback.FeedbackSendRequest;
@@ -12,10 +11,12 @@ import com.capstone.ads.model.Orders;
 import com.capstone.ads.model.Users;
 import com.capstone.ads.repository.internal.FeedbacksRepository;
 import com.capstone.ads.service.FeedbackService;
+import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.service.OrderService;
-import com.capstone.ads.service.S3Service;
 import com.capstone.ads.utils.SecurityContextUtils;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,19 +27,19 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FeedbackServiceImpl implements FeedbackService {
-    private final OrderService orderService;
-    private final S3Service s3Service;
-    private final FeedbacksRepository feedbacksRepository;
-    private final FeedbackMapper feedbackMapper;
-    private final SecurityContextUtils securityContextUtils;
+    OrderService orderService;
+    FileDataService fileDataService;
+    FeedbacksRepository feedbacksRepository;
+    FeedbackMapper feedbackMapper;
+    SecurityContextUtils securityContextUtils;
 
     @Override
     @Transactional
@@ -80,7 +81,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public List<FeedbackDTO> findFeedbackByOrderId(String orderId) {
         return feedbacksRepository.findByOrders_Id(orderId).stream()
-                .map(this::convertToFeedbackDTOWithImageIsPresignedURL)
+                .map(feedbackMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -89,7 +90,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         Sort sort = Sort.by("sendAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return feedbacksRepository.findBySendBy_Id(userId, pageable)
-                .map(this::convertToFeedbackDTOWithImageIsPresignedURL);
+                .map(feedbackMapper::toDTO);
     }
 
     @Override
@@ -97,7 +98,7 @@ public class FeedbackServiceImpl implements FeedbackService {
         Sort sort = Sort.by("sendAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return feedbacksRepository.findAll(pageable)
-                .map(this::convertToFeedbackDTOWithImageIsPresignedURL);
+                .map(feedbackMapper::toDTO);
     }
 
     @Override
@@ -119,17 +120,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     private String uploadFeedbackImageToS3(String feedbackId, MultipartFile feedbackImage) {
         String feedbackImageKey = generateFeedbackImageKey(feedbackId);
-        s3Service.uploadSingleFile(feedbackImageKey, feedbackImage);
+        fileDataService.uploadSingleFile(feedbackImageKey, feedbackImage);
         return feedbackImageKey;
-    }
-
-    private FeedbackDTO convertToFeedbackDTOWithImageIsPresignedURL(Feedbacks feedbacks) {
-        var feedbackResponse = feedbackMapper.toDTO(feedbacks);
-        if (!Objects.isNull(feedbacks.getFeedbackImageUrl())) {
-            String designTemplateImageKey = feedbacks.getFeedbackImageUrl();
-            var designTemplateImagePresigned = s3Service.getPresignedUrl(designTemplateImageKey, S3ImageDuration.FEEDBACK_DURATION);
-            feedbackResponse.setFeedbackImageUrl(designTemplateImagePresigned);
-        }
-        return feedbackResponse;
     }
 }

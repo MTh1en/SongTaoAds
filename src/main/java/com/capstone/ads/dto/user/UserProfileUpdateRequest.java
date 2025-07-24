@@ -15,4 +15,6 @@ public class UserProfileUpdateRequest {
     String fullName;
     @Size(min = 10, message = "Phone must be at least 10 characters")
     String phone;
+    @NotBlank(message = "Address is required")
+    String address;
 }

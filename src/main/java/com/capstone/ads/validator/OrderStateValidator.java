@@ -21,6 +21,27 @@ public class OrderStateValidator {
     private void initializeValidTransitions() {
         validTransitions.put(OrderStatus.PENDING_DESIGN, Set.of(
                 OrderStatus.CANCELLED,
+                OrderStatus.NEED_DEPOSIT_DESIGN
+        ));
+
+        validTransitions.put(OrderStatus.NEED_DEPOSIT_DESIGN, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.DEPOSITED_DESIGN
+        ));
+
+        validTransitions.put(OrderStatus.DEPOSITED_DESIGN, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.NEED_FULLY_PAID_DESIGN,
+                OrderStatus.WAITING_FINAL_DESIGN
+        ));
+
+        validTransitions.put(OrderStatus.NEED_FULLY_PAID_DESIGN, Set.of(
+                OrderStatus.CANCELLED,
+                OrderStatus.WAITING_FINAL_DESIGN
+        ));
+
+        validTransitions.put(OrderStatus.WAITING_FINAL_DESIGN, Set.of(
+                OrderStatus.CANCELLED,
                 OrderStatus.PENDING_CONTRACT
         ));
 
@@ -82,11 +103,11 @@ public class OrderStateValidator {
         ));
 
         validTransitions.put(OrderStatus.INSTALLED, Set.of(
-                OrderStatus.COMPLETED
+                OrderStatus.ORDER_COMPLETED
         ));
 
         validTransitions.put(OrderStatus.CANCELLED, Set.of());
-        validTransitions.put(OrderStatus.COMPLETED, Set.of());
+        validTransitions.put(OrderStatus.ORDER_COMPLETED, Set.of());
     }
 
     public boolean isValidTransition(OrderStatus currentStatus, OrderStatus newStatus) {

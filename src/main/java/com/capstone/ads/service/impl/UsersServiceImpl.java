@@ -1,7 +1,6 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.PredefinedRole;
-import com.capstone.ads.constaint.S3ImageDuration;
 import com.capstone.ads.dto.user.ChangePasswordRequest;
 import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.dto.user.UserCreateRequest;
@@ -14,10 +13,12 @@ import com.capstone.ads.model.Users;
 import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.repository.internal.RolesRepository;
 
-import com.capstone.ads.service.S3Service;
+import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.service.UserService;
 import com.capstone.ads.utils.SecurityContextUtils;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,17 +27,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UsersServiceImpl implements UserService {
-    private final S3Service s3Service;
-    private final RolesRepository rolesRepository;
-    private final UsersRepository usersRepository;
-    private final UsersMapper usersMapper;
-    private final SecurityContextUtils securityContextUtils;
+    FileDataService fileDataService;
+    RolesRepository rolesRepository;
+    UsersRepository usersRepository;
+    UsersMapper usersMapper;
+    SecurityContextUtils securityContextUtils;
 
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
@@ -104,7 +103,7 @@ public class UsersServiceImpl implements UserService {
     @Override
     public UserDTO getCurrentUserProfile() {
         Users user = securityContextUtils.getCurrentUser();
-        return convertUserToDTOWithAvatarIsPresignedURL(user);
+        return usersMapper.toDTO(user);
     }
 
     @Override
@@ -112,7 +111,7 @@ public class UsersServiceImpl implements UserService {
     public UserDTO uploadUserAvatar(String userId, MultipartFile file) {
         Users user = getUserByIdAndIsActive(userId);
         String avatarName = generateAvatarName(user.getId());
-        s3Service.uploadSingleFile(avatarName, file);
+        fileDataService.uploadSingleFile(avatarName, file);
         user.setAvatar(avatarName);
         usersRepository.save(user);
         return usersMapper.toDTO(user);
@@ -149,16 +148,7 @@ public class UsersServiceImpl implements UserService {
     }
 
     private String generateAvatarName(String userId) {
-        return String.format("avatar/%s/%s", userId, UUID.randomUUID());
-    }
-
-    private UserDTO convertUserToDTOWithAvatarIsPresignedURL(Users user) {
-        var userResponse = usersMapper.toDTO(user);
-        if (!Objects.isNull(userResponse.getAvatar())) {
-            var avatarImageDownloadFromS3 = s3Service.getPresignedUrl(user.getAvatar(), S3ImageDuration.AVATAR_IMAGE_DURATION);
-            userResponse.setAvatar(avatarImageDownloadFromS3);
-        }
-        return userResponse;
+        return String.format("avatar/%s", userId);
     }
 
     private boolean isValidRole(String role) {

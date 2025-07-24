@@ -20,15 +20,16 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 @Tag(name = "AUTH")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthController {
-    private final AuthService authService;
-    private final VerificationService verificationService;
+    AuthService authService;
+    VerificationService verificationService;
 
-    @GetMapping("/name")
-    public String getThreadName() {
-        return Thread.currentThread().toString();
+    @PostMapping("/outbound/authentication")
+    public ApiResponse<AuthResponse> outboundAuthentication(@RequestParam String code, HttpServletResponse response) {
+        var result = authService.outboundAuthenticate(code, response);
+        return ApiResponseBuilder.buildSuccessResponse("Login successful", result);
     }
-
 
     @PostMapping("/login")
     @Operation(summary = "Đăng nhập")

@@ -24,5 +24,5 @@ public interface CustomerDetailService {
     void hardDeleteCustomerDetail(String customerDetailId);
 
     //INTERNAL FUNCTION
-    CustomerDetail getCustomerChoiceDetailById(String customerDetailId);
+    CustomerDetail getCustomerDetailById(String customerDetailId);
 }

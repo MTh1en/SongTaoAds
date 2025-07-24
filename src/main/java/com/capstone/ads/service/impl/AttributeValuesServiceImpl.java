@@ -11,7 +11,9 @@ import com.capstone.ads.model.Attributes;
 import com.capstone.ads.repository.internal.AttributeValuesRepository;
 import com.capstone.ads.service.AttributeValuesService;
 import com.capstone.ads.service.AttributesService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AttributeValuesServiceImpl implements AttributeValuesService {
-    private final AttributesService attributesService;
-    private final AttributeValuesRepository attributeValuesRepository;
-    private final AttributeValuesMapper attributeValuesMapper;
+    AttributesService attributesService;
+    AttributeValuesRepository attributeValuesRepository;
+    AttributeValuesMapper attributeValuesMapper;
 
     @Override
     @Transactional

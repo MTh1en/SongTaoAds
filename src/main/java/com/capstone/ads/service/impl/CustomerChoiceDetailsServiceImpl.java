@@ -7,7 +7,9 @@ import com.capstone.ads.mapper.CustomerChoiceDetailsMapper;
 import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.CustomerChoiceDetailsRepository;
 import com.capstone.ads.service.*;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
@@ -26,13 +28,14 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsService {
-    private final CustomerChoicesService customerChoicesService;
-    private final CustomerChoiceCostsService customerChoiceCostsService;
-    private final AttributeValuesService attributeValuesService;
-    private final CustomerChoiceDetailsRepository customerChoiceDetailsRepository;
-    private final CustomerChoiceDetailsMapper customerChoiceDetailsMapper;
-    private final ExpressionParser parser = new SpelExpressionParser();
+    CustomerChoicesService customerChoicesService;
+    CustomerChoiceCostsService customerChoiceCostsService;
+    AttributeValuesService attributeValuesService;
+    CustomerChoiceDetailsRepository customerChoiceDetailsRepository;
+    CustomerChoiceDetailsMapper customerChoiceDetailsMapper;
+    ExpressionParser parser = new SpelExpressionParser();
 
     @Override
     @Transactional

@@ -11,7 +11,9 @@ import com.capstone.ads.model.ProductTypes;
 import com.capstone.ads.repository.internal.CostTypesRepository;
 import com.capstone.ads.service.CostTypesService;
 import com.capstone.ads.service.ProductTypesService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,10 +27,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CostTypesServiceImpl implements CostTypesService {
-    private final ProductTypesService productTypesService;
-    private final CostTypeMapper costTypeMapper;
-    private final CostTypesRepository costTypesRepository;
+    ProductTypesService productTypesService;
+    CostTypeMapper costTypeMapper;
+    CostTypesRepository costTypesRepository;
 
     @Override
     @Transactional

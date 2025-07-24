@@ -1,7 +1,7 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.file.FileData;
+import com.capstone.ads.dto.file.FileInformation;
 import com.capstone.ads.dto.stable_diffusion.pendingtask.PendingTaskResponse;
 import com.capstone.ads.dto.stable_diffusion.progress.ProgressResponse;
 import com.capstone.ads.service.ChatBotService;
@@ -9,7 +9,9 @@ import com.capstone.ads.service.StableDiffusionService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpHeaders;
@@ -22,9 +24,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 @Slf4j
 @Tag(name = "STABLE DIFFUSION")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StableDiffusionController {
-    private final StableDiffusionService stableDiffusionService;
-    private final ChatBotService chatBotService;
+    StableDiffusionService stableDiffusionService;
+    ChatBotService chatBotService;
 
     @PostMapping(
             value = "/design-templates/{designTemplateId}/txt2img",
@@ -33,7 +36,7 @@ public class StableDiffusionController {
     @Operation(summary = "Tạo hình ảnh từ thiết kế mẫu")
     public ResponseEntity<?> generateImageFromDesignTemplate(@PathVariable String designTemplateId,
                                                              @RequestPart(required = false) String prompt) {
-        FileData response = null;
+        FileInformation response;
         if (!Strings.isBlank(prompt)) {
             var translatedResponse = chatBotService.translateToTextToImagePrompt(prompt);
             log.info("Translated response: {}", translatedResponse);

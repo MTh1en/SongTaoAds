@@ -4,33 +4,35 @@ import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestCreateRequest;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestDTO;
+import com.capstone.ads.dto.custom_design_request.CustomDesignRequestFinalDesignRequest;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.service.CustomDesignRequestService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Slf4j
 @Tag(name = "CUSTOM DESIGN REQUEST")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomDesignRequestsController {
-    private final CustomDesignRequestService service;
+    CustomDesignRequestService service;
 
-    @PostMapping("/customer-details/{customerDetailId}/customer-choices/{customerChoiceId}")
+    @PostMapping("/customer-details/{customerDetailId}/custom-design-requests")
     @Operation(summary = "Tạo thông yêu cầu thiết kế tùy chỉnh")
     public ApiResponse<CustomDesignRequestDTO> createCustomDesignRequest(
             @PathVariable String customerDetailId,
-            @PathVariable String customerChoiceId,
             @Valid @RequestBody CustomDesignRequestCreateRequest request) {
-        var response = service.createCustomDesignRequest(customerDetailId, customerChoiceId, request);
+        var response = service.createCustomDesignRequest(customerDetailId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create custom design request successful", response);
     }
 
@@ -62,8 +64,8 @@ public class CustomDesignRequestsController {
     )
     @Operation(summary = "Designer gửi bản thiết kế chính thức")
     public ApiResponse<CustomDesignRequestDTO> designerUploadFinalDesignImage(@PathVariable String customDesignRequestId,
-                                                                              @RequestPart MultipartFile finalDesignImage) {
-        var response = service.designerUploadFinalDesignImage(customDesignRequestId, finalDesignImage);
+                                                                              @ModelAttribute CustomDesignRequestFinalDesignRequest request) {
+        var response = service.designerUploadFinalDesignImage(customDesignRequestId, request);
         return ApiResponseBuilder.buildSuccessResponse("Designer rejected custom design request assigned", response);
     }
 

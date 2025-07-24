@@ -1,16 +1,14 @@
-package com.capstone.ads.dto.stable_diffusion.controlnet;
+package com.capstone.ads.dto.file;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
-
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ControlNet {
-    List<Args> args;
+public class FileInformation {
+    byte[] content;
+    String contentType;
 }
-

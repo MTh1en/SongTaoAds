@@ -9,7 +9,9 @@ import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,8 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 @Tag(name = "CONTRACT")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ContractController {
-    private final ContractService contractService;
+    ContractService contractService;
 
     @PostMapping(value = "/orders/{orderId}/contract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Sale tạo bản hợp đồng đầu tiên")
