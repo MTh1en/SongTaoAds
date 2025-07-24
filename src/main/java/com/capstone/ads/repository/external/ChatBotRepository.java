@@ -58,6 +58,12 @@ public interface ChatBotRepository {
     @GetMapping(value = "/models")
     ListModelsResponse getModels(
             @RequestHeader("Authorization") String authorization);
+
+    @PostMapping(value = "/chat/completions", consumes = MediaType.APPLICATION_JSON_VALUE)
+    ResponsePricingChat getResponseChatCompletions(
+            @RequestHeader("Authorization") String authorization,
+            @RequestBody RequestPricingChat requestBody);
+
 }
 
 

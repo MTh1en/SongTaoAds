@@ -4,34 +4,20 @@ import com.capstone.ads.dto.chatBot.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ChatBotLogMapper;
-import com.capstone.ads.mapper.ModelChatBotMapper;
 import com.capstone.ads.model.ChatBotLog;
 import com.capstone.ads.model.ModelChatBot;
 import com.capstone.ads.repository.external.ChatBotRepository;
 import com.capstone.ads.repository.internal.ChatBotLogRepository;
 import com.capstone.ads.repository.internal.ModelChatBotRepository;
 import com.capstone.ads.service.ChatBotService;
-import com.capstone.ads.service.S3Service;
 import com.capstone.ads.utils.SecurityContextUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,10 +30,7 @@ public class ChatBotServiceImpl implements ChatBotService {
     private final SecurityContextUtils securityContextUtils;
     private final ChatBotRepository chatBotRepository;
     private final ModelChatBotRepository modelChatBotRepository;
-    private final S3Service s3Service;
     private final ChatBotLogMapper chatBotLogMapper;
-    private final ModelChatBotMapper modelChatBotMapper;
-
 
     @Override
     public String chat(ChatRequest request) {
@@ -98,81 +81,6 @@ public class ChatBotServiceImpl implements ChatBotService {
     }
 
     @Override
-    public FileUploadResponse uploadFileToFineTune(MultipartFile file) {
-        String fileName = file.getOriginalFilename();
-        if (fileName == null || !fileName.toLowerCase().endsWith(".jsonl")) {
-            throw new AppException(ErrorCode.INVALID_INPUT);
-        }
-        // Call OpenAI file upload API
-        return chatBotRepository.uploadFile(
-                "Bearer " + openaiApiKey,
-                "fine-tune",
-                file);
-    }
-
-    @Override
-    public FineTuningJobResponse fineTuningJob(FineTuningJobRequest request) {
-        // Call OpenAI fine-tuning API
-        FineTuningJobResponse response;
-        response = chatBotRepository.createFineTuningJob(
-                "Bearer " + openaiApiKey,
-                request);
-        return response;
-    }
-
-    @Override
-    public FileUploadResponse getUploadedFileById(String fileId) {
-        if (fileId == null || fileId.trim().isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_INPUT);
-        }
-        return chatBotRepository.getFileById(
-                "Bearer " + openaiApiKey,
-                fileId);
-    }
-
-    @Override
-    public List<FileUploadResponse> getAllUploadedFiles() {
-        FileUploadedListResponse response = chatBotRepository.getFiles(
-                "Bearer " + openaiApiKey);
-        return response.getData();
-    }
-
-    @Override
-    public FileDeletionResponse deleteUploadedFile(String fileId) {
-        if (fileId == null || fileId.trim().isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_INPUT);
-        }
-        return chatBotRepository.deleteFileById(
-                "Bearer " + openaiApiKey,
-                fileId);
-    }
-
-    @Override
-    public List<FineTuningJobResponse> getAllFineTuneJobs() {
-        FineTuningJobListResponse response = chatBotRepository.getFineTuningJobs(
-                "Bearer " + openaiApiKey);
-        return response.getData();
-    }
-
-    @Override
-    public FineTuningJobResponse getFineTuningJob(String jobId) {
-        FineTuningJobResponse response =chatBotRepository.getFineTuningJobById(
-                "Bearer " + openaiApiKey
-                , jobId);
-        if ("succeeded".equalsIgnoreCase(response.getStatus())) {
-            String newModelName = response.getFineTunedModel();
-            ModelChatBotDTO modelChatBotDTO = new ModelChatBotDTO();
-            modelChatBotDTO.setModelName(newModelName);
-            modelChatBotDTO.setPreviousModelName(response.getModel());
-            modelChatBotDTO.setActive(false);
-
-            ModelChatBot modelChatBot = modelChatBotMapper.toEntity(modelChatBotDTO);
-            modelChatBotRepository.save(modelChatBot);
-        }
-        return response;
-    }
-
-    @Override
     public ListModelsResponse getModels(){
         return chatBotRepository.getModels(
                 "Bearer " + openaiApiKey
@@ -180,134 +88,129 @@ public class ChatBotServiceImpl implements ChatBotService {
     }
 
     @Override
-    public Page<ModelChatBotDTO> getModelChatBots(int page, int size) {
-        Sort sort = Sort.by("createdAt").ascending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return modelChatBotRepository.findAll(pageable)
-                .map(modelChatBotMapper::toDTO);
+    public List<FrequentQuestion> getTop10FrequentQuestions() {
+        List<FrequentQuestion> questions = chatBotLogRepository.findTop10FrequentQuestions();
+        return questions.stream().limit(10).collect(Collectors.toList());
     }
 
     @Override
-    public ModelChatBotDTO setModeChatBot(String modelChatId) {
-        ModelChatBot modelChatBotActive= modelChatBotRepository.getModelChatBotByActive(true)
-                .orElseThrow(()->new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
-        modelChatBotActive.setActive(false);
-        ModelChatBot modelChatBot= modelChatBotRepository.getById(modelChatId);
-        modelChatBot.setActive(true);
-        return modelChatBotMapper.toDTO(modelChatBot);
-    }
+    public ResponsePricingChat getModernBillboardPricing(ModernBillboardRequest request) {
 
+        ModelChatBot modelChatBot = modelChatBotRepository.getModelChatBotByActive(true)
+                .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
 
-    @Override
-    public FineTuningJobResponse cancelFineTuningJob(String fineTuningJobId) {
+        String prompt = buildModernPricingPrompt(request);
 
-        if (fineTuningJobId == null || fineTuningJobId.trim().isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_INPUT);
-        }
-        return chatBotRepository.cancelFineTuningJob(
+        RequestPricingChat pricingRequest = new RequestPricingChat();
+        pricingRequest.setModel(modelChatBot.getModelName());
+        pricingRequest.setMessages(List.of(
+                new RequestPricingChat.Message("system", "Bạn là trợ lý AI chuyên tư vấn về thiết kế và in ấn biển quảng cáo. Hãy cung cấp báo giá chi tiết cho biển quảng cáo truyền thống dựa trên các thông số được cung cấp, bao gồm chi phí vật liệu, thiết kế, và lắp đặt. Trả lời bằng tiếng Việt và cung cấp giá ước tính rõ ràng theo định dạng được yêu cầu."),
+                new RequestPricingChat.Message("user", prompt)
+        ));
+        pricingRequest.setMaxTokens(500);
+        pricingRequest.setTemperature(0.7);
+        ResponsePricingChat response = chatBotRepository.getResponseChatCompletions(
                 "Bearer " + openaiApiKey,
-                fineTuningJobId);
+                pricingRequest);
+
+
+        //saveResponse(response, prompt, modelChatBot);
+
+        return response;
     }
 
+    @Override
+    public ResponsePricingChat getTraditionalBillboardPricing(TraditionalBillboardRequest request) {
 
+        ModelChatBot modelChatBot = modelChatBotRepository.getModelChatBotByActive(true)
+                .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
 
-        @Override
-        public FileUploadResponse uploadFileExcel(MultipartFile file, String fileName) {
-            try (XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream())) {
-                int sheetIndex = workbook.getActiveSheetIndex();
-                Sheet sheetToProcess = workbook.getSheetAt(sheetIndex);
-                if (sheetToProcess == null) {
-                    throw new AppException(ErrorCode.INVALID_INPUT);
-                }
-                Iterator<Row> rows = sheetToProcess.rowIterator();
-                if (!rows.hasNext()) {
-                    throw new AppException(ErrorCode.INVALID_INPUT);
-                }
+        String prompt = buildTraditionalPricingPrompt(request);
 
-                List<String> headers = new ArrayList<>();
-                Row headerRow = rows.next();
-                headerRow.forEach(cell -> headers.add(getCellValueAsString(cell)));
-                if (headers.isEmpty()) {
-                    throw new AppException(ErrorCode.INVALID_INPUT);
-                }
+        RequestPricingChat pricingRequest = new RequestPricingChat();
+        pricingRequest.setModel(modelChatBot.getModelName());
+        pricingRequest.setMessages(List.of(
+                new RequestPricingChat.Message("system", "Bạn là trợ lý AI chuyên tư vấn về thiết kế và in ấn biển quảng cáo. Hãy cung cấp báo giá chi tiết cho biển quảng cáo truyền thống dựa trên các thông số được cung cấp, bao gồm chi phí vật liệu, thiết kế, và lắp đặt. Trả lời bằng tiếng Việt và cung cấp giá ước tính rõ ràng theo định dạng được yêu cầu."),
+                new RequestPricingChat.Message("user", prompt)
+        ));
+        pricingRequest.setMaxTokens(500);
+        pricingRequest.setTemperature(0.7);
+        ResponsePricingChat response = chatBotRepository.getResponseChatCompletions(
+                "Bearer " + openaiApiKey,
+                pricingRequest);
 
-                List<Map<String, Object>> rowsResult = new ArrayList<>();
-                rows.forEachRemaining(row -> {
-                    Map<String, Object> rowMap = new LinkedHashMap<>();
-                    for (int i = 0; i < Math.min(headers.size(), row.getPhysicalNumberOfCells()); i++) {
-                        Cell cell = row.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                        rowMap.put(headers.get(i), getCellValueAsString(cell));
-                    }
-                    rowsResult.add(rowMap);
-                });
-                if (rowsResult.isEmpty()) {
-                    throw new AppException(ErrorCode.INVALID_INPUT);
-                }
-                String jsonlFileName = fileName.endsWith(".jsonl") ? fileName : fileName + ".jsonl";
-                MultipartFile jsonlFile = convertToJsonl(rowsResult, headers, jsonlFileName);
-                String s3Key = String.format("uploadJsonlFile/%s_%s", UUID.randomUUID(), jsonlFileName);
-                String awsLink = s3Service.uploadSingleFile(s3Key, jsonlFile);
-                return chatBotRepository.uploadFile(
-                        "Bearer " + openaiApiKey,
-                        "fine-tune",
-                        jsonlFile);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        //saveResponse(response, prompt, modelChatBot);
+        log.info("Generated prompt for traditional billboard pricing: {}", prompt);
+        return response;
+    }
+    private String buildModernPricingPrompt(ModernBillboardRequest modern) {
+        StringBuilder prompt = new StringBuilder();
+        prompt.append("Cung cấp báo giá cho một biển quảng cáo hiện đại với các thông số sau: ");
+        prompt.append("Loại biển: Hiện đại. ");
+        if (modern.getFrame() != null && !modern.getFrame().trim().isEmpty()) {
+            prompt.append("Khung bảng: ").append(modern.getFrame()).append(". ");
         }
-
-        private MultipartFile convertToJsonl(List<Map<String, Object>> data, List<String> headers, String fileName) {
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                for (Map<String, Object> row : data) {
-                    // Transform row into OpenAI fine-tuning format (messages)
-                    Map<String, List<Map<String, String>>> fineTuneEntry = new HashMap<>();
-                    List<Map<String, String>> messages = new ArrayList<>();
-
-                    String userContent = !headers.isEmpty() ? String.valueOf(row.getOrDefault(headers.get(0), "")) : "";
-                    String assistantContent = headers.size() > 1 ? String.valueOf(row.getOrDefault(headers.get(1), "")) : "";
-
-                    Map<String, String> userMessage = new HashMap<>();
-                    userMessage.put("role", "user");
-                    userMessage.put("content", userContent);
-                    messages.add(userMessage);
-
-                    Map<String, String> assistantMessage = new HashMap<>();
-                    assistantMessage.put("role", "assistant");
-                    assistantMessage.put("content", assistantContent);
-                    messages.add(assistantMessage);
-
-                    fineTuneEntry.put("messages", messages);
-
-                    // Write each entry as a JSON line
-                    String jsonLine = objectMapper.writeValueAsString(fineTuneEntry);
-                    baos.write(jsonLine.getBytes());
-                    baos.write("\n".getBytes());
-                }
-
-                byte[] byteArray = baos.toByteArray();
-                return new MockMultipartFile(fileName, byteArray);
-            } catch (IOException e) {
-                throw new AppException(ErrorCode.INVALID_INPUT);
-            }
+        if (modern.getBackground() != null && !modern.getBackground().trim().isEmpty()) {
+            prompt.append("Nền bảng: ").append(modern.getBackground()).append(". ");
         }
-
-    private String getCellValueAsString(Cell cell) {
-        if (cell == null) {
-            return "";
+        if (modern.getBorder() != null && !modern.getBorder().trim().isEmpty()) {
+            prompt.append("Viền bảng: ").append(modern.getBorder()).append(". ");
         }
-        return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue();
-            case NUMERIC -> {
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    yield cell.getDateCellValue().toString();
-                }
-                yield String.valueOf(cell.getNumericCellValue());
-            }
-            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
-            case FORMULA -> cell.getCellFormula();
-            default -> "";
-        };
+        if (modern.getTextAndLogo() != null && !modern.getTextAndLogo().trim().isEmpty()) {
+            prompt.append("Chữ và logo: ").append(modern.getTextAndLogo()).append(". ");
+        }
+        if (modern.getTextSpecification() != null && !modern.getTextSpecification().trim().isEmpty()) {
+            prompt.append("Quy cách chữ: ").append(modern.getTextSpecification()).append(". ");
+        }
+        if (modern.getInstallationMethod() != null && !modern.getInstallationMethod().trim().isEmpty()) {
+            prompt.append("Quy cách gắn: ").append(modern.getInstallationMethod()).append(". ");
+        }
+        prompt.append(String.format("Kích thước: Cao %.2f mét, Ngang %.2f mét. ", modern.getHeight(), modern.getWidth()));
+        prompt.append(String.format("Kích thước chữ: %.2f cm. ", modern.getTextSize()));
+        prompt.append("Vui lòng cung cấp báo giá chi tiết bằng tiếng Việt, bao gồm chi phí vật liệu, thiết kế, in ấn, và lắp đặt. ");
+        prompt.append("Trả lời theo định dạng sau:\n");
+        prompt.append("- Chi phí Khung bảng: [số tiền] VND\n");
+        prompt.append("- Chi phí Nền bảng: [số tiền] VND\n");
+        prompt.append("- Chi phí Viền bảng: [số tiền] VND\n");
+        prompt.append("- Chi phí Chữ và logo: [số tiền] VND/m²\n");
+        prompt.append("- Chi phí Quy cách chữ: [số tiền] VND\n");
+        prompt.append("- Chi phí Quy cách gắn: [số tiền] VND\n");
+        prompt.append("- Tổng chi phí: [số tiền] VND");
+        return prompt.toString();
+    }
+
+    private String buildTraditionalPricingPrompt(TraditionalBillboardRequest traditional) {
+        StringBuilder prompt = new StringBuilder();
+        prompt.append("Cung cấp báo giá cho một biển quảng cáo truyền thống với các thông số sau: ");
+        prompt.append("Loại biển: Truyền thống. ");
+        if (traditional.getFrame() != null && !traditional.getFrame().trim().isEmpty()) {
+            prompt.append("Khung bảng: ").append(traditional.getFrame()).append(". ");
+        }
+        if (traditional.getBackground() != null && !traditional.getBackground().trim().isEmpty()) {
+            prompt.append("Nền bảng: ").append(traditional.getBackground()).append(". ");
+        }
+        if (traditional.getBorder() != null && !traditional.getBorder().trim().isEmpty()) {
+            prompt.append("Viền bảng: ").append(traditional.getBorder()).append(". ");
+        }
+        prompt.append("Số mặt: ").append(traditional.getNumberOfFaces()).append(". ");
+        if (traditional.getInstallationMethod() != null && !traditional.getInstallationMethod().trim().isEmpty()) {
+            prompt.append("Quy cách gắn: ").append(traditional.getInstallationMethod()).append(". ");
+        }
+        if (traditional.getBillboardFace() != null && !traditional.getBillboardFace().trim().isEmpty()) {
+            prompt.append("Mặt bảng: ").append(traditional.getBillboardFace()).append(". ");
+        }
+        prompt.append(String.format("Kích thước: Cao %.2f mét, Ngang %.2f mét. "
+                , traditional.getHeight(), traditional.getWidth()));
+        prompt.append("Vui lòng cung cấp báo giá chi tiết bằng tiếng Việt, bao gồm chi phí vật liệu, thiết kế, in ấn, và lắp đặt. ");
+        prompt.append("Trả lời theo định dạng sau:\n");
+        prompt.append("- Chi phí Khung bảng: [số tiền] VND\n");
+        prompt.append("- Chi phí Nền bảng: [số tiền] VND\n");
+        prompt.append("- Chi phí Viền bảng: [số tiền] VND\n");
+        prompt.append("- Chi phí Mặt bảng: [số tiền] VND/m²\n");
+        prompt.append("- Chi phí Số mặt bảng: \n");
+        prompt.append("- Chi phí Quy cách gắn: [số tiền] VND\n");
+        prompt.append("- Tổng chi phí: [số tiền] VND");
+        return prompt.toString();
     }
 
 

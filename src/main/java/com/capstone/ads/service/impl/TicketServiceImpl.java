@@ -61,8 +61,8 @@ public class TicketServiceImpl implements TicketService {
     public TicketDTO reportTicketByStaff(String ticketId, TicketReport report) {
         Tickets ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new AppException(ErrorCode.TICKET_NOT_FOUND));
-        if (ticket.getStatus() != TicketStatus.IN_PROGRESS) {
-            throw new AppException(ErrorCode.ROLE_NOT_AUTHORIZED);
+        if (ticket.getStatus() == TicketStatus.CLOSED) {
+            throw new AppException(ErrorCode.TICKET_NOT_OPEN);
         }
         return reportTicket(report, ticket);
     }
