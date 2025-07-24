@@ -14,7 +14,7 @@ import java.util.Map;
 public interface StableDiffusionMapper {
     Args mapArgs(String image, String module, String model);
 
-    TextToImageRequest mapTextToImageRequest(String prompt, AlwaysonScripts alwaysonScripts, String forceTaskId,
+    TextToImageRequest mapTextToImageRequest(String prompt, Long width, Long height,  AlwaysonScripts alwaysonScripts, String forceTaskId,
                                              Map<String, Object> overrideSettings);
 
     ProgressRequest mapProgressRequest(String idTask);

@@ -106,6 +106,7 @@ public enum ErrorCode {
 
     // ============ AI ============
     MODEL_CHAT_NOT_FOUND("Model chat not fount", HttpStatus.NOT_FOUND),
+    PROMPT_CAN_NOT_BLANK("Prompt can not be blank", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

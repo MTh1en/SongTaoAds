@@ -62,6 +62,8 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
         productTypeSizesRepository.deleteById(productTypeSizeId);
     }
 
+    // INTERNAL FUNCTION //
+
     @Override
     public void validateProductTypeSizeExist(String productTypeId, String sizeId) {
         if (!productTypeSizesRepository.existsByProductTypes_IdAndSizes_Id(productTypeId, sizeId)) {
@@ -71,8 +73,7 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
 
     @Override
     public void validateProductTypeSizeMaxValueAndMinValue(String productTypeId, String sizeId, Float sizeValue) {
-        var productTypeSize = productTypeSizesRepository.findByProductTypes_IdAndSizes_Id(productTypeId, sizeId)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_SIZE_NOT_FOUND));
+        var productTypeSize = getProductTypeSizeByProductTypeIdAndSizeId(productTypeId, sizeId);
         Float maxValue = productTypeSize.getMaxValue();
         Float minValue = productTypeSize.getMinValue();
         log.info("sizeValue: {}", sizeValue);
@@ -80,6 +81,11 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
         if (sizeValue > maxValue || sizeValue < minValue) {
             throw new AppException(ErrorCode.SIZE_VALUE_OUT_OF_RANGE);
         }
-        log.info("result: {}, result: {}", sizeValue > maxValue, sizeValue < minValue);
+    }
+
+    @Override
+    public ProductTypeSizes getProductTypeSizeByProductTypeIdAndSizeId(String productTypeId, String sizeId) {
+        return productTypeSizesRepository.findByProductTypes_IdAndSizes_Id(productTypeId, sizeId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_SIZE_NOT_FOUND));
     }
 }

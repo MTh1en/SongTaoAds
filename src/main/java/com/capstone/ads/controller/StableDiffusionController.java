@@ -27,23 +27,18 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StableDiffusionController {
     StableDiffusionService stableDiffusionService;
-    ChatBotService chatBotService;
 
     @PostMapping(
             value = "/design-templates/{designTemplateId}/txt2img",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @Operation(summary = "Tạo hình ảnh từ thiết kế mẫu")
-    public ResponseEntity<?> generateImageFromDesignTemplate(@PathVariable String designTemplateId,
-                                                             @RequestPart(required = false) String prompt) {
-        FileInformation response;
-        if (!Strings.isBlank(prompt)) {
-            var translatedResponse = chatBotService.translateToTextToImagePrompt(prompt);
-            log.info("Translated response: {}", translatedResponse);
-            response = stableDiffusionService.generateImage(designTemplateId, translatedResponse);
-        } else {
-            response = stableDiffusionService.generateImage(designTemplateId, prompt);
-        }
+    public ResponseEntity<?> generateImageFromDesignTemplate(
+            @PathVariable String designTemplateId,
+            @RequestPart(required = false) String prompt,
+            @RequestParam(required = false, defaultValue = "512L") Long width,
+            @RequestParam(required = false, defaultValue = "512L") Long height) {
+        var response = stableDiffusionService.generateImage(designTemplateId, prompt, width, height);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, response.getContentType())
                 .body(response.getContent());
