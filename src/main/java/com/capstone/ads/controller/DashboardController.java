@@ -42,7 +42,7 @@ public class DashboardController {
         return ApiResponseBuilder.buildSuccessResponse("Response retrieved successfully.", response);
     }
 
-    @GetMapping("/customer")
+    @GetMapping("/staff")
     @Operation(summary = "Dashboard cho Staff")
     public ApiResponse<StaffDashboardResponse> staffDashboard() {
         StaffDashboardResponse response = dashboardService.getStaffDashboard();
