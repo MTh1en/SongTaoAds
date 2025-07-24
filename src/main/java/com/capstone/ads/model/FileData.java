@@ -29,7 +29,7 @@ public class FileData {
     FileTypeEnum fileType;
 
     Long fileSize;
-
+    
     @CreationTimestamp
     LocalDateTime createdAt;
     @UpdateTimestamp
