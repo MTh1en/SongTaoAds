@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 public class CustomerChoicesDetailsDTO {
     String id;
     Long subTotal;
-    Boolean isMultiplier;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     CoreDTO customerChoices;

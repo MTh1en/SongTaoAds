@@ -21,7 +21,6 @@ public class CustomerChoiceDetails {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     Long subTotal;
-    Boolean isMultiplier;
     @CreationTimestamp
     LocalDateTime createdAt;
     @UpdateTimestamp

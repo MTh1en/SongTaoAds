@@ -49,7 +49,6 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
                 .createdAt(LocalDateTime.now())
                 .customerChoices(customerChoices)
                 .attributeValues(attributeValues)
-                .isMultiplier(attributeValues.getIsMultiplier())
                 .build();
 
         customerChoicesDetails = customerChoiceDetailsRepository.save(customerChoicesDetails);

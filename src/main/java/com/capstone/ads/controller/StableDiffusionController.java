@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +25,14 @@ import org.springframework.web.bind.annotation.*;
 public class StableDiffusionController {
     StableDiffusionService stableDiffusionService;
 
-    @PostMapping(value = "/design-templates/{designTemplateId}/txt2img")
+    @PostMapping(
+            value = "/design-templates/{designTemplateId}/txt2img",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     @Operation(summary = "Tạo hình ảnh từ thiết kế mẫu")
     public ResponseEntity<?> generateImageFromDesignTemplate(
             @PathVariable String designTemplateId,
-            @RequestPart(required = false) String prompt,
+            @RequestPart String prompt,
             @RequestParam(required = false, defaultValue = "512") Integer width,
             @RequestParam(required = false, defaultValue = "512") Integer height) {
         var response = stableDiffusionService.generateImageFromDesignTemplate(designTemplateId, prompt, width, height);

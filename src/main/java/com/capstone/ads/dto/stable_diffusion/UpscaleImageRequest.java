@@ -27,7 +27,7 @@ public class UpscaleImageRequest {
 
     @Builder.Default
     @JsonProperty(value = "upscaler_1")
-    String upscaler1 = "SwinIR 4x";
+    String upscaler1 = "R-ESRGAN 4x+";
 
     @Builder.Default
     Boolean upscaleFirst = false;
