@@ -16,7 +16,7 @@ public interface ChatBotService {
     List<FrequentQuestion> getTop10FrequentQuestions();
     ;
 
-    ResponsePricingChat getModernBillboardPricing(ModernBillboardRequest request);
+    List<String> getModernBillboardPricing(ModernBillboardRequest request);
 
-    ResponsePricingChat getTraditionalBillboardPricing(TraditionalBillboardRequest request);
+    List<String> getTraditionalBillboardPricing(TraditionalBillboardRequest request);
 }

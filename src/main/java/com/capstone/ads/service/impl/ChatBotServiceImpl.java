@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -94,7 +95,7 @@ public class ChatBotServiceImpl implements ChatBotService {
     }
 
     @Override
-    public ResponsePricingChat getModernBillboardPricing(ModernBillboardRequest request) {
+    public List<String> getModernBillboardPricing(ModernBillboardRequest request) {
 
         ModelChatBot modelChatBot = modelChatBotRepository.getModelChatBotByActive(true)
                 .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
@@ -113,14 +114,15 @@ public class ChatBotServiceImpl implements ChatBotService {
                 "Bearer " + openaiApiKey,
                 pricingRequest);
 
+        String content = response.getChoices().getFirst().getMessage().getContent();
 
-        //saveResponse(response, prompt, modelChatBot);
-
-        return response;
+        return Stream.of(content.split("\n"))
+                .filter(line -> !line.trim().isEmpty())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public ResponsePricingChat getTraditionalBillboardPricing(TraditionalBillboardRequest request) {
+    public List<String> getTraditionalBillboardPricing(TraditionalBillboardRequest request) {
 
         ModelChatBot modelChatBot = modelChatBotRepository.getModelChatBotByActive(true)
                 .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
@@ -139,9 +141,11 @@ public class ChatBotServiceImpl implements ChatBotService {
                 "Bearer " + openaiApiKey,
                 pricingRequest);
 
-        //saveResponse(response, prompt, modelChatBot);
-        log.info("Generated prompt for traditional billboard pricing: {}", prompt);
-        return response;
+        String content = response.getChoices().getFirst().getMessage().getContent();
+
+        return Stream.of(content.split("\n"))
+                .filter(line -> !line.trim().isEmpty())
+                .collect(Collectors.toList());
     }
     private String buildModernPricingPrompt(ModernBillboardRequest modern) {
         StringBuilder prompt = new StringBuilder();
