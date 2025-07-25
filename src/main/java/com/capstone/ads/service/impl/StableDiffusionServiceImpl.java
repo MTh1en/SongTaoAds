@@ -62,7 +62,7 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
     public FileInformation generateImageFromDesignTemplate(String designTemplateId, String prompt, Integer width, Integer height) {
         String bearerStableDiffusionToken = generateBearerStableDiffusionToken();
         String userId = securityContextUtils.getCurrentUserId();
-
+        log.info("PROMPT: {}", prompt);
         if (prompt != null && !prompt.isEmpty()) {
             prompt = chatBotService.translateToTextToImagePrompt(prompt);
         } else {
