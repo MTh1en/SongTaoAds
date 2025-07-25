@@ -1,17 +1,19 @@
 package com.capstone.ads.utils;
 
-import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.Base64;
 
-@UtilityClass
+@Component
+@Slf4j
 public class DataConverter {
     @Value("${stable-diffusion.pixel.max}")
-    private int maxPixelValue;
+    private long maxPixelValue;
 
     @Value("${stable-diffusion.pixel.min}")
-    private int minPixelValue;
+    private long minPixelValue;
 
     public static String convertByteArrayToBase64(byte[] byteArray) {
         return Base64.getEncoder().encodeToString(byteArray);
@@ -30,7 +32,7 @@ public class DataConverter {
         return Math.round(f);
     }
 
-    public static float convertSizeValueToPixelValue(Float sizeValue,
+    public long convertSizeValueToPixelValue(Float sizeValue,
                                                    Float minSizeValue, Float maxSizeValue) {
         float pixelValue = minPixelValue + (maxPixelValue - minPixelValue) *
                 (sizeValue - minSizeValue) / (maxSizeValue - minSizeValue);

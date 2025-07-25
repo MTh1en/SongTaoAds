@@ -79,6 +79,12 @@ public class EditedDesignServiceImpl implements EditedDesignService {
     }
 
     @Override
+    public EditedDesignDTO findEditedDesignById(String editedDesignId) {
+        EditedDesigns editedDesigns = getEditedDesignById(editedDesignId);
+        return editedDesignMapper.toDTO(editedDesigns);
+    }
+
+    @Override
     @Transactional
     public void hardDeleteEditedDesign(String AIDesignId) {
         if (!editedDesignsRepository.existsById(AIDesignId)) {

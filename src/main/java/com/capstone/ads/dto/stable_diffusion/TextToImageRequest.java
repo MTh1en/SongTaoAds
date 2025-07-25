@@ -35,10 +35,10 @@ public class TextToImageRequest {
     Integer steps = 30;
 
     @Builder.Default
-    Double width = 1024.0;
+    Integer width = 1024;
 
     @Builder.Default
-    Double height = 512.0;
+    Integer height = 512;
 
     @Builder.Default
     Boolean restoreFaces = false;

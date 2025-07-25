@@ -6,7 +6,7 @@ import com.capstone.ads.dto.email.TransactionalEmailResponse;
 import com.capstone.ads.dto.email.transactional.Recipient;
 import com.capstone.ads.dto.email.transactional.Sender;
 import com.capstone.ads.mapper.VerificationMapper;
-import com.capstone.ads.repository.external.BrevoRepository;
+import com.capstone.ads.repository.external.BrevoClient;
 import com.capstone.ads.service.VerificationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class VerificationServiceImpl implements VerificationService {
     @Value("${brevo.password-reset-url}")
     private String passwordResetUrl;
 
-    BrevoRepository brevoRepository;
+    BrevoClient brevoClient;
     VerificationMapper verificationMapper;
     SpringTemplateEngine templateEngine;
     RedisTemplate<String, String> redisTemplate;
@@ -70,7 +70,7 @@ public class VerificationServiceImpl implements VerificationService {
         String htmlContent = templateEngine.process("VerificationEmail", context);
 
         TransactionalEmailRequest emailRequest = verificationMapper.toTransactionalEmailRequest(sender, to, subject, htmlContent);
-        return brevoRepository.sendTransactionalEmail(brevoKey, emailRequest);
+        return brevoClient.sendTransactionalEmail(brevoKey, emailRequest);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class VerificationServiceImpl implements VerificationService {
         String htmlContent = templateEngine.process("PasswordResetEmail", context);
 
         TransactionalEmailRequest emailRequest = verificationMapper.toTransactionalEmailRequest(sender, to, subject, htmlContent);
-        return brevoRepository.sendTransactionalEmail(brevoKey, emailRequest);
+        return brevoClient.sendTransactionalEmail(brevoKey, emailRequest);
     }
 
     @Override

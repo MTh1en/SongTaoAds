@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(name = "brevo", url = "https://api.brevo.com")
-public interface BrevoRepository {
+public interface BrevoClient {
     @PostMapping(value = "/v3/smtp/email", produces = MediaType.APPLICATION_JSON_VALUE)
     TransactionalEmailResponse sendTransactionalEmail(@RequestHeader("api-key") String apiKey,
                                                       @RequestBody TransactionalEmailRequest body);

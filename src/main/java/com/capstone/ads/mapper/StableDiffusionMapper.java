@@ -1,6 +1,7 @@
 package com.capstone.ads.mapper;
 
 import com.capstone.ads.dto.stable_diffusion.TextToImageRequest;
+import com.capstone.ads.dto.stable_diffusion.UpscaleImageRequest;
 import com.capstone.ads.dto.stable_diffusion.controlnet.AlwaysonScripts;
 import com.capstone.ads.dto.stable_diffusion.controlnet.Args;
 import com.capstone.ads.dto.stable_diffusion.controlnet.Controlnet;
@@ -14,7 +15,7 @@ import java.util.Map;
 public interface StableDiffusionMapper {
     Args mapArgs(String image, String module, String model);
 
-    TextToImageRequest mapTextToImageRequest(String prompt, AlwaysonScripts alwaysonScripts, String forceTaskId,
+    TextToImageRequest mapTextToImageRequest(String prompt, Integer width, Integer height, AlwaysonScripts alwaysonScripts, String forceTaskId,
                                              Map<String, Object> overrideSettings);
 
     ProgressRequest mapProgressRequest(String idTask);
@@ -27,4 +28,6 @@ public interface StableDiffusionMapper {
                 .build();
 
     }
+
+    UpscaleImageRequest mapUpscaleImageRequest(String image, Integer upscalingResizeW, Integer upscalingResizeH);
 }

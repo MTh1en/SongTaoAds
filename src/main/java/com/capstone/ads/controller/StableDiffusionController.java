@@ -1,10 +1,8 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.file.FileInformation;
 import com.capstone.ads.dto.stable_diffusion.pendingtask.PendingTaskResponse;
 import com.capstone.ads.dto.stable_diffusion.progress.ProgressResponse;
-import com.capstone.ads.service.ChatBotService;
 import com.capstone.ads.service.StableDiffusionService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +11,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,23 +24,30 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StableDiffusionController {
     StableDiffusionService stableDiffusionService;
-    ChatBotService chatBotService;
 
     @PostMapping(
             value = "/design-templates/{designTemplateId}/txt2img",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @Operation(summary = "Tạo hình ảnh từ thiết kế mẫu")
-    public ResponseEntity<?> generateImageFromDesignTemplate(@PathVariable String designTemplateId,
-                                                             @RequestPart(required = false) String prompt) {
-        FileInformation response;
-        if (!Strings.isBlank(prompt)) {
-            var translatedResponse = chatBotService.translateToTextToImagePrompt(prompt);
-            log.info("Translated response: {}", translatedResponse);
-            response = stableDiffusionService.generateImage(designTemplateId, translatedResponse);
-        } else {
-            response = stableDiffusionService.generateImage(designTemplateId, prompt);
-        }
+    public ResponseEntity<?> generateImageFromDesignTemplate(
+            @PathVariable String designTemplateId,
+            @RequestPart String prompt,
+            @RequestParam(required = false, defaultValue = "512") Integer width,
+            @RequestParam(required = false, defaultValue = "512") Integer height) {
+        var response = stableDiffusionService.generateImageFromDesignTemplate(designTemplateId, prompt, width, height);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, response.getContentType())
+                .body(response.getContent());
+    }
+
+    @PostMapping(value = "/backgrounds/{backgroundId}/extras")
+    @Operation(summary = "Resize hình ảnh từ background")
+    public ResponseEntity<?> generateImageFromDesignTemplate(
+            @PathVariable String backgroundId,
+            @RequestParam(required = false, defaultValue = "512") Integer width,
+            @RequestParam(required = false, defaultValue = "512") Integer height) {
+        var response = stableDiffusionService.resizeImageFromBackground(backgroundId, width, height);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, response.getContentType())
                 .body(response.getContent());
