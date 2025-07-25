@@ -62,12 +62,16 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
     public FileInformation generateImageFromDesignTemplate(String designTemplateId, String prompt, Integer width, Integer height) {
         String bearerStableDiffusionToken = generateBearerStableDiffusionToken();
         String userId = securityContextUtils.getCurrentUserId();
-        log.info("PROMPT: {}", prompt);
+        // Xây dựng TextToImageRequest
         if (prompt != null && !prompt.isEmpty()) {
             prompt = chatBotService.translateToTextToImagePrompt(prompt);
+
         } else {
-            throw new AppException(ErrorCode.PROMPT_CAN_NOT_BLANK);
+            prompt = "A simple advertising 2d background";
         }
+
+        log.info("Prompt: {}", prompt);
+
         String imageBase64 = getImageBytesFromDesignTemplate(designTemplateId);
         Args controlNetArgs = stableDiffusionMapper.mapArgs(imageBase64, controlnetModule, controlnetModel);
 
@@ -79,16 +83,10 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
             }
         };
 
-        // Xây dựng TextToImageRequest
-        if (Strings.isBlank(prompt)) {
-            prompt = "A simple advertising 2d background";
-        }
-
         TextToImageRequest request = stableDiffusionMapper.mapTextToImageRequest(prompt, width, height, alwaysonScripts, userId, overrideSettings);
         var response = stableDiffusionClient.textToImage(bearerStableDiffusionToken, request);
         String base64OutputImage = response.getImages().getFirst();
         byte[] outputImageBytes = DataConverter.convertBase64ToByteArray(base64OutputImage);
-
         return FileInformation.builder()
                 .content(outputImageBytes)
                 .contentType(MediaType.IMAGE_PNG_VALUE)

@@ -32,7 +32,7 @@ public class TextToImageRequest {
     Integer nIter = 1;
 
     @Builder.Default
-    Integer steps = 30;
+    Integer steps = 25;
 
     @Builder.Default
     Integer width = 1024;
