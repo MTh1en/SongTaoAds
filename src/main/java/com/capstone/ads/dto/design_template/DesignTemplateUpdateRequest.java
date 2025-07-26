@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.design_template;
 
+import com.capstone.ads.model.enums.AspectRatio;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -13,8 +14,6 @@ public class DesignTemplateUpdateRequest {
     @NotBlank(message = "Name is Required")
     String name;
     String description;
-    String negativePrompt;
-    Integer width;
-    Integer height;
+    AspectRatio aspectRatio;
     Boolean isAvailable;
 }

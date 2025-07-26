@@ -3,10 +3,12 @@ package com.capstone.ads.service.impl;
 import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeCreateRequest;
 import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeDTO;
 import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeUpdateRequest;
+import com.capstone.ads.dto.customer_choice_size.PixelConvertResponse;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerChoiceSizesMapper;
 import com.capstone.ads.model.*;
+import com.capstone.ads.model.enums.DimensionType;
 import com.capstone.ads.repository.internal.*;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.DataConverter;
@@ -17,8 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.capstone.ads.utils.LookupMapUtils.mapProductTypeSizesByDimensionAndSize;
 
 @Service
 @RequiredArgsConstructor
@@ -97,18 +103,37 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
     }
 
     @Override
-    public Long convertToPixel(String customerChoiceSizeId) {
-        CustomerChoiceSizes customerChoiceSizes = getCustomerChoiceSizesById(customerChoiceSizeId);
-        String sizeId = customerChoiceSizes.getSizes().getId();
-        String productTypeId = customerChoiceSizes.getCustomerChoices().getProductTypes().getId();
+    public PixelConvertResponse convertCustomerChoiceSizeToPixel(String customerChoiceId) {
+        CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoiceId);
+        PixelConvertResponse response = new PixelConvertResponse();
 
-        ProductTypeSizes productTypeSizes = productTypeSizesService.getProductTypeSizeByProductTypeIdAndSizeId(productTypeId, sizeId);
+        Map<String, Map<DimensionType, ProductTypeSizes>> productTypeSizesLookup = mapProductTypeSizesByDimensionAndSize(customerChoices);
 
-        return dataConverter.convertSizeValueToPixelValue(
-                customerChoiceSizes.getSizeValue(),
-                productTypeSizes.getMinValue(),
-                productTypeSizes.getMaxValue()
-        );
+        for (CustomerChoiceSizes customerChoiceSize : customerChoices.getCustomerChoiceSizes()) {
+            Map<DimensionType, ProductTypeSizes> dimTypeMap = productTypeSizesLookup.get(customerChoiceSize.getSizes().getId());
+
+            ProductTypeSizes widthPts = dimTypeMap.get(DimensionType.WIDTH);
+            ProductTypeSizes heightPts = dimTypeMap.get(DimensionType.HEIGHT);
+
+            // Xử lý WIDTH
+            if (widthPts != null) {
+                Long pixelValue = dataConverter.convertSizeValueToPixelValue(
+                        customerChoiceSize.getSizeValue(),
+                        widthPts.getMinValue(),
+                        widthPts.getMaxValue());
+                response.setWidth(pixelValue);
+            }
+
+            // Xử lý HEIGHT
+            if (heightPts != null) {
+                Long pixelValue = dataConverter.convertSizeValueToPixelValue(
+                        customerChoiceSize.getSizeValue(),
+                        heightPts.getMinValue(),
+                        heightPts.getMaxValue());
+                response.setHeight(pixelValue);
+            }
+        }
+        return response;
     }
 
     // INTERNAL FUNCTION //
