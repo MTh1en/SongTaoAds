@@ -140,10 +140,11 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
 
     public Long calculateSubtotal(CustomerChoiceDetails customerChoicesDetail) {
         Attributes attribute = customerChoicesDetail.getAttributeValues().getAttributes();
-        var attributeValues = customerChoicesDetail.getAttributeValues();
-        var customerChoiceSize = customerChoicesDetail.getCustomerChoices().getCustomerChoiceSizes();
 
-        Map<String, Float> variables = prepareVariablesForSubtotal(attributeValues, customerChoiceSize);
+        Map<String, Float> variables = prepareVariablesForSubtotal(
+                customerChoicesDetail.getAttributeValues(),
+                customerChoicesDetail.getCustomerChoices().getCustomerChoiceSizes()
+        );
 
         return calculateWithFormula(attribute.getCalculateFormula(), variables);
     }
