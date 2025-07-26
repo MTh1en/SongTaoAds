@@ -2,6 +2,7 @@ package com.capstone.ads.dto.design_template;
 
 import com.capstone.ads.dto.CoreDTO;
 import com.capstone.ads.dto.user.UserDTO;
+import com.capstone.ads.model.enums.AspectRatio;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -17,9 +18,7 @@ public class DesignTemplateDTO {
     String name;
     String description;
     String image;
-    String negativePrompt;
-    Integer width;
-    Integer height;
+    AspectRatio aspectRatio;
     Boolean isAvailable;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;

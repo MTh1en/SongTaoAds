@@ -20,6 +20,8 @@ public interface DesignTemplatesService {
 
     Page<DesignTemplateDTO> findAllDesignTemplates(int page, int size);
 
+    Page<DesignTemplateDTO> suggestDesignTemplatesBaseCustomerChoice(String customerChoiceId, int page, int size);
+
     void hardDeleteDesignTemplate(String designTemplateId);
 
     //INTERNAL FUNCTION

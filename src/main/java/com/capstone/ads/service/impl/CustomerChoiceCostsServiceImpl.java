@@ -1,6 +1,8 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.dto.customer_choice_cost.CustomerChoiceCostDTO;
+import com.capstone.ads.exception.AppException;
+import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.CustomerChoiceCostMapper;
 import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.CustomerChoiceCostsRepository;
@@ -17,6 +19,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +35,6 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
     CustomerChoiceCostsRepository customerChoiceCostsRepository;
     ExpressionParser parser = new SpelExpressionParser();
 
-
     @Override
     public List<CustomerChoiceCostDTO> findCustomerChoiceCostByCustomerChoice(String customerChoiceId) {
         return getCustomerChoiceCostByCustomerChoiceId(customerChoiceId).stream()
@@ -44,27 +46,42 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
     @Override
     @Transactional
     public void calculateAllCosts(CustomerChoices customerChoice) {
-        // 1. Tạo context chứa biến cơ bản
-        Map<String, Object> context = createBaseContext(customerChoice);
         String productTypeId = customerChoice.getProductTypes().getId();
 
-        // 2. Tính toán chi phí core trước
-        CostTypes coreCostType = costTypesService.getCoreCostTypeByProductType(productTypeId);
+        // 2. Tạo context chứa biến cơ bản (sử dụng dữ liệu đã fetch)
+        Map<String, Object> context = createBaseContext(customerChoice);
+
+        // 3. Tải tất cả CostTypes liên quan đến ProductType trong MỘT TRUY VẤN
+        // và phân loại chúng trong bộ nhớ.
+        List<CostTypes> allCostTypesForProductType = costTypesService.getCostTypesByProductTypeSortedByPriority(productTypeId);
+
+        // Tìm Core Cost Type
+        CostTypes coreCostType = allCostTypesForProductType.stream()
+                .filter(CostTypes::getIsCore) // Giả sử có getter isCore()
+                .findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.COST_TYPE_NOT_FOUND));
+
+        // Lọc các Dependent Costs (loại bỏ core và sắp xếp)
+        List<CostTypes> dependentCosts = allCostTypesForProductType.stream()
+                .filter(ct -> !ct.getIsCore())
+                .sorted(Comparator.comparing(CostTypes::getPriority)) // Đảm bảo đúng thứ tự ưu tiên
+                .toList();
+
+        // 4. Tính toán chi phí core
         Long coreCostValue = evaluateFormula(coreCostType.getFormula(), context);
         context.put(normalizeName(coreCostType.getName()), coreCostValue.doubleValue());
 
-        // 3. Tính toán các chi phí khác không phải chi phí core theo mức độ ưu tiên
+        // 5. Tính toán các chi phí khác không phải chi phí core theo mức độ ưu tiên
         Map<CostTypes, Long> calculatedCosts = new HashMap<>();
         calculatedCosts.put(coreCostType, coreCostValue);
 
-        List<CostTypes> dependentCosts = costTypesService.getCostTypesByProductTypeSortedByPriority(productTypeId);
         dependentCosts.forEach(costType -> {
             Long value = evaluateFormula(costType.getFormula(), context);
             calculatedCosts.put(costType, value);
             context.put(normalizeName(costType.getName()), value.doubleValue());
         });
 
-        // 4. Lưu tất cả kết quả một lần
+        // 6. Lưu tất cả kết quả một lần
         saveAllCostValues(customerChoice, calculatedCosts);
     }
 

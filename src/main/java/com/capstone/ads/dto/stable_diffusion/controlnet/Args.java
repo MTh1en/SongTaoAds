@@ -27,7 +27,7 @@ public class Args {
     String resizeMode = "Just Resize";
 
     @Builder.Default
-    Boolean lowVram = false;
+    Boolean lowVram = true;
 
     @Builder.Default
     Double processorRes = 512.0;
@@ -39,8 +39,8 @@ public class Args {
     Double guidanceEnd = 1.0;
 
     @Builder.Default
-    Boolean pixelPerfect = false;
+    Boolean pixelPerfect = true;
 
     @Builder.Default
-    String controlMode = "Controlnet is more important";
+    String controlMode = "Balanced";
 }

@@ -3,6 +3,7 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeCreateRequest;
 import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeDTO;
 import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeUpdateRequest;
+import com.capstone.ads.dto.customer_choice_size.PixelConvertResponse;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public interface CustomerChoiceSizesService {
 
     void hardDeleteCustomerChoiceSize(String id);
 
-    Long convertToPixel(String customerChoiceSizeId);
+    PixelConvertResponse convertCustomerChoiceSizeToPixel(String customerChoiceId);
+
     //INTERNAL FUNCTION
 }
