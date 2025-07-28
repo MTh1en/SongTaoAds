@@ -8,6 +8,7 @@ import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.CustomerChoiceDetailsRepository;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.DataConverter;
+import com.capstone.ads.utils.SpelFormulaEvaluator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -37,6 +38,7 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
     CustomerChoiceDetailsRepository customerChoiceDetailsRepository;
     CustomerChoiceDetailsMapper customerChoiceDetailsMapper;
     ExpressionParser parser = new SpelExpressionParser();
+    SpelFormulaEvaluator formulaEvaluator;
 
     @Override
     @Transactional
@@ -150,16 +152,16 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
     public Long calculateSubtotal(CustomerChoiceDetails customerChoicesDetail) {
         Attributes attribute = customerChoicesDetail.getAttributeValues().getAttributes();
 
-        Map<String, Float> variables = prepareVariablesForSubtotal(
+        Map<String, Object> variables = prepareVariablesForSubtotal(
                 customerChoicesDetail.getAttributeValues(),
                 customerChoicesDetail.getCustomerChoices().getCustomerChoiceSizes()
         );
 
-        return calculateWithFormula(attribute.getCalculateFormula(), variables);
+        return formulaEvaluator.evaluateFormula(attribute.getCalculateFormula(), variables);
     }
 
-    private Map<String, Float> prepareVariablesForSubtotal(AttributeValues attributeValues, List<CustomerChoiceSizes> customerChoiceSizes) {
-        Map<String, Float> variables = new HashMap<>();
+    private Map<String, Object> prepareVariablesForSubtotal(AttributeValues attributeValues, List<CustomerChoiceSizes> customerChoiceSizes) {
+        Map<String, Object> variables = new HashMap<>();
 
         variables.put("unitPrice", Optional.ofNullable(attributeValues)
                 .map(AttributeValues::getUnitPrice)
@@ -167,14 +169,6 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
 
         variables.putAll(getSizeValues(customerChoiceSizes));
         return variables;
-    }
-
-    private Long calculateWithFormula(String formula, Map<String, Float> variables) {
-        StandardEvaluationContext context = new StandardEvaluationContext();
-        context.setVariables(new HashMap<>(variables));
-        Expression expression = parser.parseExpression(formula);
-        Long result = expression.getValue(context, Long.class);
-        return result != null ? result : 0L;
     }
 
     private Map<String, Float> getSizeValues(List<CustomerChoiceSizes> customerChoiceSizes) {

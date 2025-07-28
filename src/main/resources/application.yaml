@@ -18,6 +18,12 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+        jdbc:
+          batch_size: 50
+        order_updates: true
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html

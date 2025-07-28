@@ -9,6 +9,7 @@ import com.capstone.ads.repository.internal.CustomerChoiceCostsRepository;
 import com.capstone.ads.service.CostTypesService;
 import com.capstone.ads.service.CustomerChoiceCostsService;
 import com.capstone.ads.utils.DataConverter;
+import com.capstone.ads.utils.SpelFormulaEvaluator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -34,6 +35,7 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
     CustomerChoiceCostMapper customerChoiceCostMapper;
     CustomerChoiceCostsRepository customerChoiceCostsRepository;
     ExpressionParser parser = new SpelExpressionParser();
+    SpelFormulaEvaluator formulaEvaluator;
 
     @Override
     public List<CustomerChoiceCostDTO> findCustomerChoiceCostByCustomerChoice(String customerChoiceId) {
@@ -42,7 +44,7 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
                 .toList();
     }
 
-    //CALCULATE Material
+    //CALCULATE Materiala
     @Override
     public void calculateAllCosts(CustomerChoices customerChoice) {
         String productTypeId = customerChoice.getProductTypes().getId();
@@ -67,7 +69,7 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
                 .toList();
 
         // 4. Tính toán chi phí core
-        Long coreCostValue = evaluateFormula(coreCostType.getFormula(), context);
+        Long coreCostValue = formulaEvaluator.evaluateFormula(coreCostType.getFormula(), context);
         context.put(DataConverter.normalizeFormulaValueName(coreCostType.getName()), coreCostValue.doubleValue());
 
         // 5. Tính toán các chi phí khác không phải chi phí core theo mức độ ưu tiên
@@ -75,7 +77,7 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
         calculatedCosts.put(coreCostType, coreCostValue);
 
         dependentCosts.forEach(costType -> {
-            Long value = evaluateFormula(costType.getFormula(), context);
+            Long value = formulaEvaluator.evaluateFormula(costType.getFormula(), context);
             calculatedCosts.put(costType, value);
             context.put(DataConverter.normalizeFormulaValueName(costType.getName()), value.doubleValue());
         });
