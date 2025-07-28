@@ -8,6 +8,7 @@ import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.CustomerChoiceCostsRepository;
 import com.capstone.ads.service.CostTypesService;
 import com.capstone.ads.service.CustomerChoiceCostsService;
+import com.capstone.ads.utils.DataConverter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,7 +18,6 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -44,7 +44,6 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
 
     //CALCULATE Material
     @Override
-    @Transactional
     public void calculateAllCosts(CustomerChoices customerChoice) {
         String productTypeId = customerChoice.getProductTypes().getId();
 
@@ -69,7 +68,7 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
 
         // 4. Tính toán chi phí core
         Long coreCostValue = evaluateFormula(coreCostType.getFormula(), context);
-        context.put(normalizeName(coreCostType.getName()), coreCostValue.doubleValue());
+        context.put(DataConverter.normalizeFormulaValueName(coreCostType.getName()), coreCostValue.doubleValue());
 
         // 5. Tính toán các chi phí khác không phải chi phí core theo mức độ ưu tiên
         Map<CostTypes, Long> calculatedCosts = new HashMap<>();
@@ -78,7 +77,7 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
         dependentCosts.forEach(costType -> {
             Long value = evaluateFormula(costType.getFormula(), context);
             calculatedCosts.put(costType, value);
-            context.put(normalizeName(costType.getName()), value.doubleValue());
+            context.put(DataConverter.normalizeFormulaValueName(costType.getName()), value.doubleValue());
         });
 
         // 6. Lưu tất cả kết quả một lần
@@ -104,27 +103,30 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
         Map<String, Object> variables = new HashMap<>();
 
         // Thêm các biến từ attributes
-        customerChoice.getProductTypes().getAttributes().forEach(attr ->
-                variables.put(
-                        normalizeName(attr.getName()),
-                        0F
-                ));
+        variables.putAll(customerChoice.getProductTypes().getAttributes().stream()
+                .collect(Collectors.toMap(
+                        attr -> DataConverter.normalizeFormulaValueName(attr.getName()),
+                        attr -> 0F,
+                        (v1, v2) -> v1
+                )));
 
         // Thêm biến từ sizes
-        customerChoice.getCustomerChoiceSizes().forEach(size ->
-                variables.put(
-                        normalizeName(size.getSizes().getName()),
-                        size.getSizeValue()
-                ));
+        variables.putAll(customerChoice.getCustomerChoiceSizes().stream()
+                .collect(Collectors.toMap(
+                        size -> DataConverter.normalizeFormulaValueName(size.getSizes().getName()),
+                        CustomerChoiceSizes::getSizeValue,
+                        (v1, v2) -> v1
+                )));
 
         // Thêm biến từ attribute details
-        customerChoice.getCustomerChoiceDetails().forEach(detail -> {
-            String attrName = normalizeName(detail.getAttributeValues().getAttributes().getName());
-            Double value = detail.getAttributeValues().getIsMultiplier()
-                    ? (detail.getAttributeValues().getUnitPrice() / 10.0)
-                    : detail.getAttributeValues().getUnitPrice().doubleValue();
-            variables.put(attrName, value);
-        });
+        variables.putAll(customerChoice.getCustomerChoiceDetails().stream()
+                .collect(Collectors.toMap(
+                        detail -> DataConverter.normalizeFormulaValueName(detail.getAttributeValues().getAttributes().getName()),
+                        detail -> detail.getAttributeValues().getIsMultiplier()
+                                ? (detail.getAttributeValues().getUnitPrice() / 10.0)
+                                : detail.getAttributeValues().getUnitPrice().doubleValue(),
+                        (v1, v2) -> v1
+                )));
 
         return variables;
     }
@@ -146,9 +148,5 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
                 .collect(Collectors.toList());
 
         customerChoiceCostsRepository.saveAll(costsToSave);
-    }
-
-    private String normalizeName(String name) {
-        return name.trim().replaceAll("\\s+", "");
     }
 }

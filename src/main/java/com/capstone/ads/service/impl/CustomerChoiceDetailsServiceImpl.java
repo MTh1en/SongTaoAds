@@ -7,6 +7,7 @@ import com.capstone.ads.mapper.CustomerChoiceDetailsMapper;
 import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.CustomerChoiceDetailsRepository;
 import com.capstone.ads.service.*;
+import com.capstone.ads.utils.DataConverter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -103,13 +104,6 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
         customerChoiceDetailsRepository.deleteById(id);
     }
 
-    @Override
-    public void recalculateSubtotal(CustomerChoiceDetails customerChoiceDetails) {
-        long newValue = calculateSubtotal(customerChoiceDetails);
-        customerChoiceDetails.setSubTotal(newValue);
-        customerChoiceDetailsRepository.save(customerChoiceDetails);
-    }
-
     private void validateAttributeBelongsToSameAttributeType(AttributeValues currentValue, AttributeValues newValue) {
         if (!currentValue.getAttributes().getId().equals(newValue.getAttributes().getId())) {
             throw new AppException(ErrorCode.ATTRIBUTE_NOT_BELONG_CUSTOMER_CHOICE_DETAIL);
@@ -138,6 +132,21 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
 
     //CALCULATE SUBTOTAL
 
+    @Override
+    public void recalculateAllSubtotal(List<CustomerChoiceDetails> customerChoiceDetailsList) {
+        customerChoiceDetailsList.forEach(customerChoiceDetails -> {
+            customerChoiceDetails.setSubTotal(calculateSubtotal(customerChoiceDetails));
+        });
+        customerChoiceDetailsRepository.saveAll(customerChoiceDetailsList);
+    }
+
+    @Override
+    public void recalculateSubtotal(CustomerChoiceDetails customerChoiceDetails) {
+        long newValue = calculateSubtotal(customerChoiceDetails);
+        customerChoiceDetails.setSubTotal(newValue);
+        customerChoiceDetailsRepository.save(customerChoiceDetails);
+    }
+
     public Long calculateSubtotal(CustomerChoiceDetails customerChoicesDetail) {
         Attributes attribute = customerChoicesDetail.getAttributeValues().getAttributes();
 
@@ -164,20 +173,16 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
         StandardEvaluationContext context = new StandardEvaluationContext();
         context.setVariables(new HashMap<>(variables));
         Expression expression = parser.parseExpression(formula);
-        return expression.getValue(context, Long.class);
+        Long result = expression.getValue(context, Long.class);
+        return result != null ? result : 0L;
     }
 
     private Map<String, Float> getSizeValues(List<CustomerChoiceSizes> customerChoiceSizes) {
-        Map<String, Float> variables = new HashMap<>();
-        customerChoiceSizes.forEach(size -> {
-            String sizeName = size.getSizes().getName();
-            variables.put(normalizeName(sizeName), size.getSizeValue());
-        });
-        return variables;
-    }
-
-    // Chuẩn hóa tên (loại bỏ khoảng trắng)
-    private String normalizeName(String name) {
-        return name.trim().replaceAll("\\s+", "");
+        return customerChoiceSizes.stream()
+                .collect(Collectors.toMap(
+                        size -> DataConverter.normalizeFormulaValueName(size.getSizes().getName()),
+                        CustomerChoiceSizes::getSizeValue,
+                        (v1, v2) -> v1 // Xử lý trường hợp trùng key (nếu có)
+                ));
     }
 }
