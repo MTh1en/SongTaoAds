@@ -49,7 +49,27 @@ spring:
   threads:
     virtual:
       enabled: true
-
+  cloud:
+    openfeign:
+      client:
+        config:
+          stable-diffusion:
+            connect-timeout: 5000
+            read-timeout: 90000
+resilience4j:
+  circuitbreaker:
+    instances:
+      stableDiffusionApi:
+        failureRateThreshold: 50 # Tỷ lệ lỗi (tính bằng %) để Circuit Breaker chuyển sang trạng thái OPEN (mở). Nếu 50% số cuộc gọi gần đây nhất thất bại, CB sẽ mở.
+        waitDurationInOpenState: 60s # Thời gian (Duration) mà Circuit Breaker sẽ ở trạng thái OPEN. Trong thời gian này, tất cả các cuộc gọi sẽ thất bại ngay lập tức (và gọi fallback).
+        permittedNumberOfCallsInHalfOpenState: 10 # Khi Circuit Breaker chuyển từ OPEN sang HALF_OPEN, nó cho phép một số lượng giới hạn các request đi qua (ví dụ: 10 request). Nếu các request này thành công, CB sẽ chuyển sang CLOSED. Nếu thất bại, nó lại quay về OPEN.
+        slidingWindowType: COUNT_BASED # Loại cửa sổ trượt để tính toán tỷ lệ lỗi. COUNT_BASED (dựa trên số lượng cuộc gọi) hoặc TIME_BASED (dựa trên thời gian).
+        slidingWindowSize: 100 # Kích thước của cửa sổ trượt. Nếu là COUNT_BASED, là số lượng cuộc gọi gần nhất. Nếu là TIME_BASED, là khoảng thời gian (seconds).
+        minimumNumberOfCalls: 20 # Số lượng cuộc gọi tối thiểu phải xảy ra trong sliding window trước khi Circuit Breaker bắt đầu tính toán tỷ lệ lỗi.
+  timelimiter: # Cấu hình timeout ở cấp độ Resilience4j, không phải Feign. Circuit Breaker sử dụng này.
+    instances:
+      stableDiffusionApi: # Phải khớp với tên circuit breaker
+        timeoutDuration: 80 # Nếu
 server:
   port: 8080
   tomcat:

@@ -19,7 +19,4 @@ public class RegisterRequest {
 
     @Size(min = 10, message = "Phone must be at least 10 characters")
     private String phone;
-
-    @NotBlank(message = "Address is required")
-    private String address;
 }

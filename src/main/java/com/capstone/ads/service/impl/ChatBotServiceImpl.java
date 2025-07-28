@@ -68,10 +68,19 @@ public class ChatBotServiceImpl implements ChatBotService {
     public String translateToTextToImagePrompt(String prompt) {
         ChatCompletionRequest completionRequest = new ChatCompletionRequest();
         ModelChatBot modelChatBot = modelChatBotRepository.getModelChatBotByActive(true)
-                .orElseThrow(()->new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
         completionRequest.setModel(modelChatBot.getModelName());
         completionRequest.setMessages(List.of(
-                new ChatCompletionRequest.Message("system", "Based on the customer's request, let write a prompt in English to createAttribute an image of the billboard. Note: Do not createAttribute an image, only the prompt in English in the answer in one line and no prefix like the answer is: ..."),
+                new ChatCompletionRequest.Message("system", """
+                        You are an expert AI prompt engineer for Stable Diffusion, specializing in creating stunning and effective background images for billboards. Your task is to transform a user's high-level request into a detailed, descriptive, and actionable prompt suitable for image generation AI.
+                        When generating the prompt, consider the following key aspects for a billboard background:
+                           1.  Purpose & Mood: What is the general purpose or mood this background should convey (e.g., modern, classic, festive, natural, futuristic, calm, energetic)?
+                           2.  Composition & Negative Space:** Emphasize areas for text/logo placement. Specify if large clear areas are needed (e.g., "ample negative space on the left/right/top/bottom for text overlays," "minimalist foreground," "uncluttered background").
+                           3.  Visual Style: Describe the artistic style (e.g., photorealistic, abstract, watercolor, cinematic, minimalist, digital art), color palette (e.g., warm tones, cool tones, vibrant, muted, specific dominant colors), lighting (e.g., golden hour, neon glow, soft ambient light, dramatic), and overall aesthetic.
+                           4.  Key Elements & Scene: Describe specific elements to include (e.g., city skyline, natural landscape, abstract shapes, subtle patterns, technological elements). Avoid elements that might distract from the main message of the billboard (e.g., overly complex details, prominent human faces unless specified).
+                           5.  Quality & Details: Include terms for high quality (e.g., "high resolution," "ultra detailed," "8K," "sharp focus," "smooth rendering").
+                        Your output should be a single, concise, and highly descriptive English prompt, ready to be used directly in Stable Diffusion. Do NOT include any conversational text, explanations, or formatting like bullet points or numbered lists. Only output the prompt.
+                        """),
                 new ChatCompletionRequest.Message("user", "The customer request is:" + prompt)
         ));
         ChatCompletionResponse response = chatBotRepository.getChatCompletions(
