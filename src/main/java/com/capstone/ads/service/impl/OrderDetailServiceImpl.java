@@ -12,7 +12,7 @@ import com.capstone.ads.model.*;
 import com.capstone.ads.model.enums.OrderStatus;
 import com.capstone.ads.repository.internal.OrderDetailsRepository;
 import com.capstone.ads.service.*;
-import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
+import com.capstone.ads.utils.DataConverter;
 import io.micrometer.common.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     CustomerChoicesService customerChoicesService;
     CustomDesignRequestService customDesignRequestService;
     EditedDesignService editedDesignService;
-    CustomerChoiceHistoriesConverter customerChoiceHistoriesConverter;
+    DataConverter dataConverter;
     OrderDetailsRepository orderDetailsRepository;
     OrderDetailMapper orderDetailMapper;
 
@@ -55,7 +55,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         OrderDetails orderDetails = orderDetailMapper.mapCreateRequestToEntity(request);
         orderDetails.setOrders(orders);
         orderDetails.setDetailConstructionAmount(customerChoices.getTotalAmount());
-        orderDetails.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
+        orderDetails.setCustomerChoiceHistories(dataConverter.convertToHistory(customerChoices));
 
         if (StringUtils.isNotBlank(request.getCustomDesignRequestId())) {
             orderDetailsRepository.findByCustomDesignRequests_Id(request.getCustomDesignRequestId())

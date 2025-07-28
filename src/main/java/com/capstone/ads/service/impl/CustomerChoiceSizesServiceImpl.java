@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -72,7 +71,7 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
         customerChoiceSizesMapper.updateEntityFromRequest(request, customerChoicesSize);
         customerChoicesSize = customerChoiceSizesRepository.save(customerChoicesSize);
 
-        customerChoice.getCustomerChoiceDetails().forEach(customerChoiceDetailsService::recalculateSubtotal);
+        customerChoiceDetailsService.recalculateAllSubtotal(customerChoice.getCustomerChoiceDetails());
         customerChoiceCostsService.calculateAllCosts(customerChoice);
         customerChoicesService.recalculateTotalAmount(customerChoice);
         return customerChoiceSizesMapper.toDTO(customerChoicesSize);

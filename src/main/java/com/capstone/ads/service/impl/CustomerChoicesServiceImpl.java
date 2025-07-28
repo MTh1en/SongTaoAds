@@ -7,6 +7,7 @@ import com.capstone.ads.mapper.CustomerChoicesMapper;
 import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.service.*;
+import com.capstone.ads.utils.DataConverter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -88,7 +90,6 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
     }
 
     @Override
-    @Transactional
     public void recalculateTotalAmount(CustomerChoices customerChoices) {
         ProductTypes productTypes = customerChoices.getProductTypes();
         String totalFormula = productTypes.getCalculateFormula().trim();
@@ -110,18 +111,11 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
     }
 
     private Map<String, Object> createBaseContext(List<CustomerChoiceCosts> customerChoiceCosts) {
-        Map<String, Object> variables = new HashMap<>();
-
-        customerChoiceCosts.forEach(cost -> {
-            String costTypeName = normalizeName(cost.getCostTypes().getName());
-            Long costValue = cost.getValue() == null ? 0L : cost.getValue();
-            variables.put(costTypeName, costValue);
-        });
-
-        return variables;
-    }
-
-    private String normalizeName(String name) {
-        return name.trim().replaceAll("\\s+", "");
+        return customerChoiceCosts.stream()
+                .collect(Collectors.toMap(
+                        cost -> DataConverter.normalizeFormulaValueName(cost.getCostTypes().getName()),
+                        cost -> cost.getValue() == null ? 0L : cost.getValue(),
+                        (v1, v2) -> v1 // Xử lý trường hợp trùng key (nếu có)
+                ));
     }
 }

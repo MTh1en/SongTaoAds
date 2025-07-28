@@ -17,5 +17,7 @@ public interface CustomerChoiceDetailsService {
     void hardDeleteCustomerChoiceDetail(String customerChoiceDetailId);
 
     //INTERNAL FUNCTION
+    void recalculateAllSubtotal(List<CustomerChoiceDetails> customerChoiceDetailsList);
+
     void recalculateSubtotal(CustomerChoiceDetails customerChoiceDetails);
 }
