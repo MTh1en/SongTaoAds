@@ -14,6 +14,7 @@ import com.capstone.ads.model.*;
 import com.capstone.ads.model.enums.*;
 import com.capstone.ads.repository.internal.OrdersRepository;
 import com.capstone.ads.service.*;
+import com.capstone.ads.utils.KeyGenerator;
 import com.capstone.ads.validator.ContractStateValidator;
 import com.capstone.ads.validator.OrderStateValidator;
 import com.capstone.ads.utils.SecurityContextUtils;
@@ -48,8 +49,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDTO createOrder(OrderCreateRequest request) {
         Users users = securityContextUtils.getCurrentUser();
-
         Orders orders = orderMapper.mapCreateRequestToEntity(request);
+        orders.setOrderCode(KeyGenerator.generateOrderCode());
         orders.setUsers(users);
         orders.setStatus(
                 (request.getOrderType().equals(OrderType.AI_DESIGN))
