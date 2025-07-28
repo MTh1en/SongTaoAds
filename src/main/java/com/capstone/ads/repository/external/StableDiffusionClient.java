@@ -1,5 +1,6 @@
 package com.capstone.ads.repository.external;
 
+import com.capstone.ads.config.FeignClientConfig;
 import com.capstone.ads.dto.stable_diffusion.TextToImageRequest;
 import com.capstone.ads.dto.stable_diffusion.TextToImageResponse;
 import com.capstone.ads.dto.stable_diffusion.UpscaleImageRequest;
@@ -14,9 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-import java.util.Objects;
-
-@FeignClient(name = "stable-diffusion", url = "${stable-diffusion.url}")
+@FeignClient(name = "stable-diffusion", url = "${stable-diffusion.url}", configuration = FeignClientConfig.class)
 public interface StableDiffusionClient {
     @PostMapping(value = "/sdapi/v1/txt2img", produces = MediaType.APPLICATION_JSON_VALUE)
     TextToImageResponse textToImage(@RequestHeader("Authorization") String vastAiKey,

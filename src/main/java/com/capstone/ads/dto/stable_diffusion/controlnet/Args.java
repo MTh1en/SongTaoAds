@@ -21,16 +21,16 @@ public class Args {
     String model;
 
     @Builder.Default
-    Double weight = 0.8;
+    Double weight = 0.7;
 
     @Builder.Default
     String resizeMode = "Just Resize";
 
     @Builder.Default
-    Boolean lowVram = true;
+    Boolean lowvram = true;
 
     @Builder.Default
-    Double processorRes = 512.0;
+    Integer processorRes = 512;
 
     @Builder.Default
     Double guidanceStart = 0.0;
