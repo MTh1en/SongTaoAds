@@ -9,6 +9,4 @@ import java.util.List;
 @Repository
 public interface CustomerChoiceDetailsRepository extends JpaRepository<CustomerChoiceDetails, String> {
     List<CustomerChoiceDetails> findByCustomerChoices_IdOrderByCreatedAtAsc(String id);
-
-    List<CustomerChoiceDetails> findByCustomerChoices_Id(String id);
 }

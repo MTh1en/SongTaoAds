@@ -13,10 +13,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +33,6 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
     AttributeValuesService attributeValuesService;
     CustomerChoiceDetailsRepository customerChoiceDetailsRepository;
     CustomerChoiceDetailsMapper customerChoiceDetailsMapper;
-    ExpressionParser parser = new SpelExpressionParser();
     SpelFormulaEvaluator formulaEvaluator;
 
     @Override

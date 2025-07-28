@@ -13,14 +13,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,7 +30,6 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
     CustomerChoiceCostsService customerChoiceCostsService;
     CustomerChoicesRepository customerChoicesRepository;
     CustomerChoicesMapper customerChoicesMapper;
-    ExpressionParser parser = new SpelExpressionParser();
     SpelFormulaEvaluator formulaEvaluator;
 
     @Override
