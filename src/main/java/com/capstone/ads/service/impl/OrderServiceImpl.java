@@ -104,6 +104,16 @@ public class OrderServiceImpl implements OrderService {
         orders.getContract().setStatus(ContractStatus.CONFIRMED);
         orders.setDepositConstructionAmount(depositAmount);
         orders.setRemainingConstructionAmount(remainingAmount);
+
+        orders.setTotalOrderDepositAmount(orders.getDepositDesignAmount() != null
+                ? orders.getTotalOrderDepositAmount() + depositAmount
+                : depositAmount
+        );
+        orders.setTotalOrderRemainingAmount(orders.getRemainingDesignAmount() != null
+                ? orders.getRemainingDesignAmount() + remainingAmount
+                : remainingAmount
+        );
+
         orderRepository.save(orders);
 
         eventPublisher.publishEvent(new OrderStatusChangedEvent(
@@ -213,11 +223,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public boolean checkOrderNeedDepositDesign(String orderId) {
         Orders orders = getOrderById(orderId);
-//        orders.getOrderDetails()
-//                .forEach(orderDetails ->
-//                        log.info("id: {}, status: {}",
-//                                orderDetails.getCustomDesignRequests().getId(),
-//                                orderDetails.getCustomDesignRequests().getStatus()));
         return orders.getOrderDetails().stream()
                 .allMatch(orderDetails ->
                         orderDetails.getCustomDesignRequests().getStatus().equals(CustomDesignRequestStatus.APPROVED_PRICING));
@@ -227,12 +232,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public boolean checkOrderNeedFullyPaidDesign(String orderId) {
         Orders orders = getOrderById(orderId);
-//        orders.getOrderDetails()
-//                .forEach(orderDetails ->
-//                        log.info("status: {}, id: {}",
-//                                orderDetails.getCustomDesignRequests().getStatus(),
-//                                orderDetails.getCustomDesignRequests().getId()));
-
         return orders.getOrderDetails().stream()
                 .allMatch(orderDetails ->
                         orderDetails.getCustomDesignRequests().getStatus().equals(CustomDesignRequestStatus.WAITING_FULL_PAYMENT));
@@ -242,11 +241,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public boolean checkOrderCustomDesignSubmittedDesign(String orderId) {
         Orders orders = getOrderById(orderId);
-//        orders.getOrderDetails()
-//                .forEach(orderDetails ->
-//                        log.info("status check: {}, id: {}",
-//                                orderDetails.getCustomDesignRequests().getStatus(),
-//                                orderDetails.getCustomDesignRequests().getId()));
         return orders.getOrderDetails().stream()
                 .allMatch(orderDetails ->
                         orderDetails.getCustomDesignRequests().getStatus().equals(CustomDesignRequestStatus.COMPLETED)
@@ -257,11 +251,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void updateOrderStatusAfterCustomDesignCompleted(String orderId) {
         Orders orders = getOrderById(orderId);
-//        orders.getOrderDetails()
-//                .forEach(orderDetails ->
-//                        log.info("status completed: {}, id: {}",
-//                                orderDetails.getCustomDesignRequests().getStatus(),
-//                                orderDetails.getCustomDesignRequests().getId()));
         if (orders.getOrderType().equals(OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION)) {
             orders.setStatus(OrderStatus.PENDING_CONTRACT);
         } else {
@@ -345,9 +334,16 @@ public class OrderServiceImpl implements OrderService {
         orders.setTotalConstructionAmount(totalConstructionAmount);
         orders.setDepositConstructionAmount(depositConstructionAmount);
         orders.setRemainingConstructionAmount(totalConstructionAmount - depositConstructionAmount);
+
         orders.setTotalDesignAmount(totalDesignAmount);
         orders.setDepositDesignAmount(depositDesignAmount);
         orders.setRemainingDesignAmount(totalDesignAmount - depositDesignAmount);
+
+        orders.setTotalOrderAmount(totalConstructionAmount + totalDesignAmount);
+        orders.setTotalOrderDepositAmount(depositConstructionAmount + depositDesignAmount);
+        orders.setTotalOrderRemainingAmount(
+                (totalConstructionAmount - depositConstructionAmount) + (totalDesignAmount - depositDesignAmount)
+        );
 
         orderRepository.save(orders);
     }

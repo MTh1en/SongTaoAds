@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDTO {
     String id;
+    String orderCode;
     String address;
     Long totalConstructionAmount;
     Long depositConstructionAmount;
@@ -24,6 +25,9 @@ public class OrderDTO {
     Long totalDesignAmount;
     Long depositDesignAmount;
     Long remainingDesignAmount;
+    Long totalOrderAmount;
+    Long totalOrderDepositAmount;
+    Long totalOrderRemainingAmount;
     String note;
     OrderType orderType;
     OrderStatus status;
