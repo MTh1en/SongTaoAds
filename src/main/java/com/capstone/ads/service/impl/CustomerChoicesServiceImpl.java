@@ -8,18 +8,14 @@ import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.DataConverter;
+import com.capstone.ads.utils.SpelFormulaEvaluator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,7 +30,7 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
     CustomerChoiceCostsService customerChoiceCostsService;
     CustomerChoicesRepository customerChoicesRepository;
     CustomerChoicesMapper customerChoicesMapper;
-    ExpressionParser parser = new SpelExpressionParser();
+    SpelFormulaEvaluator formulaEvaluator;
 
     @Override
     @Transactional
@@ -96,18 +92,10 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
         var customerChoiceCostList = customerChoiceCostsService.getCustomerChoiceCostByCustomerChoiceId(customerChoices.getId());
 
         Map<String, Object> variables = createBaseContext(customerChoiceCostList);
-        Long result = evaluateFormula(totalFormula, variables);
+        Long result = formulaEvaluator.evaluateFormula(totalFormula, variables);
 
         customerChoices.setTotalAmount(result);
         customerChoicesRepository.save(customerChoices);
-    }
-
-    private Long evaluateFormula(String formula, Map<String, Object> baseVariables) {
-        StandardEvaluationContext context = new StandardEvaluationContext();
-        context.setVariables(new HashMap<>(baseVariables));
-        Expression expression = parser.parseExpression(formula);
-        Double result = expression.getValue(context, Double.class);
-        return result != null ? Math.round(result) : 0L;
     }
 
     private Map<String, Object> createBaseContext(List<CustomerChoiceCosts> customerChoiceCosts) {
