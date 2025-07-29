@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         OrderDetails orderDetails = orderDetailMapper.mapCreateRequestToEntity(request);
         orderDetails.setOrders(orders);
+        orderDetails.setCreatedAt(LocalDateTime.now());
         orderDetails.setDetailConstructionAmount(customerChoices.getTotalAmount());
         orderDetails.setCustomerChoiceHistories(dataConverter.convertToHistory(customerChoices));
 
@@ -77,7 +79,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
         orderDetails = orderDetailsRepository.save(orderDetails);
 
-        orderService.updateAllAmount(orderId);
+        orders.getOrderDetails().add(orderDetails);
+        orderService.updateAllAmount(orderDetails.getOrders());
         customerChoicesService.hardDeleteCustomerChoice(request.getCustomerChoiceId());
         return orderDetailMapper.toDTO(orderDetails);
     }
@@ -119,9 +122,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         orderDetail.setDetailDesignAmount(event.getTotalPrice());
         orderDetail.setDetailDepositDesignAmount(event.getDepositAmount());
         orderDetail.setDetailRemainingDesignAmount(event.getRemainingAmount());
-        orderDetailsRepository.save(orderDetail);
+        orderDetail = orderDetailsRepository.save(orderDetail);
 
-        orderService.updateAllAmount(orderDetail.getOrders().getId());
+        orderService.updateAllAmount(orderDetail.getOrders());
         if (orderService.checkOrderNeedDepositDesign(orderId)) {
             orderService.updateOrderStatus(orderId, OrderStatus.NEED_DEPOSIT_DESIGN);
         }

@@ -42,7 +42,7 @@ public interface OrderService {
 
     void updateOrderStatusAfterCustomDesignCompleted(String orderId);
 
-    void updateAllAmount(String orderId);
+    void updateAllAmount(Orders orders);
 
     void updateOrderFromWebhookResult(Orders orders, PaymentType paymentType);
 }
