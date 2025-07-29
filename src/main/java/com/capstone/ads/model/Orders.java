@@ -30,6 +30,9 @@ public class Orders {
     Long totalDesignAmount;
     Long depositDesignAmount;
     Long remainingDesignAmount;
+    Long totalOrderAmount;
+    Long totalOrderDepositAmount;
+    Long totalOrderRemainingAmount;
     String note;
     Boolean isPaymentCompleted;
 

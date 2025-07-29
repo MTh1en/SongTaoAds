@@ -122,7 +122,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         orderDetailsRepository.save(orderDetail);
 
         orderService.updateAllAmount(orderDetail.getOrders().getId());
-        log.info("Result price approved: {}", orderService.checkOrderNeedDepositDesign(orderId));
         if (orderService.checkOrderNeedDepositDesign(orderId)) {
             orderService.updateOrderStatus(orderId, OrderStatus.NEED_DEPOSIT_DESIGN);
         }
@@ -136,8 +135,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
         String orderId = orderDetail.getOrders().getId();
 
-        log.info("Result demo approved: {}", orderService.checkOrderNeedFullyPaidDesign(orderId));
-
         if (orderService.checkOrderNeedFullyPaidDesign(orderId)) {
             orderService.updateOrderStatus(orderId, OrderStatus.NEED_FULLY_PAID_DESIGN);
         }
@@ -150,7 +147,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
         String orderId = orderDetail.getOrders().getId();
 
-        log.info("result: {}", orderService.checkOrderCustomDesignSubmittedDesign(orderId));
         if (orderService.checkOrderCustomDesignSubmittedDesign(orderId)) {
             orderService.updateOrderStatusAfterCustomDesignCompleted(orderId);
         }
