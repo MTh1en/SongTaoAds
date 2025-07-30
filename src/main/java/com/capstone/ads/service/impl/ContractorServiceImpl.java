@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.contractor.ContractorCreateRequest;
 import com.capstone.ads.dto.contractor.ContractorDTO;
 import com.capstone.ads.dto.contractor.ContractorUpdateRequest;
@@ -9,6 +10,7 @@ import com.capstone.ads.mapper.ContractorMapper;
 import com.capstone.ads.model.Contractors;
 import com.capstone.ads.repository.internal.ContractorsRepository;
 import com.capstone.ads.service.ContractorService;
+import com.capstone.ads.service.FileDataService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,6 +20,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,23 +31,46 @@ import org.springframework.transaction.annotation.Transactional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ContractorServiceImpl implements ContractorService {
     ContractorMapper contractorMapper;
+    FileDataService fileDataService;
     ContractorsRepository contractorsRepository;
 
     @Override
     @Transactional
     public ContractorDTO createContractor(ContractorCreateRequest request) {
         Contractors contractor = contractorMapper.mapCreateRequestToEntity(request);
+
+        if (Objects.nonNull(request.getLogoImage())) {
+            String contractorKey = generateContractorImageKey();
+            fileDataService.uploadSingleFile(contractorKey, request.getLogoImage());
+            contractor.setLogo(contractorKey);
+        }
+
         contractor = contractorsRepository.save(contractor);
         return contractorMapper.toDTO(contractor);
     }
 
     @Override
-    public ContractorDTO updateContractor(String contractorId, ContractorUpdateRequest request) {
+    @Transactional
+    public ContractorDTO updateContractorInformation(String contractorId, ContractorUpdateRequest request) {
         Contractors contractor = getContractorById(contractorId);
         contractorMapper.mapUpdateRequestToEntity(request, contractor);
         contractor = contractorsRepository.save(contractor);
         return contractorMapper.toDTO(contractor);
     }
+
+    @Override
+    @Transactional
+    public ContractorDTO updateContractorLogo(String contractorId, MultipartFile logoImage) {
+        Contractors contractor = getContractorById(contractorId);
+
+        String contractorKey = generateContractorImageKey();
+        fileDataService.uploadSingleFile(contractorKey, logoImage);
+        contractor.setLogo(contractorKey);
+
+        contractor = contractorsRepository.save(contractor);
+        return contractorMapper.toDTO(contractor);
+    }
+
 
     @Override
     public Page<ContractorDTO> findAllContractors(int page, int size) {
@@ -77,5 +106,9 @@ public class ContractorServiceImpl implements ContractorService {
     public Contractors getContractorById(String contractorId) {
         return contractorsRepository.findByIdAndIsAvailable(contractorId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.CONTRACTOR_NOT_FOUND));
+    }
+
+    private String generateContractorImageKey() {
+        return String.format(S3ImageKeyFormat.CONTRACTOR, UUID.randomUUID());
     }
 }

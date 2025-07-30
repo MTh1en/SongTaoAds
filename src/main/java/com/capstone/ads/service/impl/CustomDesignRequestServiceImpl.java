@@ -1,6 +1,7 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.PredefinedRole;
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestCreateRequest;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestDTO;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestFinalDesignRequest;
@@ -177,13 +178,13 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     // UPLOAD IMAGE //
     private String generateCustomDesignRequestKey(String customDesignRequestId) {
-        return String.format("custom-design/%s/final", customDesignRequestId);
+        return String.format(S3ImageKeyFormat.FINAL_CUSTOM_DESIGN, customDesignRequestId);
     }
 
     private List<String> generateCustomDesignRequestSubImagesKey(String customDesignRequestId, Integer amountKey) {
         List<String> keys = new ArrayList<>();
         IntStream.range(0, amountKey)
-                .forEach(i -> keys.add(String.format("custom-design/%s/sub-final/%s", customDesignRequestId, UUID.randomUUID())));
+                .forEach(i -> keys.add(String.format(S3ImageKeyFormat.FINAL_CUSTOM_DESIGN_SUB_IMAGE, customDesignRequestId, UUID.randomUUID())));
         return keys;
     }
 

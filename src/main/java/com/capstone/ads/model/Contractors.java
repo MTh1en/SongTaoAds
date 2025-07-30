@@ -24,6 +24,7 @@ public class Contractors {
     String address;
     String phone;
     String email;
+    String logo;
     Boolean isInternal;
     Boolean isAvailable;
 

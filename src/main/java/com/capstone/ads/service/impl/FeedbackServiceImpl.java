@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.feedback.FeedbackDTO;
 import com.capstone.ads.dto.feedback.FeedbackResponseRequest;
 import com.capstone.ads.dto.feedback.FeedbackSendRequest;
@@ -115,7 +116,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     private String generateFeedbackImageKey(String feedbackId) {
-        return String.format("feedback/%s/%s", feedbackId, UUID.randomUUID());
+        return String.format(S3ImageKeyFormat.FEEDBACK, feedbackId, UUID.randomUUID());
     }
 
     private String uploadFeedbackImageToS3(String feedbackId, MultipartFile feedbackImage) {

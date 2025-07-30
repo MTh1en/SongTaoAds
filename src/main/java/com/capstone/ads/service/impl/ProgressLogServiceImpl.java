@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.progress_log.ProgressLogCreateRequest;
 import com.capstone.ads.dto.progress_log.ProgressLogDTO;
 import com.capstone.ads.event.OrderStatusChangedEvent;
@@ -105,7 +106,7 @@ public class ProgressLogServiceImpl implements ProgressLogService {
     private List<String> generateProgressLogImagesKey(String orderId, OrderStatus orderStatus, Integer amountKey) {
         List<String> keys = new ArrayList<>();
         IntStream.range(0, amountKey)
-                .forEach(i -> keys.add(String.format("orders/%s/%s/%s", orderId, orderStatus, UUID.randomUUID())));
+                .forEach(i -> keys.add(String.format(S3ImageKeyFormat.ORDER_LOG, orderId, orderStatus, UUID.randomUUID())));
         return keys;
     }
 }

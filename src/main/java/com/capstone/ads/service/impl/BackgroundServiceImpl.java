@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.background.BackgroundCreateRequest;
 import com.capstone.ads.dto.background.BackgroundDTO;
 import com.capstone.ads.dto.background.BackgroundUpdateRequest;
@@ -122,7 +123,7 @@ public class BackgroundServiceImpl implements BackgroundService {
     }
 
     private String generateBackgroundKey(String attributeValueId) {
-        return String.format("background/%s/%s", attributeValueId, UUID.randomUUID());
+        return String.format(S3ImageKeyFormat.BACKGROUND, attributeValueId, UUID.randomUUID());
     }
 
     private String uploadBackgroundImageToS3(String attributeValueId, MultipartFile file) {

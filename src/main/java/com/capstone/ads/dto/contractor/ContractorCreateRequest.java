@@ -3,6 +3,7 @@ package com.capstone.ads.dto.contractor;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -22,4 +23,5 @@ public class ContractorCreateRequest {
     String email;
     Boolean isInternal;
     Boolean isAvailable;
+    MultipartFile logoImage;
 }
