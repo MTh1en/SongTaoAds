@@ -5,11 +5,14 @@ import com.capstone.ads.dto.contractor.ContractorDTO;
 import com.capstone.ads.dto.contractor.ContractorUpdateRequest;
 import com.capstone.ads.model.Contractors;
 import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ContractorService {
     ContractorDTO createContractor(ContractorCreateRequest request);
 
-    ContractorDTO updateContractor(String contractorId, ContractorUpdateRequest request);
+    ContractorDTO updateContractorInformation(String contractorId, ContractorUpdateRequest request);
+
+    ContractorDTO updateContractorLogo(String contractorId, MultipartFile logoImage);
 
     Page<ContractorDTO> findAllContractors(int page, int size);
 

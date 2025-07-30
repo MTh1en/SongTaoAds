@@ -15,6 +15,7 @@ public class S3ImageKeyFormat {
     public static final String PRODUCT_TYPE = "product-type/%s";
     public static final String ORDER_LOG = "orders/%s/%s/%s";
     public static final String AVATAR = "avatar/%s";
+    public static final String CONTRACTOR = "contractor/%s";
 
     private S3ImageKeyFormat() {
     }

@@ -8,6 +8,7 @@ import com.capstone.ads.model.json.CustomerChoiceHistories;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -28,6 +29,7 @@ public class OrderDTO {
     Long totalOrderAmount;
     Long totalOrderDepositAmount;
     Long totalOrderRemainingAmount;
+    LocalDate estimatedDeliveryDate;
     String note;
     OrderType orderType;
     OrderStatus status;
