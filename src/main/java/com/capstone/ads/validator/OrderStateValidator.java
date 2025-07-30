@@ -12,8 +12,10 @@ import java.util.Set;
 @Component
 public class OrderStateValidator {
     private final Map<OrderStatus, Set<OrderStatus>> validTransitions;
+    private final Set<OrderStatus> createProgressLogsStatus;
 
-    public OrderStateValidator() {
+    public OrderStateValidator(Set<OrderStatus> createProgressLogsStatus) {
+        this.createProgressLogsStatus = createProgressLogsStatus;
         this.validTransitions = new EnumMap<>(OrderStatus.class);
         initializeValidTransitions();
     }
@@ -108,6 +110,13 @@ public class OrderStateValidator {
 
         validTransitions.put(OrderStatus.CANCELLED, Set.of());
         validTransitions.put(OrderStatus.ORDER_COMPLETED, Set.of());
+
+        createProgressLogsStatus.addAll(Set.of(
+                OrderStatus.PRODUCING,
+                OrderStatus.PRODUCTION_COMPLETED,
+                OrderStatus.DELIVERING,
+                OrderStatus.INSTALLED
+        ));
     }
 
     public boolean isValidTransition(OrderStatus currentStatus, OrderStatus newStatus) {
@@ -128,5 +137,12 @@ public class OrderStateValidator {
         if (!isValidTransition(currentStatus, newStatus)) {
             throw new AppException(ErrorCode.INVALID_ORDER_STATUS_TRANSITION);
         }
+    }
+
+    public boolean notCreateProgressLogsStatus(OrderStatus status) {
+        if (status == null) {
+            return true;
+        }
+        return !createProgressLogsStatus.contains(status);
     }
 }
