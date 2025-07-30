@@ -23,6 +23,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,7 +95,8 @@ public class ProgressLogServiceImpl implements ProgressLogService {
 
     @Override
     public Page<ProgressLogDTO> findProgressLogByOrderId(String orderId, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return progressLogsRepository.findByOrders_Id(orderId, pageable)
                 .map(progressLogMapper::toDTO);
     }
