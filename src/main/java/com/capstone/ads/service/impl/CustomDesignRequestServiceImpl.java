@@ -145,6 +145,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     @Override
     public Page<CustomDesignRequestDTO> findCustomerDesignRequestByAssignDesignerId(String assignDesignerId, int page, int size) {
+        Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size);
         return customDesignRequestsRepository.findByAssignDesigner_Id(assignDesignerId, pageable)
                 .map(customDesignRequestsMapper::toDTO);
@@ -152,14 +153,15 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     @Override
     public Page<CustomDesignRequestDTO> findCustomerDesignRequestByStatus(CustomDesignRequestStatus status, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return customDesignRequestsRepository.findByStatus(status, pageable)
                 .map(customDesignRequestsMapper::toDTO);
     }
 
     @Override
     public Page<CustomDesignRequestDTO> findAllCustomerDesignRequest(int page, int size) {
-        Sort sort = Sort.by("createdAt").ascending();
+        Sort sort = Sort.by("createdAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return customDesignRequestsRepository.findAll(pageable)
                 .map(customDesignRequestsMapper::toDTO);
