@@ -23,6 +23,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -143,16 +144,26 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
-    public Page<CustomDesignRequestDTO> findCustomerDetailRequestByAssignDesignerId(String assignDesignerId, int page, int size) {
+    public Page<CustomDesignRequestDTO> findCustomerDesignRequestByAssignDesignerId(String assignDesignerId, int page, int size) {
+        Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size);
         return customDesignRequestsRepository.findByAssignDesigner_Id(assignDesignerId, pageable)
                 .map(customDesignRequestsMapper::toDTO);
     }
 
     @Override
-    public Page<CustomDesignRequestDTO> findCustomerDetailRequestByStatus(CustomDesignRequestStatus status, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+    public Page<CustomDesignRequestDTO> findCustomerDesignRequestByStatus(CustomDesignRequestStatus status, int page, int size) {
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return customDesignRequestsRepository.findByStatus(status, pageable)
+                .map(customDesignRequestsMapper::toDTO);
+    }
+
+    @Override
+    public Page<CustomDesignRequestDTO> findAllCustomerDesignRequest(int page, int size) {
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return customDesignRequestsRepository.findAll(pageable)
                 .map(customDesignRequestsMapper::toDTO);
     }
 

@@ -78,14 +78,23 @@ public class OrderController {
         return ApiResponseBuilder.buildPagingSuccessResponse("Find Order by Users", response, page);
     }
 
-    @GetMapping("/orders")
+    @GetMapping(value = "/orders", params = "orderStatus")
     @Operation(summary = "Xem order theo status")
     public ApiPagingResponse<OrderDTO> findOrderByStatus(
-            @RequestParam OrderStatus orderStatus,
+            @RequestParam(required = false) OrderStatus orderStatus,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = orderService.findOrderByStatus(orderStatus, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find Order By Status", response, page);
+    }
+
+    @GetMapping(value = "/orders", params = "!orderStatus")
+    @Operation(summary = "Xem order theo status")
+    public ApiPagingResponse<OrderDTO> findAllOrders(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = orderService.findAllOrders(page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find all orders", response, page);
     }
 
     @DeleteMapping("/orders/{orderId}")

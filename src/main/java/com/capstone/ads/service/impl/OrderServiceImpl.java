@@ -26,6 +26,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -173,8 +174,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderDTO> findOrderByStatus(OrderStatus status, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return orderRepository.findByStatus(status, pageable)
+                .map(orderMapper::toDTO);
+    }
+
+    @Override
+    public Page<OrderDTO> findAllOrders(int page, int size) {
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return orderRepository.findAll(pageable)
                 .map(orderMapper::toDTO);
     }
 
@@ -189,7 +199,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderDTO> findOrderByUserId(String userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return orderRepository.findByUsers_Id(userId, pageable).map(orderMapper::toDTO);
     }
 

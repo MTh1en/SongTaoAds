@@ -67,6 +67,15 @@ public class EditedDesignsController {
         return ApiResponseBuilder.buildSuccessResponse("Find Edited Design by Id successfully", response);
     }
 
+    @GetMapping("/edited-designs")
+    @Operation(summary = "Xem tất cả ảnh tự thiết kế")
+    public ApiPagingResponse<EditedDesignDTO> findEditedDesignByCustomerDetailIds(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findAllEditedDesign(page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find All Edited Designs successfully", response, page);
+    }
+
     @DeleteMapping("/edited-designs/{editedDesignId}")
     @Operation(summary = "Xóa cứng hình ảnh thiết kế")
     public ApiResponse<Void> hardDeleteEditedDesign(@PathVariable String editedDesignId) {

@@ -79,6 +79,13 @@ public class EditedDesignServiceImpl implements EditedDesignService {
     }
 
     @Override
+    public Page<EditedDesignDTO> findAllEditedDesign(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return editedDesignsRepository.findAll(pageable)
+                .map(editedDesignMapper::toDTO);
+    }
+
+    @Override
     public EditedDesignDTO findEditedDesignById(String editedDesignId) {
         EditedDesigns editedDesigns = getEditedDesignById(editedDesignId);
         return editedDesignMapper.toDTO(editedDesigns);

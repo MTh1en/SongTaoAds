@@ -31,6 +31,8 @@ public class OrderDTO {
     String note;
     OrderType orderType;
     OrderStatus status;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
     CoreDTO contractors;
     UserDTO users;
 }
