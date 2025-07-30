@@ -1,6 +1,7 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.PredefinedRole;
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.user.ChangePasswordRequest;
 import com.capstone.ads.dto.user.UserDTO;
 import com.capstone.ads.dto.user.UserCreateRequest;
@@ -148,7 +149,7 @@ public class UsersServiceImpl implements UserService {
     }
 
     private String generateAvatarName(String userId) {
-        return String.format("avatar/%s", userId);
+        return String.format(S3ImageKeyFormat.AVATAR, userId);
     }
 
     private boolean isValidRole(String role) {

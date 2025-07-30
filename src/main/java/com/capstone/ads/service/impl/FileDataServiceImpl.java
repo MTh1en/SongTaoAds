@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.file.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
@@ -151,7 +152,7 @@ public class FileDataServiceImpl implements FileDataService {
 
 
     private String generateIconKey() {
-        return String.format("icon/%s", UUID.randomUUID());
+        return String.format(S3ImageKeyFormat.ICON, UUID.randomUUID());
     }
 
     private String uploadIconToS3(MultipartFile iconImage) {

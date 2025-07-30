@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.design_template.DesignTemplateCreateRequest;
 import com.capstone.ads.dto.design_template.DesignTemplateDTO;
 import com.capstone.ads.dto.design_template.DesignTemplateUpdateRequest;
@@ -23,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,7 +37,6 @@ import static com.capstone.ads.utils.LookupMapUtils.mapProductTypeSizesByDimensi
 public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     ProductTypesService productTypesService;
     CustomerChoicesService customerChoicesService;
-    ProductTypeSizesService productTypeSizesService;
     FileDataService fileDataService;
     DesignTemplatesRepository designTemplatesRepository;
     DesignTemplatesMapper designTemplatesMapper;
@@ -166,7 +165,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     }
 
     private String generateDesignTemplateKey(String productTypeId) {
-        return String.format("design-template/%s/%s", productTypeId, UUID.randomUUID());
+        return String.format(S3ImageKeyFormat.DESIGN_TEMPLATE, productTypeId, UUID.randomUUID());
     }
 
     private String uploadDesignTemplateImageToS3(String productTypeId, MultipartFile file) {

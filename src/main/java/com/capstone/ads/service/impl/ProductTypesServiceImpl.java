@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.product_type.ProductTypeCreateRequest;
 import com.capstone.ads.dto.product_type.ProductTypeDTO;
 import com.capstone.ads.dto.product_type.ProductTypeUpdateRequest;
@@ -90,6 +91,6 @@ public class ProductTypesServiceImpl implements ProductTypesService {
     }
 
     private String generateProductTypeImageKey(String productTypeId) {
-        return String.format("product-type/%s", productTypeId);
+        return String.format(S3ImageKeyFormat.PRODUCT_TYPE, productTypeId);
     }
 }

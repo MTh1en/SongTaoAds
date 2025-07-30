@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.chatBot.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
@@ -52,10 +53,11 @@ public class ModelChatServiceImpl implements ModelChatService {
 
     @Override
     public ModelChatBotDTO setModeChatBot(String modelChatId) {
-        ModelChatBot modelChatBotActive= modelChatBotRepository.getModelChatBotByActive(true)
-                .orElseThrow(()->new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
+        ModelChatBot modelChatBotActive = modelChatBotRepository.getModelChatBotByActive(true)
+                .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
         modelChatBotActive.setActive(false);
-        ModelChatBot modelChatBot= modelChatBotRepository.getById(modelChatId);
+        ModelChatBot modelChatBot = modelChatBotRepository.findById(modelChatId)
+                .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
         modelChatBot.setActive(true);
         modelChatBotRepository.save(modelChatBot);
         return modelChatBotMapper.toDTO(modelChatBot);
@@ -95,7 +97,7 @@ public class ModelChatServiceImpl implements ModelChatService {
             }
             String jsonlFileName = fileName.endsWith(".jsonl") ? fileName : fileName + ".jsonl";
             MultipartFile jsonlFile = convertToJsonl(rowsResult, headers, jsonlFileName);
-            String s3Key = String.format("uploadJsonlFile/%s_%s", UUID.randomUUID(), jsonlFileName);
+            String s3Key = String.format(S3ImageKeyFormat.FINE_TUNE_FILE, UUID.randomUUID(), jsonlFileName);
             String awsLink = s3Service.uploadSingleFile(s3Key, jsonlFile);
             return chatBotRepository.uploadFile(
                     "Bearer " + openaiApiKey,
