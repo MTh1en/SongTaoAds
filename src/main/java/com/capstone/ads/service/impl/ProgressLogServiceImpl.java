@@ -32,7 +32,6 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -51,12 +50,14 @@ public class ProgressLogServiceImpl implements ProgressLogService {
     @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleOrderStatusChangedEvent(OrderStatusChangedEvent event) {
-        ProgressLogs log = ProgressLogs.builder()
-                .orders(orderService.getOrderById(event.getOrderId()))
-                .status(event.getOrderStatus())
-                .createdBy(event.getUserId())
-                .build();
-        progressLogsRepository.save(log);
+        if (orderStateValidator.notCreateProgressLogsStatus(event.getOrderStatus())) {
+            ProgressLogs log = ProgressLogs.builder()
+                    .orders(orderService.getOrderById(event.getOrderId()))
+                    .status(event.getOrderStatus())
+                    .createdBy(event.getUserId())
+                    .build();
+            progressLogsRepository.save(log);
+        }
     }
 
     @Override
@@ -64,13 +65,8 @@ public class ProgressLogServiceImpl implements ProgressLogService {
     public ProgressLogDTO createProgressLog(String orderId, ProgressLogCreateRequest request) {
         String userId = securityContextUtils.getCurrentUserId();
         Orders order = orderService.getOrderById(orderId);
-        List<OrderStatus> validStatus = Arrays.asList(
-                OrderStatus.PRODUCING,
-                OrderStatus.PRODUCTION_COMPLETED,
-                OrderStatus.DELIVERING,
-                OrderStatus.INSTALLED
-        );
-        if (!validStatus.contains(request.getStatus())) {
+
+        if (orderStateValidator.notCreateProgressLogsStatus(request.getStatus())) {
             throw new AppException(ErrorCode.INVALID_PROGRESS_LOG_STATUS);
         }
         ProgressLogs log = progressLogMapper.mapCreateRequestToEntity(request);
