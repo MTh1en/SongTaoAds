@@ -35,4 +35,6 @@ public interface UserService {
     Users getUserByIdAndIsActive(String userId);
 
     Users getUsersByIdAndIsActiveAndRoleName(String userId, boolean isActive, String roleName);
+
+    Users getUserByEmail(String email);
 }

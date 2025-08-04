@@ -5,7 +5,7 @@ import com.capstone.ads.dto.auth.AuthResponse;
 import com.capstone.ads.dto.auth.LoginRequest;
 import com.capstone.ads.dto.auth.RegisterRequest;
 import com.capstone.ads.service.AuthService;
-import com.capstone.ads.service.VerificationService;
+import com.capstone.ads.service.RecoveryService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthController {
     AuthService authService;
-    VerificationService verificationService;
+    RecoveryService recoveryService;
 
     @PostMapping("/outbound/authentication")
     public ApiResponse<AuthResponse> outboundAuthentication(@RequestParam String code, HttpServletResponse response) {
@@ -42,7 +42,7 @@ public class AuthController {
     @Operation(summary = "Đăng ký")
     public ApiResponse<Void> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
-        verificationService.sendVerifyEmail(request.getEmail());
+        recoveryService.sendVerifyEmail(request.getEmail());
         return ApiResponseBuilder.buildSuccessResponse("Registration successful", null);
     }
 

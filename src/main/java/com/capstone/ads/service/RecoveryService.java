@@ -2,7 +2,7 @@ package com.capstone.ads.service;
 
 import com.capstone.ads.dto.email.TransactionalEmailResponse;
 
-public interface VerificationService {
+public interface RecoveryService {
     TransactionalEmailResponse sendVerifyEmail(String email);
 
     TransactionalEmailResponse sendResetPasswordEmail(String email);

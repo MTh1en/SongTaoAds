@@ -2,14 +2,14 @@ package com.capstone.ads.service.impl;
 
 import com.capstone.ads.dto.order_detail.OrderDetailCreateRequest;
 import com.capstone.ads.dto.order_detail.OrderDetailDTO;
-import com.capstone.ads.event.CustomDesignRequestCompletedEvent;
-import com.capstone.ads.event.CustomDesignRequestDemoSubmittedEvent;
-import com.capstone.ads.event.CustomDesignRequestPricingApprovedEvent;
+import com.capstone.ads.event.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.OrderDetailMapper;
 import com.capstone.ads.model.*;
+import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.model.enums.OrderStatus;
+import com.capstone.ads.model.enums.OrderType;
 import com.capstone.ads.repository.internal.OrderDetailsRepository;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.DataConverter;
@@ -18,6 +18,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     DataConverter dataConverter;
     OrderDetailsRepository orderDetailsRepository;
     OrderDetailMapper orderDetailMapper;
+    ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -153,5 +155,21 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         if (orderService.checkOrderCustomDesignSubmittedDesign(orderId)) {
             orderService.updateOrderStatusAfterCustomDesignCompleted(orderId);
         }
+    }
+
+    @Async("delegatingSecurityContextAsyncTaskExecutor")
+    @EventListener
+    @Transactional
+    public void handleOrderCancel(OrderCancelEvent event) {
+        Orders orders = orderService.getOrderById(event.getOrderId());
+
+        orders.getOrderDetails().forEach(orderDetail -> {
+            log.info("Custom Design Request publish cancelled");
+            eventPublisher.publishEvent(new CustomDesignRequestChangeStatusEvent(
+                    this,
+                    orderDetail.getCustomDesignRequests().getId(),
+                    CustomDesignRequestStatus.CANCELLED
+            ));
+        });
     }
 }

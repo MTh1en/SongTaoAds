@@ -14,6 +14,7 @@ import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.model.enums.FileTypeEnum;
 import com.capstone.ads.repository.internal.CustomDesignRequestsRepository;
 import com.capstone.ads.service.*;
+import com.capstone.ads.utils.KeyGenerator;
 import com.capstone.ads.validator.CustomDesignRequestStateValidator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         CustomerDetail customerDetail = customerDetailService.getCustomerDetailById(customerDetailId);
 
         var customDesignRequest = customDesignRequestsMapper.mapCreateRequestToEntity(request);
+        customDesignRequest.setCode(KeyGenerator.generateCustomDesignRequest());
         customDesignRequest.setCustomerDetail(customerDetail);
         customDesignRequest.setStatus(CustomDesignRequestStatus.PENDING);
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
@@ -147,7 +149,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     @Override
     public Page<CustomDesignRequestDTO> findCustomerDesignRequestByAssignDesignerId(String assignDesignerId, int page, int size) {
         Sort sort = Sort.by("updatedAt").descending();
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return customDesignRequestsRepository.findByAssignDesigner_Id(assignDesignerId, pageable)
                 .map(customDesignRequestsMapper::toDTO);
     }

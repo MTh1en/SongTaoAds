@@ -7,7 +7,8 @@ import com.capstone.ads.dto.email.transactional.Recipient;
 import com.capstone.ads.dto.email.transactional.Sender;
 import com.capstone.ads.mapper.VerificationMapper;
 import com.capstone.ads.repository.external.BrevoClient;
-import com.capstone.ads.service.VerificationService;
+import com.capstone.ads.service.RecoveryService;
+import com.capstone.ads.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class VerificationServiceImpl implements VerificationService {
+public class RecoveryServiceImpl implements RecoveryService {
     @NonFinal
     @Value("${brevo.key}")
     private String brevoKey;
@@ -53,11 +54,12 @@ public class VerificationServiceImpl implements VerificationService {
     VerificationMapper verificationMapper;
     SpringTemplateEngine templateEngine;
     RedisTemplate<String, String> redisTemplate;
+    UserService userService;
 
     @Override
     public TransactionalEmailResponse sendVerifyEmail(String email) {
+        userService.getUserByEmail(email);
         Sender sender = verificationMapper.toSender(senderName, senderEmail);
-
         List<Recipient> to = new ArrayList<>(List.of(
                 verificationMapper.toRecipient(email))
         );
@@ -75,6 +77,7 @@ public class VerificationServiceImpl implements VerificationService {
 
     @Override
     public TransactionalEmailResponse sendResetPasswordEmail(String email) {
+        userService.getUserByEmail(email);
         Sender sender = verificationMapper.toSender(senderName, senderEmail);
 
         List<Recipient> to = new ArrayList<>(List.of(

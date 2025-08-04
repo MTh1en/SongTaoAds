@@ -6,6 +6,7 @@ import com.capstone.ads.dto.order.OrderCreateRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
 import com.capstone.ads.event.CustomDesignPaymentEvent;
+import com.capstone.ads.event.OrderCancelEvent;
 import com.capstone.ads.event.OrderStatusChangedEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
@@ -16,6 +17,7 @@ import com.capstone.ads.repository.internal.OrdersRepository;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.KeyGenerator;
 import com.capstone.ads.validator.ContractStateValidator;
+import com.capstone.ads.validator.CustomDesignRequestStateValidator;
 import com.capstone.ads.validator.OrderStateValidator;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.AccessLevel;
@@ -166,8 +168,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDTO findOrderById(String orderId) {
-        Orders orders = orderRepository.findById(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        Orders orders = getOrderById(orderId);
         return orderMapper.toDTO(orders);
     }
 
@@ -185,6 +186,24 @@ public class OrderServiceImpl implements OrderService {
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return orderRepository.findAll(pageable)
                 .map(orderMapper::toDTO);
+    }
+
+    @Override
+    @Transactional
+    public void cancelOrder(String orderId) {
+        Orders orders = getOrderById(orderId);
+        orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.CANCELLED);
+
+        if (orderStateValidator.isCancelOrderDesignStatus(orders.getStatus())) {
+            log.info("Cancel order design status: {}", orders.getStatus());
+            eventPublisher.publishEvent(new OrderCancelEvent(
+                    this,
+                    orderId
+            ));
+        }
+
+        orders.setStatus(OrderStatus.CANCELLED);
+        orderRepository.save(orders);
     }
 
     @Override

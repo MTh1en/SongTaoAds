@@ -148,6 +148,12 @@ public class UsersServiceImpl implements UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
+    @Override
+    public Users getUserByEmail(String email) {
+        return usersRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
     private String generateAvatarName(String userId) {
         return String.format(S3ImageKeyFormat.AVATAR, userId);
     }

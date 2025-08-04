@@ -6,7 +6,7 @@ import com.capstone.ads.dto.email.ResendVerificationEmailRequest;
 import com.capstone.ads.dto.email.SendResetPasswordEmailRequest;
 import com.capstone.ads.dto.email.TransactionalEmailResponse;
 import com.capstone.ads.service.AuthService;
-import com.capstone.ads.service.VerificationService;
+import com.capstone.ads.service.RecoveryService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,19 +24,19 @@ import org.springframework.web.servlet.ModelAndView;
 @Tag(name = "RECOVERY")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RecoveryController {
-    VerificationService verificationService;
+    RecoveryService recoveryService;
     AuthService authService;
 
     @PostMapping("/verifications/resend")
     @Operation(summary = "Gửi lại email xác nhận tài khoản")
     public ApiResponse<TransactionalEmailResponse> resendVerificationEmail(@Valid @RequestBody ResendVerificationEmailRequest request) {
-        var response = verificationService.sendVerifyEmail(request.getEmail());
+        var response = recoveryService.sendVerifyEmail(request.getEmail());
         return ApiResponseBuilder.buildSuccessResponse("Resend email verified successfully", response);
     }
 
     @GetMapping("/verifications/verify")
     public ModelAndView verifyAccount(@RequestParam String email, @RequestParam String code) {
-        if (verificationService.validateVerificationCode(email, code)) {
+        if (recoveryService.validateVerificationCode(email, code)) {
             authService.verifyUser(email);
             return new ModelAndView("VerificationSuccess");
         } else {
@@ -49,13 +49,13 @@ public class RecoveryController {
     @PostMapping("/password-reset/resend")
     @Operation(summary = "Gửi email đặt lại mật khẩu")
     public ApiResponse<TransactionalEmailResponse> sendResetPasswordEmail(@Valid @RequestBody SendResetPasswordEmailRequest request) {
-        var response = verificationService.sendResetPasswordEmail(request.getEmail());
+        var response = recoveryService.sendResetPasswordEmail(request.getEmail());
         return ApiResponseBuilder.buildSuccessResponse("Reset password email verified successfully", response);
     }
 
     @GetMapping("/password-reset/form")
     public ModelAndView showResetForm(@RequestParam String email, @RequestParam String code) {
-        if (verificationService.validateResetCode(email, code, false)) {
+        if (recoveryService.validateResetCode(email, code, false)) {
             ModelAndView modelAndView = new ModelAndView("ResetPassword");
             ResetPasswordRequest resetForm = new ResetPasswordRequest();
             resetForm.setEmail(email);
@@ -76,7 +76,7 @@ public class RecoveryController {
         if (result.hasErrors()) {
             return new ModelAndView("ResetPassword");
         }
-        if (verificationService.validateResetCode(email, code, true)) {
+        if (recoveryService.validateResetCode(email, code, true)) {
             if (newPassword != null && newPassword.equals(confirmPassword)) {
                 authService.resetPassword(email, newPassword);
                 return new ModelAndView("PasswordResetSuccess");

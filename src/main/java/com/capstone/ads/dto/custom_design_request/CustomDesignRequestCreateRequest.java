@@ -10,6 +10,5 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomDesignRequestCreateRequest {
-    @NotBlank(message = "Requirement is Required")
     String requirements;
 }
