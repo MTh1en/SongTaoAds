@@ -21,6 +21,7 @@ public class CustomDesignRequests {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+    String code;
     String requirements;
     Long totalPrice;
     Long depositAmount;

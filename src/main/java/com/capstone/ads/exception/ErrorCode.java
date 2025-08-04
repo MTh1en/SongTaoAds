@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatusCode;
 @Getter
 public enum ErrorCode {
     // ============ AUTHENTICATION & AUTHORIZATION ============
+    ACCOUNT_NOT_REGISTERED("Account not registered", HttpStatus.UNAUTHORIZED),
     USER_NOT_FOUND("User not found", HttpStatus.NOT_FOUND),
     INVALID_CREDENTIALS("Invalid email or password", HttpStatus.UNAUTHORIZED),
     ACCOUNT_DISABLED("Account is disabled", HttpStatus.FORBIDDEN),

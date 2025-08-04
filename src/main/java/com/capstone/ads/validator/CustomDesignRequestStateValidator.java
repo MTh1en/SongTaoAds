@@ -47,7 +47,8 @@ public class CustomDesignRequestStateValidator {
 
         validTransitions.put(CustomDesignRequestStatus.ASSIGNED_DESIGNER, Set.of(
                 CustomDesignRequestStatus.DESIGNER_REJECTED,
-                CustomDesignRequestStatus.PROCESSING
+                CustomDesignRequestStatus.PROCESSING,
+                CustomDesignRequestStatus.CANCELLED
         ));
         validTransitions.put(CustomDesignRequestStatus.PROCESSING, Set.of(
                 CustomDesignRequestStatus.DEMO_SUBMITTED,

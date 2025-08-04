@@ -13,9 +13,11 @@ import java.util.Set;
 public class OrderStateValidator {
     private final Map<OrderStatus, Set<OrderStatus>> validTransitions;
     private final Set<OrderStatus> createProgressLogsStatus;
+    private final Set<OrderStatus> cancelOrderDesignStatus;
 
-    public OrderStateValidator(Set<OrderStatus> createProgressLogsStatus) {
+    public OrderStateValidator(Set<OrderStatus> createProgressLogsStatus, Set<OrderStatus> cancelOrderDesignStatus) {
         this.createProgressLogsStatus = createProgressLogsStatus;
+        this.cancelOrderDesignStatus = cancelOrderDesignStatus;
         this.validTransitions = new EnumMap<>(OrderStatus.class);
         initializeValidTransitions();
     }
@@ -33,8 +35,7 @@ public class OrderStateValidator {
 
         validTransitions.put(OrderStatus.DEPOSITED_DESIGN, Set.of(
                 OrderStatus.CANCELLED,
-                OrderStatus.NEED_FULLY_PAID_DESIGN,
-                OrderStatus.WAITING_FINAL_DESIGN
+                OrderStatus.NEED_FULLY_PAID_DESIGN
         ));
 
         validTransitions.put(OrderStatus.NEED_FULLY_PAID_DESIGN, Set.of(
@@ -44,7 +45,8 @@ public class OrderStateValidator {
 
         validTransitions.put(OrderStatus.WAITING_FINAL_DESIGN, Set.of(
                 OrderStatus.CANCELLED,
-                OrderStatus.PENDING_CONTRACT
+                OrderStatus.PENDING_CONTRACT,
+                OrderStatus.DESIGN_COMPLETED
         ));
 
         validTransitions.put(OrderStatus.PENDING_CONTRACT, Set.of(
@@ -75,32 +77,26 @@ public class OrderStateValidator {
         ));
 
         validTransitions.put(OrderStatus.CONTRACT_CONFIRMED, Set.of(
-                OrderStatus.CANCELLED,
                 OrderStatus.DEPOSITED
         ));
 
         validTransitions.put(OrderStatus.DEPOSITED, Set.of(
-                OrderStatus.CANCELLED,
                 OrderStatus.IN_PROGRESS
         ));
 
         validTransitions.put(OrderStatus.IN_PROGRESS, Set.of(
-                OrderStatus.CANCELLED,
                 OrderStatus.PRODUCING
         ));
 
         validTransitions.put(OrderStatus.PRODUCING, Set.of(
-                OrderStatus.CANCELLED,
                 OrderStatus.PRODUCTION_COMPLETED
         ));
 
         validTransitions.put(OrderStatus.PRODUCTION_COMPLETED, Set.of(
-                OrderStatus.CANCELLED,
                 OrderStatus.DELIVERING
         ));
 
         validTransitions.put(OrderStatus.DELIVERING, Set.of(
-                OrderStatus.CANCELLED,
                 OrderStatus.INSTALLED
         ));
 
@@ -110,12 +106,21 @@ public class OrderStateValidator {
 
         validTransitions.put(OrderStatus.CANCELLED, Set.of());
         validTransitions.put(OrderStatus.ORDER_COMPLETED, Set.of());
+        validTransitions.put(OrderStatus.DESIGN_COMPLETED, Set.of());
 
         createProgressLogsStatus.addAll(Set.of(
                 OrderStatus.PRODUCING,
                 OrderStatus.PRODUCTION_COMPLETED,
                 OrderStatus.DELIVERING,
                 OrderStatus.INSTALLED
+        ));
+
+        cancelOrderDesignStatus.addAll(Set.of(
+                OrderStatus.PENDING_DESIGN,
+                OrderStatus.NEED_DEPOSIT_DESIGN,
+                OrderStatus.DEPOSITED_DESIGN,
+                OrderStatus.NEED_FULLY_PAID_DESIGN,
+                OrderStatus.WAITING_FINAL_DESIGN
         ));
     }
 
@@ -143,5 +148,12 @@ public class OrderStateValidator {
             return true;
         }
         return !createProgressLogsStatus.contains(status);
+    }
+
+    public boolean isCancelOrderDesignStatus(OrderStatus status) {
+        if (status == null) {
+            return false;
+        }
+        return cancelOrderDesignStatus.contains(status);
     }
 }
