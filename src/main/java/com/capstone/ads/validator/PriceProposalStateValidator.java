@@ -33,9 +33,8 @@ public class PriceProposalStateValidator {
             return false;
         }
 
-        // Allow staying in the same state (if needed)
         if (currentStatus == newStatus) {
-            return true;
+            return false;
         }
         return validTransitions.getOrDefault(currentStatus, Set.of())
                 .contains(newStatus);
