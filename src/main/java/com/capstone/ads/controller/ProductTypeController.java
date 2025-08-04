@@ -25,9 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProductTypeController {
     ProductTypesService service;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Tạo loại sản phẩm")
-    public ApiResponse<ProductTypeDTO> createProductType(@Valid @RequestBody ProductTypeCreateRequest request) {
+    public ApiResponse<ProductTypeDTO> createProductType(@Valid @ModelAttribute ProductTypeCreateRequest request) {
         var response = service.createProductType(request);
         return ApiResponseBuilder.buildSuccessResponse("Create product type successful", response);
     }

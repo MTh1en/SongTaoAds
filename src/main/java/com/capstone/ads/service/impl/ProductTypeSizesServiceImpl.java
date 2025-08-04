@@ -76,8 +76,6 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
         var productTypeSize = getProductTypeSizeByProductTypeIdAndSizeId(productTypeId, sizeId);
         Float maxValue = productTypeSize.getMaxValue();
         Float minValue = productTypeSize.getMinValue();
-        log.info("sizeValue: {}", sizeValue);
-        log.info("maxValue: {}, minValue: {}", maxValue, minValue);
         if (sizeValue > maxValue || sizeValue < minValue) {
             throw new AppException(ErrorCode.SIZE_VALUE_OUT_OF_RANGE);
         }

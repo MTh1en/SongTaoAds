@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.progress_log.ProgressLogCreateRequest;
 import com.capstone.ads.dto.progress_log.ProgressLogDTO;
 import com.capstone.ads.event.OrderStatusChangedEvent;
@@ -23,6 +24,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +32,6 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -49,12 +50,14 @@ public class ProgressLogServiceImpl implements ProgressLogService {
     @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleOrderStatusChangedEvent(OrderStatusChangedEvent event) {
-        ProgressLogs log = ProgressLogs.builder()
-                .orders(orderService.getOrderById(event.getOrderId()))
-                .status(event.getOrderStatus())
-                .createdBy(event.getUserId())
-                .build();
-        progressLogsRepository.save(log);
+        if (orderStateValidator.notCreateProgressLogsStatus(event.getOrderStatus())) {
+            ProgressLogs log = ProgressLogs.builder()
+                    .orders(orderService.getOrderById(event.getOrderId()))
+                    .status(event.getOrderStatus())
+                    .createdBy(event.getUserId())
+                    .build();
+            progressLogsRepository.save(log);
+        }
     }
 
     @Override
@@ -62,13 +65,8 @@ public class ProgressLogServiceImpl implements ProgressLogService {
     public ProgressLogDTO createProgressLog(String orderId, ProgressLogCreateRequest request) {
         String userId = securityContextUtils.getCurrentUserId();
         Orders order = orderService.getOrderById(orderId);
-        List<OrderStatus> validStatus = Arrays.asList(
-                OrderStatus.PRODUCING,
-                OrderStatus.PRODUCTION_COMPLETED,
-                OrderStatus.DELIVERING,
-                OrderStatus.INSTALLED
-        );
-        if (!validStatus.contains(request.getStatus())) {
+
+        if (orderStateValidator.notCreateProgressLogsStatus(request.getStatus())) {
             throw new AppException(ErrorCode.INVALID_PROGRESS_LOG_STATUS);
         }
         ProgressLogs log = progressLogMapper.mapCreateRequestToEntity(request);
@@ -94,7 +92,8 @@ public class ProgressLogServiceImpl implements ProgressLogService {
 
     @Override
     public Page<ProgressLogDTO> findProgressLogByOrderId(String orderId, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return progressLogsRepository.findByOrders_Id(orderId, pageable)
                 .map(progressLogMapper::toDTO);
     }
@@ -103,7 +102,7 @@ public class ProgressLogServiceImpl implements ProgressLogService {
     private List<String> generateProgressLogImagesKey(String orderId, OrderStatus orderStatus, Integer amountKey) {
         List<String> keys = new ArrayList<>();
         IntStream.range(0, amountKey)
-                .forEach(i -> keys.add(String.format("orders/%s/%s/%s", orderId, orderStatus, UUID.randomUUID())));
+                .forEach(i -> keys.add(String.format(S3ImageKeyFormat.ORDER_LOG, orderId, orderStatus, UUID.randomUUID())));
         return keys;
     }
 }

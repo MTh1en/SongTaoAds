@@ -12,7 +12,7 @@ import com.capstone.ads.model.*;
 import com.capstone.ads.model.enums.OrderStatus;
 import com.capstone.ads.repository.internal.OrderDetailsRepository;
 import com.capstone.ads.service.*;
-import com.capstone.ads.utils.CustomerChoiceHistoriesConverter;
+import com.capstone.ads.utils.DataConverter;
 import io.micrometer.common.util.StringUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     CustomerChoicesService customerChoicesService;
     CustomDesignRequestService customDesignRequestService;
     EditedDesignService editedDesignService;
-    CustomerChoiceHistoriesConverter customerChoiceHistoriesConverter;
+    DataConverter dataConverter;
     OrderDetailsRepository orderDetailsRepository;
     OrderDetailMapper orderDetailMapper;
 
@@ -54,8 +55,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         OrderDetails orderDetails = orderDetailMapper.mapCreateRequestToEntity(request);
         orderDetails.setOrders(orders);
+        orderDetails.setCreatedAt(LocalDateTime.now());
         orderDetails.setDetailConstructionAmount(customerChoices.getTotalAmount());
-        orderDetails.setCustomerChoiceHistories(customerChoiceHistoriesConverter.convertToHistory(customerChoices));
+        orderDetails.setCustomerChoiceHistories(dataConverter.convertToHistory(customerChoices));
 
         if (StringUtils.isNotBlank(request.getCustomDesignRequestId())) {
             orderDetailsRepository.findByCustomDesignRequests_Id(request.getCustomDesignRequestId())
@@ -77,7 +79,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
         orderDetails = orderDetailsRepository.save(orderDetails);
 
-        orderService.updateAllAmount(orderId);
+        orders.getOrderDetails().add(orderDetails);
+        orderService.updateAllAmount(orderDetails.getOrders());
         customerChoicesService.hardDeleteCustomerChoice(request.getCustomerChoiceId());
         return orderDetailMapper.toDTO(orderDetails);
     }
@@ -119,10 +122,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         orderDetail.setDetailDesignAmount(event.getTotalPrice());
         orderDetail.setDetailDepositDesignAmount(event.getDepositAmount());
         orderDetail.setDetailRemainingDesignAmount(event.getRemainingAmount());
-        orderDetailsRepository.save(orderDetail);
+        orderDetail = orderDetailsRepository.save(orderDetail);
 
-        orderService.updateAllAmount(orderDetail.getOrders().getId());
-        log.info("Result price approved: {}", orderService.checkOrderNeedDepositDesign(orderId));
+        orderService.updateAllAmount(orderDetail.getOrders());
         if (orderService.checkOrderNeedDepositDesign(orderId)) {
             orderService.updateOrderStatus(orderId, OrderStatus.NEED_DEPOSIT_DESIGN);
         }
@@ -136,8 +138,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
         String orderId = orderDetail.getOrders().getId();
 
-        log.info("Result demo approved: {}", orderService.checkOrderNeedFullyPaidDesign(orderId));
-
         if (orderService.checkOrderNeedFullyPaidDesign(orderId)) {
             orderService.updateOrderStatus(orderId, OrderStatus.NEED_FULLY_PAID_DESIGN);
         }
@@ -150,7 +150,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
         String orderId = orderDetail.getOrders().getId();
 
-        log.info("result: {}", orderService.checkOrderCustomDesignSubmittedDesign(orderId));
         if (orderService.checkOrderCustomDesignSubmittedDesign(orderId)) {
             orderService.updateOrderStatusAfterCustomDesignCompleted(orderId);
         }

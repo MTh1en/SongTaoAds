@@ -90,7 +90,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Page<TicketDTO> viewTicketByStatus(TicketStatus status, int page, int size) {
-        Sort sort = Sort.by("createdAt").ascending();
+        Sort sort = Sort.by("createdAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return ticketRepository.findByStatus(status, pageable)
                 .map(ticketsMapper::toDTO);
@@ -98,7 +98,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Page<TicketDTO> viewTicketsOfStaff(int page, int size) {
-        Sort sort = Sort.by("createdAt").ascending();
+        Sort sort = Sort.by("createdAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return ticketRepository.findBySeverity(TicketSeverity.PRODUCTION, pageable)
                 .map(ticketsMapper::toDTO);
@@ -106,7 +106,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Page<TicketDTO> viewAllTickets(int page, int size) {
-        Sort sort = Sort.by("createdAt").ascending();
+        Sort sort = Sort.by("createdAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return ticketRepository.findAll(pageable)
                 .map(ticketsMapper::toDTO);
@@ -114,7 +114,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Page<TicketDTO> viewTicketsByUserId(String userId, int page, int size) {
-        Sort sort = Sort.by("createdAt").ascending();
+        Sort sort = Sort.by("createdAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return ticketRepository.findByCustomerId(userId, pageable)
                 .map(ticketsMapper::toDTO);

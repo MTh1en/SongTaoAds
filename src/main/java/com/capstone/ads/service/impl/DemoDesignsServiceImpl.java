@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.demo_design.DemoDesignCreateRequest;
 import com.capstone.ads.dto.demo_design.DemoDesignDTO;
 import com.capstone.ads.dto.demo_design.CustomerRejectCustomDesignRequest;
@@ -213,13 +214,13 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
     }
 
     private String generateCustomDesignKey(String customDesignRequestId) {
-        return String.format("custom-design/%s/%s", customDesignRequestId, UUID.randomUUID());
+        return String.format(S3ImageKeyFormat.DEMO_DESIGN, customDesignRequestId, UUID.randomUUID());
     }
 
     private List<String> generateDemoDesignSumImageKey(String customDesignRequestId, Integer amountKey) {
         List<String> keys = new ArrayList<>();
         IntStream.range(0, amountKey)
-                .forEach(i -> keys.add(String.format("custom-design/%s/sub-demo/%s",
+                .forEach(i -> keys.add(String.format(S3ImageKeyFormat.DEMO_DESIGN_SUB_IMAGE,
                         customDesignRequestId, UUID.randomUUID())));
         return keys;
     }

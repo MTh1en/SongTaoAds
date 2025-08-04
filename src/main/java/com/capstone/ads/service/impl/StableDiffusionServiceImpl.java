@@ -16,14 +16,16 @@ import com.capstone.ads.repository.external.StableDiffusionClient;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.DataConverter;
 import com.capstone.ads.utils.SecurityContextUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -59,40 +61,45 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
     SecurityContextUtils securityContextUtils;
 
     @Override
+    @CircuitBreaker(name = "stableDiffusionApi", fallbackMethod = "generateImageFromDesignTemplateFallback")
     public FileInformation generateImageFromDesignTemplate(String designTemplateId, String prompt, Integer width, Integer height) {
         String bearerStableDiffusionToken = generateBearerStableDiffusionToken();
         String userId = securityContextUtils.getCurrentUserId();
-        log.info("PROMPT: {}", prompt);
+        // Xây dựng TextToImageRequest
         if (prompt != null && !prompt.isEmpty()) {
             prompt = chatBotService.translateToTextToImagePrompt(prompt);
+
         } else {
-            throw new AppException(ErrorCode.PROMPT_CAN_NOT_BLANK);
+            prompt = "A simple advertising 2d background";
         }
+
+        log.info("Prompt: {}", prompt);
+
         String imageBase64 = getImageBytesFromDesignTemplate(designTemplateId);
         Args controlNetArgs = stableDiffusionMapper.mapArgs(imageBase64, controlnetModule, controlnetModel);
-
         AlwaysonScripts alwaysonScripts = stableDiffusionMapper.mapAlwaysonScripts(controlNetArgs);
 
         Map<String, Object> overrideSettings = new HashMap<>() {
             {
                 put("sd_model_checkpoint", modelCheckpoint);
+                put("forge_async_loading", "Async");
+                put("forge_pin_shared_memory", "Shared");
             }
         };
-
-        // Xây dựng TextToImageRequest
-        if (Strings.isBlank(prompt)) {
-            prompt = "A simple advertising 2d background";
-        }
 
         TextToImageRequest request = stableDiffusionMapper.mapTextToImageRequest(prompt, width, height, alwaysonScripts, userId, overrideSettings);
         var response = stableDiffusionClient.textToImage(bearerStableDiffusionToken, request);
         String base64OutputImage = response.getImages().getFirst();
         byte[] outputImageBytes = DataConverter.convertBase64ToByteArray(base64OutputImage);
-
         return FileInformation.builder()
                 .content(outputImageBytes)
                 .contentType(MediaType.IMAGE_PNG_VALUE)
                 .build();
+    }
+
+    public FileInformation generateImageFromDesignTemplateFallback(String designTemplateId, String prompt, Integer width, Integer height, Throwable t) {
+        log.error("Circuit Breaker triggered for generateImageFromDesignTemplate. Stable Diffusion API might be unavailable. Error: {}", t.getMessage());
+        throw new AppException(ErrorCode.EXTERNAL_SERVICE_ERROR);
     }
 
     @Override

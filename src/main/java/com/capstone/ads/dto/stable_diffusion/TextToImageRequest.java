@@ -20,7 +20,13 @@ public class TextToImageRequest {
     String prompt = "A simple advertising 2d background";
 
     @Builder.Default
-    String negativePrompt = "(nsfw, naked, nude, deformed iris, deformed pupils, semi-realistic, cgi, 3d, render, sketch, cartoon, drawing, anime, mutated hands and fingers:1.4), (deformed, distorted, disfigured:1.3), poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, disconnected limbs, mutation, mutated, ugly, disgusting, amputation";
+    String negativePrompt = """
+            (nsfw, naked, nude, deformed iris, deformed pupils, semi-realistic, 
+            cgi, 3d, render, sketch, cartoon, drawing, anime, mutated hands and fingers:1.4), 
+            (deformed, distorted, disfigured:1.3), 
+            poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, disconnected limbs, 
+            mutation, mutated, ugly, disgusting, amputation, text, fictional structure
+            """;
 
     @Builder.Default
     Integer cfgScale = 5;
@@ -32,7 +38,7 @@ public class TextToImageRequest {
     Integer nIter = 1;
 
     @Builder.Default
-    Integer steps = 30;
+    Integer steps = 25;
 
     @Builder.Default
     Integer width = 1024;

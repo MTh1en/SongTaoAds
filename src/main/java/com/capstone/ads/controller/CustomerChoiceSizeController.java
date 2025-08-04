@@ -4,6 +4,7 @@ import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeCreateRequest;
 import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeDTO;
 import com.capstone.ads.dto.customer_choice_size.CustomerChoicesSizeUpdateRequest;
+import com.capstone.ads.dto.customer_choice_size.PixelConvertResponse;
 import com.capstone.ads.service.CustomerChoiceSizesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,10 +58,10 @@ public class CustomerChoiceSizeController {
         return ApiResponseBuilder.buildSuccessResponse("Find all customer choices size by customer choices", response);
     }
 
-    @GetMapping("/customer-choice-sizes/{customerChoiceSizeId}/pixel-value")
+    @GetMapping("/customer-choices/{customerChoiceId}/pixel-value")
     @Operation(summary = "Chuyển kích thước khách hàng chọn sang giá trị pixel")
-    public ApiResponse<Long> convertToPixelValue(@PathVariable String customerChoiceSizeId) {
-        var response = service.convertToPixel(customerChoiceSizeId);
+    public ApiResponse<PixelConvertResponse> convertToPixelValue(@PathVariable String customerChoiceId) {
+        var response = service.convertCustomerChoiceSizeToPixel(customerChoiceId);
         return ApiResponseBuilder.buildSuccessResponse("Convert pixel value successful", response);
     }
 

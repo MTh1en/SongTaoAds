@@ -24,6 +24,8 @@ public interface OrderService {
 
     Page<OrderDTO> findOrderByStatus(OrderStatus status, int page, int size);
 
+    Page<OrderDTO> findAllOrders(int page, int size);
+
     void hardDeleteOrder(String orderId);
 
     Page<OrderDTO> findOrderByUserId(String userId, int page, int size);
@@ -42,7 +44,7 @@ public interface OrderService {
 
     void updateOrderStatusAfterCustomDesignCompleted(String orderId);
 
-    void updateAllAmount(String orderId);
+    void updateAllAmount(Orders orders);
 
     void updateOrderFromWebhookResult(Orders orders, PaymentType paymentType);
 }

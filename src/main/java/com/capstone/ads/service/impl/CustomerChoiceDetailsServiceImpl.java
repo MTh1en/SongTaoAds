@@ -7,14 +7,12 @@ import com.capstone.ads.mapper.CustomerChoiceDetailsMapper;
 import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.CustomerChoiceDetailsRepository;
 import com.capstone.ads.service.*;
+import com.capstone.ads.utils.DataConverter;
+import com.capstone.ads.utils.SpelFormulaEvaluator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +33,7 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
     AttributeValuesService attributeValuesService;
     CustomerChoiceDetailsRepository customerChoiceDetailsRepository;
     CustomerChoiceDetailsMapper customerChoiceDetailsMapper;
-    ExpressionParser parser = new SpelExpressionParser();
+    SpelFormulaEvaluator formulaEvaluator;
 
     @Override
     @Transactional
@@ -103,13 +101,6 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
         customerChoiceDetailsRepository.deleteById(id);
     }
 
-    @Override
-    public void recalculateSubtotal(CustomerChoiceDetails customerChoiceDetails) {
-        long newValue = calculateSubtotal(customerChoiceDetails);
-        customerChoiceDetails.setSubTotal(newValue);
-        customerChoiceDetailsRepository.save(customerChoiceDetails);
-    }
-
     private void validateAttributeBelongsToSameAttributeType(AttributeValues currentValue, AttributeValues newValue) {
         if (!currentValue.getAttributes().getId().equals(newValue.getAttributes().getId())) {
             throw new AppException(ErrorCode.ATTRIBUTE_NOT_BELONG_CUSTOMER_CHOICE_DETAIL);
@@ -138,18 +129,34 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
 
     //CALCULATE SUBTOTAL
 
-    public Long calculateSubtotal(CustomerChoiceDetails customerChoicesDetail) {
-        Attributes attribute = customerChoicesDetail.getAttributeValues().getAttributes();
-        var attributeValues = customerChoicesDetail.getAttributeValues();
-        var customerChoiceSize = customerChoicesDetail.getCustomerChoices().getCustomerChoiceSizes();
-
-        Map<String, Float> variables = prepareVariablesForSubtotal(attributeValues, customerChoiceSize);
-
-        return calculateWithFormula(attribute.getCalculateFormula(), variables);
+    @Override
+    public void recalculateAllSubtotal(List<CustomerChoiceDetails> customerChoiceDetailsList) {
+        customerChoiceDetailsList.forEach(customerChoiceDetails -> {
+            customerChoiceDetails.setSubTotal(calculateSubtotal(customerChoiceDetails));
+        });
+        customerChoiceDetailsRepository.saveAll(customerChoiceDetailsList);
     }
 
-    private Map<String, Float> prepareVariablesForSubtotal(AttributeValues attributeValues, List<CustomerChoiceSizes> customerChoiceSizes) {
-        Map<String, Float> variables = new HashMap<>();
+    @Override
+    public void recalculateSubtotal(CustomerChoiceDetails customerChoiceDetails) {
+        long newValue = calculateSubtotal(customerChoiceDetails);
+        customerChoiceDetails.setSubTotal(newValue);
+        customerChoiceDetailsRepository.save(customerChoiceDetails);
+    }
+
+    public Long calculateSubtotal(CustomerChoiceDetails customerChoicesDetail) {
+        Attributes attribute = customerChoicesDetail.getAttributeValues().getAttributes();
+
+        Map<String, Object> variables = prepareVariablesForSubtotal(
+                customerChoicesDetail.getAttributeValues(),
+                customerChoicesDetail.getCustomerChoices().getCustomerChoiceSizes()
+        );
+
+        return formulaEvaluator.evaluateFormula(attribute.getCalculateFormula(), variables);
+    }
+
+    private Map<String, Object> prepareVariablesForSubtotal(AttributeValues attributeValues, List<CustomerChoiceSizes> customerChoiceSizes) {
+        Map<String, Object> variables = new HashMap<>();
 
         variables.put("unitPrice", Optional.ofNullable(attributeValues)
                 .map(AttributeValues::getUnitPrice)
@@ -159,24 +166,12 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
         return variables;
     }
 
-    private Long calculateWithFormula(String formula, Map<String, Float> variables) {
-        StandardEvaluationContext context = new StandardEvaluationContext();
-        context.setVariables(new HashMap<>(variables));
-        Expression expression = parser.parseExpression(formula);
-        return expression.getValue(context, Long.class);
-    }
-
     private Map<String, Float> getSizeValues(List<CustomerChoiceSizes> customerChoiceSizes) {
-        Map<String, Float> variables = new HashMap<>();
-        customerChoiceSizes.forEach(size -> {
-            String sizeName = size.getSizes().getName();
-            variables.put(normalizeName(sizeName), size.getSizeValue());
-        });
-        return variables;
-    }
-
-    // Chuẩn hóa tên (loại bỏ khoảng trắng)
-    private String normalizeName(String name) {
-        return name.trim().replaceAll("\\s+", "");
+        return customerChoiceSizes.stream()
+                .collect(Collectors.toMap(
+                        size -> DataConverter.normalizeFormulaValueName(size.getSizes().getName()),
+                        CustomerChoiceSizes::getSizeValue,
+                        (v1, v2) -> v1 // Xử lý trường hợp trùng key (nếu có)
+                ));
     }
 }

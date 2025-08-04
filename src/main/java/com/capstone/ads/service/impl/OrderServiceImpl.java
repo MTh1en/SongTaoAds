@@ -14,6 +14,7 @@ import com.capstone.ads.model.*;
 import com.capstone.ads.model.enums.*;
 import com.capstone.ads.repository.internal.OrdersRepository;
 import com.capstone.ads.service.*;
+import com.capstone.ads.utils.KeyGenerator;
 import com.capstone.ads.validator.ContractStateValidator;
 import com.capstone.ads.validator.OrderStateValidator;
 import com.capstone.ads.utils.SecurityContextUtils;
@@ -25,6 +26,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,8 +50,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDTO createOrder(OrderCreateRequest request) {
         Users users = securityContextUtils.getCurrentUser();
-
         Orders orders = orderMapper.mapCreateRequestToEntity(request);
+        orders.setOrderCode(KeyGenerator.generateOrderCode());
         orders.setUsers(users);
         orders.setStatus(
                 (request.getOrderType().equals(OrderType.AI_DESIGN))
@@ -103,6 +105,16 @@ public class OrderServiceImpl implements OrderService {
         orders.getContract().setStatus(ContractStatus.CONFIRMED);
         orders.setDepositConstructionAmount(depositAmount);
         orders.setRemainingConstructionAmount(remainingAmount);
+
+        orders.setTotalOrderDepositAmount(orders.getDepositDesignAmount() != null
+                ? orders.getTotalOrderDepositAmount() + depositAmount
+                : depositAmount
+        );
+        orders.setTotalOrderRemainingAmount(orders.getRemainingDesignAmount() != null
+                ? orders.getRemainingDesignAmount() + remainingAmount
+                : remainingAmount
+        );
+
         orderRepository.save(orders);
 
         eventPublisher.publishEvent(new OrderStatusChangedEvent(
@@ -161,8 +173,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderDTO> findOrderByStatus(OrderStatus status, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return orderRepository.findByStatus(status, pageable)
+                .map(orderMapper::toDTO);
+    }
+
+    @Override
+    public Page<OrderDTO> findAllOrders(int page, int size) {
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return orderRepository.findAll(pageable)
                 .map(orderMapper::toDTO);
     }
 
@@ -177,7 +198,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderDTO> findOrderByUserId(String userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return orderRepository.findByUsers_Id(userId, pageable).map(orderMapper::toDTO);
     }
 
@@ -212,11 +234,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public boolean checkOrderNeedDepositDesign(String orderId) {
         Orders orders = getOrderById(orderId);
-//        orders.getOrderDetails()
-//                .forEach(orderDetails ->
-//                        log.info("id: {}, status: {}",
-//                                orderDetails.getCustomDesignRequests().getId(),
-//                                orderDetails.getCustomDesignRequests().getStatus()));
         return orders.getOrderDetails().stream()
                 .allMatch(orderDetails ->
                         orderDetails.getCustomDesignRequests().getStatus().equals(CustomDesignRequestStatus.APPROVED_PRICING));
@@ -226,12 +243,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public boolean checkOrderNeedFullyPaidDesign(String orderId) {
         Orders orders = getOrderById(orderId);
-//        orders.getOrderDetails()
-//                .forEach(orderDetails ->
-//                        log.info("status: {}, id: {}",
-//                                orderDetails.getCustomDesignRequests().getStatus(),
-//                                orderDetails.getCustomDesignRequests().getId()));
-
         return orders.getOrderDetails().stream()
                 .allMatch(orderDetails ->
                         orderDetails.getCustomDesignRequests().getStatus().equals(CustomDesignRequestStatus.WAITING_FULL_PAYMENT));
@@ -241,11 +252,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public boolean checkOrderCustomDesignSubmittedDesign(String orderId) {
         Orders orders = getOrderById(orderId);
-//        orders.getOrderDetails()
-//                .forEach(orderDetails ->
-//                        log.info("status check: {}, id: {}",
-//                                orderDetails.getCustomDesignRequests().getStatus(),
-//                                orderDetails.getCustomDesignRequests().getId()));
         return orders.getOrderDetails().stream()
                 .allMatch(orderDetails ->
                         orderDetails.getCustomDesignRequests().getStatus().equals(CustomDesignRequestStatus.COMPLETED)
@@ -256,11 +262,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void updateOrderStatusAfterCustomDesignCompleted(String orderId) {
         Orders orders = getOrderById(orderId);
-//        orders.getOrderDetails()
-//                .forEach(orderDetails ->
-//                        log.info("status completed: {}, id: {}",
-//                                orderDetails.getCustomDesignRequests().getStatus(),
-//                                orderDetails.getCustomDesignRequests().getId()));
         if (orders.getOrderType().equals(OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION)) {
             orders.setStatus(OrderStatus.PENDING_CONTRACT);
         } else {
@@ -315,9 +316,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
-    public void updateAllAmount(String orderId) {
-        Orders orders = getOrderById(orderId);
+    public void updateAllAmount(Orders orders) {
         long totalConstructionAmount = 0L;
         long depositConstructionAmount = 0L;
         long totalDesignAmount = 0L;
@@ -344,9 +343,16 @@ public class OrderServiceImpl implements OrderService {
         orders.setTotalConstructionAmount(totalConstructionAmount);
         orders.setDepositConstructionAmount(depositConstructionAmount);
         orders.setRemainingConstructionAmount(totalConstructionAmount - depositConstructionAmount);
+
         orders.setTotalDesignAmount(totalDesignAmount);
         orders.setDepositDesignAmount(depositDesignAmount);
         orders.setRemainingDesignAmount(totalDesignAmount - depositDesignAmount);
+
+        orders.setTotalOrderAmount(totalConstructionAmount + totalDesignAmount);
+        orders.setTotalOrderDepositAmount(depositConstructionAmount + depositDesignAmount);
+        orders.setTotalOrderRemainingAmount(
+                (totalConstructionAmount - depositConstructionAmount) + (totalDesignAmount - depositDesignAmount)
+        );
 
         orderRepository.save(orders);
     }

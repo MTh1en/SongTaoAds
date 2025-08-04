@@ -1,5 +1,6 @@
 package com.capstone.ads.model;
 
+import com.capstone.ads.model.enums.DimensionType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -21,6 +22,9 @@ public class ProductTypeSizes {
     String id;
     Float maxValue;
     Float minValue;
+
+    @Enumerated(EnumType.STRING)
+    DimensionType dimensionType;
 
     @CreationTimestamp
     LocalDateTime createdAt;

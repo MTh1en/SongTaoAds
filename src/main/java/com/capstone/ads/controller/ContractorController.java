@@ -13,7 +13,9 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,18 +25,26 @@ import org.springframework.web.bind.annotation.*;
 public class ContractorController {
     ContractorService contractorService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Tạo đơn vị thi công")
-    public ApiResponse<ContractorDTO> createContractor(@Valid @RequestBody ContractorCreateRequest request) {
+    public ApiResponse<ContractorDTO> createContractor(@Valid @ModelAttribute ContractorCreateRequest request) {
         var response = contractorService.createContractor(request);
         return ApiResponseBuilder.buildSuccessResponse("Create contractor successful", response);
     }
 
     @PutMapping("/{contractorId}")
     @Operation(summary = "Cập nhật thông tin đơn vị thi công")
-    public ApiResponse<ContractorDTO> updateContractor(@PathVariable String contractorId,
-                                                       @Valid @RequestBody ContractorUpdateRequest request) {
-        var response = contractorService.updateContractor(contractorId, request);
+    public ApiResponse<ContractorDTO> updateContractorInformation(@PathVariable String contractorId,
+                                                                  @Valid @RequestBody ContractorUpdateRequest request) {
+        var response = contractorService.updateContractorInformation(contractorId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Update contractor successful", response);
+    }
+
+    @PatchMapping(value = "/{contractorId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Cập nhật hình ảnh đơn vị thi công")
+    public ApiResponse<ContractorDTO> updateContractorImage(@PathVariable String contractorId,
+                                                            @RequestPart MultipartFile file) {
+        var response = contractorService.updateContractorLogo(contractorId, file);
         return ApiResponseBuilder.buildSuccessResponse("Update contractor successful", response);
     }
 

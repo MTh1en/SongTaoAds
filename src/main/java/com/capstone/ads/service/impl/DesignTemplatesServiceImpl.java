@@ -1,18 +1,17 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.design_template.DesignTemplateCreateRequest;
 import com.capstone.ads.dto.design_template.DesignTemplateDTO;
 import com.capstone.ads.dto.design_template.DesignTemplateUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.DesignTemplatesMapper;
-import com.capstone.ads.model.DesignTemplates;
-import com.capstone.ads.model.ProductTypes;
-import com.capstone.ads.model.Users;
+import com.capstone.ads.model.*;
+import com.capstone.ads.model.enums.AspectRatio;
+import com.capstone.ads.model.enums.DimensionType;
 import com.capstone.ads.repository.internal.DesignTemplatesRepository;
-import com.capstone.ads.service.DesignTemplatesService;
-import com.capstone.ads.service.FileDataService;
-import com.capstone.ads.service.ProductTypesService;
+import com.capstone.ads.service.*;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import static com.capstone.ads.utils.LookupMapUtils.mapProductTypeSizesByDimensionAndSize;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     ProductTypesService productTypesService;
+    CustomerChoicesService customerChoicesService;
     FileDataService fileDataService;
     DesignTemplatesRepository designTemplatesRepository;
     DesignTemplatesMapper designTemplatesMapper;
@@ -58,7 +62,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     @Override
     @Transactional
     public DesignTemplateDTO updateDesignTemplateInformation(String designTemplateId, DesignTemplateUpdateRequest request) {
-        DesignTemplates designTemplates = findDesignTemplateByIdAndAvailable(designTemplateId);
+        DesignTemplates designTemplates = getDesignTemplateByIdAndAvailable(designTemplateId);
 
         designTemplatesMapper.updateEntityFromRequest(request, designTemplates);
         designTemplates = designTemplatesRepository.save(designTemplates);
@@ -68,7 +72,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     @Override
     @Transactional
     public DesignTemplateDTO uploadDesignTemplateImage(String designTemplateId, MultipartFile file) {
-        DesignTemplates designTemplates = findDesignTemplateByIdAndAvailable(designTemplateId);
+        DesignTemplates designTemplates = getDesignTemplateByIdAndAvailable(designTemplateId);
         String productTypeId = designTemplates.getProductTypes().getId();
         fileDataService.hardDeleteFileDataByImageUrl(designTemplates.getImage());
 
@@ -81,7 +85,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
 
     @Override
     public DesignTemplateDTO findDesignTemplateById(String designTemplateId) {
-        var designTemplates = findById(designTemplateId);
+        var designTemplates = getDesignTemplateById(designTemplateId);
         return designTemplatesMapper.toDTO(designTemplates);
     }
 
@@ -97,7 +101,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     public Page<DesignTemplateDTO> findAllDesignTemplates(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        return designTemplatesRepository.findAll(pageable)
+        return designTemplatesRepository.findByIsAvailable(true, pageable)
                 .map(designTemplatesMapper::toDTO);
     }
 
@@ -116,18 +120,52 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
                 .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
     }
 
-    private DesignTemplates findById(String designTemplateId) {
-        return designTemplatesRepository.findById(designTemplateId)
-                .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
+    public Page<DesignTemplateDTO> suggestDesignTemplatesBaseCustomerChoice(String customerChoiceId, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        CustomerChoices customerChoices = customerChoicesService.getCustomerChoiceById(customerChoiceId);
+        Float width = 0.0F, height = 0.0F;
+
+        Map<String, Map<DimensionType, ProductTypeSizes>> productTypeSizesLookup = mapProductTypeSizesByDimensionAndSize(customerChoices);
+
+        List<CustomerChoiceSizes> sizes = customerChoices.getCustomerChoiceSizes();
+        for (CustomerChoiceSizes customerChoiceSize : sizes) {
+            Map<DimensionType, ProductTypeSizes> dimTypeMap = productTypeSizesLookup.get(customerChoiceSize.getSizes().getId());
+
+            ProductTypeSizes widthPts = dimTypeMap.get(DimensionType.WIDTH);
+            ProductTypeSizes heightPts = dimTypeMap.get(DimensionType.HEIGHT);
+
+            if (widthPts != null) {
+                width = customerChoiceSize.getSizeValue(); // Giá trị của CustomerChoiceSize
+            }
+            if (heightPts != null) {
+                height = customerChoiceSize.getSizeValue(); // Giá trị của CustomerChoiceSize
+            }
+        }
+
+        float imageRatio = width / height;
+
+        if (imageRatio > 1) {
+            return getDesignTemplateByAspecRatioAndAvailable(AspectRatio.HORIZONTAL, pageable);
+        } else if (imageRatio < 1) {
+            return getDesignTemplateByAspecRatioAndAvailable(AspectRatio.VERTICAL, pageable);
+        } else {
+            return getDesignTemplateByAspecRatioAndAvailable(AspectRatio.SQUARE, pageable);
+        }
     }
 
-    private DesignTemplates findDesignTemplateByIdAndAvailable(String designTemplateId) {
+    private DesignTemplates getDesignTemplateByIdAndAvailable(String designTemplateId) {
         return designTemplatesRepository.findByIdAndIsAvailable(designTemplateId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
     }
 
+    private Page<DesignTemplateDTO> getDesignTemplateByAspecRatioAndAvailable(AspectRatio aspectRatio, Pageable pageable) {
+        return designTemplatesRepository.findByAspectRatioAndIsAvailable(aspectRatio, true, pageable)
+                .map(designTemplatesMapper::toDTO);
+    }
+
     private String generateDesignTemplateKey(String productTypeId) {
-        return String.format("design-template/%s/%s", productTypeId, UUID.randomUUID());
+        return String.format(S3ImageKeyFormat.DESIGN_TEMPLATE, productTypeId, UUID.randomUUID());
     }
 
     private String uploadDesignTemplateImageToS3(String productTypeId, MultipartFile file) {

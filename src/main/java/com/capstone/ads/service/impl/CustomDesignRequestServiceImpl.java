@@ -1,6 +1,7 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.PredefinedRole;
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestCreateRequest;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestDTO;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestFinalDesignRequest;
@@ -23,6 +24,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -143,16 +145,26 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
-    public Page<CustomDesignRequestDTO> findCustomerDetailRequestByAssignDesignerId(String assignDesignerId, int page, int size) {
+    public Page<CustomDesignRequestDTO> findCustomerDesignRequestByAssignDesignerId(String assignDesignerId, int page, int size) {
+        Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size);
         return customDesignRequestsRepository.findByAssignDesigner_Id(assignDesignerId, pageable)
                 .map(customDesignRequestsMapper::toDTO);
     }
 
     @Override
-    public Page<CustomDesignRequestDTO> findCustomerDetailRequestByStatus(CustomDesignRequestStatus status, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+    public Page<CustomDesignRequestDTO> findCustomerDesignRequestByStatus(CustomDesignRequestStatus status, int page, int size) {
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return customDesignRequestsRepository.findByStatus(status, pageable)
+                .map(customDesignRequestsMapper::toDTO);
+    }
+
+    @Override
+    public Page<CustomDesignRequestDTO> findAllCustomerDesignRequest(int page, int size) {
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return customDesignRequestsRepository.findAll(pageable)
                 .map(customDesignRequestsMapper::toDTO);
     }
 
@@ -166,13 +178,13 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     // UPLOAD IMAGE //
     private String generateCustomDesignRequestKey(String customDesignRequestId) {
-        return String.format("custom-design/%s/final", customDesignRequestId);
+        return String.format(S3ImageKeyFormat.FINAL_CUSTOM_DESIGN, customDesignRequestId);
     }
 
     private List<String> generateCustomDesignRequestSubImagesKey(String customDesignRequestId, Integer amountKey) {
         List<String> keys = new ArrayList<>();
         IntStream.range(0, amountKey)
-                .forEach(i -> keys.add(String.format("custom-design/%s/sub-final/%s", customDesignRequestId, UUID.randomUUID())));
+                .forEach(i -> keys.add(String.format(S3ImageKeyFormat.FINAL_CUSTOM_DESIGN_SUB_IMAGE, customDesignRequestId, UUID.randomUUID())));
         return keys;
     }
 

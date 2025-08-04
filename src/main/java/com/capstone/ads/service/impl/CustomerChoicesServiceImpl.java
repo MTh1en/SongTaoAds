@@ -7,20 +7,18 @@ import com.capstone.ads.mapper.CustomerChoicesMapper;
 import com.capstone.ads.model.*;
 import com.capstone.ads.repository.internal.CustomerChoicesRepository;
 import com.capstone.ads.service.*;
+import com.capstone.ads.utils.DataConverter;
+import com.capstone.ads.utils.SpelFormulaEvaluator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +30,7 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
     CustomerChoiceCostsService customerChoiceCostsService;
     CustomerChoicesRepository customerChoicesRepository;
     CustomerChoicesMapper customerChoicesMapper;
-    ExpressionParser parser = new SpelExpressionParser();
+    SpelFormulaEvaluator formulaEvaluator;
 
     @Override
     @Transactional
@@ -88,40 +86,24 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
     }
 
     @Override
-    @Transactional
     public void recalculateTotalAmount(CustomerChoices customerChoices) {
         ProductTypes productTypes = customerChoices.getProductTypes();
         String totalFormula = productTypes.getCalculateFormula().trim();
         var customerChoiceCostList = customerChoiceCostsService.getCustomerChoiceCostByCustomerChoiceId(customerChoices.getId());
 
         Map<String, Object> variables = createBaseContext(customerChoiceCostList);
-        Long result = evaluateFormula(totalFormula, variables);
+        Long result = formulaEvaluator.evaluateFormula(totalFormula, variables);
 
         customerChoices.setTotalAmount(result);
         customerChoicesRepository.save(customerChoices);
     }
 
-    private Long evaluateFormula(String formula, Map<String, Object> baseVariables) {
-        StandardEvaluationContext context = new StandardEvaluationContext();
-        context.setVariables(new HashMap<>(baseVariables));
-        Expression expression = parser.parseExpression(formula);
-        Double result = expression.getValue(context, Double.class);
-        return result != null ? Math.round(result) : 0L;
-    }
-
     private Map<String, Object> createBaseContext(List<CustomerChoiceCosts> customerChoiceCosts) {
-        Map<String, Object> variables = new HashMap<>();
-
-        customerChoiceCosts.forEach(cost -> {
-            String costTypeName = normalizeName(cost.getCostTypes().getName());
-            Long costValue = cost.getValue() == null ? 0L : cost.getValue();
-            variables.put(costTypeName, costValue);
-        });
-
-        return variables;
-    }
-
-    private String normalizeName(String name) {
-        return name.trim().replaceAll("\\s+", "");
+        return customerChoiceCosts.stream()
+                .collect(Collectors.toMap(
+                        cost -> DataConverter.normalizeFormulaValueName(cost.getCostTypes().getName()),
+                        cost -> cost.getValue() == null ? 0L : cost.getValue(),
+                        (v1, v2) -> v1 // Xử lý trường hợp trùng key (nếu có)
+                ));
     }
 }

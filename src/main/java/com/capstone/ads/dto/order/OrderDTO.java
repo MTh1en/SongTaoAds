@@ -8,6 +8,7 @@ import com.capstone.ads.model.json.CustomerChoiceHistories;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDTO {
     String id;
+    String orderCode;
     String address;
     Long totalConstructionAmount;
     Long depositConstructionAmount;
@@ -24,9 +26,15 @@ public class OrderDTO {
     Long totalDesignAmount;
     Long depositDesignAmount;
     Long remainingDesignAmount;
+    Long totalOrderAmount;
+    Long totalOrderDepositAmount;
+    Long totalOrderRemainingAmount;
+    LocalDate estimatedDeliveryDate;
     String note;
     OrderType orderType;
     OrderStatus status;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
     CoreDTO contractors;
     UserDTO users;
 }

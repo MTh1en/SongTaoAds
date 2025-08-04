@@ -1,6 +1,7 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.PaymentPolicy;
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.contract.ContractDTO;
 import com.capstone.ads.dto.contract.ContractRevisedRequest;
 import com.capstone.ads.dto.contract.ContractSendRequest;
@@ -119,7 +120,7 @@ public class ContractServiceImpl implements ContractService {
     }
 
     private String generateContractKey(String contractNumber) {
-        return String.format("contract/%s/%s", contractNumber, UUID.randomUUID());
+        return String.format(S3ImageKeyFormat.CONTRACT, contractNumber, UUID.randomUUID());
     }
 
     private String uploadContractImageToS3(String contractNumber, MultipartFile file) {

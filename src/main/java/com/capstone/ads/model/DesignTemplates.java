@@ -1,5 +1,6 @@
 package com.capstone.ads.model;
 
+import com.capstone.ads.model.enums.AspectRatio;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -24,10 +25,10 @@ public class DesignTemplates {
     String name;
     String description;
     String image;
-    String negativePrompt;
-    Integer width;
-    Integer height;
     Boolean isAvailable;
+
+    @Enumerated(EnumType.STRING)
+    AspectRatio aspectRatio;
 
     @CreationTimestamp
     LocalDateTime createdAt;

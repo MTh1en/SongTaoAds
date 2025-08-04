@@ -12,5 +12,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SizeSelection {
     String size;
-    Long value;
+    Float value;
 }

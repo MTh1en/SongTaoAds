@@ -30,24 +30,30 @@ public class DesignTemplatesController {
             value = "/product-types/{productTypeId}/design-templates",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ApiResponse<DesignTemplateDTO> createDesignTemplate(@PathVariable("productTypeId") String productTypeId,
-                                                               @Valid @ModelAttribute DesignTemplateCreateRequest request) {
+    public ApiResponse<DesignTemplateDTO> createDesignTemplate(
+            @PathVariable("productTypeId") String productTypeId,
+            @Valid @ModelAttribute DesignTemplateCreateRequest request) {
         var response = designTemplatesService.createDesignTemplate(productTypeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Create Design Template successful!", response);
     }
 
     @PatchMapping("/design-templates/{designTemplateId}/information")
     @Operation(summary = "Cập nhật lại thông tin thiết kế mẫu")
-    public ApiResponse<DesignTemplateDTO> updateDesignTemplateInformation(@PathVariable String designTemplateId,
-                                                                          @Valid @RequestBody DesignTemplateUpdateRequest request) {
+    public ApiResponse<DesignTemplateDTO> updateDesignTemplateInformation(
+            @PathVariable String designTemplateId,
+            @Valid @RequestBody DesignTemplateUpdateRequest request) {
         var response = designTemplatesService.updateDesignTemplateInformation(designTemplateId, request);
         return ApiResponseBuilder.buildSuccessResponse("Update Design Template information successful!", response);
     }
 
-    @PatchMapping(value = "/design-templates/{designTemplateId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(
+            value = "/design-templates/{designTemplateId}/image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     @Operation(summary = "Cập nhật hình ảnh thiết kế mẫu")
-    public ApiResponse<DesignTemplateDTO> updateDesignTemplateImage(@PathVariable String designTemplateId,
-                                                                    @RequestPart("file") MultipartFile designTemplateImage) {
+    public ApiResponse<DesignTemplateDTO> updateDesignTemplateImage(
+            @PathVariable String designTemplateId,
+            @RequestPart("file") MultipartFile designTemplateImage) {
         var response = designTemplatesService.uploadDesignTemplateImage(designTemplateId, designTemplateImage);
         return ApiResponseBuilder.buildSuccessResponse("Update Design Template image successful!", response);
     }
@@ -61,19 +67,31 @@ public class DesignTemplatesController {
 
     @GetMapping("product-types/{productTypeId}/design-templates")
     @Operation(summary = "Xem thiết kế mẫu theo loại sản phẩm")
-    public ApiPagingResponse<DesignTemplateDTO> findDesignTemplateByProductTypeId(@PathVariable String productTypeId,
-                                                                                  @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                                                  @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+    public ApiPagingResponse<DesignTemplateDTO> findDesignTemplateByProductTypeId(
+            @PathVariable String productTypeId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = designTemplatesService.findDesignTemplateByProductTypeId(productTypeId, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find Design Template by ProductTypeId successful!", response, page);
     }
 
     @GetMapping("/design-templates")
     @Operation(summary = "Xem tất cả các thiết kế mẫu")
-    public ApiPagingResponse<DesignTemplateDTO> findAllDesignTemplates(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                                                                       @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+    public ApiPagingResponse<DesignTemplateDTO> findAllDesignTemplates(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = designTemplatesService.findAllDesignTemplates(page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find All Design Template successful!", response, page);
+    }
+
+    @GetMapping("customer-choices/{customerChoiceId}/design-template-suggestion")
+    @Operation(summary = "Xem tất cả các thiết kế mẫu")
+    public ApiPagingResponse<DesignTemplateDTO> suggestDesignTemplatesBaseCustomerChoice(
+            @PathVariable String customerChoiceId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = designTemplatesService.suggestDesignTemplatesBaseCustomerChoice(customerChoiceId, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Suggest Design Template successful!", response, page);
     }
 
     @DeleteMapping("/design-templates/{designTemplateId}")

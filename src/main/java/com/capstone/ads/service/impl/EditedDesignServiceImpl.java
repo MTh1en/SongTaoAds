@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.edited_design.EditedDesignCreateRequest;
 import com.capstone.ads.dto.edited_design.EditedDesignDTO;
 import com.capstone.ads.exception.AppException;
@@ -79,6 +80,13 @@ public class EditedDesignServiceImpl implements EditedDesignService {
     }
 
     @Override
+    public Page<EditedDesignDTO> findAllEditedDesign(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return editedDesignsRepository.findAll(pageable)
+                .map(editedDesignMapper::toDTO);
+    }
+
+    @Override
     public EditedDesignDTO findEditedDesignById(String editedDesignId) {
         EditedDesigns editedDesigns = getEditedDesignById(editedDesignId);
         return editedDesignMapper.toDTO(editedDesigns);
@@ -100,7 +108,7 @@ public class EditedDesignServiceImpl implements EditedDesignService {
     }
 
     private String generateAIDesignKey(String customerDetailId) {
-        return String.format("ai-designs/%s/%s", customerDetailId, UUID.randomUUID());
+        return String.format(S3ImageKeyFormat.EDITED_DESIGN, customerDetailId, UUID.randomUUID());
     }
 
     private String uploadAIDesignImageToS3(String customerDetailId, MultipartFile file) {

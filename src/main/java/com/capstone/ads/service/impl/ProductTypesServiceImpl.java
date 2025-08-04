@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.product_type.ProductTypeCreateRequest;
 import com.capstone.ads.dto.product_type.ProductTypeDTO;
 import com.capstone.ads.dto.product_type.ProductTypeUpdateRequest;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -34,7 +36,28 @@ public class ProductTypesServiceImpl implements ProductTypesService {
     @Transactional
     public ProductTypeDTO createProductType(ProductTypeCreateRequest request) {
         ProductTypes productTypes = productTypesMapper.toEntity(request);
+
+        if (!Objects.isNull(request.getProductTypeImage())) {
+            String productTypeKey = generateProductTypeImageKey();
+            fileDataService.uploadSingleFile(productTypeKey, request.getProductTypeImage());
+            productTypes.setImage(productTypeKey);
+        }
+
         productTypes = productTypesRepository.save(productTypes);
+        return productTypesMapper.toDTO(productTypes);
+    }
+
+    @Override
+    @Transactional
+    public ProductTypeDTO uploadProductTypeImage(String productTypeId, MultipartFile file) {
+        ProductTypes productTypes = getProductTypeByIdAndAvailable(productTypeId);
+
+        String productTypeKey = generateProductTypeImageKey();
+
+        fileDataService.uploadSingleFile(productTypeKey, file);
+        productTypes.setImage(productTypeKey);
+        productTypesRepository.save(productTypes);
+
         return productTypesMapper.toDTO(productTypes);
     }
 
@@ -70,26 +93,12 @@ public class ProductTypesServiceImpl implements ProductTypesService {
     }
 
     @Override
-    @Transactional
-    public ProductTypeDTO uploadProductTypeImage(String productTypeId, MultipartFile file) {
-        ProductTypes productTypes = getProductTypeByIdAndAvailable(productTypeId);
-
-        String productTypeKey = generateProductTypeImageKey(productTypeId);
-
-        fileDataService.uploadSingleFile(productTypeKey, file);
-        productTypes.setImage(productTypeKey);
-        productTypesRepository.save(productTypes);
-
-        return productTypesMapper.toDTO(productTypes);
-    }
-
-    @Override
     public ProductTypes getProductTypeByIdAndAvailable(String productTypeId) {
         return productTypesRepository.findByIdAndIsAvailable(productTypeId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
     }
 
-    private String generateProductTypeImageKey(String productTypeId) {
-        return String.format("product-type/%s", productTypeId);
+    private String generateProductTypeImageKey() {
+        return String.format(S3ImageKeyFormat.PRODUCT_TYPE, UUID.randomUUID());
     }
 }

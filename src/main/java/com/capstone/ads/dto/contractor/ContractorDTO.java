@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class ContractorDTO {
     String id;
     String name;
+    String logo;
     String address;
     String phone;
     String email;
