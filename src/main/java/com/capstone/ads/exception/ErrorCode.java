@@ -107,6 +107,19 @@ public enum ErrorCode {
     // ============ AI ============
     MODEL_CHAT_NOT_FOUND("Model chat not fount", HttpStatus.NOT_FOUND),
     PROMPT_CAN_NOT_BLANK("Prompt can not be blank", HttpStatus.BAD_REQUEST),
+
+    //===========Topic============
+    TOPIC_NOT_FOUND("Topic not found", HttpStatus.NOT_FOUND),
+
+    //============Question=========
+    QUESTION_NOT_FOUND("Question not found", HttpStatus.NOT_FOUND),
+    NUMBER_INCORRECT("Number incorrect", HttpStatus.BAD_REQUEST),
+
+    //======UserResponse==========
+    USER_RESPONSE_NOT_FOUND("User response not found", HttpStatus.NOT_FOUND),
+
+    //======Conversation========
+    CONVERSATION_NOT_FOUND("Conversation not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
