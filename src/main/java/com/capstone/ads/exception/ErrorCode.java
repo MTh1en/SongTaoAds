@@ -104,6 +104,9 @@ public enum ErrorCode {
     // ============ EXTERNAL SERVICES ============
     EXTERNAL_SERVICE_ERROR("External service error", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_INPUT("Invalid input", HttpStatus.BAD_REQUEST),
+    EXTERNAL_SERVICE_BAD_REQUEST("External service bad request", HttpStatus.BAD_REQUEST),
+    EXTERNAL_SERVICE_UNAVAILABLE("External service unavailable", HttpStatus.SERVICE_UNAVAILABLE),
+    STABLE_DIFFUSION_SERVER_NOT_AVAILABLE("Stable diffusion server not available", HttpStatus.SERVICE_UNAVAILABLE),
 
     // ============ AI ============
     MODEL_CHAT_NOT_FOUND("Model chat not fount", HttpStatus.NOT_FOUND),

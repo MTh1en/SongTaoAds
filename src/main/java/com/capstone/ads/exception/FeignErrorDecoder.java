@@ -33,12 +33,15 @@ public class FeignErrorDecoder implements ErrorDecoder {
             // Fallback to default if body can't be read
             return defaultErrorDecoder.decode(methodKey, response);
         }
+        final String detailedMessage = responseBody != null && !responseBody.isEmpty()
+                ? "External service error: " + responseBody
+                : "External service error.";
 
         return switch (response.status()) {
             case 400 -> // Bad Request
-                    new BadRequestException("Stable Diffusion API Bad Request: " + responseBody);
+                    new AppException(ErrorCode.EXTERNAL_SERVICE_BAD_REQUEST, detailedMessage);
             case 503 -> // Service Unavailable
-                    new ServiceUnavailableException("Stable Diffusion API Service Unavailable: " + responseBody);
+                    new AppException(ErrorCode.EXTERNAL_SERVICE_UNAVAILABLE, detailedMessage);
             default ->
                 // For any other status code, use the default decoder or a generic exception
                     defaultErrorDecoder.decode(methodKey, response);

@@ -2,10 +2,7 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.user.ChangePasswordRequest;
-import com.capstone.ads.dto.user.UserDTO;
-import com.capstone.ads.dto.user.UserCreateRequest;
-import com.capstone.ads.dto.user.UserProfileUpdateRequest;
+import com.capstone.ads.dto.user.*;
 import com.capstone.ads.service.UserService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -83,6 +80,14 @@ public class UserController {
     public ApiResponse<UserDTO> updateUserPassword(@PathVariable String userId,
                                                    @Valid @RequestBody ChangePasswordRequest request) {
         var response = usersService.changePassword(userId, request);
+        return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
+    }
+
+    @PatchMapping("/users/{userId}/new-password")
+    @Operation(summary = "Tạo mới mật khẩu cho tài khoản ngoài hệ thống")
+    public ApiResponse<UserDTO> newPasswordForOutboundUser(@PathVariable String userId,
+                                                           @Valid @RequestBody NewPasswordRequest request) {
+        var response = usersService.newPasswordForOutboundAccount(userId, request);
         return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
     }
 

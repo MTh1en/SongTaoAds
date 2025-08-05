@@ -1,9 +1,6 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.user.ChangePasswordRequest;
-import com.capstone.ads.dto.user.UserDTO;
-import com.capstone.ads.dto.user.UserCreateRequest;
-import com.capstone.ads.dto.user.UserProfileUpdateRequest;
+import com.capstone.ads.dto.user.*;
 import com.capstone.ads.model.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +25,8 @@ public interface UserService {
     UserDTO uploadUserAvatar(String userId, MultipartFile file) throws IOException;
 
     UserDTO changePassword(String userId, ChangePasswordRequest request);
+
+    UserDTO newPasswordForOutboundAccount(String userId, NewPasswordRequest request);
 
     //INTERNAL FUNCTION
     void validateUserExistsAndIsActive(String userId);
