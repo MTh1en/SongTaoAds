@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatusCode;
 @Getter
 public enum ErrorCode {
     // ============ AUTHENTICATION & AUTHORIZATION ============
+    ACCOUNT_NOT_REGISTERED("Account not registered", HttpStatus.UNAUTHORIZED),
     USER_NOT_FOUND("User not found", HttpStatus.NOT_FOUND),
     INVALID_CREDENTIALS("Invalid email or password", HttpStatus.UNAUTHORIZED),
     ACCOUNT_DISABLED("Account is disabled", HttpStatus.FORBIDDEN),
@@ -103,6 +104,9 @@ public enum ErrorCode {
     // ============ EXTERNAL SERVICES ============
     EXTERNAL_SERVICE_ERROR("External service error", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_INPUT("Invalid input", HttpStatus.BAD_REQUEST),
+    EXTERNAL_SERVICE_BAD_REQUEST("External service bad request", HttpStatus.BAD_REQUEST),
+    EXTERNAL_SERVICE_UNAVAILABLE("External service unavailable", HttpStatus.SERVICE_UNAVAILABLE),
+    STABLE_DIFFUSION_SERVER_NOT_AVAILABLE("Stable diffusion server not available", HttpStatus.SERVICE_UNAVAILABLE),
 
     // ============ AI ============
     MODEL_CHAT_NOT_FOUND("Model chat not fount", HttpStatus.NOT_FOUND),

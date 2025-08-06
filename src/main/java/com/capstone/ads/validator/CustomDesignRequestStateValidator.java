@@ -47,7 +47,8 @@ public class CustomDesignRequestStateValidator {
 
         validTransitions.put(CustomDesignRequestStatus.ASSIGNED_DESIGNER, Set.of(
                 CustomDesignRequestStatus.DESIGNER_REJECTED,
-                CustomDesignRequestStatus.PROCESSING
+                CustomDesignRequestStatus.PROCESSING,
+                CustomDesignRequestStatus.CANCELLED
         ));
         validTransitions.put(CustomDesignRequestStatus.PROCESSING, Set.of(
                 CustomDesignRequestStatus.DEMO_SUBMITTED,
@@ -86,9 +87,8 @@ public class CustomDesignRequestStateValidator {
             return false;
         }
 
-        // Allow staying in the same state (if needed)
         if (currentStatus == newStatus) {
-            return true;
+            return false;
         }
 
         return validTransitions.getOrDefault(currentStatus, Set.of())

@@ -85,7 +85,8 @@ public class SecurityConfig {
                 "http://localhost:8080",
                 "http://localhost:5173",
                 "https://songtaoads.online",
-                "https://songtaoads.io.vn"
+                "https://songtaoads.io.vn", 
+                "http://localhost:3000"
         ));
         defaultConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         defaultConfig.setAllowedHeaders(Arrays.asList("Authorization", "X-XSRF-TOKEN", "Content-Type"));

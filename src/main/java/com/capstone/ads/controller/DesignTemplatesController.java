@@ -85,7 +85,7 @@ public class DesignTemplatesController {
     }
 
     @GetMapping("customer-choices/{customerChoiceId}/design-template-suggestion")
-    @Operation(summary = "Xem tất cả các thiết kế mẫu")
+    @Operation(summary = "Đề xuất thiết kế mẫu theo lựa chọn khách hàng")
     public ApiPagingResponse<DesignTemplateDTO> suggestDesignTemplatesBaseCustomerChoice(
             @PathVariable String customerChoiceId,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,

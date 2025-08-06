@@ -98,8 +98,7 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
     }
 
     public FileInformation generateImageFromDesignTemplateFallback(String designTemplateId, String prompt, Integer width, Integer height, Throwable t) {
-        log.error("Circuit Breaker triggered for generateImageFromDesignTemplate. Stable Diffusion API might be unavailable. Error: {}", t.getMessage());
-        throw new AppException(ErrorCode.EXTERNAL_SERVICE_ERROR);
+        throw new AppException(ErrorCode.STABLE_DIFFUSION_SERVER_NOT_AVAILABLE);
     }
 
     @Override

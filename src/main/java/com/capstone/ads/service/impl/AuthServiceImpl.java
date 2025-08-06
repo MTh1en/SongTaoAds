@@ -183,7 +183,7 @@ public class AuthServiceImpl implements AuthService {
 
     private Users findUserByEmail(String email) {
         return usersRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.ACCOUNT_NOT_REGISTERED));
     }
 
     private void setRefreshTokenCookie(String refreshToken, HttpServletResponse response) {

@@ -26,6 +26,8 @@ public interface OrderService {
 
     Page<OrderDTO> findAllOrders(int page, int size);
 
+    void cancelOrder(String orderId);
+
     void hardDeleteOrder(String orderId);
 
     Page<OrderDTO> findOrderByUserId(String userId, int page, int size);

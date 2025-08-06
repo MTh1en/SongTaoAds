@@ -97,6 +97,13 @@ public class OrderController {
         return ApiResponseBuilder.buildPagingSuccessResponse("Find all orders", response, page);
     }
 
+    @PatchMapping("/orders/{orderId}/cancel")
+    @Operation(summary = "Hủy đơn hàng")
+    public ApiResponse<Void> cancelOrder(@PathVariable String orderId) {
+        orderService.cancelOrder(orderId);
+        return ApiResponseBuilder.buildSuccessResponse("Cancel order", null);
+    }
+
     @DeleteMapping("/orders/{orderId}")
     @Operation(summary = "Xóa cứng order (không cần dùng)")
     public ApiResponse<Void> hardDeleteOrder(@PathVariable String orderId) {

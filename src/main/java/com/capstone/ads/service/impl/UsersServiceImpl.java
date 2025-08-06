@@ -2,10 +2,7 @@ package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.PredefinedRole;
 import com.capstone.ads.constaint.S3ImageKeyFormat;
-import com.capstone.ads.dto.user.ChangePasswordRequest;
-import com.capstone.ads.dto.user.UserDTO;
-import com.capstone.ads.dto.user.UserCreateRequest;
-import com.capstone.ads.dto.user.UserProfileUpdateRequest;
+import com.capstone.ads.dto.user.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.UsersMapper;
@@ -119,11 +116,21 @@ public class UsersServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDTO changePassword(String userId, ChangePasswordRequest request) {
         Users user = getUserByIdAndIsActive(userId);
         if (passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         }
+        usersRepository.save(user);
+        return usersMapper.toDTO(user);
+    }
+
+    @Override
+    @Transactional
+    public UserDTO newPasswordForOutboundAccount(String userId, NewPasswordRequest request) {
+        Users user = getUserByIdAndIsActive(userId);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         usersRepository.save(user);
         return usersMapper.toDTO(user);
     }
@@ -145,6 +152,12 @@ public class UsersServiceImpl implements UserService {
     @Override
     public Users getUsersByIdAndIsActiveAndRoleName(String userId, boolean isActive, String roleName) {
         return usersRepository.findByIdAndIsActiveAndRoles_Name(userId, true, roleName)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    @Override
+    public Users getUserByEmail(String email) {
+        return usersRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 

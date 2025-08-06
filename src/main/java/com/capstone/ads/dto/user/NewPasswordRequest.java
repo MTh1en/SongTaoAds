@@ -1,4 +1,4 @@
-package com.capstone.ads.dto.custom_design_request;
+package com.capstone.ads.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CustomDesignRequestCreateRequest {
-    String requirements;
+public class NewPasswordRequest {
+    @NotBlank(message = "Password is Required")
+    String password;
 }
