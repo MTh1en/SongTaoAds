@@ -115,12 +115,7 @@ public enum ErrorCode {
     QUESTION_NOT_FOUND("Question not found", HttpStatus.NOT_FOUND),
     NUMBER_INCORRECT("Number incorrect", HttpStatus.BAD_REQUEST),
 
-    //======UserResponse==========
-    USER_RESPONSE_NOT_FOUND("User response not found", HttpStatus.NOT_FOUND),
-
-    //======Conversation========
-    CONVERSATION_NOT_FOUND("Conversation not found", HttpStatus.NOT_FOUND),
-    ;
+   ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
         this.message = message;

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -21,11 +22,15 @@ public class Topic {
     String title;
     String description;
     int maxQuestion;
+
+    @ManyToOne
+    ModelChatBot modelChatBot;
+
     @CreationTimestamp
     @Column(updatable = false)
     LocalDateTime createdAt;
 
-    @CreationTimestamp
+    @UpdateTimestamp
     @Column(updatable = true)
     LocalDateTime updatedAt;
 }
