@@ -1,14 +1,12 @@
 package com.capstone.ads.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,4 +26,7 @@ public class ModelChatBot {
 
     @CreationTimestamp
     LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "modelChatBot")
+    List<Topic> topics;
 }

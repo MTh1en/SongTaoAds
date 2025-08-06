@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,16 +22,16 @@ public class Topic {
     String id;
     String title;
     String description;
-    int maxQuestion;
 
     @ManyToOne
     ModelChatBot modelChatBot;
 
+    @OneToMany(mappedBy = "topic")
+    List<Question> questions;
+
     @CreationTimestamp
-    @Column(updatable = false)
     LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(updatable = true)
     LocalDateTime updatedAt;
 }

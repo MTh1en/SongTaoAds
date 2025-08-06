@@ -3,15 +3,11 @@ package com.capstone.ads.service.impl;
 import com.capstone.ads.dto.chatBot.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
-import com.capstone.ads.mapper.ChatBotLogMapper;
 import com.capstone.ads.mapper.ModelChatBotMapper;
 import com.capstone.ads.model.ModelChatBot;
 import com.capstone.ads.repository.external.ChatBotRepository;
-import com.capstone.ads.repository.internal.ChatBotLogRepository;
 import com.capstone.ads.repository.internal.ModelChatBotRepository;
 import com.capstone.ads.service.FineTuneService;
-import com.capstone.ads.service.S3Service;
-import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +19,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class FineTuneSerivceImpl implements FineTuneService {
+public class FineTuneServiceImpl implements FineTuneService {
     @Value("${spring.ai.openai.api-key}")
     private String openaiApiKey;
 
@@ -64,6 +60,13 @@ public class FineTuneSerivceImpl implements FineTuneService {
     }
 
     @Override
+    public byte[] getContentFileById(String fileId) {
+        return chatBotRepository.retrieveFileBytes(
+                "Bearer " + openaiApiKey,
+                fileId);
+    }
+
+    @Override
     public List<FileUploadResponse> getAllUploadedFiles() {
         FileUploadedListResponse response = chatBotRepository.getFiles(
                 "Bearer " + openaiApiKey);
@@ -89,7 +92,7 @@ public class FineTuneSerivceImpl implements FineTuneService {
 
     @Override
     public FineTuningJobResponse getFineTuningJob(String jobId) {
-        FineTuningJobResponse response =chatBotRepository.getFineTuningJobById(
+        FineTuningJobResponse response = chatBotRepository.getFineTuningJobById(
                 "Bearer " + openaiApiKey
                 , jobId);
         if ("succeeded".equalsIgnoreCase(response.getStatus())) {

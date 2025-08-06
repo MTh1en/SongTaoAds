@@ -64,7 +64,7 @@ public class ModelChatServiceImpl implements ModelChatService {
     }
 
     @Override
-    public FileUploadResponse uploadFileExcel(MultipartFile file, String fileName) {
+    public FileUploadResponse uploadFileExcel(MultipartFile file) {
         try (XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream())) {
             int sheetIndex = workbook.getActiveSheetIndex();
             Sheet sheetToProcess = workbook.getSheetAt(sheetIndex);
@@ -95,10 +95,11 @@ public class ModelChatServiceImpl implements ModelChatService {
             if (rowsResult.isEmpty()) {
                 throw new AppException(ErrorCode.INVALID_INPUT);
             }
-            String jsonlFileName = fileName.endsWith(".jsonl") ? fileName : fileName + ".jsonl";
+
+            String jsonlFileName = String.format(S3ImageKeyFormat.FINE_TUNE_FILE, UUID.randomUUID());
+
             MultipartFile jsonlFile = convertToJsonl(rowsResult, headers, jsonlFileName);
-            String s3Key = String.format(S3ImageKeyFormat.FINE_TUNE_FILE, UUID.randomUUID(), jsonlFileName);
-            String awsLink = s3Service.uploadSingleFile(s3Key, jsonlFile);
+            s3Service.uploadSingleFile(jsonlFileName, jsonlFile);
             return chatBotRepository.uploadFile(
                     "Bearer " + openaiApiKey,
                     "fine-tune",
@@ -143,8 +144,9 @@ public class ModelChatServiceImpl implements ModelChatService {
             }
 
             byte[] byteArray = baos.toByteArray();
-            return new MockMultipartFile(fileName, byteArray);
+            return new MockMultipartFile("file", fileName, "application/octet-stream", byteArray);
         } catch (IOException e) {
+            log.info("Error while converting jsonl file", e);
             throw new AppException(ErrorCode.INVALID_INPUT);
         }
     }

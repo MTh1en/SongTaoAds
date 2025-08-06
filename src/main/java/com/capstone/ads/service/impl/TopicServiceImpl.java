@@ -1,7 +1,8 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.dto.topic.TopicCreateRequest;
 import com.capstone.ads.dto.topic.TopicDTO;
-import com.capstone.ads.dto.topic.TopicRequest;
+import com.capstone.ads.dto.topic.TopicUpdateInformationRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.TopicMapper;
@@ -17,19 +18,19 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class TopicServiceImpl  implements TopicService {
+public class TopicServiceImpl implements TopicService {
     private final TopicRepository topicRepository;
     private final TopicMapper topicMapper;
 
-    @Transactional
     @Override
-    public TopicDTO createTopic(TopicRequest topicRequest) {
-        Topic topic = topicMapper.createTopic(topicRequest);
-        Topic savedTopic = topicRepository.save(topic);
-        return topicMapper.toDto(savedTopic);
+    @Transactional
+    public TopicDTO createTopic(TopicCreateRequest topicCreateRequest) {
+        Topic topic = topicMapper.mapCreateRequestToEntity(topicCreateRequest);
+        topic = topicRepository.save(topic);
+        return topicMapper.toDto(topic);
     }
 
-    @Transactional
+
     @Override
     public List<TopicDTO> getAllTopics() {
         return topicRepository.findAll().stream()
@@ -38,27 +39,34 @@ public class TopicServiceImpl  implements TopicService {
     }
 
     @Override
-    public TopicDTO getTopicById(String id) {
-        return topicRepository.findById(id)
-                .map(topicMapper::toDto)
-                .orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
+    public TopicDTO findTopicById(String id) {
+        Topic topic = getTopicById(id);
+        return topicMapper.toDto(topic);
     }
 
-    @Transactional
+
     @Override
-    public TopicDTO updateTopic(String id, TopicDTO topicDTO) {
-        Topic existingTopic = topicRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
-        existingTopic.setTitle(topicDTO.getTitle());
-        existingTopic.setDescription(topicDTO.getDescription());
+    @Transactional
+    public TopicDTO updateTopic(String topicId, TopicUpdateInformationRequest request) {
+        Topic existingTopic = getTopicById(topicId);
+
+        topicMapper.mapUpdateRequestToEntity(request, existingTopic);
+
         Topic updatedTopic = topicRepository.save(existingTopic);
         return topicMapper.toDto(updatedTopic);
     }
 
     @Override
-    public void deleteTopic(String id) {
-        Topic topic = topicRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
+    @Transactional
+    public void deleteTopic(String topicId) {
+        Topic topic = getTopicById(topicId);
         topicRepository.delete(topic);
+    }
+
+    //INTERNAL FUNCTION
+
+    public Topic getTopicById(String topicId) {
+        return topicRepository.findById(topicId)
+                .orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
     }
 }

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,11 +40,19 @@ public class FineTuneController {
     }
 
     @GetMapping("/files/{fileId}")
-    @Operation(summary = "Xem chi tiết file")
+    @Operation(summary = "Xem thông tin file")
     public ApiResponse<FileUploadResponse> getFileById(
             @PathVariable String fileId) {
         FileUploadResponse response = fineTuneService.getUploadedFileById(fileId);
         return ApiResponseBuilder.buildSuccessResponse("File retrieved successfully", response);
+    }
+
+    @GetMapping(value = "/files/{fileId}/content", produces = MediaType.TEXT_PLAIN_VALUE)
+    @Operation(summary = "Xem nội dung file")
+    public ResponseEntity<byte[]> getFileContentById(@PathVariable String fileId) {
+        var response = fineTuneService.getContentFileById(fileId);
+        return ResponseEntity.ok()
+                .body(response);
     }
 
     @GetMapping("/files")

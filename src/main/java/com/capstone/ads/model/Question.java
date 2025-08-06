@@ -21,7 +21,6 @@ public class Question {
     String id;
     String question;
 
-    int number;
     @ManyToOne
     Topic topic;
 

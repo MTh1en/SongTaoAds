@@ -15,6 +15,8 @@ public interface FineTuneService {
 
     FileUploadResponse getUploadedFileById(String fileId);
 
+    byte[] getContentFileById(String fileId);
+
     List<FileUploadResponse> getAllUploadedFiles();
 
     FileDeletionResponse deleteUploadedFile(String fileId);
