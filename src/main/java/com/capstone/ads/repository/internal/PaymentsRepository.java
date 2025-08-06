@@ -14,7 +14,7 @@ public interface PaymentsRepository extends JpaRepository<Payments, String> {
 
     long countByOrders_Users_Id(String id);
 
-    @Query("SELECT SUM(p.amount) FROM Payments p")
+    @Query("SELECT SUM(p.amount) FROM Payments p WHERE p.status= 'SUCCESS'")
     long sumAmount();
 
     @Query("SELECT SUM(p.amount) FROM Payments p WHERE p.type = 'DEPOSIT_DESIGN'")
