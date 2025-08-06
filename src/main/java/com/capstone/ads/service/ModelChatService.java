@@ -10,8 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ModelChatService { ;
-    FileUploadResponse uploadFileExcel(MultipartFile file, String fileName);
-
+    FileUploadResponse uploadFileExcel(MultipartFile file);
 
     Page<ModelChatBotDTO> getModelChatBots(int page, int size);
 

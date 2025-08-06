@@ -22,10 +22,9 @@ public class ModelChatController {
 
     @PostMapping(value = "/upload-file-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Convert từ file excel thành file jsonl")
-    public ApiResponse<FileUploadResponse> uploadFileExcel(@RequestParam("file") MultipartFile file,
-                                                           @RequestParam("fileName") String fileName) {
-        FileUploadResponse resposne = modelChatService.uploadFileExcel(file, fileName);
-        return ApiResponseBuilder.buildSuccessResponse(("Uploaded file successfully"), resposne);
+    public ApiResponse<FileUploadResponse> uploadFileExcel(@RequestParam("file") MultipartFile file) {
+        FileUploadResponse response = modelChatService.uploadFileExcel(file);
+        return ApiResponseBuilder.buildSuccessResponse(("Uploaded file successfully"), response);
     }
 
     @GetMapping("/models-fine-tune")

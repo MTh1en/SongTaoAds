@@ -3,17 +3,12 @@ package com.capstone.ads.dto.topic;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TopicDTO {
-     String id;
-     String title;
-     String description;
-     LocalDateTime createdAt;
-     LocalDateTime updatedAt;
+public class TopicUpdateInformationRequest {
+    String title;
+    String description;
 }

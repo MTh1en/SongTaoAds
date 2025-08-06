@@ -1,40 +1,43 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.dto.question.QuestionDTO;
-import com.capstone.ads.dto.question.QuestionRequest;
+import com.capstone.ads.dto.question.QuestionCreateRequest;
+import com.capstone.ads.dto.question.QuestionUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.QuestionMapper;
 import com.capstone.ads.model.Question;
 import com.capstone.ads.model.Topic;
 import com.capstone.ads.repository.internal.QuestionRepository;
-import com.capstone.ads.repository.internal.TopicRepository;
 import com.capstone.ads.service.QuestionService;
+import com.capstone.ads.service.TopicService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class QuestionServiceImpl implements QuestionService {
-    private final QuestionRepository questionRepository;
-    private final TopicRepository topicRepository;
-    private final QuestionMapper questionMapper;
+    QuestionRepository questionRepository;
+    QuestionMapper questionMapper;
+    TopicService topicService;
 
     @Override
-    public QuestionDTO createQuestion(String topicId, QuestionRequest questionRequest) {
-        Topic topic = topicRepository.findById(topicId)
-                .orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
-        if(questionRequest.getNumber()<1 || questionRequest.getNumber() > topic.getMaxQuestion()){
-            throw new AppException(ErrorCode.NUMBER_INCORRECT);
-        }
-        Question question = questionMapper.createQuestion(questionRequest);
+    @Transactional
+    public QuestionDTO createQuestion(String topicId, QuestionCreateRequest questionCreateRequest) {
+        Topic topic = topicService.getTopicById(topicId);
+
+        Question question = questionMapper.mapCreateRequestToEntity(questionCreateRequest);
         question.setTopic(topic);
-        Question savedQuestion = questionRepository.save(question);
-        return questionMapper.toDto(savedQuestion);
+        question = questionRepository.save(question);
+
+        return questionMapper.toDto(question);
     }
 
     @Override
@@ -45,34 +48,40 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionDTO getQuestionById(String id) {
-        return questionRepository.findById(id)
-                .map(questionMapper::toDto)
-                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
+    public QuestionDTO findQuestionById(String questionId) {
+        Question question = getQuestionById(questionId);
+        return questionMapper.toDto(question);
     }
 
     @Override
     public List<QuestionDTO> getQuestionsByTopicId(String topicId) {
         return questionRepository.findByTopic_Id(topicId).stream()
-                .sorted(Comparator.comparing(Question::getNumber))
                 .map(questionMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public QuestionDTO updateQuestion(String id, QuestionDTO questionDTO) {
-        Question existingQuestion = questionRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
-        existingQuestion.setQuestion(questionDTO.getQuestion());
-        existingQuestion.setNumber(questionDTO.getNumber());
-        Question updatedQuestion = questionRepository.save(existingQuestion);
-        return questionMapper.toDto(updatedQuestion);
+    @Transactional
+    public QuestionDTO updateQuestion(String questionId, QuestionUpdateRequest request) {
+        Question question = getQuestionById(questionId);
+
+        questionMapper.mapUpdateRequestToEntity(request, question);
+        question = questionRepository.save(question);
+
+        return questionMapper.toDto(question);
     }
 
     @Override
-    public void deleteQuestion(String id) {
-        Question question = questionRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
+    @Transactional
+    public void deleteQuestion(String questionId) {
+        Question question = getQuestionById(questionId);
         questionRepository.delete(question);
+    }
+
+
+    //INTERNAL FUNCTION
+    public Question getQuestionById(String questionId) {
+        return questionRepository.findById(questionId)
+                .orElseThrow(() -> new AppException(ErrorCode.QUESTION_NOT_FOUND));
     }
 }

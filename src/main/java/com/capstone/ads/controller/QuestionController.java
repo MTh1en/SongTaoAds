@@ -1,7 +1,9 @@
 package com.capstone.ads.controller;
+
 import com.capstone.ads.dto.ApiResponse;
+import com.capstone.ads.dto.question.QuestionCreateRequest;
 import com.capstone.ads.dto.question.QuestionDTO;
-import com.capstone.ads.dto.question.QuestionRequest;
+import com.capstone.ads.dto.question.QuestionUpdateRequest;
 import com.capstone.ads.service.QuestionService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,21 +15,21 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "QUESTION")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class QuestionController {
-
     QuestionService questionService;
 
     @PostMapping("/topics/{topicId}/questions")
     @Operation(summary = "Create a new question under a topic")
     public ApiResponse<QuestionDTO> createQuestion(
             @PathVariable String topicId,
-            @RequestBody QuestionRequest questionRequest) {
-        QuestionDTO createdQuestion = questionService.createQuestion(topicId, questionRequest);
+            @Valid @RequestBody QuestionCreateRequest questionCreateRequest) {
+        QuestionDTO createdQuestion = questionService.createQuestion(topicId, questionCreateRequest);
         return ApiResponseBuilder.buildSuccessResponse("Question created successfully", createdQuestion);
     }
 
@@ -38,26 +40,26 @@ public class QuestionController {
         return ApiResponseBuilder.buildSuccessResponse("Questions retrieved successfully", questions);
     }
 
-    @GetMapping("/questions/{id}")
+    @GetMapping("/questions/{questionId}")
     @Operation(summary = "View question details")
-    public ApiResponse<QuestionDTO> viewQuestionDetails(@PathVariable String id) {
-        QuestionDTO question = questionService.getQuestionById(id);
+    public ApiResponse<QuestionDTO> viewQuestionDetails(@PathVariable String questionId) {
+        QuestionDTO question = questionService.findQuestionById(questionId);
         return ApiResponseBuilder.buildSuccessResponse("Question details retrieved successfully", question);
     }
 
-    @PutMapping("/questions/{id}")
+    @PutMapping("/questions/{questionId}")
     @Operation(summary = "Update a question")
     public ApiResponse<QuestionDTO> updateQuestion(
-            @PathVariable String id,
-            @Valid @RequestBody QuestionDTO questionDTO) {
-        QuestionDTO updatedQuestion = questionService.updateQuestion(id, questionDTO);
+            @PathVariable String questionId,
+            @Valid @RequestBody QuestionUpdateRequest request) {
+        QuestionDTO updatedQuestion = questionService.updateQuestion(questionId, request);
         return ApiResponseBuilder.buildSuccessResponse("Question updated successfully", updatedQuestion);
     }
 
-    @DeleteMapping("/questions/{id}")
+    @DeleteMapping("/questions/{questionId}")
     @Operation(summary = "Delete a question")
-    public ApiResponse<Void> deleteQuestion(@PathVariable String id) {
-        questionService.deleteQuestion(id);
+    public ApiResponse<Void> deleteQuestion(@PathVariable String questionId) {
+        questionService.deleteQuestion(questionId);
         return ApiResponseBuilder.buildSuccessResponse("Question deleted successfully", null);
     }
 

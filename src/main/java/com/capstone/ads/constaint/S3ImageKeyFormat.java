@@ -11,7 +11,7 @@ public class S3ImageKeyFormat {
     public static final String EDITED_DESIGN = "edited-design/%s/%s";
     public static final String FEEDBACK = "feedback/%s/%s";
     public static final String ICON = "icon/%s";
-    public static final String FINE_TUNE_FILE = "uploadJsonlFile/%s_%s";
+    public static final String FINE_TUNE_FILE = "uploadJsonlFile/%s.jsonl";
     public static final String PRODUCT_TYPE = "product-type/%s";
     public static final String ORDER_LOG = "orders/%s/%s/%s";
     public static final String AVATAR = "avatar/%s";

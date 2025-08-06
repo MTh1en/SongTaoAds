@@ -6,8 +6,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @FeignClient(name = "openai-fine-tuning", url = "https://api.openai.com/v1")
 public interface ChatBotRepository {
     @PostMapping(value = "/chat/completions", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -34,6 +32,10 @@ public interface ChatBotRepository {
     FileUploadResponse getFileById(
             @RequestHeader("Authorization") String authorization,
             @PathVariable("fileId") String fileId);
+
+    @GetMapping(value = "/files/{file_id}/content")
+    byte[] retrieveFileBytes(@RequestHeader("Authorization") String authorization,
+                             @PathVariable("file_id") String fileId);
 
     @DeleteMapping("/files/{fileId}")
     FileDeletionResponse deleteFileById(

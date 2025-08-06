@@ -1,22 +1,23 @@
 package com.capstone.ads.service;
 
 import com.capstone.ads.dto.topic.TopicDTO;
-import com.capstone.ads.dto.topic.TopicRequest;
-import org.springframework.transaction.annotation.Transactional;
+import com.capstone.ads.dto.topic.TopicCreateRequest;
+import com.capstone.ads.dto.topic.TopicUpdateInformationRequest;
+import com.capstone.ads.model.Topic;
 
 import java.util.List;
 
 public interface TopicService {
-    @Transactional
-    TopicDTO createTopic(TopicRequest topicRequest);
-
+    TopicDTO createTopic(TopicCreateRequest request);
 
     List<TopicDTO> getAllTopics();
 
-    TopicDTO getTopicById(String id);
+    TopicDTO findTopicById(String id);
 
-    @Transactional
-    TopicDTO updateTopic(String id, TopicDTO topicDTO);
+    TopicDTO updateTopic(String id, TopicUpdateInformationRequest request);
 
     void deleteTopic(String id);
+
+    //INTERNAL FUNCTION
+    Topic getTopicById(String id);
 }

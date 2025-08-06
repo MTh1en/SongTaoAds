@@ -117,7 +117,7 @@ public enum ErrorCode {
 
     //============Question=========
     QUESTION_NOT_FOUND("Question not found", HttpStatus.NOT_FOUND),
-    NUMBER_INCORRECT("Number incorrect", HttpStatus.BAD_REQUEST),
+    QUESTION_NUMBER_INCORRECT("Question number incorrect", HttpStatus.BAD_REQUEST),
 
    ;
 
