@@ -47,6 +47,11 @@ spring:
       max-file-size: 20MB
       max-request-size: 100MB
   ai:
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always
     openai:
       api-key: ${OPEN_AI_KEY}
       chat:

@@ -8,8 +8,4 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ChatBotLogMapper {
     ChatBotDTO toDTO(ChatBotLog chatBotLog);
-
-    @Mapping(target = "id", ignore = true)
-    ChatBotLog toEntity(String question, String answer);
-
 }

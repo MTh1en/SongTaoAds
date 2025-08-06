@@ -13,66 +13,65 @@ import java.util.List;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FineTuningJobResponse {
-     String object;
-     String id;
-     String model;
+    String object;
+    String id;
+    String model;
 
     @JsonProperty("created_at")
-       Integer createdAt;
+    Integer createdAt;
 
     @JsonProperty("fine_tuned_model")
-     String fineTunedModel;
+    String fineTunedModel;
 
     @JsonProperty("organization_id")
-     String organizationId;
+    String organizationId;
 
     @JsonProperty("result_files")
-     List<String> resultFiles;
+    List<String> resultFiles;
 
-     String status;
+    String status;
 
     @JsonProperty("validation_file")
-     String validationFile;
+    String validationFile;
 
     @JsonProperty("training_file")
-     String trainingFile;
+    String trainingFile;
 
-     Method method;
-
+    Method method;
 
 
     @JsonProperty("finished_at")
-        Integer finishedAt;
+    Integer finishedAt;
 
-     Method.Dpo.Hyperparameters hyperparameters;
-        Integer seed;
+    Method.Dpo.Hyperparameters hyperparameters;
+    Integer seed;
 
     @JsonProperty("estimated_finish")
-        Integer estimatedFinish;
+    Integer estimatedFinish;
 
-     List<Object>   Integeregrations;
+    List<Object> Integeregrations;
 
     @Data
     public static class Method {
-         String type;
-         Dpo dpo;
+        String type;
+        Dpo dpo;
 
         @Data
         public static class Dpo {
-             Hyperparameters hyperparameters;
+            Hyperparameters hyperparameters;
 
             @Data
             public static class Hyperparameters {
-                 double beta;
+                double beta;
 
                 @JsonProperty("batch_size")
-                 String batchSize;
+                String batchSize;
 
                 @JsonProperty("learning_rate_multiplier")
-                 String learningRateMultiplier;
+                String learningRateMultiplier;
 
                 @JsonProperty("n_epochs")
-                 String nEpochs;
+                String nEpochs;
             }
         }
     }

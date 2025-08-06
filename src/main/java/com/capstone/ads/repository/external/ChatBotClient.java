@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @FeignClient(name = "openai-fine-tuning", url = "https://api.openai.com/v1")
-public interface ChatBotRepository {
+public interface ChatBotClient {
     @PostMapping(value = "/chat/completions", consumes = MediaType.APPLICATION_JSON_VALUE)
     ChatCompletionResponse getChatCompletions(
             @RequestHeader("Authorization") String authorization,

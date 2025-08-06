@@ -13,9 +13,6 @@ public interface ChatBotService {
 
     ListModelsResponse getModels();
 
-    List<FrequentQuestion> getTop10FrequentQuestions();
-    ;
-
     List<String> getModernBillboardPricing(ModernBillboardRequest request);
 
     List<String> getTraditionalBillboardPricing(TraditionalBillboardRequest request);
