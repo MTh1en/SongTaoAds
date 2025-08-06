@@ -2,12 +2,14 @@ package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.chatBot.*;
+import com.capstone.ads.dto.webhook.FineTuneSuccess;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ModelChatBotMapper;
 import com.capstone.ads.model.ModelChatBot;
-import com.capstone.ads.repository.external.ChatBotRepository;
+import com.capstone.ads.repository.external.ChatBotClient;
 import com.capstone.ads.repository.internal.ModelChatBotRepository;
+import com.capstone.ads.service.FineTuneService;
 import com.capstone.ads.service.ModelChatService;
 import com.capstone.ads.service.S3Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,10 +41,23 @@ public class ModelChatServiceImpl implements ModelChatService {
     @Value("${spring.ai.openai.api-key}")
     private String openaiApiKey;
 
-    private final ChatBotRepository chatBotRepository;
+    private final ChatBotClient chatBotClient;
     private final ModelChatBotRepository modelChatBotRepository;
     private final S3Service s3Service;
+    private final FineTuneService fineTuneService;
     private final ModelChatBotMapper modelChatBotMapper;
+
+    @Async
+    @Override
+    public void createNewModelChat(FineTuneSuccess fineTuneSuccess) {
+        FineTuningJobResponse fineTuningJob = fineTuneService.getFineTuningJob(fineTuneSuccess.getData().getId());
+        ModelChatBot modelChatBot = ModelChatBot.builder()
+                .modelName(fineTuningJob.getFineTunedModel())
+                .previousModelName(fineTuningJob.getModel())
+                .active(false)
+                .build();
+        modelChatBotRepository.save(modelChatBot);
+    }
 
     @Override
     public Page<ModelChatBotDTO> getModelChatBots(int page, int size) {
@@ -56,12 +72,24 @@ public class ModelChatServiceImpl implements ModelChatService {
         ModelChatBot modelChatBotActive = modelChatBotRepository.getModelChatBotByActive(true)
                 .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
         modelChatBotActive.setActive(false);
+
         ModelChatBot modelChatBot = modelChatBotRepository.findById(modelChatId)
                 .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
         modelChatBot.setActive(true);
-        modelChatBotRepository.save(modelChatBot);
+
+        modelChatBotRepository.saveAll(new ArrayList<>(Arrays.asList(
+                modelChatBotActive,
+                modelChatBot
+        )));
         return modelChatBotMapper.toDTO(modelChatBot);
     }
+
+    @Override
+    public ModelChatBot getModelChatBotById(String modelChatBotId) {
+        return modelChatBotRepository.findById(modelChatBotId)
+                .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
+    }
+
 
     @Override
     public FileUploadResponse uploadFileExcel(MultipartFile file) {
@@ -100,7 +128,7 @@ public class ModelChatServiceImpl implements ModelChatService {
 
             MultipartFile jsonlFile = convertToJsonl(rowsResult, headers, jsonlFileName);
             s3Service.uploadSingleFile(jsonlFileName, jsonlFile);
-            return chatBotRepository.uploadFile(
+            return chatBotClient.uploadFile(
                     "Bearer " + openaiApiKey,
                     "fine-tune",
                     jsonlFile);

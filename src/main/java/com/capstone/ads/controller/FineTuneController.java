@@ -26,8 +26,7 @@ public class FineTuneController {
 
     @PostMapping(value = "/upload-file-finetune", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload file để fine-tune")
-    public ApiResponse<FileUploadResponse> uploadFileToFinetune(
-            @RequestParam MultipartFile file) {
+    public ApiResponse<FileUploadResponse> uploadFileToFinetune(@RequestParam MultipartFile file) {
         FileUploadResponse response = fineTuneService.uploadFileToFineTune(file);
         return ApiResponseBuilder.buildSuccessResponse("File uploaded successfully for fine-tuning", response);
     }
@@ -86,8 +85,7 @@ public class FineTuneController {
 
     @PostMapping("/{fineTuningJobId}/fine-tuning-jobs/cancel")
     @Operation(summary = "Hủy 1 job đang fine-tune")
-    public ApiResponse<FineTuningJobResponse> cancelFineTuningJob(
-            @PathVariable String fineTuningJobId) {
+    public ApiResponse<FineTuningJobResponse> cancelFineTuningJob(@PathVariable String fineTuningJobId) {
         FineTuningJobResponse response = fineTuneService.cancelFineTuningJob(fineTuningJobId);
         return ApiResponseBuilder.buildSuccessResponse("Fine tuning job cancelled successfully", response);
     }

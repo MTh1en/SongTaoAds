@@ -1,20 +1,22 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.chatBot.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
-import com.capstone.ads.mapper.ModelChatBotMapper;
-import com.capstone.ads.model.ModelChatBot;
-import com.capstone.ads.repository.external.ChatBotRepository;
-import com.capstone.ads.repository.internal.ModelChatBotRepository;
+import com.capstone.ads.repository.external.ChatBotClient;
 import com.capstone.ads.service.FineTuneService;
+import com.capstone.ads.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,98 +25,84 @@ public class FineTuneServiceImpl implements FineTuneService {
     @Value("${spring.ai.openai.api-key}")
     private String openaiApiKey;
 
-    private final ChatBotRepository chatBotRepository;
-    private final ModelChatBotRepository modelChatBotRepository;
-    private final ModelChatBotMapper modelChatBotMapper;
+    private final ChatBotClient chatBotClient;
+    private final S3Service s3Service;
 
     @Override
     public FileUploadResponse uploadFileToFineTune(MultipartFile file) {
-        String fileName = file.getOriginalFilename();
-        if (fileName == null || !fileName.toLowerCase().endsWith(".jsonl")) {
+        try {
+            String fileName = file.getOriginalFilename();
+            if (fileName == null || !fileName.toLowerCase().endsWith(".jsonl")) {
+                throw new AppException(ErrorCode.INVALID_INPUT);
+            }
+
+            String newFileName = String.format(S3ImageKeyFormat.FINE_TUNE_FILE, UUID.randomUUID());
+
+            MultipartFile newFile = new MockMultipartFile("file", newFileName,
+                    "application/octet-stream", file.getBytes());
+            s3Service.uploadSingleFile(newFileName, newFile);
+            return chatBotClient.uploadFile(
+                    "Bearer " + openaiApiKey,
+                    "fine-tune",
+                    newFile);
+        } catch (IOException e) {
+            log.info("Error while converting jsonl file", e);
             throw new AppException(ErrorCode.INVALID_INPUT);
         }
-        return chatBotRepository.uploadFile(
-                "Bearer " + openaiApiKey,
-                "fine-tune",
-                file);
     }
 
     @Override
     public FineTuningJobResponse fineTuningJob(FineTuningJobRequest request) {
-        // Call OpenAI fine-tuning API
-        FineTuningJobResponse response;
-        response = chatBotRepository.createFineTuningJob(
+        return chatBotClient.createFineTuningJob(
                 "Bearer " + openaiApiKey,
                 request);
-        return response;
     }
 
     @Override
     public FileUploadResponse getUploadedFileById(String fileId) {
-        if (fileId == null || fileId.trim().isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_INPUT);
-        }
-        return chatBotRepository.getFileById(
+        return chatBotClient.getFileById(
                 "Bearer " + openaiApiKey,
                 fileId);
     }
 
     @Override
     public byte[] getContentFileById(String fileId) {
-        return chatBotRepository.retrieveFileBytes(
+        return chatBotClient.retrieveFileBytes(
                 "Bearer " + openaiApiKey,
                 fileId);
     }
 
     @Override
     public List<FileUploadResponse> getAllUploadedFiles() {
-        FileUploadedListResponse response = chatBotRepository.getFiles(
-                "Bearer " + openaiApiKey);
-        return response.getData();
+        return chatBotClient.getFiles(
+                "Bearer " + openaiApiKey).getData();
     }
 
     @Override
     public FileDeletionResponse deleteUploadedFile(String fileId) {
-        if (fileId == null || fileId.trim().isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_INPUT);
-        }
-        return chatBotRepository.deleteFileById(
+        return chatBotClient.deleteFileById(
                 "Bearer " + openaiApiKey,
                 fileId);
     }
 
     @Override
     public List<FineTuningJobResponse> getAllFineTuneJobs() {
-        FineTuningJobListResponse response = chatBotRepository.getFineTuningJobs(
-                "Bearer " + openaiApiKey);
-        return response.getData();
+        return chatBotClient.getFineTuningJobs(
+                "Bearer " + openaiApiKey).getData();
     }
 
     @Override
     public FineTuningJobResponse getFineTuningJob(String jobId) {
-        FineTuningJobResponse response = chatBotRepository.getFineTuningJobById(
-                "Bearer " + openaiApiKey
-                , jobId);
-        if ("succeeded".equalsIgnoreCase(response.getStatus())) {
-            String newModelName = response.getFineTunedModel();
-            ModelChatBotDTO modelChatBotDTO = new ModelChatBotDTO();
-            modelChatBotDTO.setModelName(newModelName);
-            modelChatBotDTO.setPreviousModelName(response.getModel());
-            modelChatBotDTO.setActive(false);
-
-            ModelChatBot modelChatBot = modelChatBotMapper.toEntity(modelChatBotDTO);
-            modelChatBotRepository.save(modelChatBot);
-        }
-        return response;
+        return chatBotClient.getFineTuningJobById(
+                "Bearer " + openaiApiKey, jobId);
     }
 
     @Override
     public FineTuningJobResponse cancelFineTuningJob(String fineTuningJobId) {
-
         if (fineTuningJobId == null || fineTuningJobId.trim().isEmpty()) {
             throw new AppException(ErrorCode.INVALID_INPUT);
         }
-        return chatBotRepository.cancelFineTuningJob(
+        return chatBotClient.cancelFineTuningJob(
                 "Bearer " + openaiApiKey,
                 fineTuningJobId);
     }

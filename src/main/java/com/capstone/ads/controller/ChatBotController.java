@@ -1,6 +1,5 @@
 package com.capstone.ads.controller;
 
-import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.chatBot.*;
 import com.capstone.ads.service.ChatBotService;
@@ -63,12 +62,4 @@ public class ChatBotController {
         List<String> reply = chatBotService.getModernBillboardPricing(request);
         return ApiResponseBuilder.buildSuccessResponse("Chat response retrieved successfully.", reply);
     }
-
-    @GetMapping("/frequent-questions")
-    @Operation(summary = "Xem top 10 câu hỏi được hỏi nhiều nhất")
-    public ApiResponse<List<FrequentQuestion>> getTop10FrequentQuestions() {
-        List<FrequentQuestion> response = chatBotService.getTop10FrequentQuestions();
-        return ApiResponseBuilder.buildSuccessResponse("Questions retrieved successfully", response);
-    }
-
 }
