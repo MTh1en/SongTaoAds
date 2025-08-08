@@ -198,4 +198,9 @@ public class ModelChatServiceImpl implements ModelChatService {
             default -> "";
         };
     }
+
+    public ModelChatBot getModelChatBotByName(String modelName) {
+        return modelChatBotRepository.findByModelName(modelName);
+    }
+
 }
