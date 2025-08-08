@@ -1,6 +1,5 @@
 package com.capstone.ads.repository.internal;
 
-import com.capstone.ads.model.CustomerChoices;
 import com.capstone.ads.model.Orders;
 import com.capstone.ads.model.Users;
 import com.capstone.ads.model.enums.OrderStatus;
@@ -16,6 +15,8 @@ import java.util.Optional;
 @Repository
 public interface OrdersRepository extends JpaRepository<Orders, String> {
     Page<Orders> findByUsers_Id(String id, Pageable pageable);
+
+    Orders findByOrderCode(String orderCode);
 
     Page<Orders> findByStatus(OrderStatus status, Pageable pageable);
 

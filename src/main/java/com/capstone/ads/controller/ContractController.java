@@ -31,7 +31,7 @@ public class ContractController {
             @PathVariable String orderId,
             @Valid @ModelAttribute ContractSendRequest request) {
         var response = contractService.saleSendFirstContract(orderId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Sale sent contract successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Sale gửi hợp đồng thành công", response);
     }
 
     @PatchMapping(value = "/contracts/{contractId}/signed-contract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -39,7 +39,7 @@ public class ContractController {
     public ApiResponse<ContractDTO> customerSendSingedContract(@PathVariable String contractId,
                                                                @RequestPart MultipartFile signedContractFile) {
         var response = contractService.customerSendSingedContract(contractId, signedContractFile);
-        return ApiResponseBuilder.buildSuccessResponse("Customer signed contract successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Khách hàng gửi hợp đồng đã ký thành công", response);
     }
 
     @PatchMapping(value = "/contracts/{contractId}/revised-contract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -48,20 +48,20 @@ public class ContractController {
             @PathVariable String contractId,
             @Valid @ModelAttribute ContractRevisedRequest request) {
         var response = contractService.saleSendRevisedContract(contractId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Sale sent revised contract successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Sale gửi lại hợp đồng đã ký thành công", response);
     }
 
     @PatchMapping(value = "/contracts/{contractId}/discuss")
     @Operation(summary = "Khách hàng yêu cầu thảo luận thêm về hợp đồng")
     public ApiResponse<ContractDTO> customerRequestDiscussForContract(@PathVariable String contractId) {
         var response = contractService.customerRequestDiscussForContract(contractId);
-        return ApiResponseBuilder.buildSuccessResponse("Customer request discuss successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Khách hàng yêu cầu bàn luận về hợp đồng thành công", response);
     }
 
     @GetMapping("/orders/{orderId}/contract")
     @Operation(summary = "Xem hợp đồng theo đơn hàng")
     public ApiResponse<ContractDTO> findContractByOrderId(@PathVariable String orderId) {
         var response = contractService.findContractByOrderId(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Find contract by order successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem hợp đồng theo đơn hàng", response);
     }
 }

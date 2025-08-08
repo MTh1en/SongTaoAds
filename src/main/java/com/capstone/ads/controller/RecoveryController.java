@@ -31,7 +31,7 @@ public class RecoveryController {
     @Operation(summary = "Gửi lại email xác nhận tài khoản")
     public ApiResponse<TransactionalEmailResponse> resendVerificationEmail(@Valid @RequestBody ResendVerificationEmailRequest request) {
         var response = recoveryService.sendVerifyEmail(request.getEmail());
-        return ApiResponseBuilder.buildSuccessResponse("Resend email verified successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Gửi lại email xác nhận tài khoản thành công", response);
     }
 
     @GetMapping("/verifications/verify")
@@ -50,7 +50,7 @@ public class RecoveryController {
     @Operation(summary = "Gửi email đặt lại mật khẩu")
     public ApiResponse<TransactionalEmailResponse> sendResetPasswordEmail(@Valid @RequestBody SendResetPasswordEmailRequest request) {
         var response = recoveryService.sendResetPasswordEmail(request.getEmail());
-        return ApiResponseBuilder.buildSuccessResponse("Reset password email verified successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Gửi lại email đặt lại mật khẩu thành công", response);
     }
 
     @GetMapping("/password-reset/form")

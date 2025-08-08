@@ -57,13 +57,13 @@ public class StableDiffusionController {
     @Operation(summary = "Kiểm tra tiến độ hiện tại")
     public ApiResponse<ProgressResponse> checkProgress() {
         var response = stableDiffusionService.checkProgressByTaskId();
-        return ApiResponseBuilder.buildSuccessResponse("check your progress", response);
+        return ApiResponseBuilder.buildSuccessResponse("Kiểm tra tiến độ tạo ảnh thành công", response);
     }
 
     @GetMapping(value = "/stable-diffusion/pending-task")
     @Operation(summary = "Xem những hình ảnh đang trong hàng chờ")
     public ApiResponse<PendingTaskResponse> checkPendingTask() {
         var response = stableDiffusionService.checkPendingTask();
-        return ApiResponseBuilder.buildSuccessResponse("check pending task", response);
+        return ApiResponseBuilder.buildSuccessResponse("Kiểm tra tác vụ đang chạy", response);
     }
 }

@@ -1,4 +1,4 @@
-package com.capstone.ads.dto.chatBot;
+package com.capstone.ads.dto.fine_tune;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

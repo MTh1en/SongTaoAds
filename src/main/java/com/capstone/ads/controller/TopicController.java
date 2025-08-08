@@ -25,41 +25,41 @@ public class TopicController {
     TopicService topicService;
 
     @PostMapping("/topics")
-    @Operation(summary = "Create a new topic")
+    @Operation(summary = "Tạo topic")
     public ApiResponse<TopicDTO> createTopic(
             @RequestBody TopicCreateRequest topic) {
         TopicDTO createdTopic = topicService.createTopic(topic);
-        return ApiResponseBuilder.buildSuccessResponse("Topic created successfully", createdTopic);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo topic thành công", createdTopic);
     }
 
     @GetMapping("/topics")
-    @Operation(summary = "View all topics")
+    @Operation(summary = "Xem tất cả topic")
     public ApiResponse<List<TopicDTO>> viewAllTopics() {
         var topics = topicService.getAllTopics();
-        return ApiResponseBuilder.buildSuccessResponse("Topics retrieved successfully", topics);
+        return ApiResponseBuilder.buildSuccessResponse("Xem tất cả topic thành công", topics);
     }
 
     @GetMapping("/topics/{id}")
-    @Operation(summary = "View topic details")
+    @Operation(summary = "Xem topic theo ID")
     public ApiResponse<TopicDTO> viewTopicDetails(@PathVariable String id) {
         TopicDTO topic = topicService.findTopicById(id);
-        return ApiResponseBuilder.buildSuccessResponse("Topic details retrieved successfully", topic);
+        return ApiResponseBuilder.buildSuccessResponse("Xem topic theo ID thành công", topic);
     }
 
     @PutMapping("/topics/{id}")
-    @Operation(summary = "Update a topic")
+    @Operation(summary = "Cập nhật topic")
     public ApiResponse<TopicDTO> updateTopic(
             @PathVariable String id,
             @Valid @RequestBody TopicUpdateInformationRequest request) {
         TopicDTO updatedTopic = topicService.updateTopic(id, request);
-        return ApiResponseBuilder.buildSuccessResponse("Topic updated successfully", updatedTopic);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật topic thành công", updatedTopic);
     }
 
     @DeleteMapping("/topics/{id}")
-    @Operation(summary = "Delete a topic")
+    @Operation(summary = "Xóa topic")
     public ApiResponse<Void> deleteTopic(@PathVariable String id) {
         topicService.deleteTopic(id);
-        return ApiResponseBuilder.buildSuccessResponse("Topic deleted successfully", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa topic thành công", null);
     }
 
 }

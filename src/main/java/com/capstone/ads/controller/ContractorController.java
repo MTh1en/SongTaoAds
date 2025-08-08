@@ -29,7 +29,7 @@ public class ContractorController {
     @Operation(summary = "Tạo đơn vị thi công")
     public ApiResponse<ContractorDTO> createContractor(@Valid @ModelAttribute ContractorCreateRequest request) {
         var response = contractorService.createContractor(request);
-        return ApiResponseBuilder.buildSuccessResponse("Create contractor successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo đơn vị thi công thành công", response);
     }
 
     @PutMapping("/{contractorId}")
@@ -37,7 +37,7 @@ public class ContractorController {
     public ApiResponse<ContractorDTO> updateContractorInformation(@PathVariable String contractorId,
                                                                   @Valid @RequestBody ContractorUpdateRequest request) {
         var response = contractorService.updateContractorInformation(contractorId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Update contractor successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật thông tin đơn vị thi công thành công", response);
     }
 
     @PatchMapping(value = "/{contractorId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -45,14 +45,14 @@ public class ContractorController {
     public ApiResponse<ContractorDTO> updateContractorImage(@PathVariable String contractorId,
                                                             @RequestPart MultipartFile file) {
         var response = contractorService.updateContractorLogo(contractorId, file);
-        return ApiResponseBuilder.buildSuccessResponse("Update contractor successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật logo đơn vị thi công thành công", response);
     }
 
     @GetMapping("/{contractorId}")
     @Operation(summary = "Xem đơn vị thi công theo ID")
     public ApiResponse<ContractorDTO> findContractorById(@PathVariable String contractorId) {
         var response = contractorService.findContractorById(contractorId);
-        return ApiResponseBuilder.buildSuccessResponse("contractor by Id", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem đơn vị thi công theo ID", response);
     }
 
     @GetMapping(params = "!isInternal")
@@ -61,7 +61,7 @@ public class ContractorController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = contractorService.findAllContractors(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find all contractor", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả đơn vị thi công", response, page);
     }
 
     @GetMapping(params = "isInternal")
@@ -71,7 +71,7 @@ public class ContractorController {
             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
             @RequestParam(required = false) boolean isInternal) {
         var response = contractorService.findAllContractorByIsInternal(page, size, isInternal);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find all contractor internal or external", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem đơn vị thi công bên trong và ngoài", response, page);
     }
 
 
@@ -79,6 +79,6 @@ public class ContractorController {
     @Operation(summary = "Xóa cứng kích thước(Không dùng)")
     public ApiResponse<Void> hardDeleteSize(@PathVariable String contractorId) {
         contractorService.hardDeleteContractor(contractorId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete contractor successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa đơn vị thi công thành công", null);
     }
 }

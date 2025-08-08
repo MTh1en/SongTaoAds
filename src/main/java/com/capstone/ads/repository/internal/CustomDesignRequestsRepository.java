@@ -23,4 +23,6 @@ public interface CustomDesignRequestsRepository extends JpaRepository<CustomDesi
     Page<CustomDesignRequests> findByAssignDesigner_Id(String id, Pageable pageable);
 
     Page<CustomDesignRequests> findByStatus(CustomDesignRequestStatus status, Pageable pageable);
+
+    Page<CustomDesignRequests> findByIsNeedSupport(Boolean isNeedSupport, Pageable pageable);
 }
