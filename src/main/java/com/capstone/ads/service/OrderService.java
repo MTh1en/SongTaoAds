@@ -6,6 +6,7 @@ import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
 import com.capstone.ads.model.Orders;
 import com.capstone.ads.model.enums.OrderStatus;
+import com.capstone.ads.model.enums.OrderType;
 import com.capstone.ads.model.enums.PaymentType;
 import org.springframework.data.domain.Page;
 
@@ -23,6 +24,10 @@ public interface OrderService {
     OrderDTO findOrderById(String orderId);
 
     Page<OrderDTO> findOrderByStatus(OrderStatus status, int page, int size);
+
+    Page<OrderDTO> findOrderByType(OrderType orderType, int page, int size);
+
+    Page<OrderDTO> findOrderByStatusAndType(OrderStatus status, OrderType orderType, int page, int size);
 
     Page<OrderDTO> findAllOrders(int page, int size);
 

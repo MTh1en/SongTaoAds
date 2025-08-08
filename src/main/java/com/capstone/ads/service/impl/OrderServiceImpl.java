@@ -181,6 +181,22 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Page<OrderDTO> findOrderByType(OrderType orderType, int page, int size) {
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return orderRepository.findByOrderType(orderType, pageable)
+                .map(orderMapper::toDTO);
+    }
+
+    @Override
+    public Page<OrderDTO> findOrderByStatusAndType(OrderStatus status, OrderType orderType, int page, int size) {
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return orderRepository.findByStatusAndOrderType(status, orderType, pageable)
+                .map(orderMapper::toDTO);
+    }
+
+    @Override
     public Page<OrderDTO> findAllOrders(int page, int size) {
         Sort sort = Sort.by("createdAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
