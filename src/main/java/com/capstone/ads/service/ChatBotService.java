@@ -13,7 +13,7 @@ public interface ChatBotService {
 
     ListModelsResponse getModels();
 
-    List<String> getModernBillboardPricing(ModernBillboardRequest request);
+    ModernBillboardResponse getModernBillboardPricing(ModernBillboardRequest request);
 
-    List<String> getTraditionalBillboardPricing(TraditionalBillboardRequest request);
+    TraditionalBillboardResponse getTraditionalBillboardPricing(TraditionalBillboardRequest request);
 }

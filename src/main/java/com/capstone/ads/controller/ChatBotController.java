@@ -51,15 +51,15 @@ public class ChatBotController {
 
     @PostMapping("/pricing/traditional")
     @Operation(summary = "Báo giá bảng quảng cáo truyền thống bằng chatbot")
-    public ApiResponse<List<String>> getTraditionalBillboardPricing(@RequestBody TraditionalBillboardRequest request) {
-        List<String> reply = chatBotService.getTraditionalBillboardPricing(request);
-        return ApiResponseBuilder.buildSuccessResponse("Chat response retrieved successfully.", reply);
+    public ApiResponse<TraditionalBillboardResponse> getTraditionalBillboardPricing(@RequestBody TraditionalBillboardRequest request) {
+        var response = chatBotService.getTraditionalBillboardPricing(request);
+        return ApiResponseBuilder.buildSuccessResponse("Chat response retrieved successfully.", response);
     }
 
     @PostMapping("/pricing/modern")
     @Operation(summary = "Báo giá bảng quảng cáo hiện đại bằng chatbot")
-    public ApiResponse<List<String>> getModernBillboardPricing(@RequestBody ModernBillboardRequest request) {
-        List<String> reply = chatBotService.getModernBillboardPricing(request);
+    public ApiResponse<ModernBillboardResponse> getModernBillboardPricing(@RequestBody ModernBillboardRequest request) {
+        var reply = chatBotService.getModernBillboardPricing(request);
         return ApiResponseBuilder.buildSuccessResponse("Chat response retrieved successfully.", reply);
     }
 }

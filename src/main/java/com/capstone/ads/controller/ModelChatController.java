@@ -2,8 +2,8 @@ package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.chatBot.FileUploadResponse;
-import com.capstone.ads.dto.chatBot.ModelChatBotDTO;
+import com.capstone.ads.dto.fine_tune.FileUploadResponse;
+import com.capstone.ads.dto.model_chat.ModelChatBotDTO;
 import com.capstone.ads.dto.webhook.FineTuneSuccess;
 import com.capstone.ads.service.ModelChatService;
 import com.capstone.ads.utils.ApiResponseBuilder;

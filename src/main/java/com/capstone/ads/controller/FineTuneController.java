@@ -1,10 +1,10 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.chatBot.FileDeletionResponse;
-import com.capstone.ads.dto.chatBot.FileUploadResponse;
-import com.capstone.ads.dto.chatBot.FineTuningJobRequest;
-import com.capstone.ads.dto.chatBot.FineTuningJobResponse;
+import com.capstone.ads.dto.fine_tune.FileDeletionResponse;
+import com.capstone.ads.dto.fine_tune.FileUploadResponse;
+import com.capstone.ads.dto.fine_tune.FineTuningJobRequest;
+import com.capstone.ads.dto.fine_tune.FineTuningJobResponse;
 import com.capstone.ads.service.FineTuneService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;

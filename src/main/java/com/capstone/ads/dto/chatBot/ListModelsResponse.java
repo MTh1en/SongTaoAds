@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.chatBot;
 
+import com.capstone.ads.dto.model_chat.ModelResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
