@@ -1,7 +1,8 @@
 package com.capstone.ads.repository.internal;
 
 import com.capstone.ads.model.Payments;
-import com.capstone.ads.model.Users;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,4 +20,8 @@ public interface PaymentsRepository extends JpaRepository<Payments, String> {
 
     @Query("SELECT SUM(p.amount) FROM Payments p WHERE p.type = 'DEPOSIT_DESIGN'")
     long sumDepositAmount();
+
+    Page<Payments> findByOrders_Id(String id, Pageable pageable);
+
+    Page<Payments> findByOrders_Users_Id(String id, Pageable pageable);
 }

@@ -1,6 +1,8 @@
 package com.capstone.ads.controller;
 
+import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
+import com.capstone.ads.dto.payment.PaymentDTO;
 import com.capstone.ads.service.PaymentService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -68,6 +70,30 @@ public class PaymentController {
     public ApiResponse<String> registerWebhookUrl(@RequestBody String webhookUrl) throws Exception {
         String result = paymentService.confirmWebhookUrl(webhookUrl);
         return ApiResponseBuilder.buildSuccessResponse("Register WebhookUrl successfully", result);
+    }
+
+    @GetMapping("/orders/{orderId}/payments")
+    @Operation(summary = "Xem lịch sử thanh toán theo đơn hàng")
+    public ApiPagingResponse<PaymentDTO> findPaymentByOrderId(
+            @PathVariable String orderId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = paymentService.findPaymentByOrderId(orderId, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse(
+                "Xem lịch sử thanh toán theo đơn hàng thành công",
+                response, page);
+    }
+
+    @GetMapping("/users/{userId}/payments")
+    @Operation(summary = "Xem lịch sử thanh toán theo đơn hàng")
+    public ApiPagingResponse<PaymentDTO> findPaymentByUserId(
+            @PathVariable String userId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = paymentService.findPaymentByUserId(userId, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse(
+                "Xem lịch sử thanh toán theo tài khoản thành công",
+                response, page);
     }
 
     //Template Engine

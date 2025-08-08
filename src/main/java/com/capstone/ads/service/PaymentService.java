@@ -1,6 +1,9 @@
 package com.capstone.ads.service;
 
+import com.capstone.ads.dto.payment.PaymentDTO;
+import org.springframework.data.domain.Page;
 import vn.payos.type.CheckoutResponseData;
+import vn.payos.type.PaymentData;
 import vn.payos.type.Webhook;
 import vn.payos.type.WebhookData;
 
@@ -22,4 +25,8 @@ public interface PaymentService {
     String confirmWebhookUrl(String webhookUrl) throws Exception;
 
     void cancelPayment(Long paymentCode);
+
+    Page<PaymentDTO> findPaymentByOrderId(String orderId, int page, int size);
+
+    Page<PaymentDTO> findPaymentByUserId(String userId, int page, int size);
 }
