@@ -7,7 +7,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -16,26 +15,20 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-public class Topic {
+public class ChatBotTopic {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String title;
-    String description;
 
     @ManyToOne
     ModelChatBot modelChatBot;
 
-    @OneToMany(mappedBy = "topic")
-    List<Question> questions;
+    @ManyToOne
+    Topic topic;
 
     @CreationTimestamp
     LocalDateTime createdAt;
 
     @UpdateTimestamp
     LocalDateTime updatedAt;
-
-    @OneToMany(mappedBy = "topic")
-    private List<ChatBotTopic> chatBotTopics;
-
 }

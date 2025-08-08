@@ -119,6 +119,9 @@ public enum ErrorCode {
     QUESTION_NOT_FOUND("Question not found", HttpStatus.NOT_FOUND),
     QUESTION_NUMBER_INCORRECT("Question number incorrect", HttpStatus.BAD_REQUEST),
 
+    //==========CHAT BOT TOPIC==============
+    CHAT_BOT_TOPIC_NOT_FOUND("Chat bot topic not found", HttpStatus.NOT_FOUND),
+
    ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

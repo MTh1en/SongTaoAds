@@ -18,4 +18,6 @@ public interface ModelChatService {
 
     //INTERNAL FUNCTION
     ModelChatBot getModelChatBotById(String modelChatBotId);
+
+    ModelChatBot getModelChatBotByName(String modelChatBotName);
 }

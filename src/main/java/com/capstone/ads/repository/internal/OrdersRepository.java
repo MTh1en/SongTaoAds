@@ -31,4 +31,7 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
     })
     @NonNull
     Optional<Orders> findById(@NonNull String id);
+
+    Optional<Orders> findByOrderCode(String orderCode);
+
 }
