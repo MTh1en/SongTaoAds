@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import vn.payos.type.CheckoutResponseData;
+import vn.payos.type.PaymentLinkData;
 import vn.payos.type.Webhook;
 import vn.payos.type.WebhookData;
 
@@ -70,6 +71,12 @@ public class PaymentController {
     public ApiResponse<String> registerWebhookUrl(@RequestBody String webhookUrl) throws Exception {
         String result = paymentService.confirmWebhookUrl(webhookUrl);
         return ApiResponseBuilder.buildSuccessResponse("Register WebhookUrl successfully", result);
+    }
+
+    @PostMapping("/payments/{orderCode}/information")
+    public ApiResponse<PaymentLinkData> getPaymentLinkInformation(@PathVariable Long orderCode) throws Exception {
+        var response = paymentService.getPaymentLinkInformation(orderCode);
+        return ApiResponseBuilder.buildSuccessResponse("Register WebhookUrl successfully", response);
     }
 
     @GetMapping("/orders/{orderId}/payments")

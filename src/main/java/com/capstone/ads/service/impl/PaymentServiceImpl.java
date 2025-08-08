@@ -113,6 +113,12 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    public PaymentLinkData getPaymentLinkInformation(Long orderCode) throws Exception {
+        PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
+        return payOS.getPaymentLinkInformation(orderCode);
+    }
+
+    @Override
     @Transactional
     public void cancelPayment(Long paymentCode) {
         Payments payments = paymentRepository.findByCode(paymentCode)
@@ -210,7 +216,6 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
         return createPaymentLinkFromPayOS(amount.intValue(), paymentCode);
     }
-    // INTERNAL FUNCTION //
 
     private CheckoutResponseData createPaymentLinkFromPayOS(Integer amount, Long paymentCode) throws Exception {
         PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
