@@ -33,6 +33,14 @@ public class UserController {
         return ApiResponseBuilder.buildSuccessResponse("Tạo tài khoản hệ thống thành công", response);
     }
 
+    @PatchMapping("/users/{userId}/ban-decision")
+    @Operation(summary = "Tạo tài khoản hệ thống")
+    public ApiResponse<UserDTO> createUser(@PathVariable String userId,
+                                           @RequestParam Boolean isBanned) {
+        var response = usersService.banOrUnbanUser(userId, isBanned);
+        return ApiResponseBuilder.buildSuccessResponse("Quyết định ban hoặc mở ban thành công", response);
+    }
+
     @GetMapping("/users/{userId}")
     @Operation(summary = "Xem thông tin người dùng theo ID")
     public ApiResponse<UserDTO> getUserById(@PathVariable String userId) {
