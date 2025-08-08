@@ -197,7 +197,7 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
     @Transactional
     public void hardDeleteCustomDesign(String customDesignId) {
         if (!demoDesignsRepository.existsById(customDesignId)) {
-            throw new AppException(ErrorCode.CUSTOM_DESIGN_NOT_FOUND);
+            throw new AppException(ErrorCode.DEMO_DESIGN_NOT_FOUND);
         }
         demoDesignsRepository.deleteById(customDesignId);
     }
@@ -210,7 +210,7 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
 
     private DemoDesigns findCustomDesignByIdAndPendingStatus(String customDesignId) {
         return demoDesignsRepository.findByIdAndStatus(customDesignId, DemoDesignStatus.PENDING)
-                .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.DEMO_DESIGN_NOT_FOUND));
     }
 
     private String generateCustomDesignKey(String customDesignRequestId) {
