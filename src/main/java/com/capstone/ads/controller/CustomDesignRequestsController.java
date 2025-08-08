@@ -75,7 +75,7 @@ public class CustomDesignRequestsController {
             @PathVariable String customerDetailId,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = service.findCustomerDesignRequestByCustomerDetailId(customerDetailId, page, size);
+        var response = service.findCustomDesignRequestByCustomerDetailId(customerDetailId, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse(
                 "Find custom design request by custom detail request successful",
                 response, page
@@ -88,7 +88,7 @@ public class CustomDesignRequestsController {
             @PathVariable String designerId,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = service.findCustomerDesignRequestByAssignDesignerId(designerId, page, size);
+        var response = service.findCustomDesignRequestByAssignDesignerId(designerId, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse(
                 "Find custom design request by designer request successful",
                 response, page
@@ -101,8 +101,19 @@ public class CustomDesignRequestsController {
             @RequestParam(value = "status", required = false) CustomDesignRequestStatus status,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = service.findCustomerDesignRequestByStatus(status, page, size);
+        var response = service.findCustomDesignRequestByStatus(status, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request by status successful",
+                response, page
+        );
+    }
+
+    @GetMapping(value = "/custom-design-requests/need-support")
+    @Operation(summary = "Xem yêu cầu thiết kế theo trạng thái")
+    public ApiPagingResponse<CustomDesignRequestDTO> findAllCustomDesignRequestNeedSupport(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findAllCustomDesignRequestNeedSupport(page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request need support successful",
                 response, page
         );
     }

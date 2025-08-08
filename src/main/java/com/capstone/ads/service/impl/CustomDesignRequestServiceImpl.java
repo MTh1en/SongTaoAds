@@ -59,6 +59,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
         var customDesignRequest = customDesignRequestsMapper.mapCreateRequestToEntity(request);
         customDesignRequest.setCode(KeyGenerator.generateCustomDesignRequest());
+        customDesignRequest.setIsNeedSupport(false);
         customDesignRequest.setCustomerDetail(customerDetail);
         customDesignRequest.setStatus(CustomDesignRequestStatus.PENDING);
         customDesignRequest = customDesignRequestsRepository.save(customDesignRequest);
@@ -140,14 +141,14 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
-    public Page<CustomDesignRequestDTO> findCustomerDesignRequestByCustomerDetailId(String customerDetailId, int page, int size) {
+    public Page<CustomDesignRequestDTO> findCustomDesignRequestByCustomerDetailId(String customerDetailId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         return customDesignRequestsRepository.findByCustomerDetail_Id(customerDetailId, pageable)
                 .map(customDesignRequestsMapper::toDTO);
     }
 
     @Override
-    public Page<CustomDesignRequestDTO> findCustomerDesignRequestByAssignDesignerId(String assignDesignerId, int page, int size) {
+    public Page<CustomDesignRequestDTO> findCustomDesignRequestByAssignDesignerId(String assignDesignerId, int page, int size) {
         Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return customDesignRequestsRepository.findByAssignDesigner_Id(assignDesignerId, pageable)
@@ -155,10 +156,18 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
-    public Page<CustomDesignRequestDTO> findCustomerDesignRequestByStatus(CustomDesignRequestStatus status, int page, int size) {
+    public Page<CustomDesignRequestDTO> findCustomDesignRequestByStatus(CustomDesignRequestStatus status, int page, int size) {
         Sort sort = Sort.by("createdAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return customDesignRequestsRepository.findByStatus(status, pageable)
+                .map(customDesignRequestsMapper::toDTO);
+    }
+
+    @Override
+    public Page<CustomDesignRequestDTO> findAllCustomDesignRequestNeedSupport(int page, int size) {
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return customDesignRequestsRepository.findByIsNeedSupport(true, pageable)
                 .map(customDesignRequestsMapper::toDTO);
     }
 
