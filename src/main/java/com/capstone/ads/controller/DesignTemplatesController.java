@@ -34,7 +34,7 @@ public class DesignTemplatesController {
             @PathVariable("productTypeId") String productTypeId,
             @Valid @ModelAttribute DesignTemplateCreateRequest request) {
         var response = designTemplatesService.createDesignTemplate(productTypeId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Create Design Template successful!", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo thiết kế mẫu thành công", response);
     }
 
     @PatchMapping("/design-templates/{designTemplateId}/information")
@@ -43,7 +43,7 @@ public class DesignTemplatesController {
             @PathVariable String designTemplateId,
             @Valid @RequestBody DesignTemplateUpdateRequest request) {
         var response = designTemplatesService.updateDesignTemplateInformation(designTemplateId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Update Design Template information successful!", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật thông tin thiết kế mẫu thành công", response);
     }
 
     @PatchMapping(
@@ -55,24 +55,24 @@ public class DesignTemplatesController {
             @PathVariable String designTemplateId,
             @RequestPart("file") MultipartFile designTemplateImage) {
         var response = designTemplatesService.uploadDesignTemplateImage(designTemplateId, designTemplateImage);
-        return ApiResponseBuilder.buildSuccessResponse("Update Design Template image successful!", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật hình ảnh thiết kế mẫu thành công", response);
     }
 
     @GetMapping("/design-templates/{designTemplateId}")
     @Operation(summary = "Xem thiết kễ mẫu theo ID")
     public ApiResponse<DesignTemplateDTO> findDesignTemplateById(@PathVariable String designTemplateId) {
         var response = designTemplatesService.findDesignTemplateById(designTemplateId);
-        return ApiResponseBuilder.buildSuccessResponse("Find Design Template successful!", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem thiết kế mẫu theo ID thành công", response);
     }
 
     @GetMapping("product-types/{productTypeId}/design-templates")
-    @Operation(summary = "Xem thiết kế mẫu theo loại sản phẩm")
+    @Operation(summary = "Xem thiết kế mẫu theo loại biển hiệu")
     public ApiPagingResponse<DesignTemplateDTO> findDesignTemplateByProductTypeId(
             @PathVariable String productTypeId,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = designTemplatesService.findDesignTemplateByProductTypeId(productTypeId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find Design Template by ProductTypeId successful!", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem thiết kế mẫu theo loại biển hiệu thành công", response, page);
     }
 
     @GetMapping("/design-templates")
@@ -81,7 +81,7 @@ public class DesignTemplatesController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = designTemplatesService.findAllDesignTemplates(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find All Design Template successful!", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả các thiết kế mẫu thành công", response, page);
     }
 
     @GetMapping("customer-choices/{customerChoiceId}/design-template-suggestion")
@@ -91,13 +91,15 @@ public class DesignTemplatesController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = designTemplatesService.suggestDesignTemplatesBaseCustomerChoice(customerChoiceId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Suggest Design Template successful!", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse(
+                "Đề xuất thiết kế mẫu theo lựa chọn khách hàng thành công",
+                response, page);
     }
 
     @DeleteMapping("/design-templates/{designTemplateId}")
     @Operation(summary = "Xóa cứng thiết kế mẫu")
     public ApiResponse<Void> hardDeleteDesignTemplate(@PathVariable String designTemplateId) {
         designTemplatesService.hardDeleteDesignTemplate(designTemplateId);
-        return ApiResponseBuilder.buildSuccessResponse("Hard hardDeleteAttribute Design Template successful!", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa thiết kế mẫu thành công", null);
     }
 }

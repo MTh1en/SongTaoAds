@@ -28,28 +28,28 @@ public class PaymentController {
     @Operation(summary = "Đặt cọc theo đơn hàng")
     public ApiResponse<CheckoutResponseData> createOrderDepositPaymentLink(@PathVariable String orderId) throws Exception {
         CheckoutResponseData response = paymentService.createConstructionDepositPaymentLink(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo link đặt cọc đơn hàng thành công", response);
     }
 
     @PostMapping("/orders/{orderId}/remaining")
     @Operation(summary = "Thanh toán hết đơn hàng")
     public ApiResponse<CheckoutResponseData> createOrderRemainingPaymentLink(@PathVariable String orderId) throws Exception {
         CheckoutResponseData response = paymentService.createConstructionRemainingPaymentLink(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo link thanh toán hết đơn hàng thành công", response);
     }
 
     @PostMapping("/orders/{orderId}/design-deposit")
     @Operation(summary = "Đặt cọc theo thiết kế")
     public ApiResponse<CheckoutResponseData> createCustomDesignFullDepositPaymentLink(@PathVariable String orderId) throws Exception {
         CheckoutResponseData response = paymentService.createCustomDesignFullDepositPaymentLink(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo link đặt cọc thiết kế thành công", response);
     }
 
     @PostMapping("/orders/{orderId}/design-remaining")
     @Operation(summary = "Thanh toán hết thiết kế")
     public ApiResponse<CheckoutResponseData> createCustomDesignFullRemainingPaymentLink(@PathVariable String orderId) throws Exception {
         CheckoutResponseData response = paymentService.createCustomDesignFullRemainingPaymentLink(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Payment initiated", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo link thanh toán hết thiết kế thành công", response);
     }
 
     @PostMapping("/webhook/handle-webhook")

@@ -32,7 +32,7 @@ public class FeedbackController {
     public ApiResponse<FeedbackDTO> sendFeedback(@PathVariable String orderId,
                                                  @Valid @RequestBody FeedbackSendRequest request) {
         var response = feedbackService.sendFeedback(orderId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Send feedback successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Gửi feedback thành công", response);
     }
 
     @PatchMapping(value = "/feedbacks/{feedbackId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -40,7 +40,7 @@ public class FeedbackController {
     public ApiResponse<FeedbackDTO> uploadFeedbackImage(@PathVariable String feedbackId,
                                                         @RequestPart MultipartFile feedbackImage) {
         var response = feedbackService.uploadFeedbackImage(feedbackId, feedbackImage);
-        return ApiResponseBuilder.buildSuccessResponse("Upload feedback image successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Upload hình ảnh feedback thành công", response);
     }
 
     @PatchMapping("/feedbacks/{feedbackId}/response")
@@ -48,14 +48,14 @@ public class FeedbackController {
     public ApiResponse<FeedbackDTO> responseFeedback(@PathVariable String feedbackId,
                                                      @Valid @RequestBody FeedbackResponseRequest request) {
         var response = feedbackService.responseFeedback(feedbackId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Response feedback successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Phản hồi feedback thành công", response);
     }
 
     @GetMapping("/orders/{orderId}/feedbacks")
     @Operation(summary = "Xem phản hồi theo đơn hàng")
     public ApiResponse<List<FeedbackDTO>> findFeedbackByOrderId(@PathVariable String orderId) {
         var response = feedbackService.findFeedbackByOrderId(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Find feedback by Order successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem phản hồi theo đơn hàng thành công", response);
     }
 
     @GetMapping("/users/{userId}/feedbacks")
@@ -65,7 +65,7 @@ public class FeedbackController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = feedbackService.findFeedbackByUserId(userId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find Feedback by User successful", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem phản hồi theo người dùng", response, page);
     }
 
     @GetMapping("/feedbacks")
@@ -74,13 +74,13 @@ public class FeedbackController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = feedbackService.findAllFeedback(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find Feedback successful", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả phản hồi", response, page);
     }
 
     @DeleteMapping("/feedbacks/{feedbackId}")
     @Operation(summary = "Xóa cứng phản hồi")
     public ApiResponse<Void> hardDeleteFeedback(@PathVariable String feedbackId) {
         feedbackService.hardDeleteFeedback(feedbackId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete feedback successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa phản hồi thành công", null);
     }
 }

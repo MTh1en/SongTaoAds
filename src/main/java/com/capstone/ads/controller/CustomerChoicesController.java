@@ -24,27 +24,27 @@ public class CustomerChoicesController {
     public ApiResponse<CustomerChoicesDTO> createCustomerChoice(@PathVariable String customerId,
                                                                 @PathVariable String productTypeId) {
         var response = service.createCustomerChoice(customerId, productTypeId);
-        return ApiResponseBuilder.buildSuccessResponse("Create customer choices successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Chọn loại biển hiệu thành công", response);
     }
 
     @GetMapping("/customer-choices/{customerChoicesId}")
     @Operation(summary = "Xem loại sản phẩm khách hàng chọn theo ID")
     public ApiResponse<CustomerChoicesDTO> findCustomerChoiceById(@PathVariable String customerChoicesId) {
         var response = service.findCustomerChoiceById(customerChoicesId);
-        return ApiResponseBuilder.buildSuccessResponse("customer choices by Id", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem loại biển hiệu đã chọn theo ID", response);
     }
 
     @GetMapping("/customers/{customerId}/customer-choices")
     @Operation(summary = "Xem loại sản phẩm khách hàng chọn theo ID khách hàng")
     public ApiResponse<CustomerChoicesDTO> findCustomerChoiceByUserId(@PathVariable String customerId) {
         var response = service.findCustomerChoiceByUserId(customerId);
-        return ApiResponseBuilder.buildSuccessResponse("Find all customer choices by product type", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem lựa chọn khách hàng", response);
     }
 
     @DeleteMapping("/customer-choices/{customerChoicesId}")
     @Operation(summary = "Xóa cứng loại sản phẩm khách hàng chọn")
     public ApiResponse<Void> hardDeleteCustomerChoice(@PathVariable String customerChoicesId) {
         service.hardDeleteCustomerChoice(customerChoicesId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete customer choices successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa lựa chọn biện hiệu thành công", null);
     }
 }

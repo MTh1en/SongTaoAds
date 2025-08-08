@@ -15,7 +15,6 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @RestControllerAdvice
 @Slf4j
@@ -42,7 +41,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponseBuilder.buildErrorResponse("Validation Error", errors));
+                .body(ApiResponseBuilder.buildErrorResponse("Lỗi định dạng", errors));
     }
 
     @ExceptionHandler(value = HandlerMethodValidationException.class)
@@ -55,7 +54,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponseBuilder.buildErrorResponse("Validation Error", errors));
+                .body(ApiResponseBuilder.buildErrorResponse("Lỗi định dạng", errors));
     }
 
     @ExceptionHandler(value = AuthorizationDeniedException.class)

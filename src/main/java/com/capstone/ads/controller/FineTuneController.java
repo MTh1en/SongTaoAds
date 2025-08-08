@@ -28,14 +28,14 @@ public class FineTuneController {
     @Operation(summary = "Upload file để fine-tune")
     public ApiResponse<FileUploadResponse> uploadFileToFinetune(@RequestParam MultipartFile file) {
         FileUploadResponse response = fineTuneService.uploadFileToFineTune(file);
-        return ApiResponseBuilder.buildSuccessResponse("File uploaded successfully for fine-tuning", response);
+        return ApiResponseBuilder.buildSuccessResponse("Upload file để fine tune thành công", response);
     }
 
     @PostMapping("/finetune-model")
     @Operation(summary = "File-tune model hiện tại")
     public ApiResponse<FineTuningJobResponse> finetuneModel(@RequestBody FineTuningJobRequest request) {
         FineTuningJobResponse response = fineTuneService.fineTuningJob(request);
-        return ApiResponseBuilder.buildSuccessResponse("Fine-tuning job created successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Bắt đầu fine tune thành công", response);
     }
 
     @GetMapping("/files/{fileId}")
@@ -43,7 +43,7 @@ public class FineTuneController {
     public ApiResponse<FileUploadResponse> getFileById(
             @PathVariable String fileId) {
         FileUploadResponse response = fineTuneService.getUploadedFileById(fileId);
-        return ApiResponseBuilder.buildSuccessResponse("File retrieved successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem thông tin file", response);
     }
 
     @GetMapping(value = "/files/{fileId}/content", produces = MediaType.TEXT_PLAIN_VALUE)
@@ -58,7 +58,7 @@ public class FineTuneController {
     @Operation(summary = "Xem tất cả file uploaded để fine-tune")
     public ApiResponse<List<FileUploadResponse>> getFineTuningFiles() {
         List<FileUploadResponse> response = fineTuneService.getAllUploadedFiles();
-        return ApiResponseBuilder.buildSuccessResponse("Fine-tuning files retrieved successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem tất cả file uploaded để fine-tune thành công", response);
     }
 
     @DeleteMapping("/files/{fileId}")
@@ -66,27 +66,27 @@ public class FineTuneController {
     public ApiResponse<FileDeletionResponse> deleteFile(
             @PathVariable String fileId) {
         FileDeletionResponse response = fineTuneService.deleteUploadedFile(fileId);
-        return ApiResponseBuilder.buildSuccessResponse("File deleted successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa file đã upload để fine tune thành công", response);
     }
 
     @GetMapping("/fine-tune-jobs")
     @Operation(summary = "Xem tất cả các job đã fine-tune")
     public ApiResponse<List<FineTuningJobResponse>> getFineTuningJobs() {
         List<FineTuningJobResponse> response = fineTuneService.getAllFineTuneJobs();
-        return ApiResponseBuilder.buildSuccessResponse("Fine tuning jobs retrieved successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem tất cả các job đã fine-tune thành công", response);
     }
 
     @GetMapping("/{fineTuneJobId}/fine-tune-jobs")
     @Operation(summary = "Xem chi tiết job đã fine-tune")
     public ApiResponse<FineTuningJobResponse> getFineTuningJobById(@PathVariable String fineTuneJobId) {
         FineTuningJobResponse response = fineTuneService.getFineTuningJob(fineTuneJobId);
-        return ApiResponseBuilder.buildSuccessResponse("Fine tuning job retrieved successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem chi tiết job đã fine-tune thành công", response);
     }
 
     @PostMapping("/{fineTuningJobId}/fine-tuning-jobs/cancel")
     @Operation(summary = "Hủy 1 job đang fine-tune")
     public ApiResponse<FineTuningJobResponse> cancelFineTuningJob(@PathVariable String fineTuningJobId) {
         FineTuningJobResponse response = fineTuneService.cancelFineTuningJob(fineTuningJobId);
-        return ApiResponseBuilder.buildSuccessResponse("Fine tuning job cancelled successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Hủy job đang fine-tune thành công", response);
     }
 }

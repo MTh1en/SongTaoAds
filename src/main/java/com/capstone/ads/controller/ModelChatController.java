@@ -27,7 +27,7 @@ public class ModelChatController {
     @Operation(summary = "Convert từ file excel thành file jsonl")
     public ApiResponse<FileUploadResponse> uploadFileExcel(@RequestParam("file") MultipartFile file) {
         FileUploadResponse response = modelChatService.uploadFileExcel(file);
-        return ApiResponseBuilder.buildSuccessResponse(("Uploaded file successfully"), response);
+        return ApiResponseBuilder.buildSuccessResponse("Upload file excel thành công", response);
     }
 
     @GetMapping("/model-chat/models-fine-tune")
@@ -36,7 +36,7 @@ public class ModelChatController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var models = modelChatService.getModelChatBots(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Models retrieved successfully", models, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả các model đã fine-tune", models, page);
     }
 
     @PostMapping("/model-chat/{modelChatId}/fine-tuning-jobs/select-model")
@@ -44,11 +44,11 @@ public class ModelChatController {
     public ApiResponse<ModelChatBotDTO> selectModelChat(
             @PathVariable String modelChatId) {
         ModelChatBotDTO response = modelChatService.setModeChatBot(modelChatId);
-        return ApiResponseBuilder.buildSuccessResponse("Model chat selected successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Chọn model để chat từ list model thành công", response);
     }
 
     @PostMapping("/webhook/fine-tune/success")
-    @Operation(summary = "Chọn model để chat từ list model")
+    @Operation(summary = "Webhook nhận thông tin fine tune thành công")
     public void selectModelChat(@RequestBody FineTuneSuccess fineTuneSuccess) {
         log.info("Fine tune successful");
         modelChatService.createNewModelChat(fineTuneSuccess);

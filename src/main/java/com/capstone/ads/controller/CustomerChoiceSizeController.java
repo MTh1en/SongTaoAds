@@ -32,7 +32,7 @@ public class CustomerChoiceSizeController {
             @PathVariable String sizeId,
             @Valid @RequestBody CustomerChoicesSizeCreateRequest request) {
         var response = service.createCustomerChoiceSize(customerChoicesId, sizeId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Create customer choices size successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Chọn kích thước thành công", response);
     }
 
     @PutMapping("/customer-choice-sizes/{customerChoiceSizeId}")
@@ -41,21 +41,21 @@ public class CustomerChoiceSizeController {
             @PathVariable String customerChoiceSizeId,
             @Valid @RequestBody CustomerChoicesSizeUpdateRequest request) {
         var response = service.updateValueInCustomerChoiceSize(customerChoiceSizeId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Update customer choices size successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật kích thước đã chọn thành công", response);
     }
 
     @GetMapping("/customer-choice-sizes/{customerChoiceSizeId}")
     @Operation(summary = "Xem kích thước đã chọn theo ID")
     public ApiResponse<CustomerChoicesSizeDTO> findCustomerChoiceSizeById(@PathVariable String customerChoiceSizeId) {
         var response = service.findCustomerChoiceSizeById(customerChoiceSizeId);
-        return ApiResponseBuilder.buildSuccessResponse("customer choices size by Id", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem kích thước đã chọn theo ID thành công", response);
     }
 
     @GetMapping("/customer-choices/{customerChoicesId}/customer-choices-value")
     @Operation(summary = "Xem kích thước theo loại sản phẩm đã chọn")
     public ApiResponse<List<CustomerChoicesSizeDTO>> findAllCustomerChoiceSizeByCustomerChoicesId(@PathVariable String customerChoicesId) {
         var response = service.findAllCustomerChoiceSizeByCustomerChoicesId(customerChoicesId);
-        return ApiResponseBuilder.buildSuccessResponse("Find all customer choices size by customer choices", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem tất cả kích thước đã chọn thành công", response);
     }
 
     @GetMapping("/customer-choices/{customerChoiceId}/pixel-value")
@@ -69,6 +69,6 @@ public class CustomerChoiceSizeController {
     @Operation(summary = "Xóa cứng kích thước đã chọn")
     public ApiResponse<Void> hardDeleteCustomerChoiceSize(@PathVariable String customerChoiceSizeId) {
         service.hardDeleteCustomerChoiceSize(customerChoiceSizeId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete customer choices size successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa kích thước đã chọn thành công", null);
     }
 }

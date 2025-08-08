@@ -33,7 +33,7 @@ public class CustomDesignRequestsController {
             @PathVariable String customerDetailId,
             @Valid @RequestBody CustomDesignRequestCreateRequest request) {
         var response = service.createCustomDesignRequest(customerDetailId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Create custom design request successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo yêu cầu thiết kế tùy chỉnh thành công", response);
     }
 
     @PatchMapping("/custom-design-requests/{customDesignRequestId}/users/{designerId}")
@@ -41,21 +41,21 @@ public class CustomDesignRequestsController {
     public ApiResponse<CustomDesignRequestDTO> assignDesignerToCustomerRequest(@PathVariable String customDesignRequestId,
                                                                                @PathVariable String designerId) {
         var response = service.assignDesignerToCustomerRequest(customDesignRequestId, designerId);
-        return ApiResponseBuilder.buildSuccessResponse("Assign custom design request successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Chia task cho Designer thành công", response);
     }
 
     @PatchMapping("/custom-design-requests/{customDesignRequestId}/approve")
     @Operation(summary = "Designer chấp nhận yêu cầu")
     public ApiResponse<CustomDesignRequestDTO> approveCustomDesignRequest(@PathVariable String customDesignRequestId) {
         var response = service.designerApproveCustomDesignRequest(customDesignRequestId);
-        return ApiResponseBuilder.buildSuccessResponse("Designer approved custom design request assigned", response);
+        return ApiResponseBuilder.buildSuccessResponse("Designer chấp nhận task được chia thành công", response);
     }
 
     @PatchMapping("/custom-design-requests/{customDesignRequestId}/reject")
     @Operation(summary = "Designer từ chối yêu cầu")
     public ApiResponse<CustomDesignRequestDTO> rejectCustomDesignRequest(@PathVariable String customDesignRequestId) {
         var response = service.designerRejectCustomDesignRequest(customDesignRequestId);
-        return ApiResponseBuilder.buildSuccessResponse("Designer rejected custom design request assigned", response);
+        return ApiResponseBuilder.buildSuccessResponse("Designer từ chối task được chia thành công", response);
     }
 
     @PatchMapping(
@@ -66,7 +66,7 @@ public class CustomDesignRequestsController {
     public ApiResponse<CustomDesignRequestDTO> designerUploadFinalDesignImage(@PathVariable String customDesignRequestId,
                                                                               @ModelAttribute CustomDesignRequestFinalDesignRequest request) {
         var response = service.designerUploadFinalDesignImage(customDesignRequestId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Designer rejected custom design request assigned", response);
+        return ApiResponseBuilder.buildSuccessResponse("Designer gửi bản thiết kế chính thức thành công", response);
     }
 
     @GetMapping("/customer-details/{customerDetailId}/custom-design-requests")
@@ -77,7 +77,7 @@ public class CustomDesignRequestsController {
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findCustomDesignRequestByCustomerDetailId(customerDetailId, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse(
-                "Find custom design request by custom detail request successful",
+                "Xem yêu cầu thiết kế theo thông tin doanh nghiệp",
                 response, page
         );
     }
@@ -90,7 +90,7 @@ public class CustomDesignRequestsController {
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findCustomDesignRequestByAssignDesignerId(designerId, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse(
-                "Find custom design request by designer request successful",
+                "Xem những yêu cầu thiết kế được chia cho designer thành công",
                 response, page
         );
     }
@@ -102,7 +102,7 @@ public class CustomDesignRequestsController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findCustomDesignRequestByStatus(status, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request by status successful",
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem yêu cầu thiết kế theo trạng thái thành công",
                 response, page
         );
     }
@@ -113,7 +113,7 @@ public class CustomDesignRequestsController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findAllCustomDesignRequestNeedSupport(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request need support successful",
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem yêu cầu thiết kế cần hỗ trợ thành công",
                 response, page
         );
     }
@@ -124,7 +124,7 @@ public class CustomDesignRequestsController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findAllCustomerDesignRequest(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find custom design request successful",
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả yêu cầu thiết kế thành công",
                 response, page
         );
     }

@@ -30,7 +30,7 @@ public class PriceProposalController {
     public ApiResponse<PriceProposalDTO> createPriceProposal(@PathVariable String customDesignRequestId,
                                                              @Valid @RequestBody PriceProposalCreateRequest request) {
         var response = priceProposalService.createPriceProposal(customDesignRequestId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Successfully created price proposal", response);
+        return ApiResponseBuilder.buildSuccessResponse("Báo giá thành công", response);
     }
 
     @PatchMapping("/price-proposals/{priceProposalId}/pricing")
@@ -38,7 +38,7 @@ public class PriceProposalController {
     public ApiResponse<PriceProposalDTO> updatePricing(@PathVariable String priceProposalId,
                                                        @Valid @RequestBody PriceProposalUpdatePricingRequest request) {
         var response = priceProposalService.updatePricing(priceProposalId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Successfully updated price proposal", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật lại báo giá thành công", response);
     }
 
     @PatchMapping("/price-proposals/{priceProposalId}/offer")
@@ -46,20 +46,22 @@ public class PriceProposalController {
     public ApiResponse<PriceProposalDTO> offerPricing(@PathVariable String priceProposalId,
                                                       @Valid @RequestBody PriceProposalOfferPricingRequest request) {
         var response = priceProposalService.offerPricing(priceProposalId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Successfully offer price proposal", response);
+        return ApiResponseBuilder.buildSuccessResponse("Từ chối báo giá thành công", response);
     }
 
     @PatchMapping("/price-proposals/{priceProposalId}/approve")
     @Operation(summary = "Khách hàng chấp nhận báo giá")
     public ApiResponse<PriceProposalDTO> approvePricing(@PathVariable String priceProposalId) {
         var response = priceProposalService.approvePricing(priceProposalId);
-        return ApiResponseBuilder.buildSuccessResponse("Successfully approved price proposal", response);
+        return ApiResponseBuilder.buildSuccessResponse("Chấp nhận báo giá thành công", response);
     }
 
     @GetMapping("/custom-design-requests/{customDesignRequestId}/price-proposals")
     @Operation(summary = "Xem tất cả lịch sử báo giá theo request")
     public ApiResponse<List<PriceProposalDTO>> getPriceProposals(@PathVariable String customDesignRequestId) {
         var response = priceProposalService.findPriceProposalByCustomerDesignRequestId(customDesignRequestId);
-        return ApiResponseBuilder.buildSuccessResponse("Successfully retrieved price proposals", response);
+        return ApiResponseBuilder.buildSuccessResponse(
+                "Xem tất cả lịch sử báo giá theo yêu cầu thiết kế thành công",
+                response);
     }
 }

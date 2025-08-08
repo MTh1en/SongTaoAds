@@ -26,20 +26,20 @@ public class ProductTypeSizeController {
     public ApiResponse<ProductTypeSizeDTO> createProductTypeSize(@PathVariable String productTypeId,
                                                                  @PathVariable String sizeId) {
         var response = service.createProductTypeSize(productTypeId, sizeId);
-        return ApiResponseBuilder.buildSuccessResponse("Create product type successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo kích thước sử dụng trong loại biển thành công", response);
     }
 
     @GetMapping("product-types/{productTypeId}/product-type-sizes")
     @Operation(summary = "Xem kích thước mà biển đó cần dùng")
     public ApiResponse<List<ProductTypeSizeDTO>> getAllProductTypeSizeByProductTypeId(@PathVariable String productTypeId) {
         var response = service.findAllProductTypeSizeByProductTypeId(productTypeId);
-        return ApiResponseBuilder.buildSuccessResponse("Find all product type size by product type", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem kích thước mà biển đó cần dùng thành công", response);
     }
 
     @DeleteMapping("/product-type-sizes/{productTypeSizeId}")
     @Operation(summary = "Xóa cứng kích thước cần dùng khỏi biển")
     public ApiResponse<Void> hardDeleteProductTypeSize(@PathVariable String productTypeSizeId) {
         service.hardDeleteProductTypeSize(productTypeSizeId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete product type size successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa cứng kích thước cần dùng khỏi biển thành công", null);
     }
 }

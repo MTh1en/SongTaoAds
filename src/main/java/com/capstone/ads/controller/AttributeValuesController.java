@@ -28,7 +28,7 @@ public class AttributeValuesController {
     public ApiResponse<AttributeValuesDTO> createAttributeValue(@PathVariable String attributeId,
                                                                 @Valid @RequestBody AttributeValuesCreateRequest request) {
         var response = service.createAttributeValue(attributeId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Create attribute value successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo giá trị thuộc tính thành công", response);
     }
 
     @PutMapping("/attribute-values/{attributeValueId}")
@@ -36,14 +36,14 @@ public class AttributeValuesController {
     public ApiResponse<AttributeValuesDTO> updateAttributeValueInformation(@PathVariable String attributeValueId,
                                                                            @Valid @RequestBody AttributeValuesUpdateRequest request) {
         var response = service.updateAttributeValueInformation(attributeValueId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Update attribute value successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật giá trị thuộc tính thành công", response);
     }
 
     @GetMapping("/attribute-values/{attributeValueId}")
     @Operation(summary = "Xem giá trị thuộc tính theo ID")
     public ApiResponse<AttributeValuesDTO> findAttributeValueById(@PathVariable String attributeValueId) {
         var response = service.findAttributeValueById(attributeValueId);
-        return ApiResponseBuilder.buildSuccessResponse("attribute value by Id", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem giá trị thuộc tính theo ID", response);
     }
 
     @GetMapping("/attributes/{attributeId}/attribute-values")
@@ -53,13 +53,13 @@ public class AttributeValuesController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findAllAttributeValueByAttributesId(attributeId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find all attribute value by attribute", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả giá trị thuộc tính theo thuộc tính", response, page);
     }
 
     @DeleteMapping("/attribute-values/{attributeValueId}")
     @Operation(summary = "Xóa cứng giá trị thuộc tính (Không dùng)")
     public ApiResponse<Void> hardDeleteAttributeValue(@PathVariable String attributeValueId) {
         service.hardDeleteAttributeValue(attributeValueId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete attribute value successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa giá trị thuộc tính thành công", null);
     }
 }

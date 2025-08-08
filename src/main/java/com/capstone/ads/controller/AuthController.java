@@ -28,14 +28,14 @@ public class AuthController {
     @PostMapping("/outbound/authentication")
     public ApiResponse<AuthResponse> outboundAuthentication(@RequestParam String code, HttpServletResponse response) {
         var result = authService.outboundAuthenticate(code, response);
-        return ApiResponseBuilder.buildSuccessResponse("Login successful", result);
+        return ApiResponseBuilder.buildSuccessResponse("Đăng nhập thành công", result);
     }
 
     @PostMapping("/login")
     @Operation(summary = "Đăng nhập")
     public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
         var result = authService.login(request, response);
-        return ApiResponseBuilder.buildSuccessResponse("Login successful", result);
+        return ApiResponseBuilder.buildSuccessResponse("Đăng nhập thành công", result);
     }
 
     @PostMapping("/register")
@@ -43,7 +43,7 @@ public class AuthController {
     public ApiResponse<Void> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
         recoveryService.sendVerifyEmail(request.getEmail());
-        return ApiResponseBuilder.buildSuccessResponse("Registration successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Đăng ký thành công", null);
     }
 
     @PostMapping("/refresh-token")
@@ -51,7 +51,7 @@ public class AuthController {
     public ApiResponse<AuthResponse> refreshToken(@CookieValue(value = "refresh_token", required = false) String refreshToken,
                                                   HttpServletResponse response) {
         var result = authService.refreshToken(refreshToken, response);
-        return ApiResponseBuilder.buildSuccessResponse("Refresh token successful", result);
+        return ApiResponseBuilder.buildSuccessResponse("Cập lại token mới thành công", result);
     }
 
     @PostMapping("/logout")
@@ -59,6 +59,6 @@ public class AuthController {
     public ApiResponse<Void> logout(@CookieValue(value = "refresh_token", required = false) String refreshToken,
                                     HttpServletResponse response) {
         authService.logout(refreshToken, response);
-        return ApiResponseBuilder.buildSuccessResponse("Logout successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Đăng xuất thành công", null);
     }
 }

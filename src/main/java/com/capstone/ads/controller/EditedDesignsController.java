@@ -34,7 +34,7 @@ public class EditedDesignsController {
             @PathVariable String designTemplateId,
             @Valid @ModelAttribute EditedDesignCreateRequest request) {
         var response = service.createEditedDesignFromDesignTemplate(customerDetailId, designTemplateId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Create Edited Design successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo ảnh tự thiết kế từ thiết kế mẫu thành công", response);
     }
 
     @PostMapping(
@@ -47,7 +47,7 @@ public class EditedDesignsController {
             @PathVariable String backgroundId,
             @Valid @ModelAttribute EditedDesignCreateRequest request) {
         var response = service.createEditedDesignFromBackground(customerDetailId, backgroundId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Create Edited Design successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo ảnh tự thiết kế từ background thành công", response);
     }
 
     @GetMapping("/customer-details/{customerDetailId}/edited-designs")
@@ -57,14 +57,16 @@ public class EditedDesignsController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findEditedDesignByCustomerDetailId(customerDetailId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find Edited Design by Customer Detail Id successfully", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse(
+                "Xem tất cả ảnh thiết kế theo thông tin doanh nghiệp thành công",
+                response, page);
     }
 
     @GetMapping("/edited-designs/{editedDesignId}")
     @Operation(summary = "Xem ảnh thiết kế theo Id")
     public ApiResponse<EditedDesignDTO> findEditedDesignByCustomerDetailId(@PathVariable String editedDesignId) {
         var response = service.findEditedDesignById(editedDesignId);
-        return ApiResponseBuilder.buildSuccessResponse("Find Edited Design by Id successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem ảnh thiết kế theo ID thành công", response);
     }
 
     @GetMapping("/edited-designs")
@@ -73,13 +75,13 @@ public class EditedDesignsController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findAllEditedDesign(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find All Edited Designs successfully", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả ảnh tự thiết kế thành công", response, page);
     }
 
     @DeleteMapping("/edited-designs/{editedDesignId}")
     @Operation(summary = "Xóa cứng hình ảnh thiết kế")
     public ApiResponse<Void> hardDeleteEditedDesign(@PathVariable String editedDesignId) {
         service.hardDeleteEditedDesign(editedDesignId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete Edited Design successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa hình ảnh tự thiết kế thành công", null);
     }
 }
