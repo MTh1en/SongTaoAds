@@ -99,8 +99,9 @@ public enum ErrorCode {
     MODEL_CHAT_NOT_FOUND("Không tìm thấy mô hình chat", HttpStatus.NOT_FOUND),
     TOPIC_NOT_FOUND("Không tìm thấy chủ đề", HttpStatus.NOT_FOUND),
     QUESTION_NOT_FOUND("Không tìm thấy câu hỏi", HttpStatus.NOT_FOUND),
+    CHAT_BOT_TOPIC_NOT_FOUND("Không tìm thấy chủ đề của model chat bot", HttpStatus.NOT_FOUND),
 
-    ;
+   ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
         this.message = message;

@@ -28,5 +28,5 @@ public class ModelChatBot {
     LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "modelChatBot")
-    List<Topic> topics;
+    private List<ChatBotTopic> chatBotTopics;
 }
