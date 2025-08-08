@@ -30,7 +30,7 @@ public class CostTypeController {
     public ApiResponse<CostTypeDTO> createCostType(@PathVariable String productTypeId,
                                                    @Valid @RequestBody CostTypeCreateRequest request) {
         var response = costTypesService.createCostTypeByProductType(productTypeId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Create cost type successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo loại chi phí thành công", response);
     }
 
     @PutMapping("/cost-types/{costTypeId}")
@@ -38,14 +38,14 @@ public class CostTypeController {
     public ApiResponse<CostTypeDTO> updateCostTypeInformation(@PathVariable String costTypeId,
                                                               @Valid @RequestBody CostTypeUpdateRequest request) {
         var response = costTypesService.updateCostTypeInformation(costTypeId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Update cost type successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật loại chi phí thành công", response);
     }
 
     @GetMapping("/product-types/{productTypeId}/cost-types")
-    @Operation(summary = "Xem chi phí theo loại sản phẩm")
+    @Operation(summary = "Xem chi phí theo loại biển hiệu")
     public ApiResponse<List<CostTypeDTO>> findCostTypeByProductType(@PathVariable String productTypeId) {
         var response = costTypesService.findCostTypeByProductType(productTypeId);
-        return ApiResponseBuilder.buildSuccessResponse("Find cost type by productType successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem chi phí theo loại biển hiệu thành công", response);
     }
 
     @GetMapping("/cost-types")
@@ -54,13 +54,13 @@ public class CostTypeController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = costTypesService.findAllCostTypes(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find cost type successful", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả các chi phí thành công", response, page);
     }
 
     @DeleteMapping("/cost-types/{costTypeId}")
     @Operation(summary = "Xóa cứng chi phí")
     public ApiResponse<Void> deleteCostType(@PathVariable String costTypeId) {
         costTypesService.hardDeleteCostType(costTypeId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete cost type successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa chi phí thành công", null);
     }
 }

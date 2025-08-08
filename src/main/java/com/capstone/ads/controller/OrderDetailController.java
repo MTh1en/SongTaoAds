@@ -25,18 +25,18 @@ public class OrderDetailController {
     public ApiResponse<OrderDetailDTO> createOrderDetail(@PathVariable("orderId") String orderId,
                                                          @RequestBody OrderDetailCreateRequest request) {
         var response = orderDetailService.createOrderDetail(orderId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Order Detail Created", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo chi tiêt đơn hàng thành công", response);
     }
 
     @GetMapping("/orders/{orderId}/details")
     public ApiResponse<List<OrderDetailDTO>> getOrderDetail(@PathVariable("orderId") String orderId) {
         var response = orderDetailService.getOrderDetailsByOrderId(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Order Details", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem chi tiết đơn hàng thành công", response);
     }
 
     @DeleteMapping("/orders/{orderId}/details")
     public ApiResponse<Void> deleteOrderDetail(@PathVariable("orderId") String orderId) {
         orderDetailService.hardDeleteOrderDetail(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Deleted Order Detail", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa chi tiết đơn hàng", null);
     }
 }

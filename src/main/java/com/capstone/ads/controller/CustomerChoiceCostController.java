@@ -25,6 +25,6 @@ public class CustomerChoiceCostController {
     @Operation(summary = "Xem các chi phí theo lựa chọn của khách hàng")
     public ApiResponse<List<CustomerChoiceCostDTO>> findCustomerChoiceCostByCustomerChoice(@PathVariable String customerChoiceId) {
         var response = customerChoiceCostsService.findCustomerChoiceCostByCustomerChoice(customerChoiceId);
-        return ApiResponseBuilder.buildSuccessResponse("Find customer choice cost by customer choice successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem tất cả các chi phí theo lựa chọn khách hàng thành công", response);
     }
 }

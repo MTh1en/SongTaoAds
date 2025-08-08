@@ -27,7 +27,7 @@ public class SizeController {
     @Operation(summary = "Tạo kích thước")
     public ApiResponse<SizeDTO> createSize(@Valid @RequestBody SizeCreateRequest request) {
         var response = service.createSize(request);
-        return ApiResponseBuilder.buildSuccessResponse("Create size successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo kích thước thành công", response);
     }
 
     @PutMapping("/{sizeId}")
@@ -35,14 +35,14 @@ public class SizeController {
     public ApiResponse<SizeDTO> updateSizeInformation(@PathVariable String sizeId,
                                                       @Valid @RequestBody SizeUpdateRequest request) {
         var response = service.updateSizeInformation(sizeId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Update size successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật kích thước thành công", response);
     }
 
     @GetMapping("/{sizeId}")
     @Operation(summary = "Xem kích thước theo ID")
     public ApiResponse<SizeDTO> findSizeById(@PathVariable String sizeId) {
         var response = service.findSizeById(sizeId);
-        return ApiResponseBuilder.buildSuccessResponse("size by Id", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem kích thước theo ID thành công", response);
     }
 
     @GetMapping
@@ -51,13 +51,13 @@ public class SizeController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findAllSize(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find all size", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả kích thước thành công", response, page);
     }
 
     @DeleteMapping("/{sizeId}")
     @Operation(summary = "Xóa cứng kích thước(Không dùng)")
     public ApiResponse<Void> hardDeleteSize(@PathVariable String sizeId) {
         service.hardDeleteSize(sizeId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete size successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa cứng kích thước thành công", null);
     }
 }

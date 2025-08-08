@@ -34,7 +34,7 @@ public class BackgroundController {
     public ApiResponse<BackgroundDTO> createBackground(@PathVariable String attributeValueId,
                                                        @ModelAttribute BackgroundCreateRequest request) {
         var response = backgroundService.createBackgroundByAttributeValue(attributeValueId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Create background successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo background thành công", response);
     }
 
     @PatchMapping("/backgrounds/{backgroundId}/information")
@@ -42,7 +42,7 @@ public class BackgroundController {
     public ApiResponse<BackgroundDTO> updateBackgroundInformation(@PathVariable String backgroundId,
                                                                   @RequestBody BackgroundUpdateRequest request) {
         var response = backgroundService.updateBackgroundInformation(backgroundId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Update background information successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật thông tin background thành công", response);
     }
 
     @PatchMapping(value = "/backgrounds/{backgroundId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -50,14 +50,14 @@ public class BackgroundController {
     public ApiResponse<BackgroundDTO> updateBackgroundImage(@PathVariable String backgroundId,
                                                             @RequestPart MultipartFile backgroundImage) {
         var response = backgroundService.updateBackgroundImage(backgroundId, backgroundImage);
-        return ApiResponseBuilder.buildSuccessResponse("Update background image successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật hình ảnh background thành công", response);
     }
 
     @GetMapping("customer-choices/{customerChoiceId}/suggestion")
     @Operation(summary = "Xem background theo lựa chọn của khách hàng")
     public ApiResponse<List<BackgroundDTO>> suggestedBackgrounds(@PathVariable String customerChoiceId) {
         var response = backgroundService.suggestedBackgrounds(customerChoiceId);
-        return ApiResponseBuilder.buildSuccessResponse("Suggested backgrounds", response);
+        return ApiResponseBuilder.buildSuccessResponse("Đề xuất background theo lựa chọn khách hàng", response);
     }
 
     @GetMapping("/attribute-values/{attributeValueId}/backgrounds")
@@ -67,7 +67,7 @@ public class BackgroundController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = backgroundService.findBackgroundByAttributeValue(attributeValueId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find background by attribute value", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem background theo giá trị thuộc tin", response, page);
     }
 
     @GetMapping("/backgrounds")
@@ -76,13 +76,13 @@ public class BackgroundController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = backgroundService.findAllBackground(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find all background", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả background", response, page);
     }
 
     @DeleteMapping("/backgrounds/{backgroundId}")
-    @Operation(summary = "Xóa  cứng background")
+    @Operation(summary = "Xóa cứng background")
     public ApiResponse<Void> deleteBackground(@PathVariable String backgroundId) {
         backgroundService.hardDeleteBackground(backgroundId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete background successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa background thành công", null);
     }
 }

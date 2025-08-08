@@ -30,14 +30,22 @@ public class UserController {
     @Operation(summary = "Tạo tài khoản hệ thống")
     public ApiResponse<UserDTO> createUser(@Valid @RequestBody UserCreateRequest request) {
         var response = usersService.createUser(request);
-        return ApiResponseBuilder.buildSuccessResponse("User created successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo tài khoản hệ thống thành công", response);
+    }
+
+    @PatchMapping("/users/{userId}/ban-decision")
+    @Operation(summary = "Tạo tài khoản hệ thống")
+    public ApiResponse<UserDTO> createUser(@PathVariable String userId,
+                                           @RequestParam Boolean isBanned) {
+        var response = usersService.banOrUnbanUser(userId, isBanned);
+        return ApiResponseBuilder.buildSuccessResponse("Quyết định ban hoặc mở ban thành công", response);
     }
 
     @GetMapping("/users/{userId}")
     @Operation(summary = "Xem thông tin người dùng theo ID")
     public ApiResponse<UserDTO> getUserById(@PathVariable String userId) {
         var response = usersService.findUserById(userId);
-        return ApiResponseBuilder.buildSuccessResponse("User retrieved successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem tất cả thông tin người dùng theo ID thành công", response);
     }
 
     @GetMapping("/users/role")
@@ -47,7 +55,7 @@ public class UserController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = usersService.findUsersByRoleName(roleName, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Users retrieved successfully", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem thông tin người dùng theo role thành công", response, page);
     }
 
     @GetMapping("/users")
@@ -56,7 +64,7 @@ public class UserController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = usersService.findAllUsers(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Users retrieved successfully", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả thông tin người dùng thành công", response, page);
     }
 
     @PatchMapping("/users/{userId}/profile")
@@ -64,7 +72,7 @@ public class UserController {
     public ApiResponse<UserDTO> updateUserProfile(@PathVariable String userId,
                                                   @Valid @RequestBody UserProfileUpdateRequest request) {
         var response = usersService.updateUserProfile(userId, request);
-        return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem profile của tài khoản theo ID thành công", response);
     }
 
     @PatchMapping(value = "/users/{userId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -72,7 +80,7 @@ public class UserController {
     public ApiResponse<UserDTO> updateUserAvatar(@PathVariable String userId,
                                                  @RequestPart("avatar") MultipartFile avatar) throws IOException {
         var response = usersService.uploadUserAvatar(userId, avatar);
-        return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật avatar thành công", response);
     }
 
     @PatchMapping("/users/{userId}/password")
@@ -80,7 +88,7 @@ public class UserController {
     public ApiResponse<UserDTO> updateUserPassword(@PathVariable String userId,
                                                    @Valid @RequestBody ChangePasswordRequest request) {
         var response = usersService.changePassword(userId, request);
-        return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật mật khẩu thành công", response);
     }
 
     @PatchMapping("/users/{userId}/new-password")
@@ -88,7 +96,7 @@ public class UserController {
     public ApiResponse<UserDTO> newPasswordForOutboundUser(@PathVariable String userId,
                                                            @Valid @RequestBody NewPasswordRequest request) {
         var response = usersService.newPasswordForOutboundAccount(userId, request);
-        return ApiResponseBuilder.buildSuccessResponse("User updated successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo mới mật khẩu cho tài khoản ngoài hệ thống thành công", response);
     }
 
     @DeleteMapping("/users/{userId}")
@@ -99,10 +107,10 @@ public class UserController {
     }
 
     @GetMapping("/users/profile")
-    @Operation(summary = "Xem profile tài khoản đang đang nhập hiện tại ")
+    @Operation(summary = "Xem profile tài khoản đang đang nhập hiện tại")
     public ApiResponse<UserDTO> getProfile() {
         var response = usersService.getCurrentUserProfile();
-        return ApiResponseBuilder.buildSuccessResponse("Profile retrieved successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem profile tài khoản đang đang nhập hiện tại thành công", response);
     }
 
 }

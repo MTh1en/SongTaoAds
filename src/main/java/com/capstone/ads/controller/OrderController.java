@@ -28,21 +28,21 @@ public class OrderController {
     @PostMapping("/orders")
     public ApiResponse<OrderDTO> createOrder(@RequestBody OrderCreateRequest request) {
         var response = orderService.createOrder(request);
-        return ApiResponseBuilder.buildSuccessResponse("Order created", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo đơn hàng thành công", response);
     }
 
     @PatchMapping("/orders/{orderId}/contract-resign")
     @Operation(summary = "Sale yêu cầu khách hàng gửi lại bạn hợp đồng đã ký")
     public ApiResponse<OrderDTO> saleRequestCustomerResignContract(@PathVariable String orderId) {
         var response = orderService.saleRequestCustomerResignContract(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Sale request customer resign contract", response);
+        return ApiResponseBuilder.buildSuccessResponse("Yêu cầu khách hàng gửi lại hợp đồng đã ký thành công", response);
     }
 
     @PatchMapping("/orders/{orderId}/contract-signed")
     @Operation(summary = "Sale xác nhận đơn hàng đã ký")
     public ApiResponse<OrderDTO> saleConfirmContractSigned(@PathVariable String orderId) {
         var response = orderService.saleConfirmContractSigned(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Sale confirm contract signed", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xác nhận đơn hàng đã ký thành công", response);
     }
 
     @PatchMapping("/orders/{orderId}/address")
@@ -50,7 +50,7 @@ public class OrderController {
     public ApiResponse<OrderDTO> customerProvideAddress(@PathVariable String orderId,
                                                         @Valid @RequestBody OrderUpdateAddressRequest request) {
         var response = orderService.customerProvideAddress(orderId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Update order information successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cung cấp địa chỉ giao hàng thành công", response);
     }
 
     @PatchMapping("/orders/{orderId}/estimate-delivery-date")
@@ -58,14 +58,14 @@ public class OrderController {
     public ApiResponse<OrderDTO> saleNotifyEstimateDeliveryDate(@PathVariable String orderId,
                                                                 @RequestBody OrderConfirmRequest request) {
         var response = orderService.saleNotifyEstimateDeliveryDate(orderId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Confirm order successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Báo ngày giao và đơn vị thi công thành công", response);
     }
 
     @GetMapping("/orders/{orderId}")
     @Operation(summary = "Xem order theo ID")
     public ApiResponse<OrderDTO> findOrderById(@PathVariable String orderId) {
         var response = orderService.findOrderById(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Find Order by Id", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem order theo ID thành công", response);
     }
 
     @GetMapping("/users/{userId}/orders")
@@ -75,7 +75,7 @@ public class OrderController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = orderService.findOrderByUserId(userId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find Order by Users", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem order theo thông tin người dùng", response, page);
     }
 
     @GetMapping(value = "/orders", params = "orderStatus")
@@ -85,7 +85,7 @@ public class OrderController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = orderService.findOrderByStatus(orderStatus, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find Order By Status", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem order theo trạng thái thành công", response, page);
     }
 
     @GetMapping(value = "/orders", params = "!orderStatus")
@@ -94,20 +94,20 @@ public class OrderController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = orderService.findAllOrders(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find all orders", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả order thành công", response, page);
     }
 
     @PatchMapping("/orders/{orderId}/cancel")
     @Operation(summary = "Hủy đơn hàng")
     public ApiResponse<Void> cancelOrder(@PathVariable String orderId) {
         orderService.cancelOrder(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Cancel order", null);
+        return ApiResponseBuilder.buildSuccessResponse("Hủy đơn hàng thành công", null);
     }
 
     @DeleteMapping("/orders/{orderId}")
     @Operation(summary = "Xóa cứng order (không cần dùng)")
     public ApiResponse<Void> hardDeleteOrder(@PathVariable String orderId) {
         orderService.hardDeleteOrder(orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Hard hardDeleteAttribute order successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa đơn hàng thành công", null);
     }
 }

@@ -26,33 +26,33 @@ public class ProductTypeController {
     ProductTypesService service;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Tạo loại sản phẩm")
+    @Operation(summary = "Tạo loại biển hiệu")
     public ApiResponse<ProductTypeDTO> createProductType(@Valid @ModelAttribute ProductTypeCreateRequest request) {
         var response = service.createProductType(request);
-        return ApiResponseBuilder.buildSuccessResponse("Create product type successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo loại biển hiệu thành công", response);
     }
 
     @PatchMapping("/{productTypeId}/information")
-    @Operation(summary = "Cập nhập thông tin loại sản phẩm")
+    @Operation(summary = "Cập nhập thông tin loại biển hiệu")
     public ApiResponse<ProductTypeDTO> updateProductTypeInformation(@PathVariable String productTypeId,
                                                                     @Valid @RequestBody ProductTypeUpdateRequest request) {
         var response = service.updateProductTypeInformation(productTypeId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Update product type information successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật thông tin loại biển hiệu thành công", response);
     }
 
     @PatchMapping(value = "/{productTypeId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Cập nhật hình ảnh đại diện của loại sản phẩm")
+    @Operation(summary = "Cập nhật hình ảnh đại diện của loại biển hiệu")
     public ApiResponse<ProductTypeDTO> uploadProductTypeImage(@PathVariable String productTypeId,
                                                               @RequestPart("file") MultipartFile productTypeImage) {
         var response = service.uploadProductTypeImage(productTypeId, productTypeImage);
-        return ApiResponseBuilder.buildSuccessResponse("Update product type image successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật ảnh đại diện của loại biển hiệu thành công", response);
     }
 
     @GetMapping("/{productTypeId}")
-    @Operation(summary = "Xem loại sản phẩm theo ID")
+    @Operation(summary = "Xem loại biển hiệu theo ID")
     public ApiResponse<ProductTypeDTO> findProductTypeByProductTypeId(@PathVariable String productTypeId) {
         var response = service.findProductTypeByProductTypeId(productTypeId);
-        return ApiResponseBuilder.buildSuccessResponse("Product Type by Id", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem loại biển hiệu theo ID", response);
     }
 
     @GetMapping
@@ -61,13 +61,13 @@ public class ProductTypeController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findAllProductType(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find all product type", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả loại biển hiệu", response, page);
     }
 
     @DeleteMapping("/{productTypeId}")
     @Operation(summary = "Xóa cứng loại sản phẩm (Không dùng)")
     public ApiResponse<Void> hardDeleteProductType(@PathVariable String productTypeId) {
         service.hardDeleteProductType(productTypeId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete product type successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa loại biển hiệu thành công", null);
     }
 }

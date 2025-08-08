@@ -18,13 +18,16 @@ public interface CustomDesignRequestService {
 
     CustomDesignRequestDTO designerUploadFinalDesignImage(String customDesignRequestId, CustomDesignRequestFinalDesignRequest request);
 
-    Page<CustomDesignRequestDTO> findCustomerDesignRequestByCustomerDetailId(String customerDetailId, int page, int size);
+    Page<CustomDesignRequestDTO> findCustomDesignRequestByCustomerDetailId(String customerDetailId, int page, int size);
 
-    Page<CustomDesignRequestDTO> findCustomerDesignRequestByAssignDesignerId(String assignDesignerId, int page, int size);
+    Page<CustomDesignRequestDTO> findCustomDesignRequestByAssignDesignerId(String assignDesignerId, int page, int size);
 
-    Page<CustomDesignRequestDTO> findCustomerDesignRequestByStatus(CustomDesignRequestStatus status, int page, int size);
+    Page<CustomDesignRequestDTO> findCustomDesignRequestByStatus(CustomDesignRequestStatus status, int page, int size);
+
+    Page<CustomDesignRequestDTO> findAllCustomDesignRequestNeedSupport(int page, int size);
 
     Page<CustomDesignRequestDTO> findAllCustomerDesignRequest(int page, int size);
+
     //INTERNAL FUNCTION
     CustomDesignRequests getCustomDesignRequestById(String customDesignRequestId);
 }

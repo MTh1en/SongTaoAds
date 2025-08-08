@@ -27,6 +27,6 @@ public class ChatBotLogController {
     @Operation(summary = "Xem top 10 câu hỏi được hỏi nhiều nhất")
     public ApiResponse<List<FrequentQuestion>> getTop10FrequentQuestions() {
         List<FrequentQuestion> response = chatBotLogService.getTop10FrequentQuestions();
-        return ApiResponseBuilder.buildSuccessResponse("Questions retrieved successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem 10 câu hỏi được hỏi nhiều nhất", response);
     }
 }

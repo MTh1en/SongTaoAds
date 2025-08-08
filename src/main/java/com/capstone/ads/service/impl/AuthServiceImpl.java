@@ -110,6 +110,9 @@ public class AuthServiceImpl implements AuthService {
         if (!user.getIsActive()) {
             throw new AppException(ErrorCode.ACCOUNT_DISABLED);
         }
+        if (user.getIsBanned()){
+            throw new AppException(ErrorCode.ACCOUNT_BANNED);
+        }
         String accessToken = accessTokenService.generateAccessToken(user);
         String refreshToken = refreshTokenService.generateRefreshToken();
         refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);

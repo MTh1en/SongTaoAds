@@ -5,7 +5,10 @@ import com.capstone.ads.dto.email.TransactionalEmailRequest;
 import com.capstone.ads.dto.email.TransactionalEmailResponse;
 import com.capstone.ads.dto.email.transactional.Recipient;
 import com.capstone.ads.dto.email.transactional.Sender;
+import com.capstone.ads.exception.AppException;
+import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.VerificationMapper;
+import com.capstone.ads.model.Users;
 import com.capstone.ads.repository.external.BrevoClient;
 import com.capstone.ads.service.RecoveryService;
 import com.capstone.ads.service.UserService;
@@ -16,6 +19,7 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -58,7 +62,10 @@ public class RecoveryServiceImpl implements RecoveryService {
 
     @Override
     public TransactionalEmailResponse sendVerifyEmail(String email) {
-        userService.getUserByEmail(email);
+        Users users = userService.verifyAccountToSendEmail(email);
+        if (users.getIsActive()) {
+            throw new AppException(ErrorCode.ACCOUNT_VERIFIED);
+        }
         Sender sender = verificationMapper.toSender(senderName, senderEmail);
         List<Recipient> to = new ArrayList<>(List.of(
                 verificationMapper.toRecipient(email))
@@ -77,7 +84,7 @@ public class RecoveryServiceImpl implements RecoveryService {
 
     @Override
     public TransactionalEmailResponse sendResetPasswordEmail(String email) {
-        userService.getUserByEmail(email);
+        userService.verifyAccountToSendEmail(email);
         Sender sender = verificationMapper.toSender(senderName, senderEmail);
 
         List<Recipient> to = new ArrayList<>(List.of(

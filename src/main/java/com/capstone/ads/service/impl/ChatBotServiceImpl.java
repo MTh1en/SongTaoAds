@@ -9,6 +9,9 @@ import com.capstone.ads.repository.external.ChatBotClient;
 import com.capstone.ads.repository.internal.ModelChatBotRepository;
 import com.capstone.ads.service.ChatBotService;
 import com.capstone.ads.utils.SecurityContextUtils;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -27,27 +30,30 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ChatBotServiceImpl implements ChatBotService {
+    @NonFinal
     @Value("${spring.ai.openai.api-key}")
     private String openaiApiKey;
+
+    @NonFinal
     @Value("classpath:/prompt-templates/modern-pricing.st")
     private Resource modernPricingPromptTemplate;
 
-    // Tạo prompt cho biển truyền thống từ template
+    @NonFinal
     @Value("classpath:/prompt-templates/traditional-pricing.st")
     private Resource traditionalPricingPromptTemplate;
 
-    private final ChatBotClient chatBotClient;
-    private final SecurityContextUtils securityContextUtils;
-    private final ModelChatBotRepository modelChatBotRepository;
-    private final ApplicationEventPublisher eventPublisher;
-    private final ChatClient chatClient;
-    private final JdbcChatMemoryRepository jdbcChatMemoryRepository;
+    ChatBotClient chatBotClient;
+    SecurityContextUtils securityContextUtils;
+    ModelChatBotRepository modelChatBotRepository;
+    ApplicationEventPublisher eventPublisher;
+    ChatClient chatClient;
+    JdbcChatMemoryRepository jdbcChatMemoryRepository;
+
 
     public ChatBotServiceImpl(ChatBotClient chatBotClient, SecurityContextUtils securityContextUtils, ModelChatBotRepository modelChatBotRepository, ApplicationEventPublisher eventPublisher,
                               ChatClient.Builder chatClientBuilder, JdbcChatMemoryRepository jdbcChatMemoryRepository) {
@@ -59,7 +65,7 @@ public class ChatBotServiceImpl implements ChatBotService {
 
         ChatMemory chatMemory = MessageWindowChatMemory.builder()
                 .chatMemoryRepository(jdbcChatMemoryRepository)
-                .maxMessages(20)
+                .maxMessages(10)
                 .build();
 
         chatClient = chatClientBuilder
@@ -75,7 +81,17 @@ public class ChatBotServiceImpl implements ChatBotService {
                 .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
 
         SystemMessage systemMessage = new SystemMessage("""
-                Bạn là trợ lý AI tư vấn về thiết kế và in ấn biển quảng cáo.
+                Bạn là một trợ lý ảo tư vấn khách hàng của công ty Song Tạo.
+                Mục tiêu của bạn là cung cấp thông tin chính xác, hữu ích và thân thiện cho khách hàng.
+                Bạn phải tuân thủ các nguyên tắc sau:
+                1.  **Chào hỏi thân thiện:** Bắt đầu mọi cuộc trò chuyện bằng một lời chào hỏi ấm áp.
+                2.  **Chính xác:** Chỉ cung cấp thông tin đã được xác minh từ nguồn nội bộ.
+                3.  **Hữu ích:** Hướng dẫn khách hàng đến các giải pháp hoặc nguồn tài nguyên phù hợp.
+                4.  **Thân thiện và chuyên nghiệp:** Duy trì một thái độ tích cực, lịch sự, và sử dụng ngôn ngữ rõ ràng, dễ hiểu.
+                5.  **Không suy diễn:** Nếu bạn không biết câu trả lời, hãy nói rằng bạn không có thông tin và hướng dẫn khách hàng liên hệ với đội ngũ hỗ trợ trực tiếp.
+                6.  **Tránh cung cấp thông tin cá nhân:** Không bao giờ hỏi hoặc yêu cầu thông tin nhạy cảm của khách hàng như mật khẩu, số thẻ tín dụng, thông tin để liên lạc sau, ...
+                7.  **Kết thúc cuộc trò chuyện:** Khi vấn đề của khách hàng đã được giải quyết, hãy hỏi xem họ có cần hỗ trợ gì thêm không.
+                8.  **Không đặt lịch, hứa hẹn:** Không yêu cầu khách hàng cung cấp thông tin cá nhân để liên lạc sau.
                 """);
         UserMessage userMessage = new UserMessage(request.getPrompt());
         OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
@@ -155,7 +171,7 @@ public class ChatBotServiceImpl implements ChatBotService {
     }
 
     @Override
-    public List<String> getModernBillboardPricing(ModernBillboardRequest request) {
+    public ModernBillboardResponse getModernBillboardPricing(ModernBillboardRequest request) {
         ModelChatBot modelChatBot = modelChatBotRepository.getModelChatBotByActive(true)
                 .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
 
@@ -182,28 +198,21 @@ public class ChatBotServiceImpl implements ChatBotService {
 
         Prompt prompt = new Prompt(systemMessage, userMessage);
 
-        log.info("User Modern: {}", prompt.getUserMessage());
-        log.info("System Modern: {}", prompt.getSystemMessage());
-
         OpenAiChatOptions options = OpenAiChatOptions.builder()
                 .model(modelChatBot.getModelName())
                 .maxTokens(500)
                 .temperature(0.7)
                 .build();
 
-        String responseContent = chatClient
+        return chatClient
                 .prompt(prompt)
                 .options(options)
                 .call()
-                .content();
-
-        return Stream.of(responseContent.split("\n"))
-                .filter(line -> !line.trim().isEmpty())
-                .collect(Collectors.toList());
+                .entity(ModernBillboardResponse.class);
     }
 
     @Override
-    public List<String> getTraditionalBillboardPricing(TraditionalBillboardRequest request) {
+    public TraditionalBillboardResponse getTraditionalBillboardPricing(TraditionalBillboardRequest request) {
         ModelChatBot modelChatBot = modelChatBotRepository.getModelChatBotByActive(true)
                 .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
 
@@ -229,23 +238,16 @@ public class ChatBotServiceImpl implements ChatBotService {
         ));
         Prompt prompt = new Prompt(systemMessage, userMessage);
 
-        log.info("User: {}", prompt.getUserMessage());
-        log.info("System: {}", prompt.getSystemMessage());
-
         OpenAiChatOptions options = OpenAiChatOptions.builder()
                 .model(modelChatBot.getModelName())
                 .maxTokens(500)
                 .temperature(0.7)
                 .build();
 
-        String responseContent = chatClient
+        return chatClient
                 .prompt(prompt)
                 .options(options)
                 .call()
-                .content();
-
-        return Stream.of(responseContent.split("\n"))
-                .filter(line -> !line.trim().isEmpty())
-                .collect(Collectors.toList());
+                .entity(TraditionalBillboardResponse.class);
     }
 }

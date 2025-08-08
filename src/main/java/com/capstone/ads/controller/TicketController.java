@@ -31,7 +31,7 @@ public class TicketController {
             @Valid @RequestBody TicketRequest request
     ) {
         var ticket = ticketService.sendOrderTicket(request, orderId);
-        return ApiResponseBuilder.buildSuccessResponse("Order ticket sent successfully", ticket);
+        return ApiResponseBuilder.buildSuccessResponse("Gửi ticket hỗ trợ thành công", ticket);
     }
 
     @PatchMapping("/tickets/{ticketId}/report/sale")
@@ -39,7 +39,7 @@ public class TicketController {
     public ApiResponse<TicketDTO> reportTicketBySaleStaff(@PathVariable("ticketId") String ticketId,
                                                           @Valid @RequestBody TicketReport reportDetails) {
         var ticket = ticketService.reportTicketBySaleStaff(ticketId, reportDetails);
-        return ApiResponseBuilder.buildSuccessResponse("Ticket reported successfully", ticket);
+        return ApiResponseBuilder.buildSuccessResponse("Phản hồi ticket thành công", ticket);
     }
 
     @PatchMapping("/tickets/{ticketId}/report/staff")
@@ -47,14 +47,14 @@ public class TicketController {
     public ApiResponse<TicketDTO> reportTicketByStaff(@PathVariable String ticketId,
                                                       @Valid @RequestBody TicketReport reportDetails) {
         var ticket = ticketService.reportTicketByStaff(ticketId, reportDetails);
-        return ApiResponseBuilder.buildSuccessResponse("Ticket reported successfully", ticket);
+        return ApiResponseBuilder.buildSuccessResponse("Phản hồi ticket thành công", ticket);
     }
 
     @PatchMapping("/tickets/{ticketId}/deliveryTicket")
     @Operation(summary = "Sale chuyển ticket cho staff")
     public ApiResponse<TicketDTO> deliveryTicket(@PathVariable String ticketId) {
         var ticket = ticketService.deliveryTicket(ticketId);
-        return ApiResponseBuilder.buildSuccessResponse("Ticket delivered successfully", ticket);
+        return ApiResponseBuilder.buildSuccessResponse("Chuyển ticket thành công", ticket);
     }
 
     @GetMapping("/tickets")
@@ -63,14 +63,14 @@ public class TicketController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var tickets = ticketService.viewAllTickets(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Tickets retrieved successfully", tickets, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả ticket thành công", tickets, page);
     }
 
     @GetMapping("/tickets/{ticketId}")
     @Operation(summary = "Xem chi tiết ticket")
     public ApiResponse<TicketDTO> viewTicketDetails(@PathVariable String ticketId) {
         var ticket = ticketService.viewTicketDetails(ticketId);
-        return ApiResponseBuilder.buildSuccessResponse("Ticket details retrieved successfully", ticket);
+        return ApiResponseBuilder.buildSuccessResponse("Xem chi tiết ticket theo ID thành công", ticket);
     }
 
     @GetMapping("/tickets/customer")
@@ -80,7 +80,7 @@ public class TicketController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var tickets = ticketService.viewTicketByStatus(status, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Tickets sent by customer retrieved successfully", tickets, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả ticket theo trạng thái thành công", tickets, page);
     }
 
     @GetMapping("/tickets/staff")
@@ -89,7 +89,7 @@ public class TicketController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var tickets = ticketService.viewTicketsOfStaff(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Tickets for staff retrieved successfully", tickets, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả ticket cho staff thành công", tickets, page);
     }
 
     @GetMapping("/users/{userId}/tickets")
@@ -99,6 +99,6 @@ public class TicketController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var tickets = ticketService.viewTicketsByUserId(userId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Tickets retrieved successfully", tickets, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả ticket đã gửi thành công", tickets, page);
     }
 }

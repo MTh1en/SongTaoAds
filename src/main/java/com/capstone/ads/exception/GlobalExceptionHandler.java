@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponseBuilder.buildErrorResponse("Validation Error", errors));
+                .body(ApiResponseBuilder.buildErrorResponse("Lỗi định dạng", errors));
     }
 
     @ExceptionHandler(value = HandlerMethodValidationException.class)
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponseBuilder.buildErrorResponse("Validation Error", errors));
+                .body(ApiResponseBuilder.buildErrorResponse("Lỗi định dạng", errors));
     }
 
     @ExceptionHandler(value = AuthorizationDeniedException.class)
@@ -66,9 +66,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = DataAccessException.class)
     public ResponseEntity<ApiResponse<Object>> handleDataAccessException(PSQLException ex) {
-        // Xử lý chung cho cả SQLException và PSQLException
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(ApiResponseBuilder.buildErrorResponse("Database Error", ex.getServerErrorMessage()));
+        return switch (ex.getSQLState()) {
+            case "23505" -> ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(ApiResponseBuilder.buildErrorResponse("Thông tin đã tồn tại", ex.getMessage()));
+            case "23503" -> ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(ApiResponseBuilder.buildErrorResponse("Thông tin đã được sử dụng ở phần khác", ex.getMessage()));
+            default -> ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(ApiResponseBuilder.buildErrorResponse("Database Error", ex.getServerErrorMessage()));
+        };
+
     }
 }

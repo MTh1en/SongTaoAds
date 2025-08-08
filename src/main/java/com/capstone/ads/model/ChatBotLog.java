@@ -21,6 +21,7 @@ public class ChatBotLog {
     String id;
 
     String question;
+    @Column(length = 1000)
     String answer;
 
     @ManyToOne

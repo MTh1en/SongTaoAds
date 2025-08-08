@@ -25,7 +25,7 @@ public class ProgressLogController {
     public ApiResponse<ProgressLogDTO> createProgressLog(@PathVariable String orderId,
                                                          @ModelAttribute ProgressLogCreateRequest request) {
         var response = progressLogService.createProgressLog(orderId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Progress log created", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo log tiến trình thành công", response);
     }
 
     @GetMapping(value = "/orders/{orderId}/progress-logs")
@@ -34,6 +34,6 @@ public class ProgressLogController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = progressLogService.findProgressLogByOrderId(orderId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Progress log by orderId", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem log tiến trình theo đơn hàng", response, page);
     }
 }

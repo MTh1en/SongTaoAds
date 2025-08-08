@@ -29,7 +29,7 @@ public class AttributesController {
     public ApiResponse<AttributesDTO> createAttribute(@Valid @PathVariable String productTypeId,
                                                       @RequestBody AttributesCreateRequest request) {
         var response = service.createAttribute(productTypeId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Create attribute successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo thuộc tính thành công", response);
     }
 
     @PutMapping("/attributes/{attributeId}")
@@ -37,30 +37,30 @@ public class AttributesController {
     public ApiResponse<AttributesDTO> updateAttributeInformation(@Valid @PathVariable String attributeId,
                                                                  @RequestBody AttributesUpdateRequest request) {
         var response = service.updateAttributeInformation(attributeId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Update attribute successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Câp nhật thuộc tính thành công", response);
     }
 
     @GetMapping("/attributes/{attributeId}")
     @Operation(summary = "Xem thuộc tính theo ID")
     public ApiResponse<AttributesDTO> findAttributeById(@PathVariable String attributeId) {
         var response = service.findAttributeById(attributeId);
-        return ApiResponseBuilder.buildSuccessResponse("attribute by Id", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem thuộc tính theo ID", response);
     }
 
     @GetMapping("product-types/{productTypeId}/attributes")
-    @Operation(summary = "Xem thuộc tính theo loại sản phẩm")
+    @Operation(summary = "Xem thuộc tính theo loại biển hiệu")
     public ApiPagingResponse<AttributesDTO> findAllAttributeByProductTypeId(
             @PathVariable String productTypeId,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = service.findAllAttributeByProductTypeId(productTypeId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find all attribute by product type", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả thuộc tính theo loại biển hiệu", response, page);
     }
 
     @DeleteMapping("/attributes/{attributeId}")
     @Operation(summary = "Xóa cứng thuộc tính (Không dùng)")
     public ApiResponse<Void> delete(@PathVariable String attributeId) {
         service.hardDeleteAttribute(attributeId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete attribute successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa thuộc tính thành công", null);
     }
 }
