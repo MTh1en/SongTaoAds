@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -33,4 +34,11 @@ public class Notification {
 
     @CreationTimestamp
     LocalDateTime createdAt;
+
+    @OneToMany(
+            mappedBy = "notification",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    List<NotificationStatus> notificationStatuses;
 }

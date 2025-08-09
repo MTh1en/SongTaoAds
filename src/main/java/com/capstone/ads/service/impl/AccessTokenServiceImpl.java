@@ -79,7 +79,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
                 if (roleName == null) {
                     throw new AppException(ErrorCode.INVALID_TOKEN);
                 }
-                return roleName;
+                return roleName.replace("ROLE_", "");
             }
             throw new AppException(ErrorCode.INVALID_TOKEN);
         } catch (Exception e) {

@@ -120,7 +120,6 @@ public class AuthServiceImpl implements AuthService {
         refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
 
         setRefreshTokenCookie(refreshToken, response);
-        notificationService.sendNotificationToRole("ROLE_ADMIN", "Có người đăng nhập");
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

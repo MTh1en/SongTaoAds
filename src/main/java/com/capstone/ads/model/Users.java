@@ -59,4 +59,10 @@ public class Users {
 
     @OneToMany(mappedBy = "sendBy")
     List<Feedbacks> feedbacks;
+
+    @OneToMany(mappedBy = "userTarget")
+    List<Notification> notifications;
+
+    @OneToMany(mappedBy = "users")
+    List<NotificationStatus> notificationStatuses;
 }

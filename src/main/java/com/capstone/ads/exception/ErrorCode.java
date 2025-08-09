@@ -101,6 +101,9 @@ public enum ErrorCode {
     QUESTION_NOT_FOUND("Không tìm thấy câu hỏi", HttpStatus.NOT_FOUND),
     CHAT_BOT_TOPIC_NOT_FOUND("Không tìm thấy chủ đề của model chat bot", HttpStatus.NOT_FOUND),
 
+    // ============  NOTIFICATION ============
+    NOTIFICATION_NOT_FOUND("Không tìm thấy thông báo", HttpStatus.NOT_FOUND),
+
    ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {

@@ -9,7 +9,7 @@ public class SocketIOConfig {
     @Bean
     public SocketIOServer socketIOServer() {
         com.corundumstudio.socketio.Configuration config = new com.corundumstudio.socketio.Configuration();
-        config.setPort(9092);
+        config.setPort(8888);
         config.setOrigin("*");
         return new SocketIOServer(config);
     }

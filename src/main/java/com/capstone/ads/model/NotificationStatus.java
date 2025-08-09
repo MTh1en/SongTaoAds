@@ -3,7 +3,6 @@ package com.capstone.ads.model;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -24,9 +23,9 @@ public class NotificationStatus {
     Notification notification;
 
     @ManyToOne
-    Users user;
+    Users users;
 
-    boolean isRead = false;
+    Boolean isRead;
 
     @UpdateTimestamp
     LocalDateTime readAt;
