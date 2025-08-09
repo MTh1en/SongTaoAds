@@ -69,7 +69,6 @@ public class PriceProposalServiceImpl implements PriceProposalService {
     @Transactional
     public PriceProposalDTO updatePricing(String priceProposalId, PriceProposalUpdatePricingRequest request) {
         PriceProposal priceProposal = getPriceProposalById(priceProposalId);
-        priceProposalStateValidator.validateTransition(priceProposal.getStatus(), PriceProposalStatus.PENDING);
 
         priceProposalMapper.mapUpdatePricingRequestToEntity(request, priceProposal);
 
