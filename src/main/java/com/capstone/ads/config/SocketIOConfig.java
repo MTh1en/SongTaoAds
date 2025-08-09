@@ -14,6 +14,8 @@ public class SocketIOConfig {
         config.setPort(8888);
         config.setOrigin("*");
         config.setTransports(Transport.WEBSOCKET, Transport.POLLING);
+        config.setPingTimeout(60000); // Timeout ping (ms)
+        config.setPingInterval(25000); // Interval ping (ms)
         return new SocketIOServer(config);
     }
 }
