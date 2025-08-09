@@ -29,29 +29,17 @@ public class SecurityContextUtils {
         }
 
         // 2. Get email from principal
-        String email = authentication.getName();
-        if (ObjectUtils.isEmpty(email)) {
+        String userId = authentication.getName();
+        if (ObjectUtils.isEmpty(userId)) {
             log.error("Invalid principal type: {}", authentication.getPrincipal().getClass());
             throw new AppException(ErrorCode.INVALID_PRINCIPAL);
         }
 
         // 3. Query database
-        return usersRepository.findByEmail(email)
+        return usersRepository.findById(userId)
                 .orElseThrow(() -> {
-                    log.error("User not found in DB: {}", email);
+                    log.error("User not found in DB: {}", userId);
                     return new AppException(ErrorCode.USER_NOT_FOUND);
                 });
-    }
-
-    public String getCurrentUserEmail() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!ObjectUtils.isEmpty(authentication) && authentication.isAuthenticated()) {
-            return authentication.getName();
-        }
-        throw new AppException(ErrorCode.UNAUTHENTICATED);
-    }
-
-    public String getCurrentUserId() {
-        return getCurrentUser().getId();
     }
 }

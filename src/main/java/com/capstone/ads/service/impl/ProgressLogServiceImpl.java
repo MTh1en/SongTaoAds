@@ -63,7 +63,7 @@ public class ProgressLogServiceImpl implements ProgressLogService {
     @Override
     @Transactional
     public ProgressLogDTO createProgressLog(String orderId, ProgressLogCreateRequest request) {
-        String userId = securityContextUtils.getCurrentUserId();
+        String userId = securityContextUtils.getCurrentUser().getId();
         Orders order = orderService.getOrderById(orderId);
 
         if (orderStateValidator.notCreateProgressLogsStatus(request.getStatus())) {
