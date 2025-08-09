@@ -14,4 +14,5 @@ public class CoreDTO {
     String id;
     String name;
     String description;
+    String orderCode;
 }

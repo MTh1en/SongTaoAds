@@ -1,6 +1,7 @@
 package com.capstone.ads.repository.external;
 
 import com.capstone.ads.dto.chatBot.*;
+import com.capstone.ads.dto.fine_tune.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -8,11 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @FeignClient(name = "openai-fine-tuning", url = "https://api.openai.com/v1")
 public interface ChatBotClient {
-    @PostMapping(value = "/chat/completions", consumes = MediaType.APPLICATION_JSON_VALUE)
-    ChatCompletionResponse getChatCompletions(
-            @RequestHeader("Authorization") String authorization,
-            @RequestBody ChatCompletionRequest requestBody);
-
     @PostMapping(value = "/fine_tuning/jobs", consumes = MediaType.APPLICATION_JSON_VALUE)
     FineTuningJobResponse createFineTuningJob(
             @RequestHeader("Authorization") String authorization,
@@ -60,12 +56,6 @@ public interface ChatBotClient {
     @GetMapping(value = "/models")
     ListModelsResponse getModels(
             @RequestHeader("Authorization") String authorization);
-
-    @PostMapping(value = "/chat/completions", consumes = MediaType.APPLICATION_JSON_VALUE)
-    ResponsePricingChat getResponseChatCompletions(
-            @RequestHeader("Authorization") String authorization,
-            @RequestBody RequestPricingChat requestBody);
-
 }
 
 

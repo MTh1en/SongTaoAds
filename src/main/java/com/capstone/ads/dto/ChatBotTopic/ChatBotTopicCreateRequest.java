@@ -1,4 +1,4 @@
-package com.capstone.ads.dto.chatBot;
+package com.capstone.ads.dto.ChatBotTopic;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ChatMessage {
-    String role;
-    String content;
+public class ChatBotTopicCreateRequest {
+    String modelChatBotId;
+    String topicId;
 }

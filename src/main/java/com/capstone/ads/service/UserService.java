@@ -10,6 +10,8 @@ import java.io.IOException;
 public interface UserService {
     UserDTO createUser(UserCreateRequest request);
 
+    UserDTO banOrUnbanUser(String userId, boolean isBanned);
+
     UserDTO findUserById(String userId);
 
     Page<UserDTO> findUsersByRoleName(String roleName, int page, int size);
@@ -35,5 +37,5 @@ public interface UserService {
 
     Users getUsersByIdAndIsActiveAndRoleName(String userId, boolean isActive, String roleName);
 
-    Users getUserByEmail(String email);
+    Users verifyAccountToSendEmail(String email);
 }

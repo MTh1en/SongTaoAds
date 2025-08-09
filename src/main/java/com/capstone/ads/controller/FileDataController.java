@@ -29,21 +29,21 @@ public class FileDataController {
     @Operation(summary = "Upload 1 File và lưu xuống FileData")
     public ApiResponse<FileDataDTO> uploadFileData(@RequestPart String key, @RequestPart MultipartFile file) {
         var response = fileDataService.uploadSingleFile(key, file);
-        return ApiResponseBuilder.buildSuccessResponse("Upload successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Upload thành công", response);
     }
 
     @GetMapping("/file-data")
     @Operation(summary = "Xem thông tin file theo đường dẫn hình ảnh")
     public ApiResponse<FileDataDTO> findFileDataByImageUrl(@RequestParam String imageUrl) {
         var response = fileDataService.findFileDataByImageUrl(imageUrl);
-        return ApiResponseBuilder.buildSuccessResponse("Find successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem thông tin file thành công", response);
     }
 
     @DeleteMapping("/file-data/{fileDataId}")
     @Operation(summary = "Xóa cứng dữ liệu file")
     public ApiResponse<Void> hardDeleteFileDatai(@PathVariable String fileDataId) {
         fileDataService.hardDeleteFileDataById(fileDataId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete file data successfully", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa file thành công", null);
     }
 
     // ===== ICON ===== //
@@ -51,7 +51,7 @@ public class FileDataController {
     @Operation(summary = "Upload icon")
     public ApiResponse<FileDataDTO> uploadIconSystem(@Valid @ModelAttribute IconCreateRequest request) {
         var response = fileDataService.uploadIconSystem(request);
-        return ApiResponseBuilder.buildSuccessResponse("Successfully uploaded file", response);
+        return ApiResponseBuilder.buildSuccessResponse("Upload icon thành công", response);
     }
 
     @PatchMapping("/icons/{iconId}/information")
@@ -59,7 +59,7 @@ public class FileDataController {
     public ApiResponse<FileDataDTO> updateIconSystemInformation(@PathVariable String iconId,
                                                                 @Valid @RequestBody IconUpdateInfoRequest request) {
         var response = fileDataService.updateIconSystemInformation(iconId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Successfully updated icon", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật thông tin icon thành công", response);
     }
 
     @PatchMapping(value = "/icons/{iconId}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -67,7 +67,7 @@ public class FileDataController {
     public ApiResponse<FileDataDTO> updateIconSystemImage(@PathVariable String iconId,
                                                           @RequestPart MultipartFile iconImage) {
         var response = fileDataService.updateIconSystemImage(iconId, iconImage);
-        return ApiResponseBuilder.buildSuccessResponse("Successfully updated icon", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật hình ảnh icon thành công", response);
     }
 
     @GetMapping("/icons")
@@ -76,7 +76,7 @@ public class FileDataController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
         var response = fileDataService.findAllIconSystem(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find all icon successful", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả icon", response, page);
     }
 
     // ==== DEMO DESIGN ===== //
@@ -84,7 +84,7 @@ public class FileDataController {
     @Operation(summary = "Xem những hình ảnh phụ có trong bản demo")
     public ApiResponse<List<FileDataDTO>> findFileDataByDemoDesignId(@PathVariable String demoDesignId) {
         var response = fileDataService.findFileDataByDemoDesignId(demoDesignId);
-        return ApiResponseBuilder.buildSuccessResponse("Find demo design sub images successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem những hình ảnh phụ có trong bản demo thành công", response);
     }
 
     // ===== CUSTOM DESIGN REQUEST ===== //
@@ -92,7 +92,9 @@ public class FileDataController {
     @Operation(summary = "Xem những hình ảnh phụ có trong bản thiết kế chính thức")
     public ApiResponse<List<FileDataDTO>> findFileDataByCustomDesignRequestId(@PathVariable String customDesignRequestId) {
         var response = fileDataService.findFileDataByCustomDesignRequestId(customDesignRequestId);
-        return ApiResponseBuilder.buildSuccessResponse("Find custom design request sub images successful", response);
+        return ApiResponseBuilder.buildSuccessResponse(
+                "Xem những hình ảnh phụ có trong bản thiết kế chính thức thành công",
+                response);
     }
 
     // ===== PROGRESS LOG ===== //
@@ -100,6 +102,6 @@ public class FileDataController {
     @Operation(summary = "Xem những hình ảnh trong tiến trình của đơn hàng")
     public ApiResponse<List<FileDataDTO>> findFileDataByProgressLogId(@PathVariable String progressLogId) {
         var response = fileDataService.findFileDataByProgressLogId(progressLogId);
-        return ApiResponseBuilder.buildSuccessResponse("Find progress logs images successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Xem những hình ảnh trong tiến trình của đơn hàng thành công", response);
     }
 }

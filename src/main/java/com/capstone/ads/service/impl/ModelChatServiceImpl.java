@@ -1,7 +1,9 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.S3ImageKeyFormat;
-import com.capstone.ads.dto.chatBot.*;
+import com.capstone.ads.dto.fine_tune.FileUploadResponse;
+import com.capstone.ads.dto.fine_tune.FineTuningJobResponse;
+import com.capstone.ads.dto.model_chat.ModelChatBotDTO;
 import com.capstone.ads.dto.webhook.FineTuneSuccess;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
@@ -196,4 +198,9 @@ public class ModelChatServiceImpl implements ModelChatService {
             default -> "";
         };
     }
+
+    public ModelChatBot getModelChatBotByName(String modelName) {
+        return modelChatBotRepository.findByModelName(modelName);
+    }
+
 }

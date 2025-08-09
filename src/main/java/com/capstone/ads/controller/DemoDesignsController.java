@@ -38,14 +38,14 @@ public class DemoDesignsController {
     public ApiResponse<DemoDesignDTO> designerCreateCustomDesign(@PathVariable String customDesignRequestId,
                                                                  @ModelAttribute DemoDesignCreateRequest request) {
         var response = demoDesignsService.designerCreateCustomDesign(customDesignRequestId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Create custom design successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Gửi demo thành công", response);
     }
 
     @PatchMapping("/demo-designs/{customDesignId}/approve")
     @Operation(summary = "Khách hàng chấp nhận bản demo")
     public ApiResponse<DemoDesignDTO> customerApproveCustomDesign(@PathVariable String customDesignId) {
         var response = demoDesignsService.customerApproveCustomDesign(customDesignId);
-        return ApiResponseBuilder.buildSuccessResponse("Custom design decision successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Chấp nhận demo thành công", response);
     }
 
     @PatchMapping(value = "/demo-designs/{customDesignId}/reject", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -53,7 +53,7 @@ public class DemoDesignsController {
     public ApiResponse<DemoDesignDTO> customerRejectCustomDesign(@PathVariable String customDesignId,
                                                                  @Valid @ModelAttribute CustomerRejectCustomDesignRequest request) {
         var response = demoDesignsService.customerRejectCustomDesign(customDesignId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Custom design decision successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Từ chối demo thành công", response);
     }
 
     @PatchMapping("/demo-designs/{customDesignId}/designer-description")
@@ -61,7 +61,7 @@ public class DemoDesignsController {
     public ApiResponse<DemoDesignDTO> designerUpdateDescriptionCustomDesign(@PathVariable String customDesignId,
                                                                             @RequestBody DesignerUpdateDescriptionCustomDesignRequest request) {
         var response = demoDesignsService.designerUpdateDescriptionCustomDesign(customDesignId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Update design description successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật miêu tả thiết kế thành công", response);
     }
 
     @PatchMapping(value = "/demo-designs/{customDesignId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -69,7 +69,7 @@ public class DemoDesignsController {
     public ApiResponse<DemoDesignDTO> designerUploadImage(@PathVariable String customDesignId,
                                                           @RequestPart("file") MultipartFile file) {
         var response = demoDesignsService.designerUploadImage(customDesignId, file);
-        return ApiResponseBuilder.buildSuccessResponse("Upload image successful", response);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật hình ảnh thành công", response);
     }
 
     @PostMapping(value = "/demo-designs/{customDesignId}/sub-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -77,23 +77,23 @@ public class DemoDesignsController {
     public ApiResponse<List<FileDataDTO>> uploadDemoDesignSubImage(@PathVariable String customDesignId,
                                                                    @ModelAttribute UploadMultipleFileRequest request) {
         var response = demoDesignsService.uploadDemoDesignSubImages(customDesignId, request);
-        return ApiResponseBuilder.buildSuccessResponse("Upload sub image successfully", response);
+        return ApiResponseBuilder.buildSuccessResponse("Upload hình ảnh phụ thành công", response);
     }
 
     @GetMapping("/custom-design-requests/{customDesignRequestId}/demo-designs")
-    @Operation(summary = "Xem lịch sử bạn demo theo request")
+    @Operation(summary = "Xem lịch sử bản demo theo request")
     public ApiPagingResponse<DemoDesignDTO> findCustomDesignByCustomDesignRequest(
             @PathVariable String customDesignRequestId,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = demoDesignsService.findCustomDesignByCustomDesignRequest(customDesignRequestId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Find Custom Design by Custom Design Request successful", response, page);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem lịch sử demo theo yêu cầu thiết kế thành công", response, page);
     }
 
     @DeleteMapping("/demo-designs/{demoDesignId}")
     @Operation(summary = "Xóa cứng bản demo")
     public ApiResponse<Void> hardDeleteCustomDesign(@PathVariable String demoDesignId) {
         demoDesignsService.hardDeleteCustomDesign(demoDesignId);
-        return ApiResponseBuilder.buildSuccessResponse("Delete Custom Design successful", null);
+        return ApiResponseBuilder.buildSuccessResponse("Xóa demo thành công", null);
     }
 }

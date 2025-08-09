@@ -34,4 +34,8 @@ public class Topic {
 
     @UpdateTimestamp
     LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "topic")
+    private List<ChatBotTopic> chatBotTopics;
+
 }

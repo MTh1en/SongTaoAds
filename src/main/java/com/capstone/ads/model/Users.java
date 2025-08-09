@@ -35,6 +35,7 @@ public class Users {
     @Column(unique = true, length = 512)
     String avatar;
     Boolean isActive;
+    Boolean isBanned;
 
     @CreationTimestamp
     LocalDateTime createdAt;

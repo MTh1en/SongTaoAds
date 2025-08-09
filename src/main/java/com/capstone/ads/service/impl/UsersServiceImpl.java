@@ -40,15 +40,23 @@ public class UsersServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO createUser(UserCreateRequest request) {
-        // Validate role
         Roles roles = rolesRepository.findByName(request.getRoleName())
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
-        // Map DTO to entity
         Users user = usersMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword())); // Encode password
+        user.setIsBanned(false);
         user.setRoles(roles);
 
+        user = usersRepository.save(user);
+        return usersMapper.toDTO(user);
+    }
+
+    @Override
+    public UserDTO banOrUnbanUser(String userId, boolean isBanned) {
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setIsBanned(isBanned);
         user = usersRepository.save(user);
         return usersMapper.toDTO(user);
     }
@@ -156,9 +164,13 @@ public class UsersServiceImpl implements UserService {
     }
 
     @Override
-    public Users getUserByEmail(String email) {
-        return usersRepository.findByEmail(email)
+    public Users verifyAccountToSendEmail(String email) {
+        Users users = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (users.getIsBanned()) {
+            throw new AppException(ErrorCode.ACCOUNT_BANNED);
+        }
+        return users;
     }
 
     private String generateAvatarName(String userId) {

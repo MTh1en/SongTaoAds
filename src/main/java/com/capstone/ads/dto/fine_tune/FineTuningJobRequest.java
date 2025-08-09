@@ -1,4 +1,4 @@
-package com.capstone.ads.dto.chatBot;
+package com.capstone.ads.dto.fine_tune;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -9,10 +9,10 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ModelResponse {
-    private String id;
-    private String object;
-    private int created;
-    @JsonProperty("owned_by")
-    private String ownedBy;
+public class FineTuningJobRequest {
+    @JsonProperty("training_file")
+     String trainingFile;
+
+     String model;
+
 }

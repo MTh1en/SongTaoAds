@@ -1,6 +1,6 @@
 package com.capstone.ads.mapper;
 
-import com.capstone.ads.dto.chatBot.ModelChatBotDTO;
+import com.capstone.ads.dto.model_chat.ModelChatBotDTO;
 import com.capstone.ads.model.ModelChatBot;
 import org.mapstruct.Mapper;
 

@@ -1,7 +1,7 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.chatBot.FileUploadResponse;
-import com.capstone.ads.dto.chatBot.ModelChatBotDTO;
+import com.capstone.ads.dto.fine_tune.FileUploadResponse;
+import com.capstone.ads.dto.model_chat.ModelChatBotDTO;
 import com.capstone.ads.dto.webhook.FineTuneSuccess;
 import com.capstone.ads.model.ModelChatBot;
 import org.springframework.data.domain.Page;
@@ -18,4 +18,6 @@ public interface ModelChatService {
 
     //INTERNAL FUNCTION
     ModelChatBot getModelChatBotById(String modelChatBotId);
+
+    ModelChatBot getModelChatBotByName(String modelChatBotName);
 }

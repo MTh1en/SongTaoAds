@@ -1,4 +1,4 @@
-package com.capstone.ads.dto.chatBot;
+package com.capstone.ads.dto.fine_tune;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

@@ -21,6 +21,7 @@ public class UserDTO {
     String avatar;
     String address;
     Boolean isActive;
+    Boolean isBanned;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     CoreDTO roles;
