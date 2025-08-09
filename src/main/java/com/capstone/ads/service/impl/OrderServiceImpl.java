@@ -17,7 +17,6 @@ import com.capstone.ads.repository.internal.OrdersRepository;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.KeyGenerator;
 import com.capstone.ads.validator.ContractStateValidator;
-import com.capstone.ads.validator.CustomDesignRequestStateValidator;
 import com.capstone.ads.validator.OrderStateValidator;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.AccessLevel;
@@ -105,16 +104,17 @@ public class OrderServiceImpl implements OrderService {
 
         orders.setStatus(OrderStatus.CONTRACT_CONFIRMED);
         orders.getContract().setStatus(ContractStatus.CONFIRMED);
+
         orders.setDepositConstructionAmount(depositAmount);
         orders.setRemainingConstructionAmount(remainingAmount);
 
-        orders.setTotalOrderDepositAmount(orders.getDepositDesignAmount() != null
-                ? orders.getTotalOrderDepositAmount() + depositAmount
-                : depositAmount
+        orders.setTotalOrderDepositAmount(orders.getDepositDesignAmount() == 0
+                ? depositAmount
+                : orders.getDepositDesignAmount() + depositAmount
         );
-        orders.setTotalOrderRemainingAmount(orders.getRemainingDesignAmount() != null
-                ? orders.getRemainingDesignAmount() + remainingAmount
-                : remainingAmount
+        orders.setTotalOrderRemainingAmount(orders.getRemainingDesignAmount() == 0
+                ? remainingAmount
+                : orders.getRemainingDesignAmount() + remainingAmount
         );
 
         orderRepository.save(orders);
@@ -177,6 +177,22 @@ public class OrderServiceImpl implements OrderService {
         Sort sort = Sort.by("createdAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return orderRepository.findByStatus(status, pageable)
+                .map(orderMapper::toDTO);
+    }
+
+    @Override
+    public Page<OrderDTO> findOrderByType(OrderType orderType, int page, int size) {
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return orderRepository.findByOrderType(orderType, pageable)
+                .map(orderMapper::toDTO);
+    }
+
+    @Override
+    public Page<OrderDTO> findOrderByStatusAndType(OrderStatus status, OrderType orderType, int page, int size) {
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return orderRepository.findByStatusAndOrderType(status, orderType, pageable)
                 .map(orderMapper::toDTO);
     }
 
