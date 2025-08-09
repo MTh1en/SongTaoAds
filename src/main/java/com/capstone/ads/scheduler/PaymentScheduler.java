@@ -32,7 +32,7 @@ public class PaymentScheduler {
 
     PaymentsRepository paymentsRepository;
 
-    @Scheduled(fixedRate = 1800000) //30 phút
+    @Scheduled(fixedRate = 1800000000) //30 phút
     public void updateExpiredPayments() {
         PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
         List<Payments> pendingPayments = paymentsRepository.findByStatus(PaymentStatus.PENDING);

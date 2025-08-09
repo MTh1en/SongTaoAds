@@ -17,6 +17,7 @@ import com.capstone.ads.repository.internal.RolesRepository;
 import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.service.AccessTokenService;
 import com.capstone.ads.service.AuthService;
+import com.capstone.ads.service.NotificationService;
 import com.capstone.ads.service.RefreshTokenService;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,6 +44,7 @@ public class AuthServiceImpl implements AuthService {
     RolesRepository rolesRepository;
     OutboundIdentityClient outboundIdentityClient;
     OutboundUserClient outboundUserClient;
+    NotificationService notificationService;
 
     @NonFinal
     @Value("${app.jwt.refresh-token-ttl}")
@@ -118,7 +120,7 @@ public class AuthServiceImpl implements AuthService {
         refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
 
         setRefreshTokenCookie(refreshToken, response);
-
+        notificationService.sendNotificationToRole("ROLE_ADMIN", "Có người đăng nhập");
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

@@ -17,7 +17,6 @@ import com.capstone.ads.repository.internal.OrdersRepository;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.KeyGenerator;
 import com.capstone.ads.validator.ContractStateValidator;
-import com.capstone.ads.validator.CustomDesignRequestStateValidator;
 import com.capstone.ads.validator.OrderStateValidator;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.AccessLevel;
@@ -105,16 +104,17 @@ public class OrderServiceImpl implements OrderService {
 
         orders.setStatus(OrderStatus.CONTRACT_CONFIRMED);
         orders.getContract().setStatus(ContractStatus.CONFIRMED);
+
         orders.setDepositConstructionAmount(depositAmount);
         orders.setRemainingConstructionAmount(remainingAmount);
 
-        orders.setTotalOrderDepositAmount(orders.getDepositDesignAmount() != null
-                ? orders.getTotalOrderDepositAmount() + depositAmount
-                : depositAmount
+        orders.setTotalOrderDepositAmount(orders.getDepositDesignAmount() == 0
+                ? depositAmount
+                : orders.getDepositDesignAmount() + depositAmount
         );
-        orders.setTotalOrderRemainingAmount(orders.getRemainingDesignAmount() != null
-                ? orders.getRemainingDesignAmount() + remainingAmount
-                : remainingAmount
+        orders.setTotalOrderRemainingAmount(orders.getRemainingDesignAmount() == 0
+                ? remainingAmount
+                : orders.getRemainingDesignAmount() + remainingAmount
         );
 
         orderRepository.save(orders);

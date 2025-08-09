@@ -36,7 +36,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         try {
             JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                    .subject(user.getEmail())
+                    .subject(user.getId())
                     .issuer("songtaoads")
                     .issueTime(new Date())
                     .expirationTime(new Date(Instant.now().plus(accessTokenTtl, ChronoUnit.MINUTES).toEpochMilli()))
@@ -53,19 +53,36 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     }
 
     @Override
-    public String extractEmail(String token) {
+    public String extractUserId(String token) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             if (signedJWT.verify(new MACVerifier(signature.getBytes()))) {
-                String email = signedJWT.getJWTClaimsSet().getSubject();
-                if (email == null) {
+                String userId = signedJWT.getJWTClaimsSet().getSubject();
+                if (userId == null) {
                     throw new AppException(ErrorCode.INVALID_TOKEN);
                 }
-                return email;
+                return userId;
             }
             throw new AppException(ErrorCode.INVALID_TOKEN);
         } catch (Exception e) {
-            log.error("Failed to extract email from token: {}", e.getMessage());
+            log.error("Failed to extract userId from token: {}", e.getMessage());
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+    }
+
+    @Override
+    public String extractRole(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            if (signedJWT.verify(new MACVerifier(signature.getBytes()))) {
+                String roleName = signedJWT.getJWTClaimsSet().getClaim("scope").toString();
+                if (roleName == null) {
+                    throw new AppException(ErrorCode.INVALID_TOKEN);
+                }
+                return roleName;
+            }
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        } catch (Exception e) {
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
     }
