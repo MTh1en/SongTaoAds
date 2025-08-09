@@ -3,6 +3,7 @@ package com.capstone.ads.repository.internal;
 import com.capstone.ads.model.Orders;
 import com.capstone.ads.model.Users;
 import com.capstone.ads.model.enums.OrderStatus;
+import com.capstone.ads.model.enums.OrderType;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,10 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
     Orders findByOrderCode(String orderCode);
 
     Page<Orders> findByStatus(OrderStatus status, Pageable pageable);
+
+    Page<Orders> findByOrderType(OrderType orderType, Pageable pageable);
+
+    Page<Orders> findByStatusAndOrderType(OrderStatus status, OrderType orderType, Pageable pageable);
 
     int countByUsers_IdAndStatus(String id, OrderStatus status);
 
