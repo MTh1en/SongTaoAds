@@ -29,6 +29,10 @@ public interface OrderService {
 
     Page<OrderDTO> findOrderByStatusAndType(OrderStatus status, OrderType orderType, int page, int size);
 
+    Page<OrderDTO> findCustomDesignOrderByAndStatus(OrderStatus status, int page, int size);
+
+    Page<OrderDTO> findCustomDesignOrder(int page, int size);
+
     Page<OrderDTO> findAllOrders(int page, int size);
 
     void cancelOrder(String orderId);

@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,6 +26,10 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
     Page<Orders> findByOrderType(OrderType orderType, Pageable pageable);
 
     Page<Orders> findByStatusAndOrderType(OrderStatus status, OrderType orderType, Pageable pageable);
+
+    Page<Orders> findByStatusAndOrderTypeIn(OrderStatus status, List<OrderType> orderTypes, Pageable pageable);
+
+    Page<Orders> findByOrderTypeIn(List<OrderType> orderTypes, Pageable pageable);
 
     int countByUsers_IdAndStatus(String id, OrderStatus status);
 

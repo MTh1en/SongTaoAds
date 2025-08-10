@@ -119,6 +119,26 @@ public class OrderController {
         return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả order thành công", response, page);
     }
 
+
+    @GetMapping(value = "/orders/custom-design", params = {"orderStatus"})
+    @Operation(summary = "Xem tất cả order custom design theo trạng thái")
+    public ApiPagingResponse<OrderDTO> findCustomDesignOrderByAndStatus(
+            @RequestParam(required = false) OrderStatus orderStatus,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = orderService.findCustomDesignOrderByAndStatus(orderStatus, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả order custom theo trạng thái", response, page);
+    }
+
+    @GetMapping(value = "/orders/custom-design", params = {"!orderStatus"})
+    @Operation(summary = "Xem tất cả order custom design")
+    public ApiPagingResponse<OrderDTO> findCustomDesignOrderByAndStatus(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = orderService.findCustomDesignOrder(page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả order custom thành công", response, page);
+    }
+
     @PatchMapping("/orders/{orderId}/cancel")
     @Operation(summary = "Hủy đơn hàng")
     public ApiResponse<Void> cancelOrder(@PathVariable String orderId) {

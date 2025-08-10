@@ -31,6 +31,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -193,6 +194,33 @@ public class OrderServiceImpl implements OrderService {
         Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return orderRepository.findByStatusAndOrderType(status, orderType, pageable)
+                .map(orderMapper::toDTO);
+    }
+
+    @Override
+    public Page<OrderDTO> findCustomDesignOrderByAndStatus(OrderStatus status, int page, int size) {
+        List<OrderType> orderTypes = Arrays.asList(
+                OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION,
+                OrderType.CUSTOM_DESIGN_WITHOUT_CONSTRUCTION
+        );
+
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return orderRepository.findByStatusAndOrderTypeIn(status, orderTypes, pageable)
+                .map(orderMapper::toDTO);
+    }
+
+    @Override
+    public Page<OrderDTO> findCustomDesignOrder(int page, int size) {
+
+        List<OrderType> orderTypes = Arrays.asList(
+                OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION,
+                OrderType.CUSTOM_DESIGN_WITHOUT_CONSTRUCTION
+        );
+
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return orderRepository.findByOrderTypeIn(orderTypes, pageable)
                 .map(orderMapper::toDTO);
     }
 
