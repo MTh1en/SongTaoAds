@@ -17,7 +17,6 @@ import com.capstone.ads.repository.internal.RolesRepository;
 import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.service.AccessTokenService;
 import com.capstone.ads.service.AuthService;
-import com.capstone.ads.service.NotificationService;
 import com.capstone.ads.service.RefreshTokenService;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletResponse;
