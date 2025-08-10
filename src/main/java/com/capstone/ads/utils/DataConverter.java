@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
@@ -51,15 +52,32 @@ public class DataConverter {
         if (name == null) {
             return "";
         }
+        String trimmedName = name.trim();
 
-        StringBuilder normalized = new StringBuilder();
-        for (char c : name.trim().toCharArray()) {
-            if (!Character.isWhitespace(c)) {
-                normalized.append(c);
-            }
+        return trimmedName.replace(' ', '_').toUpperCase();
+    }
+
+    public static String normalizeAddFormulaValueName(String name) {
+        return formatFormulaName(name, true);
+    }
+
+    public static String appendToFormula(String currentFormula, String newName) {
+        String formattedName = normalizeAddFormulaValueName(newName);
+        if (currentFormula == null || currentFormula.trim().isEmpty()) {
+            return formattedName;
         }
+        return currentFormula + " + " + formattedName;
+    }
 
-        return normalized.toString();
+    public static String replaceFormulaValue(String formula, String oldValue, String newValue) {
+        if (formula == null || oldValue == null || newValue == null) {
+            return formula;
+        }
+        String oldFormattedValue = normalizeAddFormulaValueName(oldValue);
+        String newFormattedValue = normalizeAddFormulaValueName(newValue);
+        String regex = createFormulaBoundaryRegex(oldFormattedValue);
+
+        return formula.replaceAll(regex, "$1" + newFormattedValue + "$2");
     }
 
     public CustomerChoiceHistories convertToHistory(CustomerChoices customerChoices) {
@@ -76,5 +94,17 @@ public class DataConverter {
         );
 
         return history;
+    }
+
+    public static String formatFormulaName(String name, boolean withPrefix) {
+        if (name == null) {
+            return "";
+        }
+        String normalizedName = name.trim().replace(' ', '_').toUpperCase();
+        return withPrefix ? "#" + normalizedName : normalizedName;
+    }
+
+    public static String createFormulaBoundaryRegex(String name) {
+        return "(^|[^\\w#])" + Pattern.quote(name) + "([^\\w#]|$)";
     }
 }

@@ -7,26 +7,32 @@ import com.capstone.ads.dto.product_type.ProductTypeUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ProductTypesMapper;
+import com.capstone.ads.model.CostTypes;
 import com.capstone.ads.model.ProductTypes;
 import com.capstone.ads.repository.internal.ProductTypesRepository;
 import com.capstone.ads.service.FileDataService;
 import com.capstone.ads.service.ProductTypesService;
+import com.capstone.ads.utils.DataConverter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class ProductTypesServiceImpl implements ProductTypesService {
     FileDataService fileDataService;
     ProductTypesRepository productTypesRepository;
@@ -92,10 +98,59 @@ public class ProductTypesServiceImpl implements ProductTypesService {
         productTypesRepository.deleteById(id);
     }
 
+    //INTERNAL FUNCTION//
     @Override
     public ProductTypes getProductTypeByIdAndAvailable(String productTypeId) {
         return productTypesRepository.findByIdAndIsAvailable(productTypeId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
+    }
+
+    @Override
+    public ProductTypes getProductTypeById(String productTypeId) {
+        return productTypesRepository.findById(productTypeId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
+    }
+
+    @Async
+    @Override
+    @Transactional
+    public void addCostTypeToCalculateFormula(String productTypeId, String costTypeName) {
+        ProductTypes productTypes = productTypesRepository.findById(productTypeId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
+
+        productTypes.setCalculateFormula(
+                DataConverter.appendToFormula(productTypes.getCalculateFormula(), costTypeName)
+        );
+        productTypes.setIsAvailable(true);
+        productTypesRepository.save(productTypes);
+    }
+
+    @Async
+    @Override
+    @Transactional
+    public void updateNewValueNameCalculateFormula(String productTypeId, String oldName, String newName) {
+        ProductTypes productTypes = productTypesRepository.findById(productTypeId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_NOT_FOUND));
+        productTypes.setCalculateFormula(DataConverter.replaceFormulaValue(
+                productTypes.getCalculateFormula(), oldName, newName
+        ));
+        productTypesRepository.save(productTypes);
+    }
+
+    @Async
+    @Override
+    @Transactional
+    public void updateAllFormulaCostTypeValues(String productTypeId, String oldName, String newName) {
+        ProductTypes productTypes = getProductTypeById(productTypeId);
+        List<CostTypes> costTypes = productTypes.getCostTypes();
+
+        for (CostTypes costType : costTypes) {
+            String newFormula = DataConverter.replaceFormulaValue(costType.getFormula(), oldName, newName);
+            costType.setFormula(newFormula);
+        }
+
+        productTypes.setCostTypes(costTypes);
+        productTypesRepository.save(productTypes);
     }
 
     private String generateProductTypeImageKey() {

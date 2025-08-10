@@ -22,4 +22,12 @@ public interface ProductTypesService {
 
     //INTERNAL FUNCTION
     ProductTypes getProductTypeByIdAndAvailable(String productTypeId);
+
+    ProductTypes getProductTypeById(String productTypeId);
+
+    void addCostTypeToCalculateFormula(String productTypeId, String costTypeName);
+
+    void updateNewValueNameCalculateFormula(String productTypeId, String oldName, String newName);
+
+    void updateAllFormulaCostTypeValues(String productTypeId, String oldValue, String newValue);
 }

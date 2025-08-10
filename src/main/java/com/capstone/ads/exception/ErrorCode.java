@@ -13,7 +13,7 @@ public enum ErrorCode {
     ACCOUNT_DISABLED("Tài khoản chưa xác thực", HttpStatus.FORBIDDEN),
     ACCOUNT_BANNED("Tài khoản đã bị cấm", HttpStatus.FORBIDDEN),
     ACCOUNT_VERIFIED("Tài khoản đã được xác thực", HttpStatus.BAD_REQUEST),
-    UNAUTHENTICATED("Yêu cầu xác thực", HttpStatus.UNAUTHORIZED),
+    UNAUTHENTICATED("UNAUTHENTICATED", HttpStatus.UNAUTHORIZED),
     INVALID_REFRESH_TOKEN("Refresh token không hợp lệ hoặc đã hết hạn", HttpStatus.UNAUTHORIZED),
     ACCESS_DENIED("Truy cập bị từ chối", HttpStatus.FORBIDDEN),
     INVALID_TOKEN("Token không hợp lệ", HttpStatus.UNAUTHORIZED),
@@ -87,6 +87,7 @@ public enum ErrorCode {
     FEEDBACK_NOT_FOUND("Không tìm thấy phản hồi", HttpStatus.NOT_FOUND),
     COST_TYPE_NOT_FOUND("Không tìm thấy loại chi phí", HttpStatus.NOT_FOUND),
     CONTRACTOR_NOT_FOUND("Không tìm thấy nhà thầu", HttpStatus.NOT_FOUND),
+    CORE_COST_TYPE_EXISTED("Đã tồn tại giá trị core trong loại biển hiệu", HttpStatus.BAD_REQUEST),
 
     // ============ EXTERNAL SERVICES ============
     EXTERNAL_SERVICE_ERROR("Lỗi dịch vụ bên ngoài", HttpStatus.INTERNAL_SERVER_ERROR),
