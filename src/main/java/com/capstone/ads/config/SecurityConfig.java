@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/socket.io/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -65,14 +66,20 @@ public class SecurityConfig {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        // Cấu hình CORS cho webhook (PayOS)
+        // CORS cho webhook (PayOS)
         CorsConfiguration webhookConfig = new CorsConfiguration();
         webhookConfig.addAllowedOrigin("*");
         webhookConfig.addAllowedMethod("*");
         webhookConfig.addAllowedHeader("*");
         source.registerCorsConfiguration("/api/webhook/**", webhookConfig);
 
-        // Cấu hình CORS cho các endpoint khác (FE)
+        // CORS cho Socket.IO
+        CorsConfiguration socketIoConfig = getCorsConfiguration();
+        socketIoConfig.addAllowedHeader("Connection");
+        socketIoConfig.addAllowedHeader("Upgrade");
+        source.registerCorsConfiguration("/socket.io/**", socketIoConfig);
+
+        // CORS cho các endpoint khác (FE)
         CorsConfiguration defaultConfig = getCorsConfiguration();
         source.registerCorsConfiguration("/**", defaultConfig);
 

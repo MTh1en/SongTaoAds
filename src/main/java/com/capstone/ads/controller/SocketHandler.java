@@ -33,8 +33,11 @@ public class SocketHandler {
             client.joinRoom(role);
             client.joinRoom(userId);
             log.info("Client connected: {} to room: {}", userId, role);
+            log.info("Client session connected: {}", client.getSessionId());
+        } else {
+            log.warn("Invalid token: {}, disconnecting client: {}", token, client.getSessionId());
+            client.disconnect(); // Ngắt kết nối nếu token không hợp lệ
         }
-        log.info("Client session connected: {}", client.getSessionId());
     }
 
     @OnDisconnect
