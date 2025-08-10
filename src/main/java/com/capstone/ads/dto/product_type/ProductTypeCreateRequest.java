@@ -14,8 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProductTypeCreateRequest {
     @Size(min = 6, message = "Product Type Name must be at least 6 characters")
     String name;
-    @NotBlank(message = "Product Type Calculate Formula is Required")
-    String calculateFormula;
     Boolean isAiGenerated;
     Boolean isAvailable;
     MultipartFile productTypeImage;
