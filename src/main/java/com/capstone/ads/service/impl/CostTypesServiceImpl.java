@@ -36,12 +36,17 @@ public class CostTypesServiceImpl implements CostTypesService {
     @Override
     @Transactional
     public CostTypeDTO createCostTypeByProductType(String productTypeId, CostTypeCreateRequest request) {
+        if (request.getIsCore()) {
+            getCoreCostTypeExitedInProductType(productTypeId);
+        }
         ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
 
+        request.setName(request.getName().toUpperCase());
         CostTypes costTypes = costTypeMapper.mapCreateRequestToEntity(request);
         costTypes.setProductTypes(productTypes);
         costTypesRepository.save(costTypes);
 
+        productTypesService.addCostTypeToCalculateFormula(productTypeId, request.getName());
         return costTypeMapper.toDTO(costTypes);
     }
 
@@ -49,10 +54,20 @@ public class CostTypesServiceImpl implements CostTypesService {
     @Transactional
     public CostTypeDTO updateCostTypeInformation(String costTypeId, CostTypeUpdateRequest request) {
         CostTypes costTypes = getCostTypeByIdAndIsAvailable(costTypeId);
+        CostTypes existedCoreCost = getCoreCostTypeExitedInProductType(costTypes.getProductTypes().getId());
+        if (request.getIsCore()) {
+            if (!costTypes.getId().equals(existedCoreCost.getId())) {
+                throw new AppException(ErrorCode.CORE_COST_TYPE_EXISTED);
+            }
+        }
+        String oldName = costTypes.getName();
 
+        request.setName(request.getName().toUpperCase());
         costTypeMapper.mapUpdateRequestToEntity(request, costTypes);
         costTypesRepository.save(costTypes);
 
+        productTypesService.updateNewValueNameCalculateFormula(costTypes.getProductTypes().getId(), oldName, request.getName());
+        productTypesService.updateAllFormulaCostTypeValues(costTypes.getProductTypes().getId(), oldName, request.getName());
         return costTypeMapper.toDTO(costTypes);
     }
 
@@ -86,14 +101,14 @@ public class CostTypesServiceImpl implements CostTypesService {
                 .orElseThrow(() -> new AppException(ErrorCode.COST_TYPE_NOT_FOUND));
     }
 
-    @Override
-    public CostTypes getCoreCostTypeByProductType(String productTypeId) {
-        return costTypesRepository.findByProductTypes_IdAndIsCore(productTypeId, true)
-                .orElseThrow(() -> new AppException(ErrorCode.COST_TYPE_NOT_FOUND));
-    }
-
+    //INTERNAL FUNCTION
     @Override
     public List<CostTypes> getCostTypesByProductTypeSortedByPriority(String productTypeId) {
         return costTypesRepository.findByProductTypes_IdOrderByPriorityAsc(productTypeId);
+    }
+
+    public CostTypes getCoreCostTypeExitedInProductType(String productTypeId) {
+        return costTypesRepository.findByProductTypes_IdAndIsCore(productTypeId, true)
+                .orElseThrow(() -> new AppException(ErrorCode.CORE_COST_TYPE_EXISTED));
     }
 }

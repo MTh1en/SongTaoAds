@@ -142,7 +142,8 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     @Override
     public Page<CustomDesignRequestDTO> findCustomDesignRequestByCustomerDetailId(String customerDetailId, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         return customDesignRequestsRepository.findByCustomerDetail_Id(customerDetailId, pageable)
                 .map(customDesignRequestsMapper::toDTO);
     }
