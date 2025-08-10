@@ -44,7 +44,6 @@ public class AuthServiceImpl implements AuthService {
     RolesRepository rolesRepository;
     OutboundIdentityClient outboundIdentityClient;
     OutboundUserClient outboundUserClient;
-    NotificationService notificationService;
 
     @NonFinal
     @Value("${app.jwt.refresh-token-ttl}")
@@ -115,6 +114,7 @@ public class AuthServiceImpl implements AuthService {
         if (user.getIsBanned()){
             throw new AppException(ErrorCode.ACCOUNT_BANNED);
         }
+
         String accessToken = accessTokenService.generateAccessToken(user);
         String refreshToken = refreshTokenService.generateRefreshToken();
         refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);

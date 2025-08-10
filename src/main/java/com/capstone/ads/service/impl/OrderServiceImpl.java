@@ -174,7 +174,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderDTO> findOrderByStatus(OrderStatus status, int page, int size) {
-        Sort sort = Sort.by("createdAt").descending();
+        Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return orderRepository.findByStatus(status, pageable)
                 .map(orderMapper::toDTO);
@@ -182,7 +182,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderDTO> findOrderByType(OrderType orderType, int page, int size) {
-        Sort sort = Sort.by("createdAt").descending();
+        Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return orderRepository.findByOrderType(orderType, pageable)
                 .map(orderMapper::toDTO);
@@ -190,7 +190,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderDTO> findOrderByStatusAndType(OrderStatus status, OrderType orderType, int page, int size) {
-        Sort sort = Sort.by("createdAt").descending();
+        Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return orderRepository.findByStatusAndOrderType(status, orderType, pageable)
                 .map(orderMapper::toDTO);
@@ -198,7 +198,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderDTO> findAllOrders(int page, int size) {
-        Sort sort = Sort.by("createdAt").descending();
+        Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return orderRepository.findAll(pageable)
                 .map(orderMapper::toDTO);
@@ -233,7 +233,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderDTO> findOrderByUserId(String userId, int page, int size) {
-        Sort sort = Sort.by("createdAt").descending();
+        Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return orderRepository.findByUsers_Id(userId, pageable).map(orderMapper::toDTO);
     }

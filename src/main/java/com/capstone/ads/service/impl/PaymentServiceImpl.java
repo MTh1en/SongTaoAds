@@ -129,7 +129,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Page<PaymentDTO> findPaymentByOrderId(String orderId, int page, int size) {
-        Sort sort = Sort.by("createdAt").descending();
+        Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return paymentRepository.findByOrders_Id(orderId, pageable)
                 .map(paymentMapper::toDTO);
@@ -137,7 +137,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Page<PaymentDTO> findPaymentByUserId(String userId, int page, int size) {
-        Sort sort = Sort.by("createdAt").descending();
+        Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return paymentRepository.findByOrders_Users_Id(userId, pageable)
                 .map(paymentMapper::toDTO);
