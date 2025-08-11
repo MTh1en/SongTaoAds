@@ -5,8 +5,10 @@ import com.capstone.ads.event.ChatBotLogEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.model.ModelChatBot;
+import com.capstone.ads.model.Orders;
 import com.capstone.ads.repository.external.ChatBotClient;
 import com.capstone.ads.repository.internal.ModelChatBotRepository;
+import com.capstone.ads.repository.internal.OrdersRepository;
 import com.capstone.ads.service.ChatBotService;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.AccessLevel;
@@ -24,11 +26,13 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -52,14 +56,16 @@ public class ChatBotServiceImpl implements ChatBotService {
     ModelChatBotRepository modelChatBotRepository;
     ApplicationEventPublisher eventPublisher;
     ChatClient chatClient;
+    OrdersRepository ordersRepository;
     JdbcChatMemoryRepository jdbcChatMemoryRepository;
 
 
     public ChatBotServiceImpl(ChatBotClient chatBotClient, SecurityContextUtils securityContextUtils, ModelChatBotRepository modelChatBotRepository, ApplicationEventPublisher eventPublisher,
-                              ChatClient.Builder chatClientBuilder, JdbcChatMemoryRepository jdbcChatMemoryRepository) {
+                              ChatClient.Builder chatClientBuilder, JdbcChatMemoryRepository jdbcChatMemoryRepository, OrdersRepository ordersRepository) {
         this.chatBotClient = chatBotClient;
         this.securityContextUtils = securityContextUtils;
         this.modelChatBotRepository = modelChatBotRepository;
+        this.ordersRepository= ordersRepository;
         this.eventPublisher = eventPublisher;
         this.jdbcChatMemoryRepository = jdbcChatMemoryRepository;
 
@@ -69,6 +75,7 @@ public class ChatBotServiceImpl implements ChatBotService {
                 .build();
 
         chatClient = chatClientBuilder
+                .defaultTools(this)
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
     }
@@ -250,4 +257,17 @@ public class ChatBotServiceImpl implements ChatBotService {
                 .call()
                 .entity(TraditionalBillboardResponse.class);
     }
+
+    @Tool(name = "trackOrder", description = "Tra cứu trạng thái đơn hàng bằng mã đơn.")
+    public String trackOrder(String orderCode) {
+        Orders order = ordersRepository.findByOrderCode(orderCode);
+        if (order != null) {
+            String formattedDate = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                    .format(order.getEstimatedDeliveryDate());
+            return String.format("Đơn hàng #%s. Trạng thái: %s. Ngày giao dự kiến: %s.",
+                    order.getOrderCode(), order.getStatus(), formattedDate);
+        }
+        return "Không thể tìm thấy đơn hàng.";
+    }
+
 }

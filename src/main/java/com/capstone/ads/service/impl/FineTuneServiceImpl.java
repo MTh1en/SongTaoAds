@@ -1,10 +1,8 @@
 package com.capstone.ads.service.impl;
 
 import com.capstone.ads.constaint.S3ImageKeyFormat;
-import com.capstone.ads.dto.fine_tune.FileDeletionResponse;
-import com.capstone.ads.dto.fine_tune.FileUploadResponse;
-import com.capstone.ads.dto.fine_tune.FineTuningJobRequest;
-import com.capstone.ads.dto.fine_tune.FineTuningJobResponse;
+import com.capstone.ads.dto.ApiPagingResponse;
+import com.capstone.ads.dto.fine_tune.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.repository.external.ChatBotClient;
@@ -13,11 +11,16 @@ import com.capstone.ads.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,10 +58,27 @@ public class FineTuneServiceImpl implements FineTuneService {
     }
 
     @Override
-    public FineTuningJobResponse fineTuningJob(FineTuningJobRequest request) {
+    public FineTuningJobResponse fineTuningJob(CreateFineTuneJobRequest request) {
+        FineTuningJobRequest jobRequest = FineTuningJobRequest.builder()
+                .trainingFile(request.getTrainingFile())
+                .model(request.getModel())
+                .method(FineTuningJobRequest.Method.builder()
+                        .type("supervised")
+                        .supervised(FineTuningJobRequest.Method.Supervised.builder()
+                                .hyperparameters(FineTuningJobRequest.Method.Supervised.Hyperparameters.builder()
+                                        .nEpochs(4)
+                                        .batchSize(1)
+                                        .learningRateMultiplier(3.0)
+                                        .build()
+                                )
+                                .build()
+                        )
+                        .build()
+                )
+                .build();
         return chatBotClient.createFineTuningJob(
                 "Bearer " + openaiApiKey,
-                request);
+                jobRequest);
     }
 
     @Override
@@ -76,10 +96,43 @@ public class FineTuneServiceImpl implements FineTuneService {
     }
 
     @Override
-    public List<FileUploadResponse> getAllUploadedFiles() {
-        return chatBotClient.getFiles(
-                "Bearer " + openaiApiKey).getData();
+    public Page<FileUploadResponse> getFilesPage(int page, int size) {
+        List<FileUploadResponse> allFiles = new ArrayList<>();
+        String after = null;
+
+        while (true) {
+            FileUploadedListResponse response = chatBotClient.getFiles(
+                    "Bearer " + openaiApiKey,
+                    after,
+                    100,
+                    "desc"
+            );
+
+            List<FileUploadResponse> data = response.getData();
+            if (data == null || data.isEmpty()) break;
+
+            allFiles.addAll(data);
+
+            if (data.size() < 100) break;
+
+            after = data.getLast().getId();
+        }
+
+        int fromIndex = (page - 1) * size;
+        int toIndex = Math.min(fromIndex + size, allFiles.size());
+        List<FileUploadResponse> pagedFiles = Collections.emptyList();
+
+        if (fromIndex < allFiles.size()) {
+            pagedFiles = allFiles.subList(fromIndex, toIndex);
+        }
+
+        return new PageImpl<>(
+                pagedFiles,
+                PageRequest.of(page - 1, size),
+                allFiles.size()
+        );
     }
+
 
     @Override
     public FileDeletionResponse deleteUploadedFile(String fileId) {
