@@ -87,25 +87,32 @@ public enum ErrorCode {
     FEEDBACK_NOT_FOUND("Không tìm thấy phản hồi", HttpStatus.NOT_FOUND),
     COST_TYPE_NOT_FOUND("Không tìm thấy loại chi phí", HttpStatus.NOT_FOUND),
     CONTRACTOR_NOT_FOUND("Không tìm thấy nhà thầu", HttpStatus.NOT_FOUND),
-    CORE_COST_TYPE_EXISTED("Đã tồn tại giá trị core trong loại biển hiệu", HttpStatus.BAD_REQUEST),
+    CORE_COST_TYPE_EXISTED("Đã tồn tại chi phí core trong loại biển hiệu", HttpStatus.BAD_REQUEST),
 
     // ============ EXTERNAL SERVICES ============
-    EXTERNAL_SERVICE_ERROR("Lỗi dịch vụ bên ngoài", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_INPUT("Đầu vào không hợp lệ", HttpStatus.BAD_REQUEST),
-    EXTERNAL_SERVICE_BAD_REQUEST("Yêu cầu dịch vụ bên ngoài không hợp lệ", HttpStatus.BAD_REQUEST),
-    EXTERNAL_SERVICE_UNAVAILABLE("Dịch vụ bên ngoài không khả dụng", HttpStatus.SERVICE_UNAVAILABLE),
-    STABLE_DIFFUSION_SERVER_NOT_AVAILABLE("Máy chủ Stable Diffusion không khả dụng", HttpStatus.SERVICE_UNAVAILABLE),
+    EXTERNAL_SERVICE_ERROR("Lỗi dịch vụ bên ngoài",HttpStatus.INTERNAL_SERVER_ERROR),
+
+    INVALID_INPUT("Đầu vào không hợp lệ",HttpStatus.BAD_REQUEST),
+
+    EXTERNAL_SERVICE_BAD_REQUEST("Yêu cầu dịch vụ bên ngoài không hợp lệ",HttpStatus.BAD_REQUEST),
+
+    EXTERNAL_SERVICE_UNAVAILABLE("Dịch vụ bên ngoài không khả dụng",HttpStatus.SERVICE_UNAVAILABLE),
+
+    STABLE_DIFFUSION_SERVER_NOT_AVAILABLE("Máy chủ Stable Diffusion không khả dụng",HttpStatus.SERVICE_UNAVAILABLE),
 
     // ============ AI ============
-    MODEL_CHAT_NOT_FOUND("Không tìm thấy mô hình chat", HttpStatus.NOT_FOUND),
-    TOPIC_NOT_FOUND("Không tìm thấy chủ đề", HttpStatus.NOT_FOUND),
-    QUESTION_NOT_FOUND("Không tìm thấy câu hỏi", HttpStatus.NOT_FOUND),
-    CHAT_BOT_TOPIC_NOT_FOUND("Không tìm thấy chủ đề của model chat bot", HttpStatus.NOT_FOUND),
+    MODEL_CHAT_NOT_FOUND("Không tìm thấy mô hình chat",HttpStatus.NOT_FOUND),
+
+    TOPIC_NOT_FOUND("Không tìm thấy chủ đề",HttpStatus.NOT_FOUND),
+
+    QUESTION_NOT_FOUND("Không tìm thấy câu hỏi",HttpStatus.NOT_FOUND),
+
+    CHAT_BOT_TOPIC_NOT_FOUND("Không tìm thấy chủ đề của model chat bot",HttpStatus.NOT_FOUND),
 
     // ============  NOTIFICATION ============
-    NOTIFICATION_NOT_FOUND("Không tìm thấy thông báo", HttpStatus.NOT_FOUND),
+    NOTIFICATION_NOT_FOUND("Không tìm thấy thông báo",HttpStatus.NOT_FOUND),
 
-   ;
+    ;
 
     ErrorCode(String message, HttpStatusCode statusCode) {
         this.message = message;
@@ -114,4 +121,4 @@ public enum ErrorCode {
 
     private final String message;
     private final HttpStatusCode statusCode;
-}
+    }

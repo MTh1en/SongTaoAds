@@ -10,6 +10,7 @@ import com.capstone.ads.model.Attributes;
 import com.capstone.ads.model.ProductTypes;
 import com.capstone.ads.repository.internal.AttributesRepository;
 import com.capstone.ads.service.AttributesService;
+import com.capstone.ads.service.CostTypesService;
 import com.capstone.ads.service.ProductTypesService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AttributesServiceImpl implements AttributesService {
     ProductTypesService productTypesService;
+    CostTypesService costTypesService;
     AttributesMapper attributesMapper;
     AttributesRepository attributesRepository;
 
@@ -46,8 +48,11 @@ public class AttributesServiceImpl implements AttributesService {
         Attributes attributes = attributesRepository.findById(attributeId)
                 .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
 
+        String oldName = attributes.getName();
         attributesMapper.updateEntityFromRequest(request, attributes);
         attributes = attributesRepository.save(attributes);
+
+        costTypesService.updateNewAttributeValueForCoreCostType(attributes.getProductTypes().getId(), oldName, request.getName());
         return attributesMapper.toDTO(attributes);
     }
 

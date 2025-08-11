@@ -11,6 +11,7 @@ import com.capstone.ads.model.ProductTypes;
 import com.capstone.ads.repository.internal.CostTypesRepository;
 import com.capstone.ads.service.CostTypesService;
 import com.capstone.ads.service.ProductTypesService;
+import com.capstone.ads.utils.DataConverter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +43,6 @@ public class CostTypesServiceImpl implements CostTypesService {
         }
         ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
 
-        request.setName(request.getName().toUpperCase());
         CostTypes costTypes = costTypeMapper.mapCreateRequestToEntity(request);
         costTypes.setProductTypes(productTypes);
         costTypesRepository.save(costTypes);
@@ -62,7 +63,6 @@ public class CostTypesServiceImpl implements CostTypesService {
         }
         String oldName = costTypes.getName();
 
-        request.setName(request.getName().toUpperCase());
         costTypeMapper.mapUpdateRequestToEntity(request, costTypes);
         costTypesRepository.save(costTypes);
 
@@ -100,6 +100,22 @@ public class CostTypesServiceImpl implements CostTypesService {
         return costTypesRepository.findByIdAndIsAvailable(costTypeId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.COST_TYPE_NOT_FOUND));
     }
+
+    @Async
+    @Override
+    @Transactional
+    public void updateNewAttributeValueForCoreCostType(String productTypeId, String oldName, String newName) {
+        ProductTypes productTypes = productTypesService.getProductTypeById(productTypeId);
+        productTypes.getCostTypes().stream()
+                .filter(CostTypes::getIsCore)
+                .findFirst()
+                .ifPresent(costType -> {
+                    String newFormula = DataConverter.replaceFormulaValue(costType.getFormula(), oldName, newName);
+                    costType.setFormula(newFormula);
+                    costTypesRepository.save(costType);
+                });
+    }
+
 
     //INTERNAL FUNCTION
     @Override
