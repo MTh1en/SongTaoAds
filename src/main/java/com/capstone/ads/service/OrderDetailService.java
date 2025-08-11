@@ -11,7 +11,7 @@ public interface OrderDetailService {
 
     List<OrderDetailDTO> getOrderDetailsByOrderId(String orderId);
 
-    void hardDeleteOrderDetail(String orderId);
+    void hardDeleteOrderDetail(String orderDetailId);
 
     // INTERNAL FUNCTION //
 

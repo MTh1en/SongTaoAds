@@ -34,9 +34,9 @@ public class OrderDetailController {
         return ApiResponseBuilder.buildSuccessResponse("Xem chi tiết đơn hàng thành công", response);
     }
 
-    @DeleteMapping("/orders/{orderId}/details")
-    public ApiResponse<Void> deleteOrderDetail(@PathVariable("orderId") String orderId) {
-        orderDetailService.hardDeleteOrderDetail(orderId);
+    @DeleteMapping("/order-details/{orderDetailId}")
+    public ApiResponse<Void> deleteOrderDetail(@PathVariable("orderDetailId") String orderDetailId) {
+        orderDetailService.hardDeleteOrderDetail(orderDetailId);
         return ApiResponseBuilder.buildSuccessResponse("Xóa chi tiết đơn hàng", null);
     }
 }
