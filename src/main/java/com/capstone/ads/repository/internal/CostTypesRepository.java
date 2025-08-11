@@ -14,4 +14,6 @@ public interface CostTypesRepository extends JpaRepository<CostTypes, String> {
     List<CostTypes> findByProductTypes_IdOrderByPriorityAsc(String id);
 
     Optional<CostTypes> findByProductTypes_IdAndIsCore(String id, Boolean isCore);
+
+    boolean existsByProductTypes_IdAndIsCore(String id, Boolean isCore);
 }

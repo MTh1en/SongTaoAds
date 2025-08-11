@@ -1,6 +1,8 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.dto.product_type_size.ProductTypeSizeCreateRequest;
 import com.capstone.ads.dto.product_type_size.ProductTypeSizeDTO;
+import com.capstone.ads.dto.product_type_size.ProductTypeSizeUpdateRequest;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ProductTypeSizesMapper;
@@ -33,16 +35,27 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
 
     @Override
     @Transactional
-    public ProductTypeSizeDTO createProductTypeSize(String productTypeId, String sizeId) {
+    public ProductTypeSizeDTO createProductTypeSize(String productTypeId, String sizeId, ProductTypeSizeCreateRequest request) {
         ProductTypes productTypes = productTypesService.getProductTypeById(productTypeId);
         Sizes sizes = sizeService.getSizeByIdAndIsAvailable(sizeId);
 
-        ProductTypeSizes productTypeSizes = ProductTypeSizes.builder()
-                .productTypes(productTypes)
-                .sizes(sizes)
-                .build();
-        productTypeSizes = productTypeSizesRepository.save(productTypeSizes);
+        ProductTypeSizes productTypeSizes = productTypeSizesMapper.mapCreateRequestToEntity(request);
+        productTypeSizes.setProductTypes(productTypes);
+        productTypeSizes.setSizes(sizes);
 
+        productTypeSizes = productTypeSizesRepository.save(productTypeSizes);
+        return productTypeSizesMapper.toDTO(productTypeSizes);
+    }
+
+    @Override
+    @Transactional
+    public ProductTypeSizeDTO updateProductTypeSize(String productTypeSizeId, ProductTypeSizeUpdateRequest request) {
+        ProductTypeSizes productTypeSizes = productTypeSizesRepository.findById(productTypeSizeId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_TYPE_SIZE_NOT_FOUND));
+
+        productTypeSizesMapper.mapUpdateRequestToEntity(request, productTypeSizes);
+
+        productTypeSizes = productTypeSizesRepository.save(productTypeSizes);
         return productTypeSizesMapper.toDTO(productTypeSizes);
     }
 

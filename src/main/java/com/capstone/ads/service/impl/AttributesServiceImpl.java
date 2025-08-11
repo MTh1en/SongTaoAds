@@ -15,11 +15,11 @@ import com.capstone.ads.service.ProductTypesService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +33,7 @@ public class AttributesServiceImpl implements AttributesService {
     @Override
     @Transactional
     public AttributesDTO createAttribute(String productTypeId, AttributesCreateRequest request) {
-        ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
+        ProductTypes productTypes = productTypesService.getProductTypeById(productTypeId);
 
         Attributes attributes = attributesMapper.mapCreateRequestToEntity(productTypeId, request);
         attributes.setProductTypes(productTypes);
@@ -57,17 +57,23 @@ public class AttributesServiceImpl implements AttributesService {
     }
 
     @Override
-    public AttributesDTO findAttributeById(String productTypeId) {
-        Attributes attributes = attributesRepository.findById(productTypeId)
-                .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
+    public AttributesDTO findAttributeById(String attributeId) {
+        Attributes attributes = getAttributeById(attributeId);
         return attributesMapper.toDTO(attributes);
     }
 
     @Override
-    public Page<AttributesDTO> findAllAttributeByProductTypeId(String productTypeId, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        return attributesRepository.findByProductTypes_Id(productTypeId, pageable)
-                .map(attributesMapper::toDTO);
+    public List<AttributesDTO> findAllAttributeByProductTypeId(String productTypeId) {
+        return attributesRepository.findByProductTypes_Id(productTypeId).stream()
+                .map(attributesMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AttributesDTO> findAllAttributeByProductTypeIdAndIsAvailable(String productTypeId, boolean isAvailable) {
+        return attributesRepository.findByProductTypes_IdAndIsAvailable(productTypeId, isAvailable).stream()
+                .map(attributesMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -84,4 +90,12 @@ public class AttributesServiceImpl implements AttributesService {
         return attributesRepository.findByIdAndIsAvailable(attributeId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
     }
+
+    @Override
+    public Attributes getAttributeById(String attributeId) {
+        return attributesRepository.findById(attributeId)
+                .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
+    }
+
+
 }

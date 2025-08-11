@@ -15,10 +15,14 @@ public interface AttributesService {
 
     AttributesDTO findAttributeById(String id);
 
-    Page<AttributesDTO> findAllAttributeByProductTypeId(String productTypeId, int page, int size);
+    List<AttributesDTO> findAllAttributeByProductTypeId(String productTypeId);
+
+    List<AttributesDTO> findAllAttributeByProductTypeIdAndIsAvailable(String productTypeId, boolean isAvailable);
 
     void hardDeleteAttribute(String attributeId);
 
     //INTERNAL FUNCTION
     Attributes getAttributeByIdAndIsAvailable(String attributeId);
+
+    Attributes getAttributeById(String attributeId);
 }

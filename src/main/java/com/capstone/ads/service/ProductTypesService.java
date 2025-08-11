@@ -16,6 +16,8 @@ public interface ProductTypesService {
 
     Page<ProductTypeDTO> findAllProductType(int page, int size);
 
+    Page<ProductTypeDTO> findProductTypeByIsAvailable(boolean isAvailable, int page, int size);
+
     void hardDeleteProductType(String productTypeId);
 
     ProductTypeDTO uploadProductTypeImage(String productTypeId, MultipartFile file);

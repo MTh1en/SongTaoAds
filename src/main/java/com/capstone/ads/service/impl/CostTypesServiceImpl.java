@@ -39,9 +39,9 @@ public class CostTypesServiceImpl implements CostTypesService {
     @Transactional
     public CostTypeDTO createCostTypeByProductType(String productTypeId, CostTypeCreateRequest request) {
         if (request.getIsCore()) {
-            getCoreCostTypeExitedInProductType(productTypeId);
+            checkExitedCoreCostType(productTypeId);
         }
-        ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
+        ProductTypes productTypes = productTypesService.getProductTypeById(productTypeId);
 
         CostTypes costTypes = costTypeMapper.mapCreateRequestToEntity(request);
         costTypes.setProductTypes(productTypes);
@@ -126,5 +126,11 @@ public class CostTypesServiceImpl implements CostTypesService {
     public CostTypes getCoreCostTypeExitedInProductType(String productTypeId) {
         return costTypesRepository.findByProductTypes_IdAndIsCore(productTypeId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.CORE_COST_TYPE_EXISTED));
+    }
+
+    public void checkExitedCoreCostType(String productTypeId) {
+        if (costTypesRepository.existsByProductTypes_IdAndIsCore(productTypeId, true)) {
+            throw new AppException(ErrorCode.CORE_COST_TYPE_EXISTED);
+        }
     }
 }

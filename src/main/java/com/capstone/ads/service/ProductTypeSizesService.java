@@ -1,12 +1,16 @@
 package com.capstone.ads.service;
 
+import com.capstone.ads.dto.product_type_size.ProductTypeSizeCreateRequest;
 import com.capstone.ads.dto.product_type_size.ProductTypeSizeDTO;
+import com.capstone.ads.dto.product_type_size.ProductTypeSizeUpdateRequest;
 import com.capstone.ads.model.ProductTypeSizes;
 
 import java.util.List;
 
 public interface ProductTypeSizesService {
-    ProductTypeSizeDTO createProductTypeSize(String productTypeId, String sizeId);
+    ProductTypeSizeDTO createProductTypeSize(String productTypeId, String sizeId, ProductTypeSizeCreateRequest request);
+
+    ProductTypeSizeDTO updateProductTypeSize(String productTypeSizeId, ProductTypeSizeUpdateRequest request);
 
     List<ProductTypeSizeDTO> findAllProductTypeSizeByProductTypeId(String productTypeId);
 

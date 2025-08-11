@@ -1,25 +1,25 @@
 package com.capstone.ads.dto.product_type_size;
 
-import com.capstone.ads.dto.CoreDTO;
-import com.capstone.ads.dto.size.SizeDTO;
 import com.capstone.ads.model.enums.DimensionType;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductTypeSizeDTO {
-    String id;
+public class ProductTypeSizeUpdateRequest {
+    @NotNull
+    @Positive
     Float maxValue;
+
+    @NotNull
+    @Positive
     Float minValue;
+
+    @NotNull
     DimensionType dimensionType;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
-    CoreDTO productTypes;
-    CoreDTO sizes;
 }
