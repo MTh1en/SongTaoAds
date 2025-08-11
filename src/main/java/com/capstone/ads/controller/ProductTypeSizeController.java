@@ -1,11 +1,14 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
+import com.capstone.ads.dto.product_type_size.ProductTypeSizeCreateRequest;
 import com.capstone.ads.dto.product_type_size.ProductTypeSizeDTO;
+import com.capstone.ads.dto.product_type_size.ProductTypeSizeUpdateRequest;
 import com.capstone.ads.service.ProductTypeSizesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,8 +27,17 @@ public class ProductTypeSizeController {
     @PostMapping("/product-types/{productTypeId}/sizes/{sizeId}")
     @Operation(summary = "Tạo kích thước sử dụng trong loại biển")
     public ApiResponse<ProductTypeSizeDTO> createProductTypeSize(@PathVariable String productTypeId,
-                                                                 @PathVariable String sizeId) {
-        var response = service.createProductTypeSize(productTypeId, sizeId);
+                                                                 @PathVariable String sizeId,
+                                                                 @Valid @RequestBody ProductTypeSizeCreateRequest request) {
+        var response = service.createProductTypeSize(productTypeId, sizeId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo kích thước sử dụng trong loại biển thành công", response);
+    }
+
+    @PatchMapping("/product-type-sizes/{productTypeSizeId}")
+    @Operation(summary = "Tạo kích thước sử dụng trong loại biển")
+    public ApiResponse<ProductTypeSizeDTO> createProductTypeSize(@PathVariable String productTypeSizeId,
+                                                                 @Valid @RequestBody ProductTypeSizeUpdateRequest request) {
+        var response = service.updateProductTypeSize(productTypeSizeId, request);
         return ApiResponseBuilder.buildSuccessResponse("Tạo kích thước sử dụng trong loại biển thành công", response);
     }
 

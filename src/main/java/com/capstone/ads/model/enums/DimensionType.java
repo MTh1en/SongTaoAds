@@ -6,5 +6,5 @@ public enum DimensionType {
     LENGTH, // Chiều dài
     DEPTH,  // Chiều sâu / Độ dày
     DIAMETER, // Đường kính
-    FONT_SIZE,
+    FONT_SIZE, //Kích thước chữ
 }
