@@ -29,5 +29,5 @@ public interface ProductTypesService {
 
     void updateNewValueNameCalculateFormula(String productTypeId, String oldName, String newName);
 
-    void updateAllFormulaCostTypeValues(String productTypeId, String oldValue, String newValue);
+    void updateAllFormulaCostTypeValues(String productTypeId, String oldName, String newName);
 }

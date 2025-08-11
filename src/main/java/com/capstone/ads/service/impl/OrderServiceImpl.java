@@ -384,15 +384,16 @@ public class OrderServiceImpl implements OrderService {
         long depositConstructionAmount = 0L;
         long totalDesignAmount = 0L;
         long depositDesignAmount = 0L;
+        long remainingDesignAmount = 0L;
 
         List<OrderDetails> orderDetails = Optional.ofNullable(orders.getOrderDetails()).orElse(Collections.emptyList());
         totalConstructionAmount += orderDetails.stream()
                 .filter(detail -> detail.getDetailConstructionAmount() != null)
-                .mapToLong(detail -> detail.getDetailConstructionAmount() * detail.getQuantity())
+                .mapToLong(OrderDetails::getTotalDetailConstructionAmount)
                 .sum();
         depositConstructionAmount += orderDetails.stream()
                 .filter(detail -> detail.getDetailConstructionAmount() != null)
-                .mapToLong(detail -> detail.getDetailConstructionAmount() * detail.getQuantity() * PaymentPolicy.DEPOSIT_PERCENT / 100)
+                .mapToLong(detail -> detail.getTotalDetailConstructionAmount() * PaymentPolicy.DEPOSIT_PERCENT / 100)
                 .sum();
         totalDesignAmount += orderDetails.stream()
                 .filter(detail -> detail.getDetailDesignAmount() != null)
@@ -402,6 +403,10 @@ public class OrderServiceImpl implements OrderService {
                 .filter(detail -> detail.getDetailDepositDesignAmount() != null)
                 .mapToLong(OrderDetails::getDetailDepositDesignAmount)
                 .sum();
+        remainingDesignAmount += orderDetails.stream()
+                .filter(detail -> detail.getDetailDepositDesignAmount() != null)
+                .mapToLong(OrderDetails::getDetailRemainingDesignAmount)
+                .sum();
 
         orders.setTotalConstructionAmount(totalConstructionAmount);
         orders.setDepositConstructionAmount(depositConstructionAmount);
@@ -409,12 +414,12 @@ public class OrderServiceImpl implements OrderService {
 
         orders.setTotalDesignAmount(totalDesignAmount);
         orders.setDepositDesignAmount(depositDesignAmount);
-        orders.setRemainingDesignAmount(totalDesignAmount - depositDesignAmount);
+        orders.setRemainingDesignAmount(remainingDesignAmount);
 
         orders.setTotalOrderAmount(totalConstructionAmount + totalDesignAmount);
         orders.setTotalOrderDepositAmount(depositConstructionAmount + depositDesignAmount);
         orders.setTotalOrderRemainingAmount(
-                (totalConstructionAmount - depositConstructionAmount) + (totalDesignAmount - depositDesignAmount)
+                (totalConstructionAmount - depositConstructionAmount) + remainingDesignAmount
         );
 
         orderRepository.save(orders);

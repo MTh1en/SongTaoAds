@@ -22,6 +22,7 @@ public class OrderDetailDTO {
     Long detailDesignAmount;
     Long detailDepositDesignAmount;
     Long detailRemainingDesignAmount;
+    Long totalDetailConstructionAmount;
     CustomerChoiceHistories customerChoiceHistories;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
