@@ -14,11 +14,11 @@ import com.capstone.ads.service.AttributesService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,11 +59,17 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
     }
 
     @Override
-    public Page<AttributeValuesDTO> findAllAttributeValueByAttributesId(String attributesId, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+    public List<AttributeValuesDTO> findAllAttributeValueByAttributesId(String attributesId) {
+        return attributeValuesRepository.findByAttributes_Id(attributesId).stream()
+                .map(attributeValuesMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 
-        return attributeValuesRepository.findByAttributes_Id(attributesId, pageable)
-                .map(attributeValuesMapper::toDTO);
+    @Override
+    public List<AttributeValuesDTO> findAllAttributeValueByAttributeIdAndIsAvailable(String attributesId, boolean isAvailable) {
+        return attributeValuesRepository.findByAttributes_IdAndIsAvailable(attributesId, isAvailable).stream()
+                .map(attributeValuesMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api")
@@ -47,14 +49,23 @@ public class AttributesController {
         return ApiResponseBuilder.buildSuccessResponse("Xem thuộc tính theo ID", response);
     }
 
-    @GetMapping("product-types/{productTypeId}/attributes")
+    @GetMapping(value = "product-types/{productTypeId}/attributes", params = "!isAvailable")
     @Operation(summary = "Xem thuộc tính theo loại biển hiệu")
-    public ApiPagingResponse<AttributesDTO> findAllAttributeByProductTypeId(
+    public ApiResponse<List<AttributesDTO>> findAllAttributeByProductTypeId(
+            @PathVariable String productTypeId) {
+        var response = service.findAllAttributeByProductTypeId(productTypeId);
+        return ApiResponseBuilder.buildSuccessResponse("Xem tất cả thuộc tính theo loại biển hiệu", response);
+    }
+
+    @GetMapping(value = "product-types/{productTypeId}/attributes", params = "isAvailable")
+    @Operation(summary = "Xem thuộc tính theo loại biển hiệu")
+    public ApiResponse<List<AttributesDTO>> findAllAttributeByProductTypeIdAndIsAvailable(
             @PathVariable String productTypeId,
-            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = service.findAllAttributeByProductTypeId(productTypeId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả thuộc tính theo loại biển hiệu", response, page);
+            @RequestParam(required = false) boolean isAvailable) {
+        var response = service.findAllAttributeByProductTypeIdAndIsAvailable(productTypeId, isAvailable);
+        return ApiResponseBuilder.buildSuccessResponse(
+                "Xem tất cả thuộc tính theo loại biển hiệu và có sẵn hay không",
+                response);
     }
 
     @DeleteMapping("/attributes/{attributeId}")

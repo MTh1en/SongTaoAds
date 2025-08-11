@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -46,14 +48,25 @@ public class AttributeValuesController {
         return ApiResponseBuilder.buildSuccessResponse("Xem giá trị thuộc tính theo ID", response);
     }
 
-    @GetMapping("/attributes/{attributeId}/attribute-values")
+    @GetMapping(value = "/attributes/{attributeId}/attribute-values", params = "!isAvailable")
     @Operation(summary = "Xem giá trị theo từng thuộc tính")
-    public ApiPagingResponse<AttributeValuesDTO> findAllAttributeValueByAttributesId(
+    public ApiResponse<List<AttributeValuesDTO>> findAllAttributeValueByAttributesId(
+            @PathVariable String attributeId) {
+        var response = service.findAllAttributeValueByAttributesId(attributeId);
+        return ApiResponseBuilder.buildSuccessResponse(
+                "Xem tất cả giá trị thuộc tính theo thuộc tính",
+                response);
+    }
+
+    @GetMapping(value = "/attributes/{attributeId}/attribute-values", params = "isAvailable")
+    @Operation(summary = "Xem giá trị theo từng thuộc tính và có sẵn hay không")
+    public ApiResponse<List<AttributeValuesDTO>> findAllAttributeValueByAttributesId(
             @PathVariable String attributeId,
-            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = service.findAllAttributeValueByAttributesId(attributeId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả giá trị thuộc tính theo thuộc tính", response, page);
+            @RequestParam(required = false) boolean isAvailable) {
+        var response = service.findAllAttributeValueByAttributeIdAndIsAvailable(attributeId, isAvailable);
+        return ApiResponseBuilder.buildSuccessResponse(
+                "Xem tất cả giá trị thuộc tính theo thuộc tính và có sẵn hay không",
+                response);
     }
 
     @DeleteMapping("/attribute-values/{attributeValueId}")

@@ -11,7 +11,9 @@ import java.util.Optional;
 
 @Repository
 public interface AttributesRepository extends JpaRepository<Attributes, String> {
-    Page<Attributes> findByProductTypes_Id(String id, Pageable pageable);
+    List<Attributes> findByProductTypes_Id(String id);
+
+    List<Attributes> findByProductTypes_IdAndIsAvailable(String id, Boolean isAvailable);
 
     Optional<Attributes> findByIdAndIsAvailable(String id, Boolean isAvailable);
 }

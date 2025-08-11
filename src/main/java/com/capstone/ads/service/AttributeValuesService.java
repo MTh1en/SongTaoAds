@@ -6,6 +6,8 @@ import com.capstone.ads.dto.attribute_value.AttributeValuesUpdateRequest;
 import com.capstone.ads.model.AttributeValues;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface AttributeValuesService {
     AttributeValuesDTO createAttributeValue(String attributesId, AttributeValuesCreateRequest request);
 
@@ -13,7 +15,9 @@ public interface AttributeValuesService {
 
     AttributeValuesDTO findAttributeValueById(String attributeValueId);
 
-    Page<AttributeValuesDTO> findAllAttributeValueByAttributesId(String attributesId, int page, int size);
+    List<AttributeValuesDTO> findAllAttributeValueByAttributesId(String attributesId);
+
+    List<AttributeValuesDTO> findAllAttributeValueByAttributeIdAndIsAvailable(String attributesId, boolean isAvailable);
 
     void hardDeleteAttributeValue(String attributeValueId);
 
