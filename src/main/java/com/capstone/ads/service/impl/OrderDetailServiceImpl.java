@@ -103,7 +103,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         orderDetailsRepository.deleteById(orderDetailId);
         orders.getOrderDetails().remove(orderDetails);
-        orderService.updateAllAmount(orderService.getOrderById(orderDetailId));
+        orderService.updateAllAmount(orders);
     }
 
     // INTERNAL FUNCTION //
