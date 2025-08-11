@@ -97,12 +97,13 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Override
     @Transactional
-    public void hardDeleteOrderDetail(String orderId) {
-        if (!orderDetailsRepository.existsById(orderId)) {
-            throw new AppException(ErrorCode.ORDER_DETAIL_NOT_FOUND);
-        }
-        orderService.updateAllAmount(orderService.getOrderById(orderId));
-        orderDetailsRepository.deleteById(orderId);
+    public void hardDeleteOrderDetail(String orderDetailId) {
+        OrderDetails orderDetails = getOrderDetailById(orderDetailId);
+        Orders orders = orderService.getOrderById(orderDetails.getOrders().getId());
+
+        orderDetailsRepository.deleteById(orderDetailId);
+        orders.getOrderDetails().remove(orderDetails);
+        orderService.updateAllAmount(orderService.getOrderById(orderDetailId));
     }
 
     // INTERNAL FUNCTION //
