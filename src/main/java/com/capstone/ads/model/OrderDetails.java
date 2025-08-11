@@ -28,6 +28,7 @@ public class OrderDetails {
     Long detailDepositDesignAmount;
     Long detailRemainingDesignAmount;
 
+    Long totalDetailConstructionAmount;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")

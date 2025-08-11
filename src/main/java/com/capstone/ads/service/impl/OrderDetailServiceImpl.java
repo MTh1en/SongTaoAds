@@ -59,6 +59,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         orderDetails.setOrders(orders);
         orderDetails.setCreatedAt(LocalDateTime.now());
         orderDetails.setDetailConstructionAmount(customerChoices.getTotalAmount());
+        orderDetails.setTotalDetailConstructionAmount(customerChoices.getTotalAmount() * request.getQuantity());
         orderDetails.setCustomerChoiceHistories(dataConverter.convertToHistory(customerChoices));
 
         if (StringUtils.isNotBlank(request.getCustomDesignRequestId())) {
