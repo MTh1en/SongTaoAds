@@ -31,7 +31,7 @@ public class AttributeValuesServiceImpl implements AttributeValuesService {
     @Override
     @Transactional
     public AttributeValuesDTO createAttributeValue(String attributesId, AttributeValuesCreateRequest request) {
-        Attributes attributes = attributesService.getAttributeByIdAndIsAvailable(attributesId);
+        Attributes attributes = attributesService.getAttributeById(attributesId);
 
         AttributeValues attributeValues = attributeValuesMapper.mapCreateRequestToEntity(request);
         attributeValues.setAttributes(attributes);

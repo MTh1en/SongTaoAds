@@ -55,7 +55,7 @@ public class ProductTypeController {
         return ApiResponseBuilder.buildSuccessResponse("Xem loại biển hiệu theo ID", response);
     }
 
-    @GetMapping
+    @GetMapping(params = "!isAvailable")
     @Operation(summary = "Xem tất cả các loại sản phẩm")
     public ApiPagingResponse<ProductTypeDTO> findAllProductType(
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
@@ -63,6 +63,17 @@ public class ProductTypeController {
         var response = service.findAllProductType(page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả loại biển hiệu", response, page);
     }
+
+    @GetMapping(params = "isAvailable")
+    @Operation(summary = "Xem tất cả các loại sản phẩm")
+    public ApiPagingResponse<ProductTypeDTO> findAllProductType(
+            @RequestParam(required = false) boolean isAvailable,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.findProductTypeByIsAvailable(isAvailable, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem biển hiệu theo isAvailable", response, page);
+    }
+
 
     @DeleteMapping("/{productTypeId}")
     @Operation(summary = "Xóa cứng loại sản phẩm (Không dùng)")

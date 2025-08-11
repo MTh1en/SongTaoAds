@@ -20,17 +20,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +57,7 @@ public class ProductTypesServiceImpl implements ProductTypesService {
     @Override
     @Transactional
     public ProductTypeDTO uploadProductTypeImage(String productTypeId, MultipartFile file) {
-        ProductTypes productTypes = getProductTypeByIdAndAvailable(productTypeId);
+        ProductTypes productTypes = getProductTypeById(productTypeId);
 
         String productTypeKey = generateProductTypeImageKey();
 
@@ -73,7 +71,7 @@ public class ProductTypesServiceImpl implements ProductTypesService {
     @Override
     @Transactional
     public ProductTypeDTO updateProductTypeInformation(String productTypeId, ProductTypeUpdateRequest request) {
-        ProductTypes productTypes = getProductTypeByIdAndAvailable(productTypeId);
+        ProductTypes productTypes = getProductTypeById(productTypeId);
         productTypesMapper.updateEntityFromRequest(request, productTypes);
         productTypes = productTypesRepository.save(productTypes);
         return productTypesMapper.toDTO(productTypes);
@@ -81,7 +79,7 @@ public class ProductTypesServiceImpl implements ProductTypesService {
 
     @Override
     public ProductTypeDTO findProductTypeByProductTypeId(String productTypeId) {
-        ProductTypes productTypes = getProductTypeByIdAndAvailable(productTypeId);
+        ProductTypes productTypes = getProductTypeById(productTypeId);
         return productTypesMapper.toDTO(productTypes);
     }
 
@@ -89,6 +87,14 @@ public class ProductTypesServiceImpl implements ProductTypesService {
     public Page<ProductTypeDTO> findAllProductType(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
         return productTypesRepository.findAll(pageable)
+                .map(productTypesMapper::toDTO);
+    }
+
+    @Override
+    public Page<ProductTypeDTO> findProductTypeByIsAvailable(boolean isAvailable, int page, int size) {
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return productTypesRepository.findByIsAvailable(isAvailable, pageable)
                 .map(productTypesMapper::toDTO);
     }
 

@@ -41,7 +41,7 @@ public class CostTypesServiceImpl implements CostTypesService {
         if (request.getIsCore()) {
             checkExitedCoreCostType(productTypeId);
         }
-        ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
+        ProductTypes productTypes = productTypesService.getProductTypeById(productTypeId);
 
         CostTypes costTypes = costTypeMapper.mapCreateRequestToEntity(request);
         costTypes.setProductTypes(productTypes);

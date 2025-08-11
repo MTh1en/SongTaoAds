@@ -45,7 +45,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     @Override
     @Transactional
     public DesignTemplateDTO createDesignTemplate(String productTypeId, DesignTemplateCreateRequest request) {
-        ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
+        ProductTypes productTypes = productTypesService.getProductTypeById(productTypeId);
         Users currentUser = securityContextUtils.getCurrentUser();
         String imageUrl = uploadDesignTemplateImageToS3(productTypeId, request.getDesignTemplateImage());
 

@@ -33,7 +33,7 @@ public class AttributesServiceImpl implements AttributesService {
     @Override
     @Transactional
     public AttributesDTO createAttribute(String productTypeId, AttributesCreateRequest request) {
-        ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
+        ProductTypes productTypes = productTypesService.getProductTypeById(productTypeId);
 
         Attributes attributes = attributesMapper.mapCreateRequestToEntity(productTypeId, request);
         attributes.setProductTypes(productTypes);
@@ -57,9 +57,8 @@ public class AttributesServiceImpl implements AttributesService {
     }
 
     @Override
-    public AttributesDTO findAttributeById(String productTypeId) {
-        Attributes attributes = attributesRepository.findById(productTypeId)
-                .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
+    public AttributesDTO findAttributeById(String attributeId) {
+        Attributes attributes = getAttributeById(attributeId);
         return attributesMapper.toDTO(attributes);
     }
 
@@ -84,4 +83,12 @@ public class AttributesServiceImpl implements AttributesService {
         return attributesRepository.findByIdAndIsAvailable(attributeId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
     }
+
+    @Override
+    public Attributes getAttributeById(String attributeId) {
+        return attributesRepository.findById(attributeId)
+                .orElseThrow(() -> new AppException(ErrorCode.ATTRIBUTE_NOT_FOUND));
+    }
+
+
 }

@@ -21,4 +21,6 @@ public interface AttributesService {
 
     //INTERNAL FUNCTION
     Attributes getAttributeByIdAndIsAvailable(String attributeId);
+
+    Attributes getAttributeById(String attributeId);
 }
