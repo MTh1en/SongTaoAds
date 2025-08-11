@@ -22,7 +22,10 @@ public interface ChatBotClient {
 
     @GetMapping("/files")
     FileUploadedListResponse getFiles(
-            @RequestHeader("Authorization") String authorization);
+            @RequestHeader("Authorization") String authorization,
+            @RequestParam(value = "after", required = false) String after,
+            @RequestParam(value = "limit", required = false) Integer limit,
+            @RequestParam(value = "order", required = false) String order);
 
     @GetMapping("/files/{fileId}")
     FileUploadResponse getFileById(

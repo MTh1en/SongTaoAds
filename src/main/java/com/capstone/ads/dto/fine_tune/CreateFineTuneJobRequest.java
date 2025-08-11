@@ -1,16 +1,18 @@
 package com.capstone.ads.dto.fine_tune;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FileUploadedListResponse {
-    String object;
-    List<FileUploadResponse> data;
-    String nextAfter;
+public class CreateFineTuneJobRequest {
+    @JsonProperty("training_file")
+    String trainingFile;
+
+    String model;
+
 }
