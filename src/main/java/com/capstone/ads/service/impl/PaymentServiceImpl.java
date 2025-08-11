@@ -1,7 +1,9 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.dto.payment.PaymentDTO;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
+import com.capstone.ads.mapper.PaymentMapper;
 import com.capstone.ads.model.Orders;
 import com.capstone.ads.model.Payments;
 import com.capstone.ads.model.enums.*;
@@ -14,6 +16,10 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.payos.PayOS;
@@ -45,6 +51,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     SecureRandom random = new SecureRandom();
     PaymentsRepository paymentRepository;
+    PaymentMapper paymentMapper;
     OrderService orderService;
 
     @Override
@@ -106,6 +113,12 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    public PaymentLinkData getPaymentLinkInformation(Long orderCode) throws Exception {
+        PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
+        return payOS.getPaymentLinkInformation(orderCode);
+    }
+
+    @Override
     @Transactional
     public void cancelPayment(Long paymentCode) {
         Payments payments = paymentRepository.findByCode(paymentCode)
@@ -114,6 +127,23 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payments);
     }
 
+    @Override
+    public Page<PaymentDTO> findPaymentByOrderId(String orderId, int page, int size) {
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return paymentRepository.findByOrders_Id(orderId, pageable)
+                .map(paymentMapper::toDTO);
+    }
+
+    @Override
+    public Page<PaymentDTO> findPaymentByUserId(String userId, int page, int size) {
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        return paymentRepository.findByOrders_Users_Id(userId, pageable)
+                .map(paymentMapper::toDTO);
+    }
+
+    //INTERNAL FUNCTION //
     private CheckoutResponseData createPaymentLinkForOrder(Orders order, boolean isDeposit) throws Exception {
         long paymentCode = generateOrderCode();
         Long amount;
@@ -186,7 +216,6 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
         return createPaymentLinkFromPayOS(amount.intValue(), paymentCode);
     }
-    // INTERNAL FUNCTION //
 
     private CheckoutResponseData createPaymentLinkFromPayOS(Integer amount, Long paymentCode) throws Exception {
         PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);

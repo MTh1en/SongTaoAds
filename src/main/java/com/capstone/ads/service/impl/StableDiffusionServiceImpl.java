@@ -64,7 +64,7 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
     @CircuitBreaker(name = "stableDiffusionApi", fallbackMethod = "generateImageFromDesignTemplateFallback")
     public FileInformation generateImageFromDesignTemplate(String designTemplateId, String prompt, Integer width, Integer height) {
         String bearerStableDiffusionToken = generateBearerStableDiffusionToken();
-        String userId = securityContextUtils.getCurrentUserId();
+        String userId = securityContextUtils.getCurrentUser().getId();
         // Xây dựng TextToImageRequest
         if (prompt != null && !prompt.isEmpty()) {
             prompt = chatBotService.translateToTextToImagePrompt(prompt);
@@ -119,7 +119,7 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
 
     @Override
     public ProgressResponse checkProgressByTaskId() {
-        String taskId = securityContextUtils.getCurrentUserId();
+        String taskId = securityContextUtils.getCurrentUser().getId();
         String bearerStableDiffusionToken = generateBearerStableDiffusionToken();
 
         ProgressRequest request = stableDiffusionMapper.mapProgressRequest(taskId);

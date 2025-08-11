@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.capstone</groupId>
     <artifactId>ads</artifactId>
-    <version>2.6.0</version>
+    <version>1.0.0</version>
     <name>ads</name>
     <description>Advertising Design and Management Printing Service System</description>
     <url/>
@@ -37,6 +37,10 @@
         <dotenv-java>3.2.0</dotenv-java>
         <aws.java.sdk.version>2.31.50</aws.java.sdk.version>
         <postgre-version>42.7.5</postgre-version>
+        <netty-socketio>2.0.13</netty-socketio>
+        <netty-common>4.1.120.Final</netty-common>
+        <payos-java>1.0.3</payos-java>
+        <poi-ooxml>5.4.0</poi-ooxml>
     </properties>
     <dependencies>
         <dependency>
@@ -114,7 +118,7 @@
         <dependency>
             <groupId>vn.payos</groupId>
             <artifactId>payos-java</artifactId>
-            <version>1.0.3</version>
+            <version>${payos-java}</version>
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -135,16 +139,21 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-common</artifactId>
-            <version>4.1.120.Final</version>
+            <version>${netty-common}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.4.0</version>
+            <version>${poi-ooxml}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.corundumstudio.socketio</groupId>
+            <artifactId>netty-socketio</artifactId>
+            <version>${netty-socketio}</version>
         </dependency>
     </dependencies>
     <dependencyManagement>

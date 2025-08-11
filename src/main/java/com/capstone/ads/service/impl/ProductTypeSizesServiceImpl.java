@@ -34,7 +34,7 @@ public class ProductTypeSizesServiceImpl implements ProductTypeSizesService {
     @Override
     @Transactional
     public ProductTypeSizeDTO createProductTypeSize(String productTypeId, String sizeId) {
-        ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
+        ProductTypes productTypes = productTypesService.getProductTypeById(productTypeId);
         Sizes sizes = sizeService.getSizeByIdAndIsAvailable(sizeId);
 
         ProductTypeSizes productTypeSizes = ProductTypeSizes.builder()

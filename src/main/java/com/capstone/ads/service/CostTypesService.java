@@ -22,8 +22,6 @@ public interface CostTypesService {
     //INTERNAL FUNCTION//
     CostTypes getCostTypeByIdAndIsAvailable(String costTypeId);
 
-    CostTypes getCoreCostTypeByProductType(String productTypeId);
-
     List<CostTypes> getCostTypesByProductTypeSortedByPriority(String productTypeId);
 
 }

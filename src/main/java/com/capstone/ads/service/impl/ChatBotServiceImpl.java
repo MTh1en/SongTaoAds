@@ -82,7 +82,7 @@ public class ChatBotServiceImpl implements ChatBotService {
 
     @Override
     public String chat(ChatRequest request) {
-        String userId = securityContextUtils.getCurrentUserId();
+        String userId = securityContextUtils.getCurrentUser().getId();
 
         ModelChatBot modelChatBot = modelChatBotRepository.getModelChatBotByActive(true)
                 .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));

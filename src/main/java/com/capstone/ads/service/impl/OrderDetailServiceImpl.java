@@ -100,6 +100,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         if (!orderDetailsRepository.existsById(orderId)) {
             throw new AppException(ErrorCode.ORDER_DETAIL_NOT_FOUND);
         }
+        orderService.updateAllAmount(orderService.getOrderById(orderId));
         orderDetailsRepository.deleteById(orderId);
     }
 

@@ -88,6 +88,10 @@ public class AuthServiceImpl implements AuthService {
                         .isActive(true)
                         .build()));
 
+        if (user.getIsBanned()) {
+            throw new AppException(ErrorCode.ACCOUNT_BANNED);
+        }
+
         String accessToken = accessTokenService.generateAccessToken(user);
         String refreshToken = refreshTokenService.generateRefreshToken();
         refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
@@ -107,18 +111,19 @@ public class AuthServiceImpl implements AuthService {
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new AppException(ErrorCode.INVALID_CREDENTIALS);
         }
+        if (user.getIsBanned()) {
+            throw new AppException(ErrorCode.ACCOUNT_BANNED);
+        }
+
         if (!user.getIsActive()) {
             throw new AppException(ErrorCode.ACCOUNT_DISABLED);
         }
-        if (user.getIsBanned()){
-            throw new AppException(ErrorCode.ACCOUNT_BANNED);
-        }
+
         String accessToken = accessTokenService.generateAccessToken(user);
         String refreshToken = refreshTokenService.generateRefreshToken();
         refreshTokenService.saveRefreshToken(user.getEmail(), refreshToken);
 
         setRefreshTokenCookie(refreshToken, response);
-
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)

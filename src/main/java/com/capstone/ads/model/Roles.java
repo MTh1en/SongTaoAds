@@ -30,4 +30,7 @@ public class Roles {
 
     @OneToMany(mappedBy = "roles")
     List<Users> users;
+
+    @OneToMany(mappedBy = "roleTarget")
+    List<Notification> notifications;
 }

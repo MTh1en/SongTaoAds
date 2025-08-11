@@ -158,7 +158,7 @@ public class CustomerChoiceDetailsServiceImpl implements CustomerChoiceDetailsSe
     private Map<String, Object> prepareVariablesForSubtotal(AttributeValues attributeValues, List<CustomerChoiceSizes> customerChoiceSizes) {
         Map<String, Object> variables = new HashMap<>();
 
-        variables.put("unitPrice", Optional.ofNullable(attributeValues)
+        variables.put("ĐƠN_GIÁ", Optional.ofNullable(attributeValues)
                 .map(AttributeValues::getUnitPrice)
                 .orElse(0L).floatValue());
 

@@ -5,7 +5,9 @@ import com.capstone.ads.model.Users;
 public interface AccessTokenService {
     String generateAccessToken(Users users);
 
-    String extractEmail(String token);
+    String extractUserId(String token);
+
+    String extractRole(String token);
 
     boolean isTokenValid(String token);
 }
