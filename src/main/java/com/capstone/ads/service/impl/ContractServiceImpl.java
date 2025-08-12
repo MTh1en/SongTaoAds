@@ -1,10 +1,13 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.NotificationMessage;
 import com.capstone.ads.constaint.PaymentPolicy;
+import com.capstone.ads.constaint.PredefinedRole;
 import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.contract.ContractDTO;
 import com.capstone.ads.dto.contract.ContractRevisedRequest;
 import com.capstone.ads.dto.contract.ContractSendRequest;
+import com.capstone.ads.event.RoleNotificationEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ContractMapper;
@@ -21,6 +24,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,6 +42,7 @@ public class ContractServiceImpl implements ContractService {
     ContractMapper contractMapper;
     ContractRepository contractRepository;
     ContractStateValidator contractStateValidator;
+    ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -69,6 +74,12 @@ public class ContractServiceImpl implements ContractService {
         contractRepository.save(contract);
 
         orderService.updateOrderStatus(orderId, OrderStatus.CONTRACT_SIGNED);
+        eventPublisher.publishEvent(new RoleNotificationEvent(
+                this,
+                PredefinedRole.SALE_ROLE,
+                String.format(NotificationMessage.CONTRACT_SINGED, contract.getOrders().getOrderCode())
+        ));
+
         return contractMapper.toDTO(contract);
     }
 

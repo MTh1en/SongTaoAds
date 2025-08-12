@@ -128,6 +128,12 @@ public class OrderServiceImpl implements OrderService {
                 null
         ));
 
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                orders.getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT, orders.getOrderCode(), OrderStatus.CONTRACT_CONFIRMED.getMessage())
+        ));
+
         return orderMapper.toDTO(orders);
     }
 
@@ -162,6 +168,12 @@ public class OrderServiceImpl implements OrderService {
                 OrderStatus.IN_PROGRESS,
                 userId,
                 null
+        ));
+
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                orders.getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT, orders.getOrderCode(), OrderStatus.IN_PROGRESS.getMessage())
         ));
 
         return orderMapper.toDTO(orders);

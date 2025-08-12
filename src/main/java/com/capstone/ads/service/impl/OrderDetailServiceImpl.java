@@ -117,7 +117,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     // HANDLE EVENT //
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
+    @Transactional
     public void handlePriceProposalApprovedEvent(CustomDesignRequestPricingApprovedEvent event) {
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
@@ -135,7 +136,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
+    @Transactional
     public void handleDemoDesignApprovedEvent(CustomDesignRequestDemoSubmittedEvent event) {
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
@@ -147,7 +149,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
+    @Transactional
     public void handleCustomDesignRequestCompletedEvent(CustomDesignRequestCompletedEvent event) {
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));

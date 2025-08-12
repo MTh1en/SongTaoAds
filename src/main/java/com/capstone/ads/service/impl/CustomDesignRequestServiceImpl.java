@@ -265,6 +265,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePriceProposalApprovedEvent(PriceProposalApprovedEvent event) {
+        log.info("custom design request");
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());
 
         customDesignRequest.setTotalPrice(event.getTotalPrice());
