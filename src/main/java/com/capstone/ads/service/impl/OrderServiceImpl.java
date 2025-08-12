@@ -1,13 +1,13 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.NotificationMessage;
 import com.capstone.ads.constaint.PaymentPolicy;
+import com.capstone.ads.constaint.PredefinedRole;
 import com.capstone.ads.dto.order.OrderConfirmRequest;
 import com.capstone.ads.dto.order.OrderCreateRequest;
 import com.capstone.ads.dto.order.OrderDTO;
 import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
-import com.capstone.ads.event.CustomDesignPaymentEvent;
-import com.capstone.ads.event.OrderCancelEvent;
-import com.capstone.ads.event.OrderStatusChangedEvent;
+import com.capstone.ads.event.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.OrdersMapper;
@@ -239,7 +239,6 @@ public class OrderServiceImpl implements OrderService {
         orderStateValidator.validateTransition(orders.getStatus(), OrderStatus.CANCELLED);
 
         if (orderStateValidator.isCancelOrderDesignStatus(orders.getStatus())) {
-            log.info("Cancel order design status: {}", orders.getStatus());
             eventPublisher.publishEvent(new OrderCancelEvent(
                     this,
                     orderId
@@ -291,6 +290,12 @@ public class OrderServiceImpl implements OrderService {
                 userId,
                 null
         ));
+
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                userId,
+                String.format(NotificationMessage.DEFAULT, orders.getOrderCode(), status.getMessage())
+        ));
     }
 
     @Override
@@ -338,8 +343,14 @@ public class OrderServiceImpl implements OrderService {
     public void updateOrderFromWebhookResult(Orders orders, PaymentType paymentType) {
         OrderStatus status = null;
         if (paymentType.equals(PaymentType.DEPOSIT_CONSTRUCTION)) {
-            status = OrderStatus.DEPOSITED;
-            orders.setStatus(status);
+            orders.setStatus(OrderStatus.DEPOSITED);
+
+            eventPublisher.publishEvent(new RoleNotificationEvent(
+                    this,
+                    PredefinedRole.SALE_ROLE,
+                    String.format(NotificationMessage.ORDER_DEPOSITED, orders.getOrderCode())
+            ));
+
         } else if (paymentType.equals(PaymentType.REMAINING_CONSTRUCTION)) {
             orders.setStatus(OrderStatus.ORDER_COMPLETED);
         } else if (paymentType.equals(PaymentType.DEPOSIT_DESIGN)) {

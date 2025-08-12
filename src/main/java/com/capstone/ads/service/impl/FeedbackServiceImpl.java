@@ -1,9 +1,13 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.NotificationMessage;
+import com.capstone.ads.constaint.PredefinedRole;
 import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.feedback.FeedbackDTO;
 import com.capstone.ads.dto.feedback.FeedbackResponseRequest;
 import com.capstone.ads.dto.feedback.FeedbackSendRequest;
+import com.capstone.ads.event.RoleNotificationEvent;
+import com.capstone.ads.event.UserNotificationEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.FeedbackMapper;
@@ -19,6 +23,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +46,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     FeedbacksRepository feedbacksRepository;
     FeedbackMapper feedbackMapper;
     SecurityContextUtils securityContextUtils;
+    ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -52,6 +58,12 @@ public class FeedbackServiceImpl implements FeedbackService {
         feedbacks.setOrders(orders);
         feedbacks.setSendBy(currentUser);
         feedbacks = feedbacksRepository.save(feedbacks);
+
+        eventPublisher.publishEvent(new RoleNotificationEvent(
+                this,
+                PredefinedRole.SALE_ROLE,
+                String.format(NotificationMessage.NEW_FEEDBACK, feedbacks.getOrders().getOrderCode())
+        ));
 
         return feedbackMapper.toDTO(feedbacks);
     }
@@ -75,6 +87,13 @@ public class FeedbackServiceImpl implements FeedbackService {
 
         feedbackMapper.mapResponseRequestToEntity(request, feedbacks);
         feedbacks = feedbacksRepository.save(feedbacks);
+
+
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                feedbacks.getSendBy().getId(),
+                String.format(NotificationMessage.ANSWERED_FEEDBACK, feedbacks.getOrders().getOrderCode())
+        ));
 
         return feedbackMapper.toDTO(feedbacks);
     }

@@ -1,11 +1,14 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.NotificationMessage;
+import com.capstone.ads.constaint.PredefinedRole;
 import com.capstone.ads.dto.price_proposal.PriceProposalCreateRequest;
 import com.capstone.ads.dto.price_proposal.PriceProposalDTO;
 import com.capstone.ads.dto.price_proposal.PriceProposalOfferPricingRequest;
 import com.capstone.ads.dto.price_proposal.PriceProposalUpdatePricingRequest;
 import com.capstone.ads.event.CustomDesignRequestChangeStatusEvent;
 import com.capstone.ads.event.PriceProposalApprovedEvent;
+import com.capstone.ads.event.RoleNotificationEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.PriceProposalMapper;
@@ -80,7 +83,7 @@ public class PriceProposalServiceImpl implements PriceProposalService {
     @Transactional
     public PriceProposalDTO offerPricing(String priceProposalId, PriceProposalOfferPricingRequest request) {
         PriceProposal priceProposal = getPriceProposalById(priceProposalId);
-        String customerDesignRequestId = priceProposal.getCustomDesignRequests().getId();
+        CustomDesignRequests customerDesignRequest = priceProposal.getCustomDesignRequests();
         priceProposalStateValidator.validateTransition(priceProposal.getStatus(), PriceProposalStatus.REJECTED);
 
         priceProposalMapper.mapOfferPricingRequestToEntity(request, priceProposal);
@@ -94,9 +97,16 @@ public class PriceProposalServiceImpl implements PriceProposalService {
 
         eventPublisher.publishEvent(new CustomDesignRequestChangeStatusEvent(
                 this,
-                customerDesignRequestId,
+                customerDesignRequest.getId(),
                 CustomDesignRequestStatus.REJECTED_PRICING
         ));
+
+        eventPublisher.publishEvent(new RoleNotificationEvent(
+                this,
+                PredefinedRole.SALE_ROLE,
+                String.format(NotificationMessage.PRICING_REJECTED, customerDesignRequest.getCode())
+        ));
+
         return priceProposalMapper.toDTO(priceProposal);
     }
 
