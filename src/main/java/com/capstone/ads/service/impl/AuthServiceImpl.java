@@ -139,6 +139,7 @@ public class AuthServiceImpl implements AuthService {
         Users newUser = usersMapper.register(request);
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setIsActive(false);
+        newUser.setIsBanned(false);
         newUser.setRoles(roles);
 
         usersRepository.save(newUser);
