@@ -293,7 +293,7 @@ public class OrderServiceImpl implements OrderService {
 
         eventPublisher.publishEvent(new UserNotificationEvent(
                 this,
-                userId,
+                orders.getUsers().getId(),
                 String.format(NotificationMessage.DEFAULT, orders.getOrderCode(), status.getMessage())
         ));
     }
