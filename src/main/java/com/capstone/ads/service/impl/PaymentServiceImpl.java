@@ -85,6 +85,33 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
+    public PaymentDTO createCastPayment(String orderId, PaymentType paymentType) {
+        Orders order = orderService.getOrderById(orderId);
+
+        long paymentCode = generateOrderCode();
+        long amount = switch (paymentType) {
+            case PaymentType.DEPOSIT_DESIGN -> order.getDepositDesignAmount();
+            case PaymentType.REMAINING_DESIGN -> order.getRemainingDesignAmount();
+            case PaymentType.DEPOSIT_CONSTRUCTION -> order.getDepositConstructionAmount();
+            case PaymentType.REMAINING_CONSTRUCTION -> order.getRemainingConstructionAmount();
+            default -> throw new AppException(ErrorCode.PAYMENT_NOT_FOUND);
+        };
+        Payments payment = Payments.builder()
+                .code(paymentCode)
+                .amount(amount)
+                .method(PaymentMethod.CAST)
+                .status(PaymentStatus.SUCCESS)
+                .type(paymentType)
+                .orders(order)
+                .build();
+        paymentRepository.save(payment);
+
+        orderService.updateOrderFromWebhookResult(order, paymentType);
+        return paymentMapper.toDTO(payment);
+    }
+
+    @Override
     public WebhookData verifyPaymentWebhookData(Webhook Webhook) throws Exception {
         PayOS payOS = new PayOS(CLIENT_ID, API_KEY, CHECKSUM_KEY);
         return payOS.verifyPaymentWebhookData(Webhook);
@@ -146,7 +173,7 @@ public class PaymentServiceImpl implements PaymentService {
     //INTERNAL FUNCTION //
     private CheckoutResponseData createPaymentLinkForOrder(Orders order, boolean isDeposit) throws Exception {
         long paymentCode = generateOrderCode();
-        Long amount;
+        long amount;
         PaymentType paymentType;
         if (isDeposit) {
             amount = order.getDepositConstructionAmount();
@@ -166,7 +193,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
         paymentRepository.save(payment);
 
-        return createPaymentLinkFromPayOS(amount.intValue(), paymentCode);
+        return createPaymentLinkFromPayOS((int) amount, paymentCode);
     }
 
     private CheckoutResponseData createPaymentLinkForCustomDesign(Orders order, boolean isDeposit) throws Exception {
@@ -196,7 +223,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private CheckoutResponseData createPaymentLinkForFullPayment(Orders orders) throws Exception {
         long paymentCode = generateOrderCode();
-        Long amount;
+        long amount;
 
         if (orders.getOrderType().equals(OrderType.AI_DESIGN)) {
             amount = orders.getTotalConstructionAmount();
@@ -214,7 +241,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
 
         paymentRepository.save(payment);
-        return createPaymentLinkFromPayOS(amount.intValue(), paymentCode);
+        return createPaymentLinkFromPayOS((int) amount, paymentCode);
     }
 
     private CheckoutResponseData createPaymentLinkFromPayOS(Integer amount, Long paymentCode) throws Exception {

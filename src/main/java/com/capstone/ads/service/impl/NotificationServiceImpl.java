@@ -51,6 +51,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .type("ROLE")
                 .roleTarget(role)
                 .message(message)
+                .createdAt(LocalDateTime.now())
                 .build();
         notificationRepository.save(notification);
 
@@ -70,6 +71,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .type("USER")
                 .userTarget(user)
                 .message(message)
+                .createdAt(LocalDateTime.now())
                 .build();
         notification = notificationRepository.save(notification);
 

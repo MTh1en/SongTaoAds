@@ -1,6 +1,7 @@
 package com.capstone.ads.service;
 
 import com.capstone.ads.dto.payment.PaymentDTO;
+import com.capstone.ads.model.enums.PaymentType;
 import org.springframework.data.domain.Page;
 import vn.payos.type.*;
 
@@ -14,6 +15,8 @@ public interface PaymentService {
     CheckoutResponseData createCustomDesignFullRemainingPaymentLink(String orderId) throws Exception;
 
     CheckoutResponseData createFullOrderPaymentLink(String orderId) throws Exception;
+
+    PaymentDTO createCastPayment(String orderId, PaymentType paymentType);
 
     WebhookData verifyPaymentWebhookData(Webhook Webhook) throws Exception;
 
