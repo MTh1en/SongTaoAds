@@ -2,6 +2,8 @@ package com.capstone.ads.service.impl;
 
 import com.capstone.ads.dto.notification.NotificationDTO;
 import com.capstone.ads.dto.notification.NotificationEvent;
+import com.capstone.ads.event.RoleNotificationEvent;
+import com.capstone.ads.event.UserNotificationEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.NotificationMapper;
@@ -19,9 +21,11 @@ import com.corundumstudio.socketio.SocketIOServer;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +44,13 @@ public class NotificationServiceImpl implements NotificationService {
     RolesRepository rolesRepository;
     SecurityContextUtils securityContextUtils;
     NotificationMapper notificationMapper;
+
+    @Async
+    @EventListener
+    @Transactional
+    public void handleRoleNotificationEvent(RoleNotificationEvent event) {
+        sendNotificationToRole(event.getRoleName(), event.getMessage());
+    }
 
     @Override
     @Transactional
@@ -60,6 +71,13 @@ public class NotificationServiceImpl implements NotificationService {
                         notification.getId(),
                         "ROLE", message,
                         notification.getCreatedAt().toString()));
+    }
+
+    @Async
+    @EventListener
+    @Transactional
+    public void handleUserNotificationEvent(UserNotificationEvent event) {
+        sendNotificationToUser(event.getUserId(), event.getMessage());
     }
 
     @Override

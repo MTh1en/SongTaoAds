@@ -1,8 +1,12 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.NotificationMessage;
+import com.capstone.ads.constaint.PredefinedRole;
 import com.capstone.ads.dto.ticket.TicketDTO;
 import com.capstone.ads.dto.ticket.TicketReport;
 import com.capstone.ads.dto.ticket.TicketRequest;
+import com.capstone.ads.event.RoleNotificationEvent;
+import com.capstone.ads.event.UserNotificationEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.TicketsMapper;
@@ -18,6 +22,7 @@ import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +38,7 @@ public class TicketServiceImpl implements TicketService {
     TicketsMapper ticketsMapper;
     SecurityContextUtils securityContextUtils;
     OrderService orderService;
+    ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -42,6 +48,12 @@ public class TicketServiceImpl implements TicketService {
 
         Tickets ticket = ticketsMapper.sendTicket(request, users, orders);
         ticket = ticketRepository.save(ticket);
+
+        eventPublisher.publishEvent(new RoleNotificationEvent(
+                this,
+                PredefinedRole.SALE_ROLE,
+                String.format(NotificationMessage.NEW_TICKET, ticket.getOrders().getOrderCode())
+        ));
         return ticketsMapper.toDTO(ticket);
     }
 
@@ -129,6 +141,11 @@ public class TicketServiceImpl implements TicketService {
         ticket.setStatus(TicketStatus.CLOSED);
         ticket = ticketRepository.save(ticket);
 
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                ticket.getCustomer().getId(),
+                String.format(NotificationMessage.ANSWERED_TICKET, ticket.getOrders().getOrderCode())
+        ));
         return ticketsMapper.toDTO(ticket);
     }
 }

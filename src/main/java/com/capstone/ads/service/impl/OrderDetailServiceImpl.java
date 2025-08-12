@@ -103,7 +103,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         orderDetailsRepository.deleteById(orderDetailId);
         orders.getOrderDetails().remove(orderDetails);
-        orderService.updateAllAmount(orderService.getOrderById(orderDetailId));
+        orderService.updateAllAmount(orders);
     }
 
     // INTERNAL FUNCTION //
@@ -117,8 +117,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     // HANDLE EVENT //
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @EventListener
-    @Transactional
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePriceProposalApprovedEvent(CustomDesignRequestPricingApprovedEvent event) {
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
@@ -136,8 +135,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @EventListener
-    @Transactional
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleDemoDesignApprovedEvent(CustomDesignRequestDemoSubmittedEvent event) {
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
@@ -161,13 +159,11 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @EventListener
-    @Transactional
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleOrderCancel(OrderCancelEvent event) {
         Orders orders = orderService.getOrderById(event.getOrderId());
 
         orders.getOrderDetails().forEach(orderDetail -> {
-            log.info("Custom Design Request publish cancelled");
             eventPublisher.publishEvent(new CustomDesignRequestChangeStatusEvent(
                     this,
                     orderDetail.getCustomDesignRequests().getId(),

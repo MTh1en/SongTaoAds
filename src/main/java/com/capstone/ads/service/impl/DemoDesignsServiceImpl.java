@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.NotificationMessage;
 import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.demo_design.DemoDesignCreateRequest;
 import com.capstone.ads.dto.demo_design.DemoDesignDTO;
@@ -10,6 +11,7 @@ import com.capstone.ads.dto.file.UploadMultipleFileRequest;
 import com.capstone.ads.event.CustomDesignRequestChangeStatusEvent;
 import com.capstone.ads.event.DemoDesignApprovedEvent;
 import com.capstone.ads.event.DemoDesignCreateEvent;
+import com.capstone.ads.event.UserNotificationEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.DemoDesignsMapper;
@@ -112,6 +114,7 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
                 demoDesigns.getCustomDesignRequests().getStatus(),
                 CustomDesignRequestStatus.WAITING_FULL_PAYMENT
         );
+
         eventPublisher.publishEvent(new DemoDesignApprovedEvent(
                 this,
                 customDesignRequestId
@@ -124,12 +127,12 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
     @Transactional
     public DemoDesignDTO customerRejectCustomDesign(String customDesignId, CustomerRejectCustomDesignRequest request) {
         DemoDesigns demoDesigns = findCustomDesignByIdAndPendingStatus(customDesignId);
-        String customDesignRequestId = demoDesigns.getCustomDesignRequests().getId();
+        CustomDesignRequests customDesignRequests = demoDesigns.getCustomDesignRequests();
 
         demoDesignStateValidator.validateTransition(demoDesigns.getStatus(), DemoDesignStatus.REJECTED);
 
         if (request.getFeedbackImage() != null && !request.getFeedbackImage().isEmpty()) {
-            String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequestId, request.getFeedbackImage());
+            String customDesignImageKey = uploadCustomDesignImageToS3(customDesignRequests.getId(), request.getFeedbackImage());
             demoDesigns.setCustomerFeedbackImage(customDesignImageKey);
         }
         demoDesignsMapper.updateEntityFromCustomerRequest(request, demoDesigns);
@@ -143,8 +146,14 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
 
         eventPublisher.publishEvent(new CustomDesignRequestChangeStatusEvent(
                 this,
-                customDesignRequestId,
+                customDesignRequests.getId(),
                 CustomDesignRequestStatus.REVISION_REQUESTED
+        ));
+
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                demoDesigns.getCustomDesignRequests().getAssignDesigner().getId(),
+                String.format(NotificationMessage.DEMO_DESIGN_REJECTED, customDesignRequests.getCode())
         ));
 
         return demoDesignsMapper.toDTO(demoDesigns);

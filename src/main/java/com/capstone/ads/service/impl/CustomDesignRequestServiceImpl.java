@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.NotificationMessage;
 import com.capstone.ads.constaint.PredefinedRole;
 import com.capstone.ads.constaint.S3ImageKeyFormat;
 import com.capstone.ads.dto.custom_design_request.CustomDesignRequestCreateRequest;
@@ -21,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -80,6 +80,13 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customerDesignRequest.setAssignDesigner(designer);
         customerDesignRequest.setStatus(CustomDesignRequestStatus.ASSIGNED_DESIGNER);
         customerDesignRequest = customDesignRequestsRepository.save(customerDesignRequest);
+
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                designerId,
+                String.format(NotificationMessage.ASSIGN_DESIGNER, customerDesignRequest.getCode())
+        ));
+
         return customDesignRequestsMapper.toDTO(customerDesignRequest);
     }
 
@@ -212,30 +219,47 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     // HANDLE EVENT //
 
     @Async
-    @EventListener
-    @Transactional
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCustomDesignPaymentEvent(CustomDesignPaymentEvent event) {
         CustomDesignRequests customDesignRequests = getCustomDesignRequestById(event.getCustomDesignRequestId());
 
         if (event.getIsDeposit()) {
-            log.info("Custom design request deposit");
             customDesignRequestStateValidator.validateTransition(customDesignRequests.getStatus(), CustomDesignRequestStatus.DEPOSITED);
             customDesignRequests.setStatus(CustomDesignRequestStatus.DEPOSITED);
+
+            eventPublisher.publishEvent(new RoleNotificationEvent(
+                    this,
+                    PredefinedRole.SALE_ROLE,
+                    String.format(NotificationMessage.CUSTOM_DESIGN_REQUEST_DEPOSITED, customDesignRequests.getCode())
+            ));
+
         } else {
-            log.info("Custom design request full");
             customDesignRequestStateValidator.validateTransition(customDesignRequests.getStatus(), CustomDesignRequestStatus.FULLY_PAID);
             customDesignRequests.setStatus(CustomDesignRequestStatus.FULLY_PAID);
+
+            eventPublisher.publishEvent(new UserNotificationEvent(
+                    this,
+                    customDesignRequests.getAssignDesigner().getId(),
+                    String.format(NotificationMessage.CUSTOM_DESIGN_REQUEST_FULLY_PAID, customDesignRequests.getCode())
+            ));
         }
         customDesignRequestsRepository.save(customDesignRequests);
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @EventListener
-    @Transactional
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCustomDesignRequestChangeStatusEvent(CustomDesignRequestChangeStatusEvent event) {
         CustomDesignRequests customDesignRequests = getCustomDesignRequestById(event.getCustomDesignRequestId());
         customDesignRequests.setStatus(event.getStatus());
         customDesignRequestsRepository.save(customDesignRequests);
+
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                customDesignRequests.getCustomerDetail().getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT,
+                        customDesignRequests.getCode(),
+                        event.getStatus().getMessage())
+        ));
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
@@ -256,11 +280,18 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
                 event.getDepositAmount(),
                 event.getRemainingAmount()
         ));
+
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                customDesignRequest.getCustomerDetail().getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT,
+                        customDesignRequest.getCode(),
+                        CustomDesignRequestStatus.APPROVED_PRICING.getMessage())
+        ));
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @EventListener
-    @Transactional
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleDemoDesignCreateEvent(DemoDesignCreateEvent event) {
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());
         if (event.isNeedSupport()) {
@@ -268,6 +299,14 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
             customDesignRequest.setIsNeedSupport(true);
         } else customDesignRequest.setStatus(CustomDesignRequestStatus.DEMO_SUBMITTED);
         customDesignRequestsRepository.save(customDesignRequest);
+
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                customDesignRequest.getCustomerDetail().getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT,
+                        customDesignRequest.getCode(),
+                        CustomDesignRequestStatus.DEMO_SUBMITTED.getMessage())
+        ));
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
@@ -280,6 +319,14 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         eventPublisher.publishEvent(new CustomDesignRequestDemoSubmittedEvent(
                 this,
                 customDesignRequest.getId()
+        ));
+
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                customDesignRequest.getCustomerDetail().getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT,
+                        customDesignRequest.getCode(),
+                        CustomDesignRequestStatus.WAITING_FULL_PAYMENT.getMessage())
         ));
     }
 }
