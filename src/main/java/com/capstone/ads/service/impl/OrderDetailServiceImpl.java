@@ -9,7 +9,6 @@ import com.capstone.ads.mapper.OrderDetailMapper;
 import com.capstone.ads.model.*;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.model.enums.OrderStatus;
-import com.capstone.ads.model.enums.OrderType;
 import com.capstone.ads.repository.internal.OrderDetailsRepository;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.DataConverter;
@@ -152,6 +151,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     @EventListener
     @Transactional
     public void handleCustomDesignRequestCompletedEvent(CustomDesignRequestCompletedEvent event) {
+        log.info("Custom design request completed: " + event.getCustomDesignRequestId());
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
         String orderId = orderDetail.getOrders().getId();

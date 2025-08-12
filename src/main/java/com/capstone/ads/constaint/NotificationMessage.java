@@ -4,6 +4,7 @@ public class NotificationMessage {
     public static String DEFAULT = "%s: %s";
     public static String PRICING_REJECTED = "%s: Khách hàng đã từ chối báo giá và đã offer giá khác, hãy check lại!";
     public static String ASSIGN_DESIGNER = "%s: Đã được giao cho bạn";
+    public static String DESIGNER_REJECTED = "%s: Designer %s đã từ chối yêu cầu, hãy giao cho Designer khác";
     public static String CUSTOM_DESIGN_REQUEST_DEPOSITED = "%s: Đã đặt cọc hãy phân công cho Designer";
     public static String CUSTOM_DESIGN_REQUEST_FULLY_PAID = "%s: Đã thanh toán hết hãy gửi bản final";
     public static String DEMO_DESIGN_REJECTED = "%s: Bản demo đã bị từ chối, hãy gửi lại 1 bản khác";

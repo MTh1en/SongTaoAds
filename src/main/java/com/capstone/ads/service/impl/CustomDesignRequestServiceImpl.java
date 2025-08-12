@@ -16,6 +16,7 @@ import com.capstone.ads.model.enums.FileTypeEnum;
 import com.capstone.ads.repository.internal.CustomDesignRequestsRepository;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.KeyGenerator;
+import com.capstone.ads.utils.SecurityContextUtils;
 import com.capstone.ads.validator.CustomDesignRequestStateValidator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     CustomDesignRequestsRepository customDesignRequestsRepository;
     CustomDesignRequestsMapper customDesignRequestsMapper;
     CustomDesignRequestStateValidator customDesignRequestStateValidator;
+    SecurityContextUtils securityContextUtils;
     ApplicationEventPublisher eventPublisher;
 
     @Override
@@ -99,12 +101,21 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequest.setStatus(CustomDesignRequestStatus.PROCESSING);
 
         customDesignRequestsRepository.save(customDesignRequest);
+
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                customDesignRequest.getCustomerDetail().getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT,
+                        customDesignRequest.getCode(), CustomDesignRequestStatus.PROCESSING.getMessage())
+        ));
+
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 
     @Override
     @Transactional
     public CustomDesignRequestDTO designerRejectCustomDesignRequest(String customDesignRequestId) {
+        var user = securityContextUtils.getCurrentUser();
         CustomDesignRequests customDesignRequest = getCustomDesignRequestById(customDesignRequestId);
         customDesignRequestStateValidator.validateTransition(customDesignRequest.getStatus(), CustomDesignRequestStatus.DESIGNER_REJECTED);
 
@@ -112,6 +123,13 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequest.setAssignDesigner(null);
 
         customDesignRequestsRepository.save(customDesignRequest);
+
+        eventPublisher.publishEvent(new RoleNotificationEvent(
+                this,
+                PredefinedRole.SALE_ROLE,
+                String.format(NotificationMessage.DESIGNER_REJECTED,
+                        customDesignRequest.getCode(), user.getFullName())
+        ));
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 
