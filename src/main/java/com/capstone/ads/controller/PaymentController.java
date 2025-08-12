@@ -3,6 +3,7 @@ package com.capstone.ads.controller;
 import com.capstone.ads.dto.ApiPagingResponse;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.payment.PaymentDTO;
+import com.capstone.ads.model.enums.PaymentType;
 import com.capstone.ads.service.PaymentService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +54,14 @@ public class PaymentController {
     public ApiResponse<CheckoutResponseData> createCustomDesignFullRemainingPaymentLink(@PathVariable String orderId) throws Exception {
         CheckoutResponseData response = paymentService.createCustomDesignFullRemainingPaymentLink(orderId);
         return ApiResponseBuilder.buildSuccessResponse("Tạo link thanh toán hết thiết kế thành công", response);
+    }
+
+    @PostMapping("/orders/{orderId}/cast-paid")
+    @Operation(summary = "Thanh toán tiền mặt")
+    public ApiResponse<PaymentDTO> createCastPayment(@PathVariable String orderId,
+                                                     @RequestParam PaymentType paymentType) {
+        var response = paymentService.createCastPayment(orderId, paymentType);
+        return ApiResponseBuilder.buildSuccessResponse("Tạo link thanh toán hết đơn hàng thành công", response);
     }
 
     @PostMapping("/webhook/handle-webhook")

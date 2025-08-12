@@ -1,6 +1,7 @@
 package com.capstone.ads.repository.internal;
 
 import com.capstone.ads.model.Payments;
+import com.capstone.ads.model.enums.PaymentMethod;
 import com.capstone.ads.model.enums.PaymentStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,4 +30,5 @@ public interface PaymentsRepository extends JpaRepository<Payments, String> {
 
     List<Payments> findByStatus(PaymentStatus status);
 
+    List<Payments> findByStatusAndMethod(PaymentStatus status, PaymentMethod method);
 }
