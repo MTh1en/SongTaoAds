@@ -22,6 +22,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -133,8 +135,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @EventListener
-    @Transactional
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleDemoDesignApprovedEvent(CustomDesignRequestDemoSubmittedEvent event) {
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
