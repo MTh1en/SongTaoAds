@@ -18,7 +18,7 @@ public enum CustomDesignRequestStatus {
     REVISION_REQUESTED("Chúng tôi đã nhận được yêu cầu chỉnh sửa thiết kế"),
     WAITING_FULL_PAYMENT("Thiết kế đã hoàn thành. Vui lòng thanh toán phần còn lại"),
     FULLY_PAID("Bạn đã thanh toán đầy đủ"),
-    COMPLETED("Yêu cầu thiết kế đã hoàn thành"),
+    COMPLETED("Bản final đã được gửi"),
     CANCELLED("Yêu cầu đã bị hủy");
 
     private final String message;

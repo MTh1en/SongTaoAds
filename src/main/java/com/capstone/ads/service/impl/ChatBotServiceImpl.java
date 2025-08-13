@@ -5,10 +5,8 @@ import com.capstone.ads.event.ChatBotLogEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.model.ModelChatBot;
-import com.capstone.ads.model.Orders;
 import com.capstone.ads.repository.external.ChatBotClient;
 import com.capstone.ads.repository.internal.ModelChatBotRepository;
-import com.capstone.ads.repository.internal.OrdersRepository;
 import com.capstone.ads.service.ChatBotService;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.AccessLevel;
@@ -26,13 +24,11 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -56,16 +52,14 @@ public class ChatBotServiceImpl implements ChatBotService {
     ModelChatBotRepository modelChatBotRepository;
     ApplicationEventPublisher eventPublisher;
     ChatClient chatClient;
-    OrdersRepository ordersRepository;
     JdbcChatMemoryRepository jdbcChatMemoryRepository;
 
 
     public ChatBotServiceImpl(ChatBotClient chatBotClient, SecurityContextUtils securityContextUtils, ModelChatBotRepository modelChatBotRepository, ApplicationEventPublisher eventPublisher,
-                              ChatClient.Builder chatClientBuilder, JdbcChatMemoryRepository jdbcChatMemoryRepository, OrdersRepository ordersRepository) {
+                              ChatClient.Builder chatClientBuilder, JdbcChatMemoryRepository jdbcChatMemoryRepository) {
         this.chatBotClient = chatBotClient;
         this.securityContextUtils = securityContextUtils;
         this.modelChatBotRepository = modelChatBotRepository;
-        this.ordersRepository= ordersRepository;
         this.eventPublisher = eventPublisher;
         this.jdbcChatMemoryRepository = jdbcChatMemoryRepository;
 
@@ -75,7 +69,6 @@ public class ChatBotServiceImpl implements ChatBotService {
                 .build();
 
         chatClient = chatClientBuilder
-                .defaultTools(this)
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
     }
@@ -147,15 +140,15 @@ public class ChatBotServiceImpl implements ChatBotService {
         ModelChatBot modelChatBot = modelChatBotRepository.getModelChatBotByActive(true)
                 .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
         SystemMessage systemMessage = new SystemMessage("""
-                You are an expert AI prompt engineer for Stable Diffusion, specializing in creating stunning and effective background images for billboards. Your task is to transform a user's high-level request into a detailed, descriptive, and actionable prompt suitable for image generation AI.
-                        When generating the prompt, consider the following key aspects for a billboard background:
-                           1.  Purpose & Mood: What is the general purpose or mood this background should convey (e.g., modern, classic, festive, natural, futuristic, calm, energetic)?
-                           2.  Composition & Negative Space:** Emphasize areas for text/logo placement. Specify if large clear areas are needed (e.g., "ample negative space on the left/right/top/bottom for text overlays," "minimalist foreground," "uncluttered background").
-                           3.  Visual Style: Describe the artistic style (e.g., photorealistic, abstract, watercolor, cinematic, minimalist, digital art), color palette (e.g., warm tones, cool tones, vibrant, muted, specific dominant colors), lighting (e.g., golden hour, neon glow, soft ambient light, dramatic), and overall aesthetic.
-                           4.  Key Elements & Scene: Describe specific elements to include (e.g., city skyline, natural landscape, abstract shapes, subtle patterns, technological elements). Avoid elements that might distract from the main message of the billboard (e.g., overly complex details, prominent human faces unless specified).
-                           5.  Quality & Details: Include terms for high quality (e.g., "high resolution," "ultra detailed," "8K," "sharp focus," "smooth rendering").
-                        Your output should be a single, concise, and highly descriptive English prompt, ready to be used directly in Stable Diffusion. Do NOT include any conversational text, explanations, or formatting like bullet points or numbered lists. Only output the prompt.
-                """);
+                    You are an expert AI prompt engineer for Stable Diffusion, specializing in creating stunning and effective background images for billboards. Your task is to transform a user's high-level request into a detailed, descriptive, and actionable prompt suitable for image generation AI.
+                            When generating the prompt, consider the following key aspects for a billboard background:
+                               1.  Purpose & Mood: What is the general purpose or mood this background should convey (e.g., modern, classic, festive, natural, futuristic, calm, energetic)?
+                               2.  Composition & **Ample Negative Space**: Emphasize **a large, clear, uncluttered area** for text/logo placement. Specify if **a significant empty space** is needed (e.g., "ample negative space on the left/right/top/bottom for text overlays," "minimalist foreground," "uncluttered background"). **The generated image must have a clear, distinct area free of complex details, perfect for overlaying text and logos.**
+                               3.  Visual Style: Describe the artistic style (e.g., photorealistic, abstract, watercolor, cinematic, minimalist, digital art), color palette (e.g., warm tones, cool tones, vibrant, muted, specific dominant colors), lighting (e.g., golden hour, neon glow, soft ambient light, dramatic), and overall aesthetic.
+                               4.  Key Elements & Scene: Describe specific elements to include (e.g., city skyline, natural landscape, abstract shapes, subtle patterns, technological elements). Avoid elements that might distract from the main message of the billboard (e.g., overly complex details, prominent human faces unless specified).
+                               5.  Quality & Details: Include terms for high quality (e.g., "high resolution," "ultra detailed," "8K," "sharp focus," "smooth rendering").
+                            Your output should be a single, concise, and highly descriptive English prompt, ready to be used directly in Stable Diffusion. Do NOT include any conversational text, explanations, or formatting like bullet points or numbered lists. Only output the prompt.
+    """);
 
         UserMessage userMessage = new UserMessage(requirement);
         OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
@@ -256,18 +249,6 @@ public class ChatBotServiceImpl implements ChatBotService {
                 .options(options)
                 .call()
                 .entity(TraditionalBillboardResponse.class);
-    }
-
-    @Tool(name = "trackOrder", description = "Tra cứu trạng thái đơn hàng bằng mã đơn.")
-    public String trackOrder(String orderCode) {
-        Orders order = ordersRepository.findByOrderCode(orderCode);
-        if (order != null) {
-            String formattedDate = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-                    .format(order.getEstimatedDeliveryDate());
-            return String.format("Đơn hàng #%s. Trạng thái: %s. Ngày giao dự kiến: %s.",
-                    order.getOrderCode(), order.getStatus(), formattedDate);
-        }
-        return "Không thể tìm thấy đơn hàng.";
     }
 
 }

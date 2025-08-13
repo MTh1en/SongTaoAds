@@ -161,6 +161,12 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
                 customDesignRequestId
         ));
 
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                customDesignRequest.getCustomerDetail().getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT, customDesignRequest.getCode(), CustomDesignRequestStatus.COMPLETED.getMessage())
+        ));
+
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 
