@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,8 +31,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -237,7 +236,8 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     // HANDLE EVENT //
 
     @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
+    @Transactional
     public void handleCustomDesignPaymentEvent(CustomDesignPaymentEvent event) {
         CustomDesignRequests customDesignRequests = getCustomDesignRequestById(event.getCustomDesignRequestId());
 
@@ -265,7 +265,8 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
+    @Transactional
     public void handleCustomDesignRequestChangeStatusEvent(CustomDesignRequestChangeStatusEvent event) {
         CustomDesignRequests customDesignRequests = getCustomDesignRequestById(event.getCustomDesignRequestId());
         customDesignRequests.setStatus(event.getStatus());
@@ -281,7 +282,8 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
+    @Transactional
     public void handlePriceProposalApprovedEvent(PriceProposalApprovedEvent event) {
         log.info("custom design request");
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());
@@ -310,7 +312,8 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
+    @Transactional
     public void handleDemoDesignCreateEvent(DemoDesignCreateEvent event) {
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());
         if (event.isNeedSupport()) {
@@ -329,7 +332,8 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
+    @Transactional
     public void handleDemoDesignApprovedEvent(DemoDesignApprovedEvent event) {
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());
         customDesignRequest.setStatus(CustomDesignRequestStatus.WAITING_FULL_PAYMENT);
