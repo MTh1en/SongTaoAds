@@ -147,8 +147,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @EventListener
-    @Transactional
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCustomDesignRequestCompletedEvent(CustomDesignRequestCompletedEvent event) {
         log.info("Custom design request completed: {}", event.getCustomDesignRequestId());
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
