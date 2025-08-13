@@ -10,11 +10,13 @@ import com.capstone.ads.model.enums.*;
 import com.capstone.ads.repository.internal.PaymentsRepository;
 import com.capstone.ads.service.OrderService;
 import com.capstone.ads.service.PaymentService;
+import com.capstone.ads.validator.OrderStateValidator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -53,6 +55,7 @@ public class PaymentServiceImpl implements PaymentService {
     PaymentsRepository paymentRepository;
     PaymentMapper paymentMapper;
     OrderService orderService;
+    OrderStateValidator orderStateValidator;
 
     @Override
     public CheckoutResponseData createConstructionDepositPaymentLink(String orderId) throws Exception {
@@ -97,6 +100,22 @@ public class PaymentServiceImpl implements PaymentService {
             case PaymentType.REMAINING_CONSTRUCTION -> order.getRemainingConstructionAmount();
             default -> throw new AppException(ErrorCode.PAYMENT_NOT_FOUND);
         };
+
+        boolean isValidStatus = switch (paymentType) {
+            case PaymentType.DEPOSIT_DESIGN -> orderStateValidator.isValidTransition(
+                    order.getStatus(), OrderStatus.DEPOSITED_DESIGN);
+            case PaymentType.REMAINING_DESIGN -> orderStateValidator.isValidTransition(
+                    order.getStatus(), OrderStatus.WAITING_FINAL_DESIGN);
+            case PaymentType.DEPOSIT_CONSTRUCTION -> orderStateValidator.isValidTransition(
+                    order.getStatus(), OrderStatus.DEPOSITED);
+            case PaymentType.REMAINING_CONSTRUCTION -> orderStateValidator.isValidTransition(
+                    order.getStatus(), OrderStatus.ORDER_COMPLETED);
+            default -> throw new AppException(ErrorCode.PAYMENT_NOT_FOUND);
+        };
+
+        if (!isValidStatus) {
+            throw new AppException(ErrorCode.INVALID_ORDER_STATUS_TRANSITION);
+        }
         Payments payment = Payments.builder()
                 .code(paymentCode)
                 .amount(amount)
