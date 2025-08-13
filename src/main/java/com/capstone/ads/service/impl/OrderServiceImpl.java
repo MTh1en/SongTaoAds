@@ -3,10 +3,7 @@ package com.capstone.ads.service.impl;
 import com.capstone.ads.constaint.NotificationMessage;
 import com.capstone.ads.constaint.PaymentPolicy;
 import com.capstone.ads.constaint.PredefinedRole;
-import com.capstone.ads.dto.order.OrderConfirmRequest;
-import com.capstone.ads.dto.order.OrderCreateRequest;
-import com.capstone.ads.dto.order.OrderDTO;
-import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
+import com.capstone.ads.dto.order.*;
 import com.capstone.ads.event.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
@@ -50,6 +47,7 @@ public class OrderServiceImpl implements OrderService {
     ApplicationEventPublisher eventPublisher;
 
     @Override
+    @Transactional
     public OrderDTO createOrder(OrderCreateRequest request) {
         Users users = securityContextUtils.getCurrentUser();
         Orders orders = orderMapper.mapCreateRequestToEntity(request);

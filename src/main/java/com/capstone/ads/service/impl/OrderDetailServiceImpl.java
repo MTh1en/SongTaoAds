@@ -2,6 +2,7 @@ package com.capstone.ads.service.impl;
 
 import com.capstone.ads.dto.order_detail.OrderDetailCreateRequest;
 import com.capstone.ads.dto.order_detail.OrderDetailDTO;
+import com.capstone.ads.dto.order_detail.OrderDetailUpdateRequest;
 import com.capstone.ads.event.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
@@ -84,6 +85,17 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         orders.getOrderDetails().add(orderDetails);
         orderService.updateAllAmount(orderDetails.getOrders());
         customerChoicesService.hardDeleteCustomerChoice(request.getCustomerChoiceId());
+        return orderDetailMapper.toDTO(orderDetails);
+    }
+
+    @Override
+    @Transactional
+    public OrderDetailDTO updateOrderDetail(String orderDetailId, OrderDetailUpdateRequest request) {
+        OrderDetails orderDetails = getOrderDetailById(orderDetailId);
+        orderDetailMapper.mapUpdateRequestToEntity(request, orderDetails);
+        orderDetails = orderDetailsRepository.save(orderDetails);
+
+        orderService.updateAllAmount(orderDetails.getOrders());
         return orderDetailMapper.toDTO(orderDetails);
     }
 
