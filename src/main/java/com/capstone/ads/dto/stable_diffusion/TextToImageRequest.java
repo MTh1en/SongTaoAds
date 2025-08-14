@@ -21,15 +21,18 @@ public class TextToImageRequest {
 
     @Builder.Default
     String negativePrompt = """
-            (nsfw, naked, nude, deformed iris, deformed pupils, semi-realistic, 
-            cgi, 3d, render, sketch, cartoon, drawing, anime, mutated hands and fingers:1.4), 
-            (deformed, distorted, disfigured:1.3), 
-            poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, disconnected limbs, 
-            mutation, mutated, ugly, disgusting, amputation, text, fictional structure
+            (nsfl, naked, nude, deformed iris, deformed pupils, semi-realistic,
+            cgi, 3d, render, sketch, cartoon, drawing, anime, mutated hands and fingers:1.4,
+            deformed, distorted, disfigured:1.3,
+            poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, disconnected limbs,
+            mutation, mutated, ugly, disgusting, amputation,
+            crowded, busy, complex details, overly detailed, multiple elements, cluttered,
+            text, watermark, signature, caption, logo, words, letters, characters, numbers, font, handwriting
+            )
             """;
 
     @Builder.Default
-    Integer cfgScale = 5;
+    Integer cfgScale = 6;
 
     @Builder.Default
     Integer batchSize = 1;
@@ -55,10 +58,10 @@ public class TextToImageRequest {
     Map<String, Object> overrideSettings = new HashMap<>();
 
     @Builder.Default
-    String samplerName = "Euler";
+    String samplerName = "DPM++ 2M";
 
     @Builder.Default
-    String scheduler = "simple";
+    String scheduler = "karras";
 
     String forceTaskId;
 

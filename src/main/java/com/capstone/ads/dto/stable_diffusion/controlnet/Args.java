@@ -36,11 +36,11 @@ public class Args {
     Double guidanceStart = 0.0;
 
     @Builder.Default
-    Double guidanceEnd = 1.0;
+    Double guidanceEnd = 0.8;
 
     @Builder.Default
     Boolean pixelPerfect = true;
 
     @Builder.Default
-    String controlMode = "Balanced";
+    String controlMode = "My prompt is more important";
 }

@@ -16,8 +16,6 @@ import com.capstone.ads.repository.external.StableDiffusionClient;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.DataConverter;
 import com.capstone.ads.utils.SecurityContextUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -68,7 +66,6 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
         // Xây dựng TextToImageRequest
         if (prompt != null && !prompt.isEmpty()) {
             prompt = chatBotService.translateToTextToImagePrompt(prompt);
-
         } else {
             prompt = "A simple advertising 2d background";
         }
