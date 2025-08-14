@@ -84,6 +84,12 @@ public class OrderServiceImpl implements OrderService {
                 null
         ));
 
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                orders.getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT, orders.getOrderCode(), OrderStatus.CONTRACT_RESIGNED.getMessage())
+        ));
+
         return orderMapper.toDTO(orders);
     }
 
@@ -172,6 +178,12 @@ public class OrderServiceImpl implements OrderService {
                 this,
                 orders.getUsers().getId(),
                 String.format(NotificationMessage.DEFAULT, orders.getOrderCode(), OrderStatus.IN_PROGRESS.getMessage())
+        ));
+
+        eventPublisher.publishEvent(new RoleNotificationEvent(
+                this,
+                PredefinedRole.STAFF_ROLE,
+                String.format(NotificationMessage.ORDER_IN_PROGRESS, orders.getOrderCode())
         ));
 
         return orderMapper.toDTO(orders);

@@ -113,6 +113,12 @@ public class ContractServiceImpl implements ContractService {
         contract.setStatus(ContractStatus.NEED_DISCUSS);
         contract = contractRepository.save(contract);
 
+        eventPublisher.publishEvent(new RoleNotificationEvent(
+                this,
+                PredefinedRole.SALE_ROLE,
+                String.format(NotificationMessage.CONTRACT_DISCUSS, contract.getOrders().getOrderCode())
+        ));
+
         orderService.updateOrderStatus(orderId, OrderStatus.CONTRACT_DISCUSS);
         return contractMapper.toDTO(contract);
     }

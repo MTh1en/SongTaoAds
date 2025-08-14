@@ -17,7 +17,7 @@ public enum OrderStatus {
     CONTRACT_SENT("Hợp đồng đã được gửi"),
     CONTRACT_SIGNED("Hợp đồng đã được ký"),
     CONTRACT_DISCUSS("Hợp đồng đang được thảo luận"),
-    CONTRACT_RESIGNED("Hợp đồng đã được ký lại"),
+    CONTRACT_RESIGNED("Yêu cẩu gửi lại hợp đồng đã ký"),
     CONTRACT_CONFIRMED("Hợp đồng đã được xác nhận. Hãy đặt cọc ngay!"),
 
     DEPOSITED("Đã thanh toán cọc đơn hàng"),
