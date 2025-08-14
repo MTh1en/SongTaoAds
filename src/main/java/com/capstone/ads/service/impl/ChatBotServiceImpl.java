@@ -149,18 +149,19 @@ public class ChatBotServiceImpl implements ChatBotService {
                 - Keep the composition minimalistic, focusing on smooth gradients, soft textures, and simple shapes.
                 - Always describe the artistic style, color palette, lighting, and atmosphere clearly.
                 - Avoid anything that might distract from the main message of the billboard.
+                - Never describe or request any text, lettering, typography, or logo in the image.
                 
                 Output only a single concise English prompt that can be used directly in Stable Diffusion. Do NOT explain or add formatting.
                 
                 At the end of the prompt, always append:
-                "minimalist composition, blurred background details, ample negative space, uncluttered design, clean background"
+                "minimalist composition, ample negative space, uncluttered design, clean background"
                 
                 """);
 
         UserMessage userMessage = new UserMessage(requirement);
         OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
-                .model(modelChatBot.getModelName())
-                .temperature(0.8)
+                .model("gpt-4.1-mini")
+                .temperature(0.6)
                 .build();
         Prompt prompt = new Prompt(systemMessage, userMessage);
         return chatClient

@@ -27,7 +27,7 @@ public class TextToImageRequest {
             poorly drawn, bad anatomy, wrong anatomy, extra limb, missing limb, floating limbs, disconnected limbs,
             mutation, mutated, ugly, disgusting, amputation,
             crowded, busy, complex details, overly detailed, multiple elements, cluttered,
-            text, watermark, signature, caption, logo, words, letters, characters, numbers, font, handwriting
+            (text, words, letters, typography, font, handwriting, caption, subtitle, watermark, signature, logo, emblem, branding, wordmark:2.0)
             )
             """;
 
