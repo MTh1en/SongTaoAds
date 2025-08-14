@@ -137,8 +137,6 @@ public class ChatBotServiceImpl implements ChatBotService {
 
     @Override
     public String translateToTextToImagePrompt(String requirement) {
-        ModelChatBot modelChatBot = modelChatBotRepository.getModelChatBotByActive(true)
-                .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
         SystemMessage systemMessage = new SystemMessage("""
                 You are an expert AI prompt engineer for Stable Diffusion, specializing in creating simple, clean, and effective background images for billboard advertisements.
                 
@@ -161,7 +159,7 @@ public class ChatBotServiceImpl implements ChatBotService {
         UserMessage userMessage = new UserMessage(requirement);
         OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
                 .model("gpt-4.1-mini")
-                .temperature(0.6)
+                .temperature(0.4)
                 .build();
         Prompt prompt = new Prompt(systemMessage, userMessage);
         return chatClient

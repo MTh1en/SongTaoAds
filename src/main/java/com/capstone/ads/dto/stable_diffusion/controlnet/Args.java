@@ -27,7 +27,7 @@ public class Args {
     String resizeMode = "Just Resize";
 
     @Builder.Default
-    Boolean lowvram = true;
+    Boolean lowvram = false;
 
     @Builder.Default
     Integer processorRes = 512;
@@ -42,5 +42,5 @@ public class Args {
     Boolean pixelPerfect = true;
 
     @Builder.Default
-    String controlMode = "My prompt is more important";
+    String controlMode = "Balanced";
 }
