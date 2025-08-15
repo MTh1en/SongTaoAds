@@ -31,6 +31,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -288,8 +290,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @EventListener
-    @Transactional
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handlePriceProposalApprovedEvent(PriceProposalApprovedEvent event) {
         log.info("custom design request");
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());

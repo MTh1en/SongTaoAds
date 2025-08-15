@@ -131,6 +131,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     @EventListener
     @Transactional
     public void handlePriceProposalApprovedEvent(CustomDesignRequestPricingApprovedEvent event) {
+        log.info("OrderDetail");
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
         String orderId = orderDetail.getOrders().getId();
