@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface TicketRepository extends JpaRepository<Tickets, String> {
 
     Page<Tickets> findByCustomerId(String customerId, Pageable pageable);
@@ -20,4 +22,5 @@ public interface TicketRepository extends JpaRepository<Tickets, String> {
 
     int countByStatus(TicketStatus status);
 
+    List<Tickets> findByOrders_OrderCode(String orderCode);
 }

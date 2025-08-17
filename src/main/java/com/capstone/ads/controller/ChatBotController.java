@@ -26,6 +26,13 @@ public class ChatBotController {
         return ApiResponseBuilder.buildSuccessResponse("Chat bot phản hồi thành công", reply);
     }
 
+    @PostMapping("/tracking-order")
+    @Operation(summary = "Chat với chatbot")
+    public ApiResponse<String> trackingOrder(@RequestBody ChatRequest request) {
+        String reply = chatBotService.trackingOrder(request);
+        return ApiResponseBuilder.buildSuccessResponse("Chat bot phản hồi thành công", reply);
+    }
+
     @PostMapping("/test-chat")
     @Operation(summary = "Staff Test Model Chat")
     public ApiResponse<String> chat(@RequestBody TestChatRequest request) {

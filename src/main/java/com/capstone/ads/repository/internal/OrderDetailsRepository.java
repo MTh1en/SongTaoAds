@@ -14,4 +14,6 @@ public interface OrderDetailsRepository extends JpaRepository<OrderDetails, Stri
     Optional<OrderDetails> findByEditedDesigns_Id(String id);
 
     List<OrderDetails> findByOrders_Id(String id);
+
+    List<OrderDetails> findByOrders_OrderCode(String orderCode);
 }

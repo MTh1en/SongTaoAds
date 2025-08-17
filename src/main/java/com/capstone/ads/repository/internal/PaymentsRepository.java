@@ -26,6 +26,8 @@ public interface PaymentsRepository extends JpaRepository<Payments, String> {
 
     Page<Payments> findByOrders_Id(String id, Pageable pageable);
 
+    List<Payments> findByOrders_OrderCode(String orderCode);
+
     Page<Payments> findByOrders_Users_Id(String id, Pageable pageable);
 
     List<Payments> findByStatus(PaymentStatus status);
