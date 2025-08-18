@@ -14,4 +14,8 @@ public interface ContractorsRepository extends JpaRepository<Contractors, String
     Page<Contractors> findByIsAvailable(Boolean isAvailable, Pageable pageable);
 
     Page<Contractors> findByIsInternalAndIsAvailable(Boolean isInternal, Boolean isAvailable, Pageable pageable);
+
+    int countByIsAvailable(Boolean isAvailable);
+
+    int countByIsInternal(Boolean isInternal);
 }

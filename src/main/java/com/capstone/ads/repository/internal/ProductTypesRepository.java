@@ -14,4 +14,8 @@ public interface ProductTypesRepository extends JpaRepository<ProductTypes, Stri
     Optional<ProductTypes> findByIdAndIsAvailable(String id, Boolean isAvailable);
 
     Page<ProductTypes> findByIsAvailable(Boolean isAvailable, Pageable pageable);
+
+    int countByIsAvailable(Boolean isAvailable);
+
+    int countByIsAiGenerated(Boolean isAiGenerated);
 }

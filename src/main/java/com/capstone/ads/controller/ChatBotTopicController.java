@@ -1,7 +1,7 @@
 package com.capstone.ads.controller;
 
 import com.capstone.ads.dto.ApiResponse;
-import com.capstone.ads.dto.ChatBotTopic.ChatBotTopicResponse;
+import com.capstone.ads.dto.chat_bot_topic.ChatBotTopicResponse;
 import com.capstone.ads.service.ChatBotTopicService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;

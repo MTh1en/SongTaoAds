@@ -9,9 +9,25 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AdminDashboardResponse {
-    int totalOrders;
     int totalUsers;
-    long totalRevenue;
-    int completedOrders;
-    int activeContracts;
+    int totalBannedUsers;
+    int totalCustomer;
+    int totalSale;
+    int totalStaff;
+    int totalDesigner;
+    int totalAdmin;
+    int totalPaymentTransactionCreated;
+    int totalPaymentSuccess;
+    int totalPaymentFailure;
+    int totalPaymentCancelled;
+    long totalPaymentSuccessAmount;
+    long totalPaymentFailureAmount;
+    long totalPaymentCancelledAmount;
+    long totalPayOSSuccessAmount;
+    long totalPayOSFailureAmount;
+    long totalPayOSCancelledAmount;
+    long totalCastAmount;
+    int totalImage;
+    int totalNotification;
+    int totalChatBotUsed;
 }

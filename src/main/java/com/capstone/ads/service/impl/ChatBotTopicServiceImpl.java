@@ -1,14 +1,12 @@
 package com.capstone.ads.service.impl;
 
-import com.capstone.ads.dto.ChatBotTopic.ChatBotTopicResponse;
+import com.capstone.ads.dto.chat_bot_topic.ChatBotTopicResponse;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.mapper.ChatBotTopicMapper;
 import com.capstone.ads.model.ChatBotTopic;
 import com.capstone.ads.model.ModelChatBot;
-import com.capstone.ads.model.Topic;
 import com.capstone.ads.repository.internal.ChatBotTopicRepository;
-import com.capstone.ads.repository.internal.TopicRepository;
 import com.capstone.ads.service.ChatBotTopicService;
 import com.capstone.ads.service.ModelChatService;
 import com.capstone.ads.service.TopicService;

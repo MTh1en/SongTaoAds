@@ -1,4 +1,4 @@
-package com.capstone.ads.dto.ChatBotTopic;
+package com.capstone.ads.dto.dashboard;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,9 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ChatBotTopicResponse {
-    String id;
-    String modelChatBotId;
-    String topicId;
-    LocalDateTime createdAt;
+public class TimeRangeRequest {
+    LocalDateTime start;
+    LocalDateTime end;
 }

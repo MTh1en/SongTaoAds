@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -31,12 +32,6 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
 
     Page<Orders> findByOrderTypeIn(List<OrderType> orderTypes, Pageable pageable);
 
-    int countByUsers_IdAndStatus(String id, OrderStatus status);
-
-    int countByUsers(Users users);
-
-    int countByStatus(OrderStatus status);
-
     @EntityGraph(attributePaths = {
             "orderDetails",
             "orderDetails.customDesignRequests",
@@ -44,4 +39,13 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
     @NonNull
     Optional<Orders> findById(@NonNull String id);
 
+    int countByStatus(OrderStatus status);
+
+    int countByStatusNotIn(Collection<OrderStatus> statuses);
+
+    int countByOrderTypeIn(Collection<OrderType> orderTypes);
+
+    int countByUpdatedAtBetween(LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
+
+    int countByStatusAndUpdatedAtBetween(OrderStatus status, LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
 }

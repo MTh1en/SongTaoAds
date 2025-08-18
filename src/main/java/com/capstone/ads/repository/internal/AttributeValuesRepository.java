@@ -11,4 +11,6 @@ public interface AttributeValuesRepository extends JpaRepository<AttributeValues
     List<AttributeValues> findByAttributes_Id(String id);
 
     List<AttributeValues> findByAttributes_IdAndIsAvailable(String id, Boolean isAvailable);
+
+    int countByIsAvailable(Boolean isAvailable);
 }
