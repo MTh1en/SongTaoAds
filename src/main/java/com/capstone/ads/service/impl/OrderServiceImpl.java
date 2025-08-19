@@ -196,31 +196,26 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderDTO> findOrderByStatus(OrderStatus status, int page, int size) {
+    public Page<OrderDTO> findOrders(OrderStatus orderStatus, OrderType orderType, int page, int size) {
         Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return orderRepository.findByStatus(status, pageable)
-                .map(orderMapper::toDTO);
+        if (orderStatus != null && orderType != null) {
+            return orderRepository.findByStatusAndOrderType(orderStatus, orderType, pageable)
+                    .map(orderMapper::toDTO);
+        } else if (orderStatus != null) {
+            return orderRepository.findByStatus(orderStatus, pageable)
+                    .map(orderMapper::toDTO);
+        } else if (orderType != null) {
+            return orderRepository.findByOrderType(orderType, pageable)
+                    .map(orderMapper::toDTO);
+        } else {
+            return orderRepository.findAll(pageable)
+                    .map(orderMapper::toDTO);
+        }
     }
 
     @Override
-    public Page<OrderDTO> findOrderByType(OrderType orderType, int page, int size) {
-        Sort sort = Sort.by("updatedAt").descending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return orderRepository.findByOrderType(orderType, pageable)
-                .map(orderMapper::toDTO);
-    }
-
-    @Override
-    public Page<OrderDTO> findOrderByStatusAndType(OrderStatus status, OrderType orderType, int page, int size) {
-        Sort sort = Sort.by("updatedAt").descending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return orderRepository.findByStatusAndOrderType(status, orderType, pageable)
-                .map(orderMapper::toDTO);
-    }
-
-    @Override
-    public Page<OrderDTO> findCustomDesignOrderByAndStatus(OrderStatus status, int page, int size) {
+    public Page<OrderDTO> findCustomDesignOrder(OrderStatus status, int page, int size) {
         List<OrderType> orderTypes = Arrays.asList(
                 OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION,
                 OrderType.CUSTOM_DESIGN_WITHOUT_CONSTRUCTION
@@ -228,30 +223,14 @@ public class OrderServiceImpl implements OrderService {
 
         Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return orderRepository.findByStatusAndOrderTypeIn(status, orderTypes, pageable)
-                .map(orderMapper::toDTO);
-    }
 
-    @Override
-    public Page<OrderDTO> findCustomDesignOrder(int page, int size) {
-
-        List<OrderType> orderTypes = Arrays.asList(
-                OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION,
-                OrderType.CUSTOM_DESIGN_WITHOUT_CONSTRUCTION
-        );
-
-        Sort sort = Sort.by("updatedAt").descending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return orderRepository.findByOrderTypeIn(orderTypes, pageable)
-                .map(orderMapper::toDTO);
-    }
-
-    @Override
-    public Page<OrderDTO> findAllOrders(int page, int size) {
-        Sort sort = Sort.by("updatedAt").descending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return orderRepository.findAll(pageable)
-                .map(orderMapper::toDTO);
+        if (status != null) {
+            return orderRepository.findByStatusAndOrderTypeIn(status, orderTypes, pageable)
+                    .map(orderMapper::toDTO);
+        } else {
+            return orderRepository.findByOrderTypeIn(orderTypes, pageable)
+                    .map(orderMapper::toDTO);
+        }
     }
 
     @Override
@@ -285,6 +264,43 @@ public class OrderServiceImpl implements OrderService {
         Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return orderRepository.findByUsers_Id(userId, pageable).map(orderMapper::toDTO);
+    }
+
+    @Override
+    public Page<OrderDTO> searchAiOrders(String query, int page, int size) {
+        List<OrderType> orderTypes = List.of(
+                OrderType.AI_DESIGN
+        );
+
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        return orderRepository.searchSaleOrder(query, query, query, orderTypes, pageable)
+                .map(orderMapper::toDTO);
+    }
+
+    @Override
+    public Page<OrderDTO> searchCustomOrders(String query, int page, int size) {
+        List<OrderType> orderTypes = Arrays.asList(
+                OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION,
+                OrderType.CUSTOM_DESIGN_WITHOUT_CONSTRUCTION
+        );
+
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        return orderRepository.searchSaleOrder(query, query, query, orderTypes, pageable)
+                .map(orderMapper::toDTO);
+    }
+
+    @Override
+    public Page<OrderDTO> searchCustomerOrders(String orderCode, int page, int size) {
+        Users currentUsers = securityContextUtils.getCurrentUser();
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        return orderRepository.findByOrderCodeContainsIgnoreCaseAndUsers(orderCode, currentUsers, pageable)
+                .map(orderMapper::toDTO);
     }
 
     //INTERNAL FUNCTION//

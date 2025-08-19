@@ -20,17 +20,9 @@ public interface OrderService {
 
     OrderDTO findOrderById(String orderId);
 
-    Page<OrderDTO> findOrderByStatus(OrderStatus status, int page, int size);
+    Page<OrderDTO> findOrders(OrderStatus orderStatus, OrderType orderType, int page, int size);
 
-    Page<OrderDTO> findOrderByType(OrderType orderType, int page, int size);
-
-    Page<OrderDTO> findOrderByStatusAndType(OrderStatus status, OrderType orderType, int page, int size);
-
-    Page<OrderDTO> findCustomDesignOrderByAndStatus(OrderStatus status, int page, int size);
-
-    Page<OrderDTO> findCustomDesignOrder(int page, int size);
-
-    Page<OrderDTO> findAllOrders(int page, int size);
+    Page<OrderDTO> findCustomDesignOrder(OrderStatus status, int page, int size);
 
     void cancelOrder(String orderId);
 
@@ -38,6 +30,11 @@ public interface OrderService {
 
     Page<OrderDTO> findOrderByUserId(String userId, int page, int size);
 
+    Page<OrderDTO> searchAiOrders(String query, int page, int size);
+
+    Page<OrderDTO> searchCustomOrders(String query, int page, int size);
+
+    Page<OrderDTO> searchCustomerOrders(String orderCode, int page, int size);
     //INTERNAL FUNCTION
 
     Orders getOrderById(String orderId);

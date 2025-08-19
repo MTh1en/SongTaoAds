@@ -42,4 +42,8 @@ public interface CustomDesignRequestsRepository extends JpaRepository<CustomDesi
     int countByUpdatedAtBetween(LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
 
     int countByStatusAndUpdatedAtBetween(CustomDesignRequestStatus status, LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
+
+    Page<CustomDesignRequests> findByCodeContainsIgnoreCaseOrCustomerDetail_CompanyNameContainsIgnoreCase(String code, String companyName, Pageable pageable);
+
+    Page<CustomDesignRequests> findByCodeContainsIgnoreCaseAndAssignDesigner(String code, Users assignDesigner, Pageable pageable);
 }

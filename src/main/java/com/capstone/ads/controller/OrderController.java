@@ -79,63 +79,54 @@ public class OrderController {
         return ApiResponseBuilder.buildPagingSuccessResponse("Xem order theo thông tin người dùng", response, page);
     }
 
-    @GetMapping(value = "/orders", params = {"orderStatus", "orderType"})
-    @Operation(summary = "Xem order theo status và type")
-    public ApiPagingResponse<OrderDTO> findOrderByStatusAndType(
+    @GetMapping("/orders")
+    @Operation(summary = "Tìm kiếm và xem order")
+    public ApiPagingResponse<OrderDTO> findOrders(
             @RequestParam(required = false) OrderStatus orderStatus,
             @RequestParam(required = false) OrderType orderType,
-            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = orderService.findOrderByStatusAndType(orderStatus, orderType, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Xem order theo trạng thái và loại thành công", response, page);
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        var response = orderService.findOrders(orderStatus, orderType, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Tìm kiếm order thành công", response, page);
     }
 
-    @GetMapping(value = "/orders", params = {"orderStatus", "!orderType"})
-    @Operation(summary = "Xem order theo status")
-    public ApiPagingResponse<OrderDTO> findOrderByStatus(
-            @RequestParam(required = false) OrderStatus orderStatus,
+    @GetMapping("/orders/ai-search")
+    @Operation(summary = "Tìm kiếm Orders")
+    public ApiPagingResponse<OrderDTO> searchAiOrders(
+            @RequestParam String query,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = orderService.findOrderByStatus(orderStatus, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Xem order theo trạng thái thành công", response, page);
+        var response = orderService.searchAiOrders(query, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Search AI order thành công", response, page);
     }
 
-    @GetMapping(value = "/orders", params = {"orderType", "!orderStatus"})
-    @Operation(summary = "Xem order theo type")
-    public ApiPagingResponse<OrderDTO> findOrderByType(
-            @RequestParam(required = false) OrderType orderType,
+    @GetMapping("/orders/custom-search")
+    @Operation(summary = "Tìm kiếm Orders")
+    public ApiPagingResponse<OrderDTO> searchCustomOrders(
+            @RequestParam String query,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = orderService.findOrderByType(orderType, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Xem order theo loại thành công", response, page);
+        var response = orderService.searchCustomOrders(query, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Search Custom Order thành công", response, page);
     }
 
-    @GetMapping(value = "/orders", params = {"!orderStatus", "!orderType"})
-    @Operation(summary = "Xem tất cả order")
-    public ApiPagingResponse<OrderDTO> findAllOrders(
+    @GetMapping("/orders/customer-search")
+    @Operation(summary = "Tìm kiếm Orders")
+    public ApiPagingResponse<OrderDTO> searchCustomerOrders(
+            @RequestParam String query,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = orderService.findAllOrders(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả order thành công", response, page);
+        var response = orderService.searchCustomerOrders(query, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Search Customer Order thành công", response, page);
     }
 
-
-    @GetMapping(value = "/orders/custom-design", params = {"orderStatus"})
-    @Operation(summary = "Xem tất cả order custom design theo trạng thái")
-    public ApiPagingResponse<OrderDTO> findCustomDesignOrderByAndStatus(
-            @RequestParam(required = false) OrderStatus orderStatus,
-            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = orderService.findCustomDesignOrderByAndStatus(orderStatus, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả order custom theo trạng thái", response, page);
-    }
-
-    @GetMapping(value = "/orders/custom-design", params = {"!orderStatus"})
+    @GetMapping("/orders/custom-design")
     @Operation(summary = "Xem tất cả order custom design")
     public ApiPagingResponse<OrderDTO> findCustomDesignOrderByAndStatus(
+            @RequestParam(required = false) OrderStatus orderStatus,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = orderService.findCustomDesignOrder(page, size);
+        var response = orderService.findCustomDesignOrder(orderStatus, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả order custom thành công", response, page);
     }
 

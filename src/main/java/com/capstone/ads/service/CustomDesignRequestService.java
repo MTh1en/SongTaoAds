@@ -22,11 +22,13 @@ public interface CustomDesignRequestService {
 
     Page<CustomDesignRequestDTO> findCustomDesignRequestByAssignDesignerId(String assignDesignerId, int page, int size);
 
-    Page<CustomDesignRequestDTO> findCustomDesignRequestByStatus(CustomDesignRequestStatus status, int page, int size);
-
     Page<CustomDesignRequestDTO> findAllCustomDesignRequestNeedSupport(int page, int size);
 
-    Page<CustomDesignRequestDTO> findAllCustomerDesignRequest(int page, int size);
+    Page<CustomDesignRequestDTO> findCustomerDesignRequest(CustomDesignRequestStatus status, int page, int size);
+
+    Page<CustomDesignRequestDTO> searchCustomDesignRequest(String keyword, int page, int size);
+
+    Page<CustomDesignRequestDTO> searchCustomDesignRequestAssigned(String keyword, int page, int size);
 
     //INTERNAL FUNCTION
     CustomDesignRequests getCustomDesignRequestById(String customDesignRequestId);

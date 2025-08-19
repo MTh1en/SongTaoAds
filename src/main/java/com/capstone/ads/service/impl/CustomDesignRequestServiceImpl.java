@@ -35,10 +35,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @Service
@@ -189,14 +186,6 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
-    public Page<CustomDesignRequestDTO> findCustomDesignRequestByStatus(CustomDesignRequestStatus status, int page, int size) {
-        Sort sort = Sort.by("updatedAt").descending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return customDesignRequestsRepository.findByStatus(status, pageable)
-                .map(customDesignRequestsMapper::toDTO);
-    }
-
-    @Override
     public Page<CustomDesignRequestDTO> findAllCustomDesignRequestNeedSupport(int page, int size) {
         Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -205,12 +194,39 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
-    public Page<CustomDesignRequestDTO> findAllCustomerDesignRequest(int page, int size) {
+    public Page<CustomDesignRequestDTO> findCustomerDesignRequest(CustomDesignRequestStatus status, int page, int size) {
         Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return customDesignRequestsRepository.findAll(pageable)
+
+        if (Objects.nonNull(status)) {
+            return customDesignRequestsRepository.findByStatus(status, pageable)
+                    .map(customDesignRequestsMapper::toDTO);
+        } else {
+            return customDesignRequestsRepository.findAll(pageable)
+                    .map(customDesignRequestsMapper::toDTO);
+        }
+    }
+
+    @Override
+    public Page<CustomDesignRequestDTO> searchCustomDesignRequest(String keyword, int page, int size) {
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        return customDesignRequestsRepository.findByCodeContainsIgnoreCaseOrCustomerDetail_CompanyNameContainsIgnoreCase(
+                keyword, keyword, pageable
+        ).map(customDesignRequestsMapper::toDTO);
+    }
+
+    @Override
+    public Page<CustomDesignRequestDTO> searchCustomDesignRequestAssigned(String keyword, int page, int size) {
+        var currentDesigner = securityContextUtils.getCurrentUser();
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        return customDesignRequestsRepository.findByCodeContainsIgnoreCaseAndAssignDesigner(keyword, currentDesigner, pageable)
                 .map(customDesignRequestsMapper::toDTO);
     }
+
 
     //INTERNAL FUNCTION//
 
@@ -221,6 +237,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     // UPLOAD IMAGE //
+
     private String generateCustomDesignRequestKey(String customDesignRequestId) {
         return String.format(S3ImageKeyFormat.FINAL_CUSTOM_DESIGN, customDesignRequestId);
     }
