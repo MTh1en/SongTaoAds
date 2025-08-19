@@ -321,7 +321,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public boolean checkOrderNeedDepositDesign(String orderId) {
         Orders orders = getOrderById(orderId);
         return orders.getOrderDetails().stream()
@@ -330,7 +329,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public boolean checkOrderNeedFullyPaidDesign(String orderId) {
         Orders orders = getOrderById(orderId);
         return orders.getOrderDetails().stream()
@@ -339,7 +337,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public boolean checkOrderCustomDesignSubmittedDesign(String orderId) {
         Orders orders = getOrderById(orderId);
         return orders.getOrderDetails().stream()

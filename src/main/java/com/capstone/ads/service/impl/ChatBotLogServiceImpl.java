@@ -17,6 +17,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,8 +33,8 @@ public class ChatBotLogServiceImpl implements ChatBotLogService {
     ModelChatService modelChatService;
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @EventListener
     @Transactional
+    @EventListener
     public void createChatBotLog(ChatBotLogEvent chatBotLogEvent) {
         Users user = securityContextUtils.getCurrentUser();
         ModelChatBot modelChatBot = modelChatService.getModelChatBotById(chatBotLogEvent.getModelChatBotId());

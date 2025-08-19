@@ -19,9 +19,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -128,9 +128,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     // HANDLE EVENT //
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @EventListener
-    @Transactional
-    public void handlePriceProposalApprovedEvent(CustomDesignRequestPricingApprovedEvent event) {
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void handleCustomDesignRequestPricingApproved(CustomDesignRequestPricingApprovedEvent event) {
         log.info("OrderDetail");
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
@@ -149,6 +149,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleDemoDesignApprovedEvent(CustomDesignRequestDemoSubmittedEvent event) {
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
@@ -161,6 +162,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleCustomDesignRequestCompletedEvent(CustomDesignRequestCompletedEvent event) {
         log.info("Custom design request completed: {}", event.getCustomDesignRequestId());
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
@@ -173,8 +175,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @EventListener
-    @Transactional
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleOrderCancel(OrderCancelEvent event) {
         Orders orders = orderService.getOrderById(event.getOrderId());
 
