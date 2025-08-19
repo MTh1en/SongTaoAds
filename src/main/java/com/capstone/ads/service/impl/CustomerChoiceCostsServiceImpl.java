@@ -54,7 +54,7 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
 
         // 3. Tải tất cả CostTypes liên quan đến ProductType trong MỘT TRUY VẤN
         // và phân loại chúng trong bộ nhớ.
-        List<CostTypes> allCostTypesForProductType = costTypesService.getCostTypesByProductTypeSortedByPriority(productTypeId);
+        List<CostTypes> allCostTypesForProductType = costTypesService.getCostTypesByProductTypeSortedByPriorityAndIsAvailable(productTypeId);
 
         // Tìm Core Cost Type
         CostTypes coreCostType = allCostTypesForProductType.stream()
