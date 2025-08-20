@@ -3,10 +3,7 @@ package com.capstone.ads.service.impl;
 import com.capstone.ads.constaint.NotificationMessage;
 import com.capstone.ads.constaint.PaymentPolicy;
 import com.capstone.ads.constaint.PredefinedRole;
-import com.capstone.ads.dto.order.OrderConfirmRequest;
-import com.capstone.ads.dto.order.OrderCreateRequest;
-import com.capstone.ads.dto.order.OrderDTO;
-import com.capstone.ads.dto.order.OrderUpdateAddressRequest;
+import com.capstone.ads.dto.order.*;
 import com.capstone.ads.event.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
@@ -50,6 +47,7 @@ public class OrderServiceImpl implements OrderService {
     ApplicationEventPublisher eventPublisher;
 
     @Override
+    @Transactional
     public OrderDTO createOrder(OrderCreateRequest request) {
         Users users = securityContextUtils.getCurrentUser();
         Orders orders = orderMapper.mapCreateRequestToEntity(request);
@@ -84,6 +82,12 @@ public class OrderServiceImpl implements OrderService {
                 OrderStatus.CONTRACT_RESIGNED,
                 userId,
                 null
+        ));
+
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                orders.getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT, orders.getOrderCode(), OrderStatus.CONTRACT_RESIGNED.getMessage())
         ));
 
         return orderMapper.toDTO(orders);
@@ -128,6 +132,12 @@ public class OrderServiceImpl implements OrderService {
                 null
         ));
 
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                orders.getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT, orders.getOrderCode(), OrderStatus.CONTRACT_CONFIRMED.getMessage())
+        ));
+
         return orderMapper.toDTO(orders);
     }
 
@@ -164,6 +174,18 @@ public class OrderServiceImpl implements OrderService {
                 null
         ));
 
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                orders.getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT, orders.getOrderCode(), OrderStatus.IN_PROGRESS.getMessage())
+        ));
+
+        eventPublisher.publishEvent(new RoleNotificationEvent(
+                this,
+                PredefinedRole.STAFF_ROLE,
+                String.format(NotificationMessage.ORDER_IN_PROGRESS, orders.getOrderCode())
+        ));
+
         return orderMapper.toDTO(orders);
     }
 
@@ -174,31 +196,26 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderDTO> findOrderByStatus(OrderStatus status, int page, int size) {
+    public Page<OrderDTO> findOrders(OrderStatus orderStatus, OrderType orderType, int page, int size) {
         Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return orderRepository.findByStatus(status, pageable)
-                .map(orderMapper::toDTO);
+        if (orderStatus != null && orderType != null) {
+            return orderRepository.findByStatusAndOrderType(orderStatus, orderType, pageable)
+                    .map(orderMapper::toDTO);
+        } else if (orderStatus != null) {
+            return orderRepository.findByStatus(orderStatus, pageable)
+                    .map(orderMapper::toDTO);
+        } else if (orderType != null) {
+            return orderRepository.findByOrderType(orderType, pageable)
+                    .map(orderMapper::toDTO);
+        } else {
+            return orderRepository.findAll(pageable)
+                    .map(orderMapper::toDTO);
+        }
     }
 
     @Override
-    public Page<OrderDTO> findOrderByType(OrderType orderType, int page, int size) {
-        Sort sort = Sort.by("updatedAt").descending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return orderRepository.findByOrderType(orderType, pageable)
-                .map(orderMapper::toDTO);
-    }
-
-    @Override
-    public Page<OrderDTO> findOrderByStatusAndType(OrderStatus status, OrderType orderType, int page, int size) {
-        Sort sort = Sort.by("updatedAt").descending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return orderRepository.findByStatusAndOrderType(status, orderType, pageable)
-                .map(orderMapper::toDTO);
-    }
-
-    @Override
-    public Page<OrderDTO> findCustomDesignOrderByAndStatus(OrderStatus status, int page, int size) {
+    public Page<OrderDTO> findCustomDesignOrder(OrderStatus status, int page, int size) {
         List<OrderType> orderTypes = Arrays.asList(
                 OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION,
                 OrderType.CUSTOM_DESIGN_WITHOUT_CONSTRUCTION
@@ -206,30 +223,14 @@ public class OrderServiceImpl implements OrderService {
 
         Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return orderRepository.findByStatusAndOrderTypeIn(status, orderTypes, pageable)
-                .map(orderMapper::toDTO);
-    }
 
-    @Override
-    public Page<OrderDTO> findCustomDesignOrder(int page, int size) {
-
-        List<OrderType> orderTypes = Arrays.asList(
-                OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION,
-                OrderType.CUSTOM_DESIGN_WITHOUT_CONSTRUCTION
-        );
-
-        Sort sort = Sort.by("updatedAt").descending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return orderRepository.findByOrderTypeIn(orderTypes, pageable)
-                .map(orderMapper::toDTO);
-    }
-
-    @Override
-    public Page<OrderDTO> findAllOrders(int page, int size) {
-        Sort sort = Sort.by("updatedAt").descending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return orderRepository.findAll(pageable)
-                .map(orderMapper::toDTO);
+        if (status != null) {
+            return orderRepository.findByStatusAndOrderTypeIn(status, orderTypes, pageable)
+                    .map(orderMapper::toDTO);
+        } else {
+            return orderRepository.findByOrderTypeIn(orderTypes, pageable)
+                    .map(orderMapper::toDTO);
+        }
     }
 
     @Override
@@ -265,6 +266,43 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findByUsers_Id(userId, pageable).map(orderMapper::toDTO);
     }
 
+    @Override
+    public Page<OrderDTO> searchAiOrders(String query, int page, int size) {
+        List<OrderType> orderTypes = List.of(
+                OrderType.AI_DESIGN
+        );
+
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        return orderRepository.searchSaleOrder(query, query, query, orderTypes, pageable)
+                .map(orderMapper::toDTO);
+    }
+
+    @Override
+    public Page<OrderDTO> searchCustomOrders(String query, int page, int size) {
+        List<OrderType> orderTypes = Arrays.asList(
+                OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION,
+                OrderType.CUSTOM_DESIGN_WITHOUT_CONSTRUCTION
+        );
+
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        return orderRepository.searchSaleOrder(query, query, query, orderTypes, pageable)
+                .map(orderMapper::toDTO);
+    }
+
+    @Override
+    public Page<OrderDTO> searchCustomerOrders(String orderCode, int page, int size) {
+        Users currentUsers = securityContextUtils.getCurrentUser();
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        return orderRepository.findByOrderCodeContainsIgnoreCaseAndUsers(orderCode, currentUsers, pageable)
+                .map(orderMapper::toDTO);
+    }
+
     //INTERNAL FUNCTION//
 
     @Override
@@ -293,13 +331,12 @@ public class OrderServiceImpl implements OrderService {
 
         eventPublisher.publishEvent(new UserNotificationEvent(
                 this,
-                userId,
+                orders.getUsers().getId(),
                 String.format(NotificationMessage.DEFAULT, orders.getOrderCode(), status.getMessage())
         ));
     }
 
     @Override
-    @Transactional
     public boolean checkOrderNeedDepositDesign(String orderId) {
         Orders orders = getOrderById(orderId);
         return orders.getOrderDetails().stream()
@@ -308,7 +345,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public boolean checkOrderNeedFullyPaidDesign(String orderId) {
         Orders orders = getOrderById(orderId);
         return orders.getOrderDetails().stream()
@@ -317,7 +353,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public boolean checkOrderCustomDesignSubmittedDesign(String orderId) {
         Orders orders = getOrderById(orderId);
         return orders.getOrderDetails().stream()

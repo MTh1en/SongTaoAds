@@ -27,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -47,7 +48,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Async
     @EventListener
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleRoleNotificationEvent(RoleNotificationEvent event) {
         sendNotificationToRole(event.getRoleName(), event.getMessage());
     }
@@ -75,7 +76,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Async
     @EventListener
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleUserNotificationEvent(UserNotificationEvent event) {
         sendNotificationToUser(event.getUserId(), event.getMessage());
     }

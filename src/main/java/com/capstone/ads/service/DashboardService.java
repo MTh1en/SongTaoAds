@@ -1,13 +1,21 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.dashboard.AdminDashboardResponse;
-import com.capstone.ads.dto.dashboard.CustomerDashboardResponse;
-import com.capstone.ads.dto.dashboard.SaleDashboardResponse;
-import com.capstone.ads.dto.dashboard.StaffDashboardResponse;
+import com.capstone.ads.dto.dashboard.*;
 
 public interface DashboardService {
-    CustomerDashboardResponse getCustomerDashboard();
     AdminDashboardResponse getAdminDashboard();
+
     SaleDashboardResponse getSaleDashboard();
+
     StaffDashboardResponse getStaffDashboard();
+
+    DesignerDashboardResponse getDesignerDashboard();
+
+    CustomRequestDashboardResponse customDesignRequestDashboard(TimeRangeRequest request);
+
+    OrderSaleDashboardResponse orderSaleDashboard(TimeRangeRequest request);
+
+    OrderStaffDashboardResponse orderStaffDashboard(TimeRangeRequest request);
+
+    PaymentDashboardResponse paymentDashboard(TimeRangeRequest request);
 }

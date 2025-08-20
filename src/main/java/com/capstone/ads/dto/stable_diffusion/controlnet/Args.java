@@ -27,7 +27,7 @@ public class Args {
     String resizeMode = "Just Resize";
 
     @Builder.Default
-    Boolean lowvram = true;
+    Boolean lowvram = false;
 
     @Builder.Default
     Integer processorRes = 512;
@@ -36,7 +36,7 @@ public class Args {
     Double guidanceStart = 0.0;
 
     @Builder.Default
-    Double guidanceEnd = 1.0;
+    Double guidanceEnd = 0.8;
 
     @Builder.Default
     Boolean pixelPerfect = true;

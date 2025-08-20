@@ -5,11 +5,10 @@ import com.capstone.ads.event.ChatBotLogEvent;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
 import com.capstone.ads.model.ModelChatBot;
-import com.capstone.ads.model.Orders;
 import com.capstone.ads.repository.external.ChatBotClient;
 import com.capstone.ads.repository.internal.ModelChatBotRepository;
-import com.capstone.ads.repository.internal.OrdersRepository;
 import com.capstone.ads.service.ChatBotService;
+import com.capstone.ads.utils.OrderTrackingTool;
 import com.capstone.ads.utils.SecurityContextUtils;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -26,13 +25,11 @@ import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -56,18 +53,18 @@ public class ChatBotServiceImpl implements ChatBotService {
     ModelChatBotRepository modelChatBotRepository;
     ApplicationEventPublisher eventPublisher;
     ChatClient chatClient;
-    OrdersRepository ordersRepository;
     JdbcChatMemoryRepository jdbcChatMemoryRepository;
+    OrderTrackingTool orderTrackingTool;
 
 
     public ChatBotServiceImpl(ChatBotClient chatBotClient, SecurityContextUtils securityContextUtils, ModelChatBotRepository modelChatBotRepository, ApplicationEventPublisher eventPublisher,
-                              ChatClient.Builder chatClientBuilder, JdbcChatMemoryRepository jdbcChatMemoryRepository, OrdersRepository ordersRepository) {
+                              ChatClient.Builder chatClientBuilder, JdbcChatMemoryRepository jdbcChatMemoryRepository, OrderTrackingTool orderTrackingTool) {
         this.chatBotClient = chatBotClient;
         this.securityContextUtils = securityContextUtils;
         this.modelChatBotRepository = modelChatBotRepository;
-        this.ordersRepository= ordersRepository;
         this.eventPublisher = eventPublisher;
         this.jdbcChatMemoryRepository = jdbcChatMemoryRepository;
+        this.orderTrackingTool = orderTrackingTool;
 
         ChatMemory chatMemory = MessageWindowChatMemory.builder()
                 .chatMemoryRepository(jdbcChatMemoryRepository)
@@ -75,7 +72,6 @@ public class ChatBotServiceImpl implements ChatBotService {
                 .build();
 
         chatClient = chatClientBuilder
-                .defaultTools(this)
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
     }
@@ -126,6 +122,81 @@ public class ChatBotServiceImpl implements ChatBotService {
     }
 
     @Override
+    public String trackingOrder(ChatRequest request) {
+        String userId = securityContextUtils.getCurrentUser().getId();
+
+        SystemMessage systemMessage = new SystemMessage("""
+                    Bạn là một trợ lý AI chuyên hỗ trợ tracking và tư vấn đơn hàng. Khi người dùng cung cấp mã đơn hàng, hãy gọi hàm `trackOrder` với tham số `orderCode` để lấy thông tin đơn hàng từ cơ sở dữ liệu. Dựa trên kết quả, trả lời câu hỏi của người dùng bằng tiếng Việt một cách rõ ràng, tự nhiên và chính xác theo flow kinh doanh dưới đây. Nếu không tìm thấy đơn hàng, thông báo rằng mã đơn hàng không hợp lệ.
+                
+                    **Quy tắc thanh toán nghiêm ngặt (PHẢI TUÂN THỦ)**:
+                    - Thanh toán được chia thành 4 loại dựa trên PaymentType: DEPOSIT_DESIGN (cọc thiết kế), REMAINING_DESIGN (hoàn tất thiết kế), DEPOSIT_CONSTRUCTION (cọc thi công), REMAINING_CONSTRUCTION (hoàn tất thi công).
+                    - `totalOrderAmount` = `totalDesignAmount` (tổng chi phí thiết kế) + `totalConstructionAmount` (tổng chi phí thi công).
+                    - `depositDesignAmount`: Khoản cọc thiết kế, chỉ gợi ý thanh toán khi status là NEED_DEPOSIT_DESIGN.
+                    - `remainingDesignAmount`: Khoản để hoàn tất thiết kế (tổng thiết kế trừ cọc), KHÔNG PHẢI 'tiền còn lại cần thanh toán' – chỉ gợi ý khi status là NEED_FULLY_PAID_DESIGN, nhấn mạnh là 'khoản cần thanh toán để nhận bản thiết kế cuối cùng'.
+                    - `depositConstructionAmount`: Khoản cọc thi công, chỉ gợi ý khi status là CONTRACT_CONFIRMED.
+                    - `remainingConstructionAmount`: Khoản để hoàn tất thi công (tổng thi công trừ cọc), KHÔNG PHẢI 'tiền còn lại cần thanh toán' – chỉ gợi ý khi status là INSTALLED, nhấn mạnh là 'khoản cần thanh toán để hoàn thành đơn hàng sau lắp đặt'.
+                    - Nếu chưa thanh toán gì (ví dụ: status PENDING_CONTRACT hoặc PENDING_DESIGN), KHÔNG ĐƯỢC đề cập `remainingDesignAmount` hoặc `remainingConstructionAmount` như tiền cần thanh toán ngay. Chỉ tính `totalPaid` từ Payments với status SUCCESS và gợi ý dựa trên status hiện tại.
+                    - KHÔNG SUY DIỄN: Không dùng từ 'tiền còn lại cần thanh toán' cho bất kỳ remaining amount nào. Luôn dùng 'khoản cần thanh toán để hoàn tất giai đoạn [thiết kế/thi công]'.
+                    - Trường `currentPaymentRequired` trong dữ liệu từ `trackOrder` cung cấp khoản thanh toán cần thiết ngay tại status hiện tại, sử dụng trực tiếp để trả lời.
+
+                    **Flow kinh doanh tổng quát**:
+                    - Có 3 loại đơn hàng: AI_DESIGN (thiết kế AI), CUSTOM_DESIGN_WITH_CONSTRUCTION (thiết kế tùy chỉnh có thi công), CUSTOM_DESIGN_WITHOUT_CONSTRUCTION (thiết kế tùy chỉnh không thi công).
+                    - Mỗi đơn hàng có liên kết với OrderDetails, Payments, Feedbacks, và Contract (nếu có).
+                
+                    **Flow cho AI_DESIGN**:
+                    - Đơn hàng có nhiều OrderDetails, mỗi cái liên kết với EditedDesigns (thiết kế chỉnh sửa từ AI).
+                    - Bắt đầu từ status PENDING_CONTRACT (đang chờ hợp đồng).
+                    - Sale gửi hợp đồng → CONTRACT_SENT.
+                    - Khách đồng ý ký → CONTRACT_SIGNED; nếu cần bàn luận → CONTRACT_DISCUSS (sale gửi hợp đồng mới).
+                    - Sale xác nhận hợp đồng → CONTRACT_CONFIRMED; nếu có vấn đề → CONTRACT_RESIGNED (khách ký lại, quay về CONTRACT_SIGNED).
+                    - Khách thanh toán cọc thi công (`depositConstructionAmount`) → DEPOSITED.
+                    - Sale báo ngày giao dự kiến và Contractor → IN_PROGRESS.
+                    - Cập nhật tiến độ: PRODUCING → PRODUCTION_COMPLETED → DELIVERING → INSTALLED.
+                    - Sau lắp đặt, khách thanh toán khoản hoàn tất thi công (`remainingConstructionAmount`) → ORDER_COMPLETED.
+                
+                    **Flow cho CUSTOM_DESIGN_WITH_CONSTRUCTION và CUSTOM_DESIGN_WITHOUT_CONSTRUCTION**:
+                    - Đơn hàng có 1 OrderDetails liên kết với CustomDesignRequests.
+                    - Bắt đầu từ status PENDING_DESIGN (đang chờ thiết kế).
+                    - Sale báo giá qua PriceProposal (status PENDING) → CustomDesignRequest status PRICING_NOTIFIED.
+                    - Khách reject → REJECTED_PRICING (sale báo giá lại); approve → APPROVED_PRICING, order status NEED_DEPOSIT_DESIGN.
+                    - Khách thanh toán cọc thiết kế (`depositDesignAmount`) → DEPOSITED_DESIGN, request → DEPOSITED → ASSIGNED_DESIGNER.
+                    - Designer nhận → PROCESSING; reject → DESIGNER_REJECTED (sale giao lại designer khác).
+                    - Designer gửi demo → DEMO_SUBMITTED.
+                    - Khách reject demo → REVISION_REQUESTED (designer gửi lại); approve → WAITING_FULL_PAYMENT, order → NEED_FULLY_PAID_DESIGN.
+                    - Khách thanh toán khoản hoàn tất thiết kế (`remainingDesignAmount`) → WAITING_FINAL_DESIGN, request → FULLY_PAID.
+                    - Designer gửi bản final → COMPLETED, order → DESIGN_COMPLETED (nếu WITHOUT_CONSTRUCTION) hoặc PENDING_CONTRACT (nếu WITH_CONSTRUCTION, tiếp tục flow như AI_DESIGN).
+                
+                    **Hướng dẫn tư vấn**:
+                    - Luôn kiểm tra status hiện tại từ dữ liệu `trackOrder` trước khi gợi ý thanh toán. Sử dụng `currentPaymentRequired` để biết khoản thanh toán cần ngay lúc này.
+                    - Nếu status không yêu cầu thanh toán (ví dụ: PENDING_CONTRACT, PENDING_DESIGN), trả lời rằng chưa cần thanh toán và nêu bước tiếp theo (ví dụ: chờ hợp đồng, chờ báo giá).
+                    - Đối với remaining amount, chỉ đề cập khi đúng giai đoạn (NEED_FULLY_PAID_DESIGN hoặc INSTALLED), và dùng đúng từ ngữ 'khoản cần thanh toán để hoàn tất giai đoạn'.
+                    - Ví dụ trả lời đúng:
+                      - Hỏi: "Đơn hàng DH-73W144JKHR tôi cần thanh toán gì?" (status PENDING_CONTRACT, AI_DESIGN) → "Đơn hàng của bạn đang ở trạng thái PENDING_CONTRACT (đang chờ sale gửi hợp đồng). Hiện tại bạn chưa cần thanh toán gì. Sau khi ký và xác nhận hợp đồng, bạn sẽ thanh toán khoản cọc thi công X đồng (depositConstructionAmount)."
+                      - Hỏi: "Tôi cần thanh toán bao nhiêu để hoàn tất?" (status NEED_FULLY_PAID_DESIGN) → "Khoản cần thanh toán để hoàn tất thiết kế là Y đồng (amountToCompleteDesign)."
+                      - Hỏi: "Đơn hàng DH-123 cần làm gì tiếp?" (status NEED_DEPOSIT_DESIGN) → "Đơn hàng của bạn đang ở trạng thái NEED_DEPOSIT_DESIGN. Hãy thanh toán khoản cọc thiết kế X đồng (depositDesignAmount) để bắt đầu."
+                      - Hỏi: "Tổng tiền đơn hàng là bao nhiêu?" → "Tổng tiền đơn hàng là Z đồng (totalOrderAmount), bao gồm X đồng thiết kế (totalDesignAmount) và Y đồng thi công (totalConstructionAmount)."
+                """);
+
+        UserMessage userMessage = new UserMessage(request.getPrompt());
+        OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
+                .model("gpt-4.1-mini")
+                .build();
+
+        Prompt prompt = new Prompt(systemMessage, userMessage);
+
+        return chatClient
+                .prompt(prompt)
+                .options(openAiChatOptions)
+                .tools(orderTrackingTool)
+                .advisors(advisorSpec -> advisorSpec.param(
+                        ChatMemory.CONVERSATION_ID, userId
+                ))
+                .call()
+                .content();
+    }
+
+
+    @Override
     public String TestChat(TestChatRequest request) {
         SystemMessage systemMessage = new SystemMessage("""
                 Bạn là trợ lý AI tư vấn về thiết kế và in ấn biển quảng cáo.
@@ -144,23 +215,29 @@ public class ChatBotServiceImpl implements ChatBotService {
 
     @Override
     public String translateToTextToImagePrompt(String requirement) {
-        ModelChatBot modelChatBot = modelChatBotRepository.getModelChatBotByActive(true)
-                .orElseThrow(() -> new AppException(ErrorCode.MODEL_CHAT_NOT_FOUND));
         SystemMessage systemMessage = new SystemMessage("""
-                You are an expert AI prompt engineer for Stable Diffusion, specializing in creating stunning and effective background images for billboards. Your task is to transform a user's high-level request into a detailed, descriptive, and actionable prompt suitable for image generation AI.
-                        When generating the prompt, consider the following key aspects for a billboard background:
-                           1.  Purpose & Mood: What is the general purpose or mood this background should convey (e.g., modern, classic, festive, natural, futuristic, calm, energetic)?
-                           2.  Composition & Negative Space:** Emphasize areas for text/logo placement. Specify if large clear areas are needed (e.g., "ample negative space on the left/right/top/bottom for text overlays," "minimalist foreground," "uncluttered background").
-                           3.  Visual Style: Describe the artistic style (e.g., photorealistic, abstract, watercolor, cinematic, minimalist, digital art), color palette (e.g., warm tones, cool tones, vibrant, muted, specific dominant colors), lighting (e.g., golden hour, neon glow, soft ambient light, dramatic), and overall aesthetic.
-                           4.  Key Elements & Scene: Describe specific elements to include (e.g., city skyline, natural landscape, abstract shapes, subtle patterns, technological elements). Avoid elements that might distract from the main message of the billboard (e.g., overly complex details, prominent human faces unless specified).
-                           5.  Quality & Details: Include terms for high quality (e.g., "high resolution," "ultra detailed," "8K," "sharp focus," "smooth rendering").
-                        Your output should be a single, concise, and highly descriptive English prompt, ready to be used directly in Stable Diffusion. Do NOT include any conversational text, explanations, or formatting like bullet points or numbered lists. Only output the prompt.
+                You are an expert AI prompt engineer for Stable Diffusion, specializing in creating simple, clean, and effective background images for billboard advertisements.
+                
+                Your job is to:
+                - Take the user's request and extract only the essential mood, color, and theme.
+                - Remove or simplify any complex, busy, or crowded elements such as dense buildings, many people, heavy patterns, or overly detailed objects.
+                - Always include clear instructions for large empty or uncluttered areas suitable for text/logo placement.
+                - Keep the composition minimalistic, focusing on smooth gradients, soft textures, and simple shapes.
+                - Always describe the artistic style, color palette, lighting, and atmosphere clearly.
+                - Avoid anything that might distract from the main message of the billboard.
+                - Never describe or request any text, lettering, typography, or logo in the image.
+                
+                Output only a single concise English prompt that can be used directly in Stable Diffusion. Do NOT explain or add formatting.
+                
+                At the end of the prompt, always append:
+                "minimalist composition, ample negative space, uncluttered design, clean background"
+                
                 """);
 
         UserMessage userMessage = new UserMessage(requirement);
         OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
-                .model(modelChatBot.getModelName())
-                .temperature(0.8)
+                .model("gpt-4.1-mini")
+                .temperature(0.4)
                 .build();
         Prompt prompt = new Prompt(systemMessage, userMessage);
         return chatClient
@@ -256,18 +333,6 @@ public class ChatBotServiceImpl implements ChatBotService {
                 .options(options)
                 .call()
                 .entity(TraditionalBillboardResponse.class);
-    }
-
-    @Tool(name = "trackOrder", description = "Tra cứu trạng thái đơn hàng bằng mã đơn.")
-    public String trackOrder(String orderCode) {
-        Orders order = ordersRepository.findByOrderCode(orderCode);
-        if (order != null) {
-            String formattedDate = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-                    .format(order.getEstimatedDeliveryDate());
-            return String.format("Đơn hàng #%s. Trạng thái: %s. Ngày giao dự kiến: %s.",
-                    order.getOrderCode(), order.getStatus(), formattedDate);
-        }
-        return "Không thể tìm thấy đơn hàng.";
     }
 
 }

@@ -93,8 +93,7 @@ public class SecurityConfig {
                 "http://localhost:5173",
                 "https://songtaoads.online",
                 "https://songtaoads.io.vn", 
-                "http://localhost:3000",
-                "https://d209c002056e.ngrok-free.app"
+                "http://localhost:3000"
         ));
         defaultConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         defaultConfig.setAllowedHeaders(Arrays.asList("Authorization", "X-XSRF-TOKEN", "Content-Type"));

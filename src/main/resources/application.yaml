@@ -23,6 +23,7 @@ spring:
         default_batch_fetch_size: 100
         jdbc:
           batch_size: 50
+          time_zone: Asia/Ho_Chi_Minh
         order_updates: true
   thymeleaf:
     prefix: classpath:/templates/

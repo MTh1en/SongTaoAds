@@ -19,5 +19,5 @@ public interface BackgroundsRepository extends JpaRepository<Backgrounds, String
 
     List<Backgrounds> findByAttributeValues_IdInAndIsAvailable(Set<String> ids, Boolean isAvailable);
 
-    boolean existsByAttributeValues_IdAndIsAvailable(String id, Boolean isAvailable);
+    int countByIsAvailable(Boolean isAvailable);
 }

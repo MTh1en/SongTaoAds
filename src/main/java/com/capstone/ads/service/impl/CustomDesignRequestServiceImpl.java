@@ -16,6 +16,7 @@ import com.capstone.ads.model.enums.FileTypeEnum;
 import com.capstone.ads.repository.internal.CustomDesignRequestsRepository;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.KeyGenerator;
+import com.capstone.ads.utils.SecurityContextUtils;
 import com.capstone.ads.validator.CustomDesignRequestStateValidator;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,15 +29,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @Service
@@ -50,6 +49,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     CustomDesignRequestsRepository customDesignRequestsRepository;
     CustomDesignRequestsMapper customDesignRequestsMapper;
     CustomDesignRequestStateValidator customDesignRequestStateValidator;
+    SecurityContextUtils securityContextUtils;
     ApplicationEventPublisher eventPublisher;
 
     @Override
@@ -99,12 +99,21 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequest.setStatus(CustomDesignRequestStatus.PROCESSING);
 
         customDesignRequestsRepository.save(customDesignRequest);
+
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                customDesignRequest.getCustomerDetail().getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT,
+                        customDesignRequest.getCode(), CustomDesignRequestStatus.PROCESSING.getMessage())
+        ));
+
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 
     @Override
     @Transactional
     public CustomDesignRequestDTO designerRejectCustomDesignRequest(String customDesignRequestId) {
+        var user = securityContextUtils.getCurrentUser();
         CustomDesignRequests customDesignRequest = getCustomDesignRequestById(customDesignRequestId);
         customDesignRequestStateValidator.validateTransition(customDesignRequest.getStatus(), CustomDesignRequestStatus.DESIGNER_REJECTED);
 
@@ -112,6 +121,13 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         customDesignRequest.setAssignDesigner(null);
 
         customDesignRequestsRepository.save(customDesignRequest);
+
+        eventPublisher.publishEvent(new RoleNotificationEvent(
+                this,
+                PredefinedRole.SALE_ROLE,
+                String.format(NotificationMessage.DESIGNER_REJECTED,
+                        customDesignRequest.getCode(), user.getFullName())
+        ));
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 
@@ -144,6 +160,12 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
                 customDesignRequestId
         ));
 
+        eventPublisher.publishEvent(new UserNotificationEvent(
+                this,
+                customDesignRequest.getCustomerDetail().getUsers().getId(),
+                String.format(NotificationMessage.DEFAULT, customDesignRequest.getCode(), CustomDesignRequestStatus.COMPLETED.getMessage())
+        ));
+
         return customDesignRequestsMapper.toDTO(customDesignRequest);
     }
 
@@ -164,14 +186,6 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
-    public Page<CustomDesignRequestDTO> findCustomDesignRequestByStatus(CustomDesignRequestStatus status, int page, int size) {
-        Sort sort = Sort.by("updatedAt").descending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return customDesignRequestsRepository.findByStatus(status, pageable)
-                .map(customDesignRequestsMapper::toDTO);
-    }
-
-    @Override
     public Page<CustomDesignRequestDTO> findAllCustomDesignRequestNeedSupport(int page, int size) {
         Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -180,12 +194,39 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     @Override
-    public Page<CustomDesignRequestDTO> findAllCustomerDesignRequest(int page, int size) {
+    public Page<CustomDesignRequestDTO> findCustomerDesignRequest(CustomDesignRequestStatus status, int page, int size) {
         Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return customDesignRequestsRepository.findAll(pageable)
+
+        if (Objects.nonNull(status)) {
+            return customDesignRequestsRepository.findByStatus(status, pageable)
+                    .map(customDesignRequestsMapper::toDTO);
+        } else {
+            return customDesignRequestsRepository.findAll(pageable)
+                    .map(customDesignRequestsMapper::toDTO);
+        }
+    }
+
+    @Override
+    public Page<CustomDesignRequestDTO> searchCustomDesignRequest(String keyword, int page, int size) {
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        return customDesignRequestsRepository.findByCodeContainsIgnoreCaseOrCustomerDetail_CompanyNameContainsIgnoreCase(
+                keyword, keyword, pageable
+        ).map(customDesignRequestsMapper::toDTO);
+    }
+
+    @Override
+    public Page<CustomDesignRequestDTO> searchCustomDesignRequestAssigned(String keyword, int page, int size) {
+        var currentDesigner = securityContextUtils.getCurrentUser();
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        return customDesignRequestsRepository.findByCodeContainsIgnoreCaseAndAssignDesigner(keyword, currentDesigner, pageable)
                 .map(customDesignRequestsMapper::toDTO);
     }
+
 
     //INTERNAL FUNCTION//
 
@@ -196,6 +237,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
     }
 
     // UPLOAD IMAGE //
+
     private String generateCustomDesignRequestKey(String customDesignRequestId) {
         return String.format(S3ImageKeyFormat.FINAL_CUSTOM_DESIGN, customDesignRequestId);
     }
@@ -218,8 +260,9 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     // HANDLE EVENT //
 
-    @Async
+    @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleCustomDesignPaymentEvent(CustomDesignPaymentEvent event) {
         CustomDesignRequests customDesignRequests = getCustomDesignRequestById(event.getCustomDesignRequestId());
 
@@ -248,6 +291,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleCustomDesignRequestChangeStatusEvent(CustomDesignRequestChangeStatusEvent event) {
         CustomDesignRequests customDesignRequests = getCustomDesignRequestById(event.getCustomDesignRequestId());
         customDesignRequests.setStatus(event.getStatus());
@@ -264,7 +308,9 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handlePriceProposalApprovedEvent(PriceProposalApprovedEvent event) {
+        log.info("custom design request");
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());
 
         customDesignRequest.setTotalPrice(event.getTotalPrice());
@@ -292,6 +338,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleDemoDesignCreateEvent(DemoDesignCreateEvent event) {
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());
         if (event.isNeedSupport()) {
@@ -311,6 +358,7 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleDemoDesignApprovedEvent(DemoDesignApprovedEvent event) {
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());
         customDesignRequest.setStatus(CustomDesignRequestStatus.WAITING_FULL_PAYMENT);

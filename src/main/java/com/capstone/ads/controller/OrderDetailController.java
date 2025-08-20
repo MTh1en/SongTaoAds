@@ -3,6 +3,7 @@ package com.capstone.ads.controller;
 import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.order_detail.OrderDetailCreateRequest;
 import com.capstone.ads.dto.order_detail.OrderDetailDTO;
+import com.capstone.ads.dto.order_detail.OrderDetailUpdateRequest;
 import com.capstone.ads.service.OrderDetailService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,10 +23,17 @@ public class OrderDetailController {
     OrderDetailService orderDetailService;
 
     @PostMapping("/orders/{orderId}/details")
-    public ApiResponse<OrderDetailDTO> createOrderDetail(@PathVariable("orderId") String orderId,
+    public ApiResponse<OrderDetailDTO> createOrderDetail(@PathVariable String orderId,
                                                          @RequestBody OrderDetailCreateRequest request) {
         var response = orderDetailService.createOrderDetail(orderId, request);
         return ApiResponseBuilder.buildSuccessResponse("Tạo chi tiêt đơn hàng thành công", response);
+    }
+
+    @PutMapping("/order-details/{orderDetailId}")
+    public ApiResponse<OrderDetailDTO> updateOrderDetail(@PathVariable String orderDetailId,
+                                                         @RequestBody OrderDetailUpdateRequest request) {
+        var response = orderDetailService.updateOrderDetail(orderDetailId, request);
+        return ApiResponseBuilder.buildSuccessResponse("Cập nhật chi tiêt đơn hàng thành công", response);
     }
 
     @GetMapping("/orders/{orderId}/details")

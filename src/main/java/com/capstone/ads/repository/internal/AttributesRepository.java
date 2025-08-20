@@ -16,4 +16,6 @@ public interface AttributesRepository extends JpaRepository<Attributes, String> 
     List<Attributes> findByProductTypes_IdAndIsAvailable(String id, Boolean isAvailable);
 
     Optional<Attributes> findByIdAndIsAvailable(String id, Boolean isAvailable);
+
+    int countByIsAvailable(Boolean isAvailable);
 }

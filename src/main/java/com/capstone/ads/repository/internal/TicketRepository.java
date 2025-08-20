@@ -1,12 +1,14 @@
 package com.capstone.ads.repository.internal;
 
 import com.capstone.ads.model.Tickets;
-import com.capstone.ads.model.Users;
 import com.capstone.ads.model.enums.TicketSeverity;
 import com.capstone.ads.model.enums.TicketStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Collection;
+import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Tickets, String> {
 
@@ -16,8 +18,7 @@ public interface TicketRepository extends JpaRepository<Tickets, String> {
 
     Page<Tickets> findBySeverity(TicketSeverity severity, Pageable pageable);
 
-    int countClosedByCustomer(Users customer);
+    List<Tickets> findByOrders_OrderCode(String orderCode);
 
-    int countByStatus(TicketStatus status);
-
+    int countByStatusIn(Collection<TicketStatus> statuses);
 }

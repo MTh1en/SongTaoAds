@@ -2,6 +2,7 @@ package com.capstone.ads.service.impl;
 
 import com.capstone.ads.dto.order_detail.OrderDetailCreateRequest;
 import com.capstone.ads.dto.order_detail.OrderDetailDTO;
+import com.capstone.ads.dto.order_detail.OrderDetailUpdateRequest;
 import com.capstone.ads.event.*;
 import com.capstone.ads.exception.AppException;
 import com.capstone.ads.exception.ErrorCode;
@@ -9,7 +10,6 @@ import com.capstone.ads.mapper.OrderDetailMapper;
 import com.capstone.ads.model.*;
 import com.capstone.ads.model.enums.CustomDesignRequestStatus;
 import com.capstone.ads.model.enums.OrderStatus;
-import com.capstone.ads.model.enums.OrderType;
 import com.capstone.ads.repository.internal.OrderDetailsRepository;
 import com.capstone.ads.service.*;
 import com.capstone.ads.utils.DataConverter;
@@ -19,9 +19,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -89,6 +89,17 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Override
+    @Transactional
+    public OrderDetailDTO updateOrderDetail(String orderDetailId, OrderDetailUpdateRequest request) {
+        OrderDetails orderDetails = getOrderDetailById(orderDetailId);
+        orderDetailMapper.mapUpdateRequestToEntity(request, orderDetails);
+        orderDetails = orderDetailsRepository.save(orderDetails);
+
+        orderService.updateAllAmount(orderDetails.getOrders());
+        return orderDetailMapper.toDTO(orderDetails);
+    }
+
+    @Override
     public List<OrderDetailDTO> getOrderDetailsByOrderId(String orderId) {
         return orderDetailsRepository.findByOrders_Id(orderId).stream()
                 .map(orderDetailMapper::toDTO)
@@ -118,7 +129,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handlePriceProposalApprovedEvent(CustomDesignRequestPricingApprovedEvent event) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void handleCustomDesignRequestPricingApproved(CustomDesignRequestPricingApprovedEvent event) {
+        log.info("OrderDetail");
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
         String orderId = orderDetail.getOrders().getId();
@@ -136,6 +149,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleDemoDesignApprovedEvent(CustomDesignRequestDemoSubmittedEvent event) {
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
@@ -148,7 +162,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleCustomDesignRequestCompletedEvent(CustomDesignRequestCompletedEvent event) {
+        log.info("Custom design request completed: {}", event.getCustomDesignRequestId());
         OrderDetails orderDetail = orderDetailsRepository.findByCustomDesignRequests_Id(event.getCustomDesignRequestId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOM_DESIGN_REQUEST_NOT_FOUND));
         String orderId = orderDetail.getOrders().getId();
@@ -160,6 +176,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Async("delegatingSecurityContextAsyncTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleOrderCancel(OrderCancelEvent event) {
         Orders orders = orderService.getOrderById(event.getOrderId());
 

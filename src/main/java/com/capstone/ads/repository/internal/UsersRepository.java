@@ -20,4 +20,8 @@ public interface UsersRepository extends JpaRepository<Users, String> {
     Page<Users> findByIsActiveAndRoles_Name(Boolean isActive, String name, Pageable pageable);
 
     boolean existsByIdAndIsActive(String id, Boolean isActive);
+
+    int countByRoles_Name(String name);
+
+    int countByIsBanned(Boolean isBanned);
 }

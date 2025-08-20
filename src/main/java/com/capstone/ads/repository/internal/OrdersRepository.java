@@ -9,8 +9,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -31,12 +34,6 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
 
     Page<Orders> findByOrderTypeIn(List<OrderType> orderTypes, Pageable pageable);
 
-    int countByUsers_IdAndStatus(String id, OrderStatus status);
-
-    int countByUsers(Users users);
-
-    int countByStatus(OrderStatus status);
-
     @EntityGraph(attributePaths = {
             "orderDetails",
             "orderDetails.customDesignRequests",
@@ -44,4 +41,27 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
     @NonNull
     Optional<Orders> findById(@NonNull String id);
 
+    int countByStatus(OrderStatus status);
+
+    int countByStatusNotIn(Collection<OrderStatus> statuses);
+
+    int countByOrderTypeIn(Collection<OrderType> orderTypes);
+
+    int countByUpdatedAtBetween(LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
+
+    int countByStatusAndUpdatedAtBetween(OrderStatus status, LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
+
+    @Query("""
+            select o from Orders o
+            where (o.orderCode like concat('%', :orderCode, '%')
+            or o.users.fullName like concat('%', :fullName, '%')
+            or o.users.phone like concat('%', :phone, '%'))
+            and o.orderType in :orderTypes""")
+    Page<Orders> searchSaleOrder(@Param("orderCode") String orderCode,
+                                 @Param("fullName") String fullName,
+                                 @Param("phone") String phone,
+                                 @Param("orderTypes") Collection<OrderType> orderTypes,
+                                 Pageable pageable);
+
+    Page<Orders> findByOrderCodeContainsIgnoreCaseAndUsers(String orderCode, Users users, Pageable pageable);
 }

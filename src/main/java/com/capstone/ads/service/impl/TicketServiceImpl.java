@@ -90,6 +90,12 @@ public class TicketServiceImpl implements TicketService {
         ticket.setStatus(TicketStatus.IN_PROGRESS);
         ticket.setSeverity(TicketSeverity.PRODUCTION);
         ticket = ticketRepository.save(ticket);
+
+        eventPublisher.publishEvent(new RoleNotificationEvent(
+                this,
+                PredefinedRole.STAFF_ROLE,
+                String.format(NotificationMessage.NEW_TICKET, ticket.getOrders().getOrderCode())
+        ));
         return ticketsMapper.toDTO(ticket);
     }
 

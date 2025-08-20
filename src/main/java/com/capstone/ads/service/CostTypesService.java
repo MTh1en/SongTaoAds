@@ -24,5 +24,7 @@ public interface CostTypesService {
 
     List<CostTypes> getCostTypesByProductTypeSortedByPriority(String productTypeId);
 
+    List<CostTypes> getCostTypesByProductTypeSortedByPriorityAndIsAvailable(String productTypeId);
+
     void updateNewAttributeValueForCoreCostType(String productTypeId, String oldName, String newName);
 }

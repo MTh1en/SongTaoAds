@@ -20,4 +20,5 @@ public class AttributeValuesUpdateRequest {
     @Positive(message = "Unit Price must be greater than 0")
     Long unitPrice;
     Boolean isAvailable;
+    Boolean isMultiplier;
 }

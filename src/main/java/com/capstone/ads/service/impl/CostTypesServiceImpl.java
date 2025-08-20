@@ -123,6 +123,11 @@ public class CostTypesServiceImpl implements CostTypesService {
         return costTypesRepository.findByProductTypes_IdOrderByPriorityAsc(productTypeId);
     }
 
+    @Override
+    public List<CostTypes> getCostTypesByProductTypeSortedByPriorityAndIsAvailable(String productTypeId) {
+        return costTypesRepository.findByProductTypes_IdAndIsAvailableOrderByPriorityAsc(productTypeId, true);
+    }
+
     public CostTypes getCoreCostTypeExitedInProductType(String productTypeId) {
         return costTypesRepository.findByProductTypes_IdAndIsCore(productTypeId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.CORE_COST_TYPE_EXISTED));

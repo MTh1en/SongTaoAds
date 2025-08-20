@@ -95,14 +95,14 @@ public class CustomDesignRequestsController {
         );
     }
 
-    @GetMapping(value = "/custom-design-requests", params = "status")
+    @GetMapping(value = "/custom-design-requests")
     @Operation(summary = "Xem yêu cầu thiết kế theo trạng thái")
     public ApiPagingResponse<CustomDesignRequestDTO> findCustomerDesignRequestByStatus(
             @RequestParam(value = "status", required = false) CustomDesignRequestStatus status,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = service.findCustomDesignRequestByStatus(status, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Xem yêu cầu thiết kế theo trạng thái thành công",
+        var response = service.findCustomerDesignRequest(status, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem yêu cầu thiết kế thành công",
                 response, page
         );
     }
@@ -118,13 +118,26 @@ public class CustomDesignRequestsController {
         );
     }
 
-    @GetMapping(value = "/custom-design-requests", params = "!status")
-    @Operation(summary = "Xem yêu cầu thiết kế theo trạng thái")
-    public ApiPagingResponse<CustomDesignRequestDTO> findAllCustomDesignRequest(
+    @GetMapping(value = "/custom-design-requests/sale-search")
+    @Operation(summary = "Search yêu cầu thiết kế của Sale")
+    public ApiPagingResponse<CustomDesignRequestDTO> searchCustomDesignRequest(
+            @RequestParam(required = false) String keyword,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = service.findAllCustomerDesignRequest(page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả yêu cầu thiết kế thành công",
+        var response = service.searchCustomDesignRequest(keyword, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Sale search yêu cầu thiết kế thành công",
+                response, page
+        );
+    }
+
+    @GetMapping(value = "/custom-design-requests/designer-search")
+    @Operation(summary = "Search yêu cầu thiết kế của Designer")
+    public ApiPagingResponse<CustomDesignRequestDTO> searchCustomDesignRequestAssigned(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = service.searchCustomDesignRequestAssigned(keyword, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Designer search yêu cầu thiết kế thành công",
                 response, page
         );
     }

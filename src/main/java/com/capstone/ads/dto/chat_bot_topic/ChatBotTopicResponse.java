@@ -1,4 +1,4 @@
-package com.capstone.ads.dto.order;
+package com.capstone.ads.dto.chat_bot_topic;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,10 +10,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderCustomDesignDTO {
+public class ChatBotTopicResponse {
     String id;
-    String requirements;
-    String finalDesignImage;
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
+    String modelChatBotId;
+    String topicId;
+    LocalDateTime createdAt;
 }

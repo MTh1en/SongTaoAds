@@ -77,7 +77,10 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
         calculatedCosts.put(coreCostType, coreCostValue);
 
         dependentCosts.forEach(costType -> {
-            Long value = formulaEvaluator.evaluateFormula(costType.getFormula(), context);
+            Long value = 0L;
+            if (costType.getIsAvailable().equals(true)) {
+                value = formulaEvaluator.evaluateFormula(costType.getFormula(), context);
+            }
             calculatedCosts.put(costType, value);
             context.put(DataConverter.normalizeFormulaValueName(costType.getName()), value.doubleValue());
         });
@@ -89,16 +92,6 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
     @Override
     public List<CustomerChoiceCosts> getCustomerChoiceCostByCustomerChoiceId(String customerChoiceId) {
         return customerChoiceCostsRepository.findByCustomerChoices_Id(customerChoiceId);
-    }
-
-
-    // Tính toán giá trị từ công thức SpEL
-    private Long evaluateFormula(String formula, Map<String, Object> baseVariables) {
-        StandardEvaluationContext context = new StandardEvaluationContext();
-        context.setVariables(new HashMap<>(baseVariables));
-        Expression expression = parser.parseExpression(formula);
-        Double result = expression.getValue(context, Double.class);
-        return result != null ? Math.round(result) : 0L;
     }
 
     private Map<String, Object> createBaseContext(CustomerChoices customerChoice) {
@@ -124,9 +117,15 @@ public class CustomerChoiceCostsServiceImpl implements CustomerChoiceCostsServic
         variables.putAll(customerChoice.getCustomerChoiceDetails().stream()
                 .collect(Collectors.toMap(
                         detail -> DataConverter.normalizeFormulaValueName(detail.getAttributeValues().getAttributes().getName()),
-                        detail -> detail.getAttributeValues().getIsMultiplier()
-                                ? (detail.getAttributeValues().getUnitPrice() / 10.0)
-                                : detail.getAttributeValues().getUnitPrice().doubleValue(),
+                        detail -> {
+                            if (detail.getAttributeValues().getAttributes().getIsAvailable().equals(true)) {
+                                return detail.getAttributeValues().getIsMultiplier()
+                                        ? (detail.getAttributeValues().getUnitPrice() / 10.0)
+                                        : detail.getAttributeValues().getUnitPrice().doubleValue();
+                            } else {
+                                return 0.0;
+                            }
+                        },
                         (v1, v2) -> v1
                 )));
 

@@ -7,6 +7,8 @@ import java.util.List;
 public interface ChatBotService {
     String chat(ChatRequest request);
 
+    String trackingOrder(ChatRequest request);
+
     String TestChat(TestChatRequest request);
 
     String translateToTextToImagePrompt(String prompt);

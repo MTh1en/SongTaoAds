@@ -1,6 +1,6 @@
 package com.capstone.ads.service;
 
-import com.capstone.ads.dto.ChatBotTopic.ChatBotTopicResponse;
+import com.capstone.ads.dto.chat_bot_topic.ChatBotTopicResponse;
 
 import java.util.List;
 
