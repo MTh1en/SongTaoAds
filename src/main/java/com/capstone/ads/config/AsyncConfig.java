@@ -24,7 +24,7 @@ public class AsyncConfig implements AsyncConfigurer {
         return executor;
     }
 
-    @Bean // Đặt tên bean mặc định (có thể không cần tên nếu là duy nhất)
+    @Bean
     public DelegatingSecurityContextAsyncTaskExecutor delegatingSecurityContextAsyncTaskExecutor(ThreadPoolTaskExecutor taskExecutor) {
         return new DelegatingSecurityContextAsyncTaskExecutor(taskExecutor);
     }

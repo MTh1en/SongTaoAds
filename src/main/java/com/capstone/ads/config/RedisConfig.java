@@ -33,19 +33,17 @@ public class RedisConfig {
         // Tạo ObjectMapper
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); // Lưu LocalDateTime dưới dạng chuỗi ISO
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.activateDefaultTyping(
                 objectMapper.getPolymorphicTypeValidator(),
                 ObjectMapper.DefaultTyping.NON_FINAL
-        ); // Bật type information cho các lớp không phải final
+        );
 
-        // Cấu hình GenericJackson2JsonRedisSerializer với ObjectMapper
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
-        // Cấu hình RedisCacheConfiguration
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(10)) // Thời gian sống của cache
-                .disableCachingNullValues() // Không cache giá trị null
+                .entryTtl(Duration.ofMinutes(10))
+                .disableCachingNullValues()
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(serializer)
                 );
