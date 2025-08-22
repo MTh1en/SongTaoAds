@@ -88,7 +88,7 @@ public class UsersServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO updateUserProfile(String userId, UserProfileUpdateRequest request) {
-        Users user = getUserByIdAndIsActive(userId);
+        Users user = this.getUserByIdAndIsActiveAndNotBanned(userId);
 
         // Use MapStruct to updateProductTypeInformation entity fields
         usersMapper.updateUserUpdateRequestToEntity(request, user);
@@ -115,7 +115,7 @@ public class UsersServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO uploadUserAvatar(String userId, MultipartFile file) {
-        Users user = getUserByIdAndIsActive(userId);
+        Users user = this.getUserByIdAndIsActiveAndNotBanned(userId);
         String avatarName = generateAvatarName(user.getId());
         fileDataService.uploadSingleFile(avatarName, file);
         user.setAvatar(avatarName);
@@ -126,7 +126,7 @@ public class UsersServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO changePassword(String userId, ChangePasswordRequest request) {
-        Users user = getUserByIdAndIsActive(userId);
+        Users user = this.getUserByIdAndIsActiveAndNotBanned(userId);
         if (passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         }
@@ -137,7 +137,7 @@ public class UsersServiceImpl implements UserService {
     @Override
     @Transactional
     public UserDTO newPasswordForOutboundAccount(String userId, NewPasswordRequest request) {
-        Users user = getUserByIdAndIsActive(userId);
+        Users user = this.getUserByIdAndIsActiveAndNotBanned(userId);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         usersRepository.save(user);
         return usersMapper.toDTO(user);
@@ -152,8 +152,8 @@ public class UsersServiceImpl implements UserService {
     }
 
     @Override
-    public Users getUserByIdAndIsActive(String userId) {
-        return usersRepository.findByIdAndIsActive(userId, true)
+    public Users getUserByIdAndIsActiveAndNotBanned(String userId) {
+        return usersRepository.findByIdAndIsActiveAndIsBanned(userId, true, false)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 

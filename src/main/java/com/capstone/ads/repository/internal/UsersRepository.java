@@ -15,6 +15,8 @@ public interface UsersRepository extends JpaRepository<Users, String> {
 
     Optional<Users> findByIdAndIsActive(String id, Boolean isActive);
 
+    Optional<Users> findByIdAndIsActiveAndIsBanned(String id, Boolean isActive, Boolean isBanned);
+
     Optional<Users> findByIdAndIsActiveAndRoles_Name(String id, Boolean isActive, String name);
 
     Page<Users> findByIsActiveAndRoles_Name(Boolean isActive, String name, Pageable pageable);

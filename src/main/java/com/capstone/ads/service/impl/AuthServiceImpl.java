@@ -17,6 +17,7 @@ import com.capstone.ads.repository.internal.RolesRepository;
 import com.capstone.ads.repository.internal.UsersRepository;
 import com.capstone.ads.service.AccessTokenService;
 import com.capstone.ads.service.AuthService;
+import com.capstone.ads.service.RecoveryService;
 import com.capstone.ads.service.RefreshTokenService;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,6 +44,7 @@ public class AuthServiceImpl implements AuthService {
     RolesRepository rolesRepository;
     OutboundIdentityClient outboundIdentityClient;
     OutboundUserClient outboundUserClient;
+    RecoveryService recoveryService;
 
     @NonFinal
     @Value("${app.jwt.refresh-token-ttl}")
@@ -127,6 +129,7 @@ public class AuthServiceImpl implements AuthService {
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .user(usersMapper.toDTO(user))
                 .build();
     }
 
@@ -143,6 +146,7 @@ public class AuthServiceImpl implements AuthService {
         newUser.setRoles(roles);
 
         usersRepository.save(newUser);
+        recoveryService.sendVerifyEmail(request.getEmail());
     }
 
     @Override
@@ -163,6 +167,7 @@ public class AuthServiceImpl implements AuthService {
 
         return AuthResponse.builder()
                 .accessToken(newAccessToken)
+                .user(usersMapper.toDTO(user))
                 .build();
     }
 

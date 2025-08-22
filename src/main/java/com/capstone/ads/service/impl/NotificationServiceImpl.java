@@ -84,7 +84,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional
     public void sendNotificationToUser(String userId, String message) {
-        Users user = userService.getUserByIdAndIsActive(userId);
+        Users user = userService.getUserByIdAndIsActiveAndNotBanned(userId);
 
         Notification notification = Notification.builder()
                 .type("USER")
