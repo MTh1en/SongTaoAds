@@ -39,8 +39,9 @@ public class CostTypesServiceImpl implements CostTypesService {
     @Transactional
     public CostTypeDTO createCostTypeByProductType(String productTypeId, CostTypeCreateRequest request) {
         if (request.getIsCore()) {
-            checkExitedCoreCostType(productTypeId);
+            checkExistedCoreCostType(productTypeId);
         }
+        checkNameCostTypeExistedInProductType(productTypeId, request.getName());
         ProductTypes productTypes = productTypesService.getProductTypeById(productTypeId);
 
         CostTypes costTypes = costTypeMapper.mapCreateRequestToEntity(request);
@@ -55,7 +56,8 @@ public class CostTypesServiceImpl implements CostTypesService {
     @Transactional
     public CostTypeDTO updateCostTypeInformation(String costTypeId, CostTypeUpdateRequest request) {
         CostTypes costTypes = getCostTypeByIdAndIsAvailable(costTypeId);
-        CostTypes existedCoreCost = getCoreCostTypeExitedInProductType(costTypes.getProductTypes().getId());
+        CostTypes existedCoreCost = getCoreCostTypeExistedInProductType(costTypes.getProductTypes().getId());
+        checkNameCostTypeExistedInProductType(costTypes.getProductTypes().getId(), request.getName());
         if (request.getIsCore()) {
             if (!costTypes.getId().equals(existedCoreCost.getId())) {
                 throw new AppException(ErrorCode.CORE_COST_TYPE_EXISTED);
@@ -128,14 +130,22 @@ public class CostTypesServiceImpl implements CostTypesService {
         return costTypesRepository.findByProductTypes_IdAndIsAvailableOrderByPriorityAsc(productTypeId, true);
     }
 
-    public CostTypes getCoreCostTypeExitedInProductType(String productTypeId) {
+    public CostTypes getCoreCostTypeExistedInProductType(String productTypeId) {
         return costTypesRepository.findByProductTypes_IdAndIsCore(productTypeId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.CORE_COST_TYPE_EXISTED));
     }
 
-    public void checkExitedCoreCostType(String productTypeId) {
+    public void checkExistedCoreCostType(String productTypeId) {
         if (costTypesRepository.existsByProductTypes_IdAndIsCore(productTypeId, true)) {
             throw new AppException(ErrorCode.CORE_COST_TYPE_EXISTED);
+        }
+    }
+
+    public void checkNameCostTypeExistedInProductType(String productTypeId, String name) {
+        boolean isExisted = costTypesRepository.findByProductTypes_Id(productTypeId).stream()
+                .anyMatch(costTypes -> costTypes.getName().equals(name));
+        if (isExisted) {
+            throw new AppException(ErrorCode.COST_TYPE_NAME_EXISTED_IN_PRODUCT_TYPE);
         }
     }
 }

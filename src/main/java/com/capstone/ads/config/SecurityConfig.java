@@ -74,10 +74,15 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/api/webhook/**", webhookConfig);
 
         // CORS cho Socket.IO
-        CorsConfiguration socketIoConfig = getCorsConfiguration();
-        socketIoConfig.addAllowedHeader("Connection");
-        socketIoConfig.addAllowedHeader("Upgrade");
-        source.registerCorsConfiguration("/socket.io/**", socketIoConfig);
+        CorsConfiguration socketConfig = getCorsConfiguration();
+        socketConfig.addAllowedHeader("Connection");
+        socketConfig.addAllowedHeader("Upgrade");
+        socketConfig.addAllowedHeader("Sec-WebSocket-Key");
+        socketConfig.addAllowedHeader("Sec-WebSocket-Version");
+        socketConfig.addAllowedHeader("Sec-WebSocket-Extensions");
+        socketConfig.addAllowedHeader("Sec-WebSocket-Protocol");
+        source.registerCorsConfiguration("/socket.io/**", socketConfig);
+        source.registerCorsConfiguration("/websocket/**", socketConfig);
 
         // CORS cho các endpoint khác (FE)
         CorsConfiguration defaultConfig = getCorsConfiguration();
@@ -92,12 +97,22 @@ public class SecurityConfig {
                 "http://localhost:8080",
                 "http://localhost:5173",
                 "https://songtaoads.online",
-                "https://songtaoads.io.vn", 
+                "https://songtaoads.io.vn",
                 "http://localhost:3000"
         ));
         defaultConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        defaultConfig.setAllowedHeaders(Arrays.asList("Authorization", "X-XSRF-TOKEN", "Content-Type"));
+        defaultConfig.setAllowedHeaders(Arrays.asList(
+                "Origin",
+                "Content-Type",
+                "Accept",
+                "Authorization",
+                "Access-Control-Allow-Origin",
+                "Access-Control-Allow-Methods",
+                "Access-Control-Allow-Headers",
+                "Access-Control-Allow-Credentials"
+        ));
         defaultConfig.setAllowCredentials(true); // Hỗ trợ cookie cho FE
+        defaultConfig.setMaxAge(3600L);
         return defaultConfig;
     }
 

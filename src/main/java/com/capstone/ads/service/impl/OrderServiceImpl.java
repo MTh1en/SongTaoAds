@@ -303,6 +303,23 @@ public class OrderServiceImpl implements OrderService {
                 .map(orderMapper::toDTO);
     }
 
+    @Override
+    public Page<OrderDTO> searchProductionOrders(String query, int page, int size) {
+        List<OrderStatus> productionStatus = Arrays.asList(
+                OrderStatus.IN_PROGRESS,
+                OrderStatus.PRODUCING,
+                OrderStatus.PRODUCTION_COMPLETED,
+                OrderStatus.DELIVERING,
+                OrderStatus.INSTALLED
+                );
+
+        Sort sort = Sort.by("updatedAt").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        return orderRepository.searchProductionOrder(query, query, query, productionStatus, pageable)
+                .map(orderMapper::toDTO);
+    }
+
     //INTERNAL FUNCTION//
 
     @Override

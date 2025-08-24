@@ -13,7 +13,7 @@ public interface QuestionService {
 
     QuestionDTO findQuestionById(String id);
 
-    List<QuestionDTO> getQuestionsByTopicId(String topicId);
+    List<QuestionDTO> findQuestionsByTopicId(String topicId);
 
     QuestionDTO updateQuestion(String id, QuestionUpdateRequest request);
 

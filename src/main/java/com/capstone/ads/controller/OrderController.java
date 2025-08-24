@@ -120,9 +120,20 @@ public class OrderController {
         return ApiResponseBuilder.buildPagingSuccessResponse("Search Customer Order thành công", response, page);
     }
 
+
+    @GetMapping("/orders/production-search")
+    @Operation(summary = "Tìm kiếm Production Orders")
+    public ApiPagingResponse<OrderDTO> searchProductionOrders(
+            @RequestParam String query,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        var response = orderService.searchProductionOrders(query, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Search Custom Order thành công", response, page);
+    }
+
     @GetMapping("/orders/custom-design")
     @Operation(summary = "Xem tất cả order custom design")
-    public ApiPagingResponse<OrderDTO> findCustomDesignOrderByAndStatus(
+    public ApiPagingResponse<OrderDTO> findCustomDesignOrder(
             @RequestParam(required = false) OrderStatus orderStatus,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {

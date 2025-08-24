@@ -35,6 +35,8 @@ public interface OrderService {
     Page<OrderDTO> searchCustomOrders(String query, int page, int size);
 
     Page<OrderDTO> searchCustomerOrders(String orderCode, int page, int size);
+
+    Page<OrderDTO> searchProductionOrders(String query, int page, int size);
     //INTERNAL FUNCTION
 
     Orders getOrderById(String orderId);

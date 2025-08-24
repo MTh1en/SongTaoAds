@@ -10,7 +10,7 @@ import java.util.List;
 public interface TopicService {
     TopicDTO createTopic(TopicCreateRequest request);
 
-    List<TopicDTO> getAllTopics();
+    List<TopicDTO> findAllTopics();
 
     TopicDTO findTopicById(String id);
 

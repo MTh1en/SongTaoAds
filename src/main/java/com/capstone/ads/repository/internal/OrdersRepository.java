@@ -53,9 +53,9 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
 
     @Query("""
             select o from Orders o
-            where (o.orderCode like concat('%', :orderCode, '%')
-            or o.users.fullName like concat('%', :fullName, '%')
-            or o.users.phone like concat('%', :phone, '%'))
+            where (upper(o.orderCode) like upper(concat('%', :orderCode, '%'))
+            or upper(o.users.fullName) like upper(concat('%', :fullName, '%'))
+            or upper(o.users.phone) like upper(concat('%', :phone, '%')))
             and o.orderType in :orderTypes""")
     Page<Orders> searchSaleOrder(@Param("orderCode") String orderCode,
                                  @Param("fullName") String fullName,
@@ -64,4 +64,17 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
                                  Pageable pageable);
 
     Page<Orders> findByOrderCodeContainsIgnoreCaseAndUsers(String orderCode, Users users, Pageable pageable);
+
+    @Query("""
+            select o from Orders o
+            where (upper(o.orderCode) like upper(concat('%', :orderCode, '%'))
+            or upper(o.users.fullName) like upper(concat('%', :fullName, '%'))
+            or upper(o.users.phone) like upper(concat('%', :phone, '%')))
+            and o.status in :orderStatus""")
+    Page<Orders> searchProductionOrder(@Param("orderCode") String orderCode,
+                                       @Param("fullName") String fullName,
+                                       @Param("phone") String phone,
+                                       @Param("orderStatus") Collection<OrderStatus> statuses,
+                                       Pageable pageable);
+
 }

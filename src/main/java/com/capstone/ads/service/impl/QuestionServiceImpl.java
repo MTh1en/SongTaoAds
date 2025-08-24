@@ -54,7 +54,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public List<QuestionDTO> getQuestionsByTopicId(String topicId) {
+    public List<QuestionDTO> findQuestionsByTopicId(String topicId) {
         return questionRepository.findByTopic_Id(topicId).stream()
                 .map(questionMapper::toDto)
                 .collect(Collectors.toList());

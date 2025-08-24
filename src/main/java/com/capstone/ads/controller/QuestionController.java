@@ -65,8 +65,8 @@ public class QuestionController {
 
     @GetMapping("/topic/{topicId}/question")
     @Operation(summary = "Xem tất cả câu hỏi theo topic")
-    public ApiResponse<List<QuestionDTO>> viewQuestionsByTopicId(@PathVariable String topicId) {
-        List<QuestionDTO> questions = questionService.getQuestionsByTopicId(topicId);
+    public ApiResponse<List<QuestionDTO>> findQuestionsByTopicId(@PathVariable String topicId) {
+        List<QuestionDTO> questions = questionService.findQuestionsByTopicId(topicId);
         return ApiResponseBuilder.buildSuccessResponse("Xem tất cả câu hỏi theo topic thành công", questions);
     }
 }
