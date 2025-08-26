@@ -94,7 +94,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     public Page<DesignTemplateDTO> findDesignTemplateByProductTypeId(String productTypeId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        return designTemplatesRepository.findByProductTypes_IdAndIsAvailable(productTypeId, true, pageable)
+        return designTemplatesRepository.findByProductTypes_Id(productTypeId, pageable)
                 .map(designTemplatesMapper::toDTO);
     }
 

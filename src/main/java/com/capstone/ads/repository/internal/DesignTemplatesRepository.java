@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface DesignTemplatesRepository extends JpaRepository<DesignTemplates, String> {
     Optional<DesignTemplates> findByIdAndIsAvailable(String id, Boolean isAvailable);
 
-    Page<DesignTemplates> findByProductTypes_IdAndIsAvailable(String id, Boolean isAvailable, Pageable pageable);
+    Page<DesignTemplates> findByProductTypes_Id(String id, Pageable pageable);
 
     Page<DesignTemplates> findByIsAvailable(Boolean isAvailable, Pageable pageable);
 
