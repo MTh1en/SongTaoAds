@@ -384,8 +384,18 @@ public class OrderServiceImpl implements OrderService {
         Orders orders = getOrderById(orderId);
         if (orders.getOrderType().equals(OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION)) {
             orders.setStatus(OrderStatus.PENDING_CONTRACT);
+            eventPublisher.publishEvent(new UserNotificationEvent(
+                    this,
+                    orders.getUsers().getId(),
+                    String.format(NotificationMessage.DEFAULT, orders.getOrderCode(), orders.getStatus().getMessage())
+            ));
         } else {
             orders.setStatus(OrderStatus.DESIGN_COMPLETED);
+            eventPublisher.publishEvent(new UserNotificationEvent(
+                    this,
+                    orders.getUsers().getId(),
+                    String.format(NotificationMessage.DEFAULT, orders.getOrderCode(), orders.getStatus().getMessage())
+            ));
         }
         orderRepository.save(orders);
     }
@@ -403,8 +413,20 @@ public class OrderServiceImpl implements OrderService {
                     String.format(NotificationMessage.ORDER_DEPOSITED, orders.getOrderCode())
             ));
 
+            eventPublisher.publishEvent(new UserNotificationEvent(
+                    this,
+                    orders.getUsers().getId(),
+                    String.format(NotificationMessage.ORDER_CUSTOMER_DEPOSITED, orders.getOrderCode())
+            ));
+
         } else if (paymentType.equals(PaymentType.REMAINING_CONSTRUCTION)) {
             orders.setStatus(OrderStatus.ORDER_COMPLETED);
+
+            eventPublisher.publishEvent(new UserNotificationEvent(
+                    this,
+                    orders.getUsers().getId(),
+                    String.format(NotificationMessage.ORDER_CUSTOMER_COMPLETED, orders.getOrderCode())
+            ));
         } else if (paymentType.equals(PaymentType.DEPOSIT_DESIGN)) {
             orders.getOrderDetails().stream()
                     .filter(orderDetails -> orderDetails.getCustomDesignRequests().getStatus().equals(CustomDesignRequestStatus.APPROVED_PRICING))

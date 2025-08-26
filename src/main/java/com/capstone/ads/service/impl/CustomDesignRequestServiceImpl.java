@@ -23,16 +23,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -260,9 +258,8 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
 
     // HANDLE EVENT //
 
-    @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @EventListener
+    @Transactional(propagation = Propagation.REQUIRED)
     public void handleCustomDesignPaymentEvent(CustomDesignPaymentEvent event) {
         CustomDesignRequests customDesignRequests = getCustomDesignRequestById(event.getCustomDesignRequestId());
 
@@ -276,6 +273,12 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
                     String.format(NotificationMessage.CUSTOM_DESIGN_REQUEST_DEPOSITED, customDesignRequests.getCode())
             ));
 
+            eventPublisher.publishEvent(new UserNotificationEvent(
+                    this,
+                    customDesignRequests.getCustomerDetail().getUsers().getId(),
+                    String.format(NotificationMessage.CUSTOM_DESIGN_REQUEST_CUSTOMER_DEPOSITED, customDesignRequests.getCode())
+            ));
+
         } else {
             customDesignRequestStateValidator.validateTransition(customDesignRequests.getStatus(), CustomDesignRequestStatus.FULLY_PAID);
             customDesignRequests.setStatus(CustomDesignRequestStatus.FULLY_PAID);
@@ -285,15 +288,26 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
                     customDesignRequests.getAssignDesigner().getId(),
                     String.format(NotificationMessage.CUSTOM_DESIGN_REQUEST_FULLY_PAID, customDesignRequests.getCode())
             ));
+
+            eventPublisher.publishEvent(new UserNotificationEvent(
+                    this,
+                    customDesignRequests.getCustomerDetail().getUsers().getId(),
+                    String.format(NotificationMessage.CUSTOM_DESIGN_REQUEST_CUSTOMER_FULLY_PAID, customDesignRequests.getCode())
+            ));
         }
         customDesignRequestsRepository.save(customDesignRequests);
     }
 
-    @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @EventListener
+    @Transactional(propagation = Propagation.REQUIRED)
     public void handleCustomDesignRequestChangeStatusEvent(CustomDesignRequestChangeStatusEvent event) {
         CustomDesignRequests customDesignRequests = getCustomDesignRequestById(event.getCustomDesignRequestId());
+
+        customDesignRequestStateValidator.validateTransition(
+                customDesignRequests.getStatus(),
+                event.getStatus()
+        );
+
         customDesignRequests.setStatus(event.getStatus());
         customDesignRequestsRepository.save(customDesignRequests);
 
@@ -306,12 +320,15 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         ));
     }
 
-    @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @EventListener
+    @Transactional(propagation = Propagation.REQUIRED)
     public void handlePriceProposalApprovedEvent(PriceProposalApprovedEvent event) {
-        log.info("custom design request");
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());
+
+        customDesignRequestStateValidator.validateTransition(
+                customDesignRequest.getStatus(),
+                CustomDesignRequestStatus.APPROVED_PRICING
+        );
 
         customDesignRequest.setTotalPrice(event.getTotalPrice());
         customDesignRequest.setDepositAmount(event.getDepositAmount());
@@ -336,15 +353,21 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         ));
     }
 
-    @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @EventListener
+    @Transactional(propagation = Propagation.REQUIRED)
     public void handleDemoDesignCreateEvent(DemoDesignCreateEvent event) {
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());
+
+        customDesignRequestStateValidator.validateTransition(
+                customDesignRequest.getStatus(),
+                CustomDesignRequestStatus.DEMO_SUBMITTED
+        );
+
         if (event.isNeedSupport()) {
             customDesignRequest.setStatus(CustomDesignRequestStatus.DEMO_SUBMITTED);
             customDesignRequest.setIsNeedSupport(true);
         } else customDesignRequest.setStatus(CustomDesignRequestStatus.DEMO_SUBMITTED);
+
         customDesignRequestsRepository.save(customDesignRequest);
 
         eventPublisher.publishEvent(new UserNotificationEvent(
@@ -356,11 +379,16 @@ public class CustomDesignRequestServiceImpl implements CustomDesignRequestServic
         ));
     }
 
-    @Async("delegatingSecurityContextAsyncTaskExecutor")
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @EventListener
+    @Transactional(propagation = Propagation.REQUIRED)
     public void handleDemoDesignApprovedEvent(DemoDesignApprovedEvent event) {
         var customDesignRequest = getCustomDesignRequestById(event.getCustomDesignRequestId());
+
+        customDesignRequestStateValidator.validateTransition(
+                customDesignRequest.getStatus(),
+                CustomDesignRequestStatus.WAITING_FULL_PAYMENT
+        );
+
         customDesignRequest.setStatus(CustomDesignRequestStatus.WAITING_FULL_PAYMENT);
         customDesignRequestsRepository.save(customDesignRequest);
 

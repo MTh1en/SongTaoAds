@@ -54,11 +54,6 @@ public class PriceProposalServiceImpl implements PriceProposalService {
         priceProposal.setCustomDesignRequests(customDesignRequests);
         priceProposal = priceProposalRepository.save(priceProposal);
 
-        customDesignRequestStateValidator.validateTransition(
-                customDesignRequests.getStatus(),
-                CustomDesignRequestStatus.PRICING_NOTIFIED
-        );
-
         eventPublisher.publishEvent(new CustomDesignRequestChangeStatusEvent(
                 this,
                 customerDesignRequestId,
@@ -90,11 +85,6 @@ public class PriceProposalServiceImpl implements PriceProposalService {
         priceProposal.setStatus(PriceProposalStatus.REJECTED);
         priceProposal = priceProposalRepository.save(priceProposal);
 
-        customDesignRequestStateValidator.validateTransition(
-                priceProposal.getCustomDesignRequests().getStatus(),
-                CustomDesignRequestStatus.REJECTED_PRICING
-        );
-
         eventPublisher.publishEvent(new CustomDesignRequestChangeStatusEvent(
                 this,
                 customerDesignRequest.getId(),
@@ -119,11 +109,6 @@ public class PriceProposalServiceImpl implements PriceProposalService {
 
         priceProposal.setStatus(PriceProposalStatus.APPROVED);
         priceProposal = priceProposalRepository.save(priceProposal);
-
-        customDesignRequestStateValidator.validateTransition(
-                priceProposal.getCustomDesignRequests().getStatus(),
-                CustomDesignRequestStatus.APPROVED_PRICING
-        );
 
         eventPublisher.publishEvent(new PriceProposalApprovedEvent(
                 this,

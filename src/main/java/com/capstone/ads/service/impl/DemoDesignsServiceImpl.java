@@ -87,11 +87,6 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
             );
         }
 
-        customDesignRequestStateValidator.validateTransition(
-                demoDesigns.getCustomDesignRequests().getStatus(),
-                CustomDesignRequestStatus.DEMO_SUBMITTED
-        );
-
         eventPublisher.publishEvent(new DemoDesignCreateEvent(
                 this,
                 customDesignRequestId,
@@ -109,11 +104,6 @@ public class DemoDesignsServiceImpl implements DemoDesignsService {
         demoDesignStateValidator.validateTransition(demoDesigns.getStatus(), DemoDesignStatus.APPROVED);
         demoDesigns.setStatus(DemoDesignStatus.APPROVED);
         demoDesigns = demoDesignsRepository.save(demoDesigns);
-
-        customDesignRequestStateValidator.validateTransition(
-                demoDesigns.getCustomDesignRequests().getStatus(),
-                CustomDesignRequestStatus.WAITING_FULL_PAYMENT
-        );
 
         eventPublisher.publishEvent(new DemoDesignApprovedEvent(
                 this,
