@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.capstone.ads.utils.LookupMapUtils.mapProductTypeSizesByDimensionAndSize;
@@ -98,11 +99,15 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     }
 
     @Override
-    public Page<DesignTemplateDTO> findAllDesignTemplates(int page, int size) {
+    public Page<DesignTemplateDTO> findAllDesignTemplates(AspectRatio aspectRatio, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-
-        return designTemplatesRepository.findByIsAvailable(true, pageable)
-                .map(designTemplatesMapper::toDTO);
+        if (Objects.nonNull(aspectRatio)) {
+            return designTemplatesRepository.findByAspectRatio(aspectRatio, pageable)
+                    .map(designTemplatesMapper::toDTO);
+        } else {
+            return designTemplatesRepository.findAll(pageable)
+                    .map(designTemplatesMapper::toDTO);
+        }
     }
 
     @Override

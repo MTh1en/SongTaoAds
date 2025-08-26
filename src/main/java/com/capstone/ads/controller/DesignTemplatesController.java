@@ -5,6 +5,7 @@ import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.design_template.DesignTemplateCreateRequest;
 import com.capstone.ads.dto.design_template.DesignTemplateDTO;
 import com.capstone.ads.dto.design_template.DesignTemplateUpdateRequest;
+import com.capstone.ads.model.enums.AspectRatio;
 import com.capstone.ads.service.DesignTemplatesService;
 import com.capstone.ads.utils.ApiResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -78,9 +79,10 @@ public class DesignTemplatesController {
     @GetMapping("/design-templates")
     @Operation(summary = "Xem tất cả các thiết kế mẫu")
     public ApiPagingResponse<DesignTemplateDTO> findAllDesignTemplates(
+            @RequestParam(required = false) AspectRatio aspectRatio,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = designTemplatesService.findAllDesignTemplates(page, size);
+        var response = designTemplatesService.findAllDesignTemplates(aspectRatio, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả các thiết kế mẫu thành công", response, page);
     }
 

@@ -20,5 +20,7 @@ public interface DesignTemplatesRepository extends JpaRepository<DesignTemplates
 
     Page<DesignTemplates> findByAspectRatioAndIsAvailable(AspectRatio aspectRatio, Boolean isAvailable, Pageable pageable);
 
+    Page<DesignTemplates> findByAspectRatio(AspectRatio aspectRatio, Pageable pageable);
+
     int countByIsAvailable(Boolean isAvailable);
 }
