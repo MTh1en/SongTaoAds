@@ -42,7 +42,7 @@ public class EditedDesignServiceImpl implements EditedDesignService {
     public EditedDesignDTO createEditedDesignFromDesignTemplate(String customerDetailId, String designTemplateId,
                                                                 EditedDesignCreateRequest request) {
         CustomerDetail customerDetail = customerDetailService.getCustomerDetailById(customerDetailId);
-        DesignTemplates designTemplates = designTemplatesService.getDesignTemplateById(designTemplateId);
+        DesignTemplates designTemplates = designTemplatesService.getDesignTemplateByIdAndAvailable(designTemplateId);
         String aiDesignImageUrl = uploadAIDesignImageToS3(customerDetailId, request.getEditedImage());
 
         EditedDesigns editedDesigns = editedDesignMapper.mapCreateRequestToEntity(request);

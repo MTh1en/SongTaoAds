@@ -63,7 +63,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     @Override
     @Transactional
     public DesignTemplateDTO updateDesignTemplateInformation(String designTemplateId, DesignTemplateUpdateRequest request) {
-        DesignTemplates designTemplates = getDesignTemplateByIdAndAvailable(designTemplateId);
+        DesignTemplates designTemplates = getDesignTemplateById(designTemplateId);
 
         designTemplatesMapper.updateEntityFromRequest(request, designTemplates);
         designTemplates = designTemplatesRepository.save(designTemplates);
@@ -73,7 +73,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     @Override
     @Transactional
     public DesignTemplateDTO uploadDesignTemplateImage(String designTemplateId, MultipartFile file) {
-        DesignTemplates designTemplates = getDesignTemplateByIdAndAvailable(designTemplateId);
+        DesignTemplates designTemplates = getDesignTemplateById(designTemplateId);
         String productTypeId = designTemplates.getProductTypes().getId();
         fileDataService.hardDeleteFileDataByImageUrl(designTemplates.getImage());
 
@@ -121,6 +121,12 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
 
     @Override
     public DesignTemplates getDesignTemplateById(String designTemplateId) {
+        return designTemplatesRepository.findById(designTemplateId)
+                .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
+    }
+
+    @Override
+    public DesignTemplates getDesignTemplateByIdAndAvailable(String designTemplateId) {
         return designTemplatesRepository.findByIdAndIsAvailable(designTemplateId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
     }
@@ -157,11 +163,6 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
         } else {
             return getDesignTemplateByAspecRatioAndAvailable(AspectRatio.SQUARE, pageable);
         }
-    }
-
-    private DesignTemplates getDesignTemplateByIdAndAvailable(String designTemplateId) {
-        return designTemplatesRepository.findByIdAndIsAvailable(designTemplateId, true)
-                .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
     }
 
     private Page<DesignTemplateDTO> getDesignTemplateByAspecRatioAndAvailable(AspectRatio aspectRatio, Pageable pageable) {

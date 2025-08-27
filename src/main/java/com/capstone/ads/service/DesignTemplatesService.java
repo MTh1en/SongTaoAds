@@ -27,4 +27,6 @@ public interface DesignTemplatesService {
 
     //INTERNAL FUNCTION
     DesignTemplates getDesignTemplateById(String designTemplateId);
+
+    DesignTemplates getDesignTemplateByIdAndAvailable(String designTemplateId);
 }

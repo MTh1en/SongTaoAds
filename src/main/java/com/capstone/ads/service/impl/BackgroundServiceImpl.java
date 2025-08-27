@@ -56,7 +56,7 @@ public class BackgroundServiceImpl implements BackgroundService {
     @Override
     @Transactional
     public BackgroundDTO updateBackgroundInformation(String backgroundId, BackgroundUpdateRequest request) {
-        Backgrounds backgrounds = getAvailableBackgroundById(backgroundId);
+        Backgrounds backgrounds = getBackgroundById(backgroundId);
 
         backgroundMapper.mapUpdateRequestToEntity(request, backgrounds);
         backgrounds = backgroundsRepository.save(backgrounds);
@@ -67,7 +67,7 @@ public class BackgroundServiceImpl implements BackgroundService {
     @Override
     @Transactional
     public BackgroundDTO updateBackgroundImage(String backgroundId, MultipartFile backgroundImage) {
-        Backgrounds backgrounds = getAvailableBackgroundById(backgroundId);
+        Backgrounds backgrounds = getBackgroundById(backgroundId);
         fileDataService.hardDeleteFileDataByImageUrl(backgrounds.getBackgroundUrl());
 
         String backgroundImageUrl = uploadBackgroundImageToS3(backgrounds.getAttributeValues().getId(), backgroundImage);
@@ -119,6 +119,11 @@ public class BackgroundServiceImpl implements BackgroundService {
     @Override
     public Backgrounds getAvailableBackgroundById(String backgroundId) {
         return backgroundsRepository.findByIdAndIsAvailable(backgroundId, true)
+                .orElseThrow(() -> new AppException(ErrorCode.BACKGROUND_NOT_FOUND));
+    }
+
+    public Backgrounds getBackgroundById(String backgroundId) {
+        return backgroundsRepository.findById(backgroundId)
                 .orElseThrow(() -> new AppException(ErrorCode.BACKGROUND_NOT_FOUND));
     }
 
