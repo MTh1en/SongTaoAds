@@ -63,7 +63,7 @@ public class ModelChatServiceImpl implements ModelChatService {
 
     @Override
     public Page<ModelChatBotDTO> getModelChatBots(int page, int size) {
-        Sort sort = Sort.by("createdAt").ascending();
+        Sort sort = Sort.by("createdAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         return modelChatBotRepository.findAll(pageable)
                 .map(modelChatBotMapper::toDTO);

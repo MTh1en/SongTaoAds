@@ -34,7 +34,7 @@ public class ModelChatController {
     @Operation(summary = "Xem tất cả các model đã fine-tune")
     public ApiPagingResponse<ModelChatBotDTO> viewAllModelFineTune(
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+            @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
         var models = modelChatService.getModelChatBots(page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả các model đã fine-tune", models, page);
     }
