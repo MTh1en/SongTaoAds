@@ -16,6 +16,8 @@ public interface ContractorService {
 
     Page<ContractorDTO> findAllContractors(int page, int size);
 
+    Page<ContractorDTO> findAllContractorsIsAvailable(int page, int size, boolean isAvailable);
+
     Page<ContractorDTO> findAllContractorByIsInternal(int page, int size, boolean isInternal);
 
     void hardDeleteContractor(String contractorId);

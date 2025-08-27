@@ -75,9 +75,18 @@ public class ContractorServiceImpl implements ContractorService {
     @Override
     public Page<ContractorDTO> findAllContractors(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        return contractorsRepository.findByIsAvailable(true, pageable)
+        return contractorsRepository.findAll(pageable)
                 .map(contractorMapper::toDTO);
     }
+
+    @Override
+    public Page<ContractorDTO> findAllContractorsIsAvailable(int page, int size, boolean isAvailable) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return contractorsRepository.findByIsAvailable(isAvailable, pageable)
+                .map(contractorMapper::toDTO);
+    }
+
+
 
     @Override
     public Page<ContractorDTO> findAllContractorByIsInternal(int page, int size, boolean isInternal) {

@@ -55,12 +55,22 @@ public class ContractorController {
         return ApiResponseBuilder.buildSuccessResponse("Xem đơn vị thi công theo ID", response);
     }
 
-    @GetMapping(params = "!isInternal")
-    @Operation(summary = "Xem tất cả đơn vị thi công")
+    @GetMapping(params = {"!isInternal", "!isAvailable"})
+    @Operation(summary = "Xem tất cả đơn vị thi công ")
     public ApiPagingResponse<ContractorDTO> findAllContractors(
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         var response = contractorService.findAllContractors(page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả đơn vị thi công", response, page);
+    }
+
+    @GetMapping(params = "isAvailable")
+    @Operation(summary = "Xem tất cả đơn vị thi công hoạt động")
+    public ApiPagingResponse<ContractorDTO> findAllContractorsIsAvailable(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size,
+            @RequestParam(required = false) boolean isAvailable) {
+        var response = contractorService.findAllContractorsIsAvailable(page, size, isAvailable);
         return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả đơn vị thi công", response, page);
     }
 
