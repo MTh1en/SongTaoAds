@@ -1,5 +1,6 @@
 package com.capstone.ads.dto.auth;
 
+import com.capstone.ads.dto.user.UserDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,4 +10,5 @@ import lombok.experimental.FieldDefaults;
 public class AuthResponse {
     String accessToken;
     String refreshToken;
+    UserDTO user;
 }

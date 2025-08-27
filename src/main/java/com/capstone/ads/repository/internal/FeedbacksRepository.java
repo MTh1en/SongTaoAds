@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -15,4 +16,6 @@ public interface FeedbacksRepository extends JpaRepository<Feedbacks, String> {
     List<Feedbacks> findByOrders_Id(String id);
 
     List<Feedbacks> findByOrders_OrderCode(String orderCode);
+
+    int countBySendAtBetween(LocalDateTime sendAtStart, LocalDateTime sendAtEnd);
 }

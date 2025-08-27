@@ -23,9 +23,6 @@ public class Topic {
     String title;
     String description;
 
-    @ManyToOne
-    ModelChatBot modelChatBot;
-
     @OneToMany(mappedBy = "topic")
     List<Question> questions;
 

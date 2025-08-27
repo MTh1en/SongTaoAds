@@ -46,9 +46,8 @@ public class NotificationServiceImpl implements NotificationService {
     SecurityContextUtils securityContextUtils;
     NotificationMapper notificationMapper;
 
-    @Async
     @EventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void handleRoleNotificationEvent(RoleNotificationEvent event) {
         sendNotificationToRole(event.getRoleName(), event.getMessage());
     }
@@ -74,9 +73,8 @@ public class NotificationServiceImpl implements NotificationService {
                         notification.getCreatedAt().toString()));
     }
 
-    @Async
     @EventListener
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void handleUserNotificationEvent(UserNotificationEvent event) {
         sendNotificationToUser(event.getUserId(), event.getMessage());
     }
@@ -84,7 +82,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional
     public void sendNotificationToUser(String userId, String message) {
-        Users user = userService.getUserByIdAndIsActive(userId);
+        Users user = userService.getUserByIdAndIsActiveAndNotBanned(userId);
 
         Notification notification = Notification.builder()
                 .type("USER")

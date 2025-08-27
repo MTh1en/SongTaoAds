@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthController {
     AuthService authService;
-    RecoveryService recoveryService;
 
     @PostMapping("/outbound/authentication")
     public ApiResponse<AuthResponse> outboundAuthentication(@RequestParam String code, HttpServletResponse response) {
@@ -42,7 +41,6 @@ public class AuthController {
     @Operation(summary = "Đăng ký")
     public ApiResponse<Void> register(@Valid @RequestBody RegisterRequest request) {
         authService.register(request);
-        recoveryService.sendVerifyEmail(request.getEmail());
         return ApiResponseBuilder.buildSuccessResponse("Đăng ký thành công", null);
     }
 

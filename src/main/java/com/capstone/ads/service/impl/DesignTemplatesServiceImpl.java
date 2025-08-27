@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.capstone.ads.utils.LookupMapUtils.mapProductTypeSizesByDimensionAndSize;
@@ -62,7 +63,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     @Override
     @Transactional
     public DesignTemplateDTO updateDesignTemplateInformation(String designTemplateId, DesignTemplateUpdateRequest request) {
-        DesignTemplates designTemplates = getDesignTemplateByIdAndAvailable(designTemplateId);
+        DesignTemplates designTemplates = getDesignTemplateById(designTemplateId);
 
         designTemplatesMapper.updateEntityFromRequest(request, designTemplates);
         designTemplates = designTemplatesRepository.save(designTemplates);
@@ -72,7 +73,7 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     @Override
     @Transactional
     public DesignTemplateDTO uploadDesignTemplateImage(String designTemplateId, MultipartFile file) {
-        DesignTemplates designTemplates = getDesignTemplateByIdAndAvailable(designTemplateId);
+        DesignTemplates designTemplates = getDesignTemplateById(designTemplateId);
         String productTypeId = designTemplates.getProductTypes().getId();
         fileDataService.hardDeleteFileDataByImageUrl(designTemplates.getImage());
 
@@ -93,16 +94,20 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
     public Page<DesignTemplateDTO> findDesignTemplateByProductTypeId(String productTypeId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        return designTemplatesRepository.findByProductTypes_IdAndIsAvailable(productTypeId, true, pageable)
+        return designTemplatesRepository.findByProductTypes_Id(productTypeId, pageable)
                 .map(designTemplatesMapper::toDTO);
     }
 
     @Override
-    public Page<DesignTemplateDTO> findAllDesignTemplates(int page, int size) {
+    public Page<DesignTemplateDTO> findAllDesignTemplates(AspectRatio aspectRatio, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-
-        return designTemplatesRepository.findByIsAvailable(true, pageable)
-                .map(designTemplatesMapper::toDTO);
+        if (Objects.nonNull(aspectRatio)) {
+            return designTemplatesRepository.findByAspectRatio(aspectRatio, pageable)
+                    .map(designTemplatesMapper::toDTO);
+        } else {
+            return designTemplatesRepository.findAll(pageable)
+                    .map(designTemplatesMapper::toDTO);
+        }
     }
 
     @Override
@@ -116,6 +121,12 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
 
     @Override
     public DesignTemplates getDesignTemplateById(String designTemplateId) {
+        return designTemplatesRepository.findById(designTemplateId)
+                .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
+    }
+
+    @Override
+    public DesignTemplates getDesignTemplateByIdAndAvailable(String designTemplateId) {
         return designTemplatesRepository.findByIdAndIsAvailable(designTemplateId, true)
                 .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
     }
@@ -152,11 +163,6 @@ public class DesignTemplatesServiceImpl implements DesignTemplatesService {
         } else {
             return getDesignTemplateByAspecRatioAndAvailable(AspectRatio.SQUARE, pageable);
         }
-    }
-
-    private DesignTemplates getDesignTemplateByIdAndAvailable(String designTemplateId) {
-        return designTemplatesRepository.findByIdAndIsAvailable(designTemplateId, true)
-                .orElseThrow(() -> new AppException(ErrorCode.DESIGN_TEMPLATE_NOT_FOUND));
     }
 
     private Page<DesignTemplateDTO> getDesignTemplateByAspecRatioAndAvailable(AspectRatio aspectRatio, Pageable pageable) {

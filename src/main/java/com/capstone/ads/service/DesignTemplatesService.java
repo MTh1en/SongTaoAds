@@ -4,6 +4,7 @@ import com.capstone.ads.dto.design_template.DesignTemplateCreateRequest;
 import com.capstone.ads.dto.design_template.DesignTemplateDTO;
 import com.capstone.ads.dto.design_template.DesignTemplateUpdateRequest;
 import com.capstone.ads.model.DesignTemplates;
+import com.capstone.ads.model.enums.AspectRatio;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +19,7 @@ public interface DesignTemplatesService {
 
     Page<DesignTemplateDTO> findDesignTemplateByProductTypeId(String productTypeId, int page, int size);
 
-    Page<DesignTemplateDTO> findAllDesignTemplates(int page, int size);
+    Page<DesignTemplateDTO> findAllDesignTemplates(AspectRatio aspectRatio, int page, int size);
 
     Page<DesignTemplateDTO> suggestDesignTemplatesBaseCustomerChoice(String customerChoiceId, int page, int size);
 
@@ -26,4 +27,6 @@ public interface DesignTemplatesService {
 
     //INTERNAL FUNCTION
     DesignTemplates getDesignTemplateById(String designTemplateId);
+
+    DesignTemplates getDesignTemplateByIdAndAvailable(String designTemplateId);
 }

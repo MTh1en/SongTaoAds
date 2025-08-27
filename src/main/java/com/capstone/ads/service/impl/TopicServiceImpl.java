@@ -32,7 +32,7 @@ public class TopicServiceImpl implements TopicService {
 
 
     @Override
-    public List<TopicDTO> getAllTopics() {
+    public List<TopicDTO> findAllTopics() {
         return topicRepository.findAll().stream()
                 .map(topicMapper::toDto)
                 .collect(Collectors.toList());

@@ -136,7 +136,7 @@ public class StableDiffusionServiceImpl implements StableDiffusionService {
 
 
     private String getImageBytesFromDesignTemplate(String designTemplateId) {
-        var designTemplate = designTemplatesService.getDesignTemplateById(designTemplateId);
+        var designTemplate = designTemplatesService.getDesignTemplateByIdAndAvailable(designTemplateId);
         FileInformation imageFileInformation = s3Service.downloadFile(designTemplate.getImage());
         return DataConverter.convertByteArrayToBase64(imageFileInformation.getContent());
     }

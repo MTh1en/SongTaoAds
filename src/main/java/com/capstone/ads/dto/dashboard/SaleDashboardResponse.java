@@ -15,15 +15,6 @@ public class SaleDashboardResponse {
     int totalOrderCancelled;
     int totalAiDesignOrder;
     int totalCustomDesignOrder;
-    int totalCustomDesignRequest;
-    int totalCustomDesignRequestCompleted;
-    int totalCustomDesignRequestInProgress;
-    int totalCustomDesignRequestCancelled;
-    long totalRevenue;
-    long totalPayOSPayment;
-    long totalCastPayment;
-    long totalDesignPaid;
-    long totalOrderPaid;
     int totalContractSigned;
     int totalFeedback;
     int totalFeedbackResponse;

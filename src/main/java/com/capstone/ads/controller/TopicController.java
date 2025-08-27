@@ -34,8 +34,8 @@ public class TopicController {
 
     @GetMapping("/topics")
     @Operation(summary = "Xem tất cả topic")
-    public ApiResponse<List<TopicDTO>> viewAllTopics() {
-        var topics = topicService.getAllTopics();
+    public ApiResponse<List<TopicDTO>> findAllTopics() {
+        var topics = topicService.findAllTopics();
         return ApiResponseBuilder.buildSuccessResponse("Xem tất cả topic thành công", topics);
     }
 

@@ -35,7 +35,7 @@ public class CustomerChoicesServiceImpl implements CustomerChoicesService {
     @Override
     @Transactional
     public CustomerChoicesDTO createCustomerChoice(String customerId, String productTypeId) {
-        Users users = userService.getUserByIdAndIsActive(customerId);
+        Users users = userService.getUserByIdAndIsActiveAndNotBanned(customerId);
         ProductTypes productTypes = productTypesService.getProductTypeByIdAndAvailable(productTypeId);
 
         CustomerChoices customerChoices = CustomerChoices.builder()

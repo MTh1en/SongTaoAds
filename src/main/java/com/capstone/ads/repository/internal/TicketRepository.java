@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,5 +21,9 @@ public interface TicketRepository extends JpaRepository<Tickets, String> {
 
     List<Tickets> findByOrders_OrderCode(String orderCode);
 
+    int countByCreatedAtBetween(LocalDateTime createdAtStart, LocalDateTime createdAtEnd);
+
     int countByStatusIn(Collection<TicketStatus> statuses);
+
+    int countByStatusInAndUpdatedAtBetween(Collection<TicketStatus> statuses, LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
 }

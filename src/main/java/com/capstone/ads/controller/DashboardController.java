@@ -16,31 +16,31 @@ import org.springframework.web.bind.annotation.*;
 public class DashboardController {
     private final DashboardService dashboardService;
 
-    @GetMapping("/admin")
+    @PostMapping("/admin")
     @Operation(summary = "Dashboard cho Admin")
-    public ApiResponse<AdminDashboardResponse> adminDashboard() {
-        var response = dashboardService.getAdminDashboard();
+    public ApiResponse<AdminDashboardResponse> adminDashboard(@RequestBody TimeRangeRequest request) {
+        var response = dashboardService.getAdminDashboard(request);
         return ApiResponseBuilder.buildSuccessResponse("Response retrieved successfully.", response);
     }
 
-    @GetMapping("/sale")
+    @PostMapping("/sale")
     @Operation(summary = "Dashboard cho Sale")
-    public ApiResponse<SaleDashboardResponse> saleDashboard() {
-        var response = dashboardService.getSaleDashboard();
+    public ApiResponse<SaleDashboardResponse> saleDashboard(@RequestBody TimeRangeRequest request) {
+        var response = dashboardService.getSaleDashboard(request);
         return ApiResponseBuilder.buildSuccessResponse("Response retrieved successfully.", response);
     }
 
-    @GetMapping("/staff")
+    @PostMapping("/staff")
     @Operation(summary = "Dashboard cho Staff")
-    public ApiResponse<StaffDashboardResponse> staffDashboard() {
-        var response = dashboardService.getStaffDashboard();
+    public ApiResponse<StaffDashboardResponse> staffDashboard(@RequestBody TimeRangeRequest request) {
+        var response = dashboardService.getStaffDashboard(request);
         return ApiResponseBuilder.buildSuccessResponse("Response retrieved successfully.", response);
     }
 
-    @GetMapping("/designer")
+    @PostMapping("/designer")
     @Operation(summary = "Dashboard cho Designer")
-    public ApiResponse<DesignerDashboardResponse> designerDashboard() {
-        var response = dashboardService.getDesignerDashboard();
+    public ApiResponse<DesignerDashboardResponse> designerDashboard(@RequestBody TimeRangeRequest request) {
+        var response = dashboardService.getDesignerDashboard(request);
         return ApiResponseBuilder.buildSuccessResponse("Response retrieved successfully.", response);
     }
 

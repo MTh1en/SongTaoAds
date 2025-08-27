@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,8 @@ public interface UsersRepository extends JpaRepository<Users, String> {
 
     Optional<Users> findByIdAndIsActive(String id, Boolean isActive);
 
+    Optional<Users> findByIdAndIsActiveAndIsBanned(String id, Boolean isActive, Boolean isBanned);
+
     Optional<Users> findByIdAndIsActiveAndRoles_Name(String id, Boolean isActive, String name);
 
     Page<Users> findByIsActiveAndRoles_Name(Boolean isActive, String name, Pageable pageable);
@@ -23,5 +26,9 @@ public interface UsersRepository extends JpaRepository<Users, String> {
 
     int countByRoles_Name(String name);
 
-    int countByIsBanned(Boolean isBanned);
+    int countByRoles_NameAndUpdatedAtBetween(String name, LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
+
+    int countByIsBannedAndUpdatedAtBetween(Boolean isBanned, LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
+
+    int countByCreatedAtBetween(LocalDateTime createdAtStart, LocalDateTime createdAtEnd);
 }
