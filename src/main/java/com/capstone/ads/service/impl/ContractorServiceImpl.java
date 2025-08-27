@@ -113,7 +113,7 @@ public class ContractorServiceImpl implements ContractorService {
 
     @Override
     public Contractors getContractorById(String contractorId) {
-        return contractorsRepository.findByIdAndIsAvailable(contractorId, true)
+        return contractorsRepository.findById(contractorId)
                 .orElseThrow(() -> new AppException(ErrorCode.CONTRACTOR_NOT_FOUND));
     }
 
