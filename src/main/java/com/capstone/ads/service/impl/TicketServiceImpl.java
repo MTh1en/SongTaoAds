@@ -30,6 +30,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -107,14 +109,6 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Page<TicketDTO> viewTicketByStatus(TicketStatus status, int page, int size) {
-        Sort sort = Sort.by("updatedAt").descending();
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return ticketRepository.findByStatus(status, pageable)
-                .map(ticketsMapper::toDTO);
-    }
-
-    @Override
     public Page<TicketDTO> viewTicketsOfStaff(int page, int size) {
         Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -131,11 +125,17 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Page<TicketDTO> viewTicketsByUserId(String userId, int page, int size) {
+    public Page<TicketDTO> viewTicketsByUserId(String userId, TicketStatus status, int page, int size) {
         Sort sort = Sort.by("updatedAt").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        return ticketRepository.findByCustomerId(userId, pageable)
-                .map(ticketsMapper::toDTO);
+
+        if (Objects.nonNull(status)) {
+            return ticketRepository.findByCustomer_IdAndStatus(userId, status, pageable)
+                    .map(ticketsMapper::toDTO);
+        } else {
+            return ticketRepository.findByCustomerId(userId, pageable)
+                    .map(ticketsMapper::toDTO);
+        }
     }
 
     private TicketDTO reportTicket(TicketReport report, Tickets ticket) {

@@ -17,13 +17,11 @@ public interface TicketService {
 
     TicketDTO viewTicketDetails(String ticketId);
 
-    Page<TicketDTO> viewTicketByStatus(TicketStatus status, int page, int size);
-
     Page<TicketDTO> viewTicketsOfStaff(int page, int size);
 
     Page<TicketDTO> viewAllTickets(int page, int size);
 
-    Page<TicketDTO> viewTicketsByUserId(String userId, int page, int size);
+    Page<TicketDTO> viewTicketsByUserId(String userId, TicketStatus status, int page, int size);
 
     TicketDTO deliveryTicket(String ticketId);
 }

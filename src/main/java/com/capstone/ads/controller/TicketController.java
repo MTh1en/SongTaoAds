@@ -39,7 +39,7 @@ public class TicketController {
     public ApiResponse<TicketDTO> reportTicketBySaleStaff(@PathVariable("ticketId") String ticketId,
                                                           @Valid @RequestBody TicketReport reportDetails) {
         var ticket = ticketService.reportTicketBySaleStaff(ticketId, reportDetails);
-        return ApiResponseBuilder.buildSuccessResponse("Phản hồi ticket thành công", ticket);
+        return ApiResponseBuilder.buildSuccessResponse("Sale phản hồi ticket thành công", ticket);
     }
 
     @PatchMapping("/tickets/{ticketId}/report/staff")
@@ -47,7 +47,7 @@ public class TicketController {
     public ApiResponse<TicketDTO> reportTicketByStaff(@PathVariable String ticketId,
                                                       @Valid @RequestBody TicketReport reportDetails) {
         var ticket = ticketService.reportTicketByStaff(ticketId, reportDetails);
-        return ApiResponseBuilder.buildSuccessResponse("Phản hồi ticket thành công", ticket);
+        return ApiResponseBuilder.buildSuccessResponse("Staff phản hồi ticket thành công", ticket);
     }
 
     @PatchMapping("/tickets/{ticketId}/deliveryTicket")
@@ -73,16 +73,6 @@ public class TicketController {
         return ApiResponseBuilder.buildSuccessResponse("Xem chi tiết ticket theo ID thành công", ticket);
     }
 
-    @GetMapping("/tickets/customer")
-    @Operation(summary = "Xem tất cả ticket theo trạng thái")
-    public ApiPagingResponse<TicketDTO> viewTicketByStatus(
-            @RequestParam TicketStatus status,
-            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var tickets = ticketService.viewTicketByStatus(status, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả ticket theo trạng thái thành công", tickets, page);
-    }
-
     @GetMapping("/tickets/staff")
     @Operation(summary = "Staff xem tất cả ticket liên quan production (Staff)")
     public ApiPagingResponse<TicketDTO> viewTicketsOfStaff(
@@ -96,9 +86,10 @@ public class TicketController {
     @Operation(summary = "Customer xem tickets của mình")
     public ApiPagingResponse<TicketDTO> viewTicketsOfUserId(
             @PathVariable String userId,
+            @RequestParam(required = false) TicketStatus status,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var tickets = ticketService.viewTicketsByUserId(userId, page, size);
-        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả ticket đã gửi thành công", tickets, page);
+        var tickets = ticketService.viewTicketsByUserId(userId, status, page, size);
+        return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả ticket của mình đã gửi thành công", tickets, page);
     }
 }

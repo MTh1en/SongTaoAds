@@ -12,18 +12,15 @@ import java.util.Collection;
 import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Tickets, String> {
-
     Page<Tickets> findByCustomerId(String customerId, Pageable pageable);
 
-    Page<Tickets> findByStatus(TicketStatus status, Pageable pageable);
+    Page<Tickets> findByCustomer_IdAndStatus(String id, TicketStatus status, Pageable pageable);
 
     Page<Tickets> findBySeverity(TicketSeverity severity, Pageable pageable);
 
     List<Tickets> findByOrders_OrderCode(String orderCode);
 
     int countByCreatedAtBetween(LocalDateTime createdAtStart, LocalDateTime createdAtEnd);
-
-    int countByStatusIn(Collection<TicketStatus> statuses);
 
     int countByStatusInAndUpdatedAtBetween(Collection<TicketStatus> statuses, LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
 }
