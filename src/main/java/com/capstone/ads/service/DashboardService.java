@@ -3,13 +3,13 @@ package com.capstone.ads.service;
 import com.capstone.ads.dto.dashboard.*;
 
 public interface DashboardService {
-    AdminDashboardResponse getAdminDashboard();
+    AdminDashboardResponse getAdminDashboard(TimeRangeRequest request);
 
-    SaleDashboardResponse getSaleDashboard();
+    SaleDashboardResponse getSaleDashboard(TimeRangeRequest request);
 
-    StaffDashboardResponse getStaffDashboard();
+    StaffDashboardResponse getStaffDashboard(TimeRangeRequest request);
 
-    DesignerDashboardResponse getDesignerDashboard();
+    DesignerDashboardResponse getDesignerDashboard(TimeRangeRequest request);
 
     CustomRequestDashboardResponse customDesignRequestDashboard(TimeRangeRequest request);
 

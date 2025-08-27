@@ -33,9 +33,9 @@ public interface CustomDesignRequestsRepository extends JpaRepository<CustomDesi
     @NonNull
     Optional<CustomDesignRequests> findById(@NonNull String id);
 
-    int countByStatusIn(List<CustomDesignRequestStatus> statuses);
+    int countByStatusInAndUpdatedAtBetween(Collection<CustomDesignRequestStatus> statuses, LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
 
-    int countByStatusNotIn(List<CustomDesignRequestStatus> statuses);
+    int countByStatusNotInAndUpdatedAtBetween(Collection<CustomDesignRequestStatus> statuses, LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
 
     List<CustomDesignRequests> findByAssignDesigner(Users assignDesigner);
 

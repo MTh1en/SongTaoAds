@@ -46,42 +46,55 @@ public class DashboardServiceImpl implements DashboardService {
     SecurityContextUtils securityContextUtils;
 
     @Override
-    public AdminDashboardResponse getAdminDashboard() {
-        int totalUser = Math.toIntExact(usersRepository.count());
-        int totalBannedUser = usersRepository.countByIsBanned(true);
-        int totalCustomer = usersRepository.countByRoles_Name(PredefinedRole.CUSTOMER_ROLE);
-        int totalSale = usersRepository.countByRoles_Name(PredefinedRole.SALE_ROLE);
-        int totalStaff = usersRepository.countByRoles_Name(PredefinedRole.STAFF_ROLE);
-        int totalDesigner = usersRepository.countByRoles_Name(PredefinedRole.DESIGNER_ROLE);
-        int totalAdmin = usersRepository.countByRoles_Name(PredefinedRole.ADMIN_ROLE);
-        int totalPaymentTransactionCreated = Math.toIntExact(paymentRepository.count());
-        int totalPaymentSuccess = paymentRepository.countByStatus(PaymentStatus.SUCCESS);
-        int totalPaymentFailed = paymentRepository.countByStatus(PaymentStatus.FAILED);
-        int totalPaymentCancelled = paymentRepository.countByStatus(PaymentStatus.CANCELLED);
+    public AdminDashboardResponse getAdminDashboard(TimeRangeRequest request) {
+        LocalDateTime start = request.getStart();
+        LocalDateTime end = request.getEnd();
 
-        long totalPaymentSuccessAmount = paymentRepository.findByStatus(PaymentStatus.SUCCESS).parallelStream()
+        int totalUser = usersRepository.countByCreatedAtBetween(start, end);
+        int totalBannedUser = usersRepository.countByIsBannedAndUpdatedAtBetween(true, start, end);
+        int totalCustomer = usersRepository.countByRoles_NameAndUpdatedAtBetween(PredefinedRole.CUSTOMER_ROLE, start, end);
+        int totalSale = usersRepository.countByRoles_NameAndUpdatedAtBetween(PredefinedRole.SALE_ROLE, start, end);
+        int totalStaff = usersRepository.countByRoles_NameAndUpdatedAtBetween(PredefinedRole.STAFF_ROLE, start, end);
+        int totalDesigner = usersRepository.countByRoles_NameAndUpdatedAtBetween(PredefinedRole.DESIGNER_ROLE, start, end);
+        int totalAdmin = usersRepository.countByRoles_NameAndUpdatedAtBetween(PredefinedRole.ADMIN_ROLE, start, end);
+
+        int totalPaymentTransactionCreated = paymentRepository.countByCreatedAtBetween(start, end);
+        int totalPaymentSuccess = paymentRepository.countByStatusAndUpdatedAtBetween(PaymentStatus.SUCCESS, start, end);
+        int totalPaymentFailed = paymentRepository.countByStatusAndUpdatedAtBetween(PaymentStatus.FAILED, start, end);
+        int totalPaymentCancelled = paymentRepository.countByStatusAndUpdatedAtBetween(PaymentStatus.CANCELLED, start, end);
+
+        long totalPaymentSuccessAmount = paymentRepository.findByStatusAndUpdatedAtBetween(
+                        PaymentStatus.SUCCESS, start, end
+                ).parallelStream()
                 .mapToLong(Payments::getAmount).sum();
 
-        long totalPaymentFailureAmount = paymentRepository.findByStatus(PaymentStatus.FAILED).parallelStream()
+        long totalPaymentFailureAmount = paymentRepository.findByStatusAndUpdatedAtBetween(PaymentStatus.FAILED, start, end
+                ).parallelStream()
                 .mapToLong(Payments::getAmount).sum();
 
-        long totalPaymentCancelledAmount = paymentRepository.findByStatus(PaymentStatus.CANCELLED).parallelStream()
+        long totalPaymentCancelledAmount = paymentRepository.findByStatusAndUpdatedAtBetween(
+                        PaymentStatus.CANCELLED, start, end
+                ).parallelStream()
                 .mapToLong(Payments::getAmount).sum();
 
-        long totalPayOSSuccessAmount = paymentRepository.findByStatusAndMethod(PaymentStatus.SUCCESS, PaymentMethod.PAYOS)
-                .parallelStream()
+        long totalPayOSSuccessAmount = paymentRepository.findByStatusAndMethodAndUpdatedAtBetween(
+                        PaymentStatus.SUCCESS, PaymentMethod.PAYOS, start, end
+                ).parallelStream()
                 .mapToLong(Payments::getAmount).sum();
 
-        long totalPayOSFailureAmount = paymentRepository.findByStatusAndMethod(PaymentStatus.FAILED, PaymentMethod.PAYOS)
-                .parallelStream()
+        long totalPayOSFailureAmount = paymentRepository.findByStatusAndMethodAndUpdatedAtBetween(
+                        PaymentStatus.FAILED, PaymentMethod.PAYOS, start, end
+                ).parallelStream()
                 .mapToLong(Payments::getAmount).sum();
 
-        long totalPayOSCancelledAmount = paymentRepository.findByStatusAndMethod(PaymentStatus.CANCELLED, PaymentMethod.PAYOS)
-                .parallelStream()
+        long totalPayOSCancelledAmount = paymentRepository.findByStatusAndMethodAndUpdatedAtBetween(
+                        PaymentStatus.CANCELLED, PaymentMethod.PAYOS, start, end
+                ).parallelStream()
                 .mapToLong(Payments::getAmount).sum();
 
-        long totalCastAmount = paymentRepository.findByStatusAndMethod(PaymentStatus.SUCCESS, PaymentMethod.CAST)
-                .parallelStream()
+        long totalCastAmount = paymentRepository.findByStatusAndMethodAndUpdatedAtBetween(
+                        PaymentStatus.SUCCESS, PaymentMethod.CAST, start, end
+                ).parallelStream()
                 .mapToLong(Payments::getAmount).sum();
 
         int totalImage = Math.toIntExact(fileDataRepository.count());
@@ -114,66 +127,40 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public SaleDashboardResponse getSaleDashboard() {
-        int totalOrder = Math.toIntExact(orderRepository.count());
-        int totalOrderCompleted = orderRepository.countByStatus(OrderStatus.ORDER_COMPLETED);
-        int totalOrderInProgress = orderRepository.countByStatusNotIn(List.of(
-                OrderStatus.ORDER_COMPLETED,
-                OrderStatus.CANCELLED)
+    public SaleDashboardResponse getSaleDashboard(TimeRangeRequest request) {
+        LocalDateTime start = request.getStart();
+        LocalDateTime end = request.getEnd();
+
+        int totalOrder = orderRepository.countByUpdatedAtBetween(start, end);
+        int totalOrderCompleted = orderRepository.countByStatusAndUpdatedAtBetween(OrderStatus.ORDER_COMPLETED, start, end);
+        int totalOrderInProgress = orderRepository.countByStatusNotInAndUpdatedAtBetween(List.of(
+                        OrderStatus.ORDER_COMPLETED,
+                        OrderStatus.CANCELLED),
+                start, end
         );
-        int totalOrderCancelled = orderRepository.countByStatus(OrderStatus.CANCELLED);
-        int totalAiDesignOrder = orderRepository.countByOrderTypeIn(List.of(OrderType.AI_DESIGN));
-        int totalCustomDesignOrder = orderRepository.countByOrderTypeIn(List.of(
-                OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION,
-                OrderType.CUSTOM_DESIGN_WITHOUT_CONSTRUCTION
-        ));
+        int totalOrderCancelled = orderRepository.countByStatusAndUpdatedAtBetween(OrderStatus.CANCELLED, start, end);
+        int totalAiDesignOrder = orderRepository.countByOrderTypeInAndUpdatedAtBetween(List.of(OrderType.AI_DESIGN), start, end);
+        int totalCustomDesignOrder = orderRepository.countByOrderTypeInAndUpdatedAtBetween(List.of(
+                        OrderType.CUSTOM_DESIGN_WITH_CONSTRUCTION,
+                        OrderType.CUSTOM_DESIGN_WITHOUT_CONSTRUCTION),
+                start, end
+        );
 
-        int totalCustomDesignRequest = Math.toIntExact(customDesignRequestsRepository.count());
-        int totalCustomDesignRequestCompleted = customDesignRequestsRepository.countByStatusIn(List.of(
-                CustomDesignRequestStatus.COMPLETED
-        ));
-        int totalCustomDesignRequestInProgress = customDesignRequestsRepository.countByStatusNotIn(List.of(
-                CustomDesignRequestStatus.COMPLETED,
-                CustomDesignRequestStatus.CANCELLED
-        ));
-        int totalCustomDesignRequestCancelled = customDesignRequestsRepository.countByStatusIn(List.of(
-                CustomDesignRequestStatus.CANCELLED
-        ));
+        int totalContractSigned = contractRepository.countByStatusAndSignedDateBetween(ContractStatus.CONFIRMED, start, end);
 
-        long totalRevenue = paymentRepository.findByStatus(PaymentStatus.SUCCESS).parallelStream()
-                .mapToLong(Payments::getAmount)
-                .sum();
-        long totalPayOSPayment = paymentRepository.findByStatusAndMethod(PaymentStatus.SUCCESS, PaymentMethod.PAYOS)
+        int totalFeedback = feedbacksRepository.countBySendAtBetween(start, end);
+        int totalFeedbackResponse = Math.toIntExact(feedbacksRepository.findAll()
                 .parallelStream()
-                .mapToLong(Payments::getAmount)
-                .sum();
-        long totalCastPayment = paymentRepository.findByStatusAndMethod(PaymentStatus.SUCCESS, PaymentMethod.CAST)
-                .parallelStream()
-                .mapToLong(Payments::getAmount)
-                .sum();
-        long totalDesignPaid = paymentRepository.findByTypeInAndStatus(
-                        List.of(PaymentType.DEPOSIT_DESIGN, PaymentType.REMAINING_DESIGN),
-                        PaymentStatus.SUCCESS)
-                .parallelStream()
-                .mapToLong(Payments::getAmount)
-                .sum();
+                .filter(feedbacks -> Objects.nonNull(feedbacks.getResponse()) &&
+                        feedbacks.getResponseAt().isAfter(start) &&
+                        feedbacks.getResponseAt().isBefore(end))
+                .count());
 
-        long totalOrderPaid = paymentRepository.findByTypeInAndStatus(
-                        List.of(PaymentType.DEPOSIT_CONSTRUCTION, PaymentType.REMAINING_CONSTRUCTION),
-                        PaymentStatus.SUCCESS)
-                .parallelStream()
-                .mapToLong(Payments::getAmount)
-                .sum();
-
-        int totalContractSigned = contractRepository.countByStatus(ContractStatus.CONFIRMED);
-        int totalFeedback = Math.toIntExact(feedbacksRepository.count());
-        int totalFeedbackResponse = Math.toIntExact(feedbacksRepository.findAll().parallelStream()
-                .filter(feedbacks -> Objects.nonNull(feedbacks.getResponse())).count());
-
-        int totalTicket = Math.toIntExact(ticketRepository.count());
-        int totalTicketInProgress = ticketRepository.countByStatusIn(List.of(TicketStatus.OPEN, TicketStatus.IN_PROGRESS));
-        int totalTicketClosed = ticketRepository.countByStatusIn(List.of(TicketStatus.CLOSED));
-        int totalTicketDelivered = ticketRepository.countByStatusIn(List.of(TicketStatus.IN_PROGRESS));
+        int totalTicket = ticketRepository.countByCreatedAtBetween(start, end);
+        int totalTicketInProgress = ticketRepository.countByStatusInAndUpdatedAtBetween(
+                List.of(TicketStatus.OPEN, TicketStatus.IN_PROGRESS), start, end);
+        int totalTicketClosed = ticketRepository.countByStatusInAndUpdatedAtBetween(List.of(TicketStatus.CLOSED), start, end);
+        int totalTicketDelivered = ticketRepository.countByStatusInAndUpdatedAtBetween(List.of(TicketStatus.IN_PROGRESS), start, end);
 
         return SaleDashboardResponse.builder()
                 .totalOrders(totalOrder)
@@ -182,15 +169,6 @@ public class DashboardServiceImpl implements DashboardService {
                 .totalOrderCancelled(totalOrderCancelled)
                 .totalAiDesignOrder(totalAiDesignOrder)
                 .totalCustomDesignOrder(totalCustomDesignOrder)
-                .totalCustomDesignRequest(totalCustomDesignRequest)
-                .totalCustomDesignRequestCompleted(totalCustomDesignRequestCompleted)
-                .totalCustomDesignRequestInProgress(totalCustomDesignRequestInProgress)
-                .totalCustomDesignRequestCancelled(totalCustomDesignRequestCancelled)
-                .totalRevenue(totalRevenue)
-                .totalPayOSPayment(totalPayOSPayment)
-                .totalCastPayment(totalCastPayment)
-                .totalDesignPaid(totalDesignPaid)
-                .totalOrderPaid(totalOrderPaid)
                 .totalContractSigned(totalContractSigned)
                 .totalFeedback(totalFeedback)
                 .totalFeedbackResponse(totalFeedbackResponse)
@@ -202,13 +180,7 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public StaffDashboardResponse getStaffDashboard() {
-        int totalOrder = Math.toIntExact(orderRepository.count());
-        int totalProducingOrder = orderRepository.countByStatus(OrderStatus.PRODUCING);
-        int totalProductionCompletedOrder = orderRepository.countByStatus(OrderStatus.PRODUCTION_COMPLETED);
-        int totalDeliveringOrder = orderRepository.countByStatus(OrderStatus.DELIVERING);
-        int totalInstalledOrder = orderRepository.countByStatus(OrderStatus.INSTALLED);
-
+    public StaffDashboardResponse getStaffDashboard(TimeRangeRequest request) {
         int totalProductType = Math.toIntExact(productTypesRepository.count());
         int totalProductTypeActive = productTypesRepository.countByIsAvailable(true);
         int totalProductTypeUsingAI = productTypesRepository.countByIsAiGenerated(true);
@@ -237,24 +209,7 @@ public class DashboardServiceImpl implements DashboardService {
         int totalContactorInternal = contractorsRepository.countByIsInternal(true);
         int totalContractorExternal = contractorsRepository.countByIsInternal(false);
 
-        long totalRevenue = paymentRepository.findByStatus(PaymentStatus.SUCCESS).parallelStream()
-                .mapToLong(Payments::getAmount)
-                .sum();
-        long totalPayOSPayment = paymentRepository.findByStatusAndMethod(PaymentStatus.SUCCESS, PaymentMethod.PAYOS)
-                .parallelStream()
-                .mapToLong(Payments::getAmount)
-                .sum();
-        long totalCastPayment = paymentRepository.findByStatusAndMethod(PaymentStatus.SUCCESS, PaymentMethod.CAST)
-                .parallelStream()
-                .mapToLong(Payments::getAmount)
-                .sum();
-
         return StaffDashboardResponse.builder()
-                .totalOrder(totalOrder)
-                .totalProducingOrder(totalProducingOrder)
-                .totalProductionCompletedOrder(totalProductionCompletedOrder)
-                .totalDeliveringOrder(totalDeliveringOrder)
-                .totalInstalledOrder(totalInstalledOrder)
                 .totalProductType(totalProductType)
                 .totalProductTypeActive(totalProductTypeActive)
                 .totalProductTypeUsingAI(totalProductTypeUsingAI)
@@ -275,17 +230,19 @@ public class DashboardServiceImpl implements DashboardService {
                 .totalContractorActive(totalContractorActive)
                 .totalContactorInternal(totalContactorInternal)
                 .totalContractorExternal(totalContractorExternal)
-                .totalRevenue(totalRevenue)
-                .totalPayOSPayment(totalPayOSPayment)
-                .totalCastPayment(totalCastPayment)
                 .build();
     }
 
     @Override
-    public DesignerDashboardResponse getDesignerDashboard() {
+    public DesignerDashboardResponse getDesignerDashboard(TimeRangeRequest request) {
+        LocalDateTime start = request.getStart();
+        LocalDateTime end = request.getEnd();
+
         var currentDesigner = securityContextUtils.getCurrentUser();
         var customDesignRequestAssigned = customDesignRequestsRepository.findByAssignDesigner(currentDesigner);
         var allDemoDesigns = customDesignRequestAssigned.stream()
+                .filter(customRequest -> customRequest.getUpdatedAt().isAfter(start)
+                        && customRequest.getUpdatedAt().isBefore(end))
                 .map(CustomDesignRequests::getDemoDesigns)
                 .flatMap(List::stream)
                 .toList();
@@ -299,7 +256,7 @@ public class DashboardServiceImpl implements DashboardService {
                 .filter(demo -> demo.getStatus() == DemoDesignStatus.REJECTED)
                 .count());
         int totalFinalDesignSubmitted = Math.toIntExact(customDesignRequestAssigned.stream()
-                .filter(request -> request.getStatus() == CustomDesignRequestStatus.COMPLETED)
+                .filter(customRequest -> customRequest.getStatus() == CustomDesignRequestStatus.COMPLETED)
                 .count());
 
         return DesignerDashboardResponse.builder()

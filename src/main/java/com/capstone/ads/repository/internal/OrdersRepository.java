@@ -43,9 +43,9 @@ public interface OrdersRepository extends JpaRepository<Orders, String> {
 
     int countByStatus(OrderStatus status);
 
-    int countByStatusNotIn(Collection<OrderStatus> statuses);
+    int countByStatusNotInAndUpdatedAtBetween(Collection<OrderStatus> statuses, LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
 
-    int countByOrderTypeIn(Collection<OrderType> orderTypes);
+    int countByOrderTypeInAndUpdatedAtBetween(Collection<OrderType> orderTypes, LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
 
     int countByUpdatedAtBetween(LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
 

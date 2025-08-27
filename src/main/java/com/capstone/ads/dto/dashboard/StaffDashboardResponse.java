@@ -9,11 +9,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class StaffDashboardResponse {
-    int totalOrder;
-    int totalProducingOrder;
-    int totalProductionCompletedOrder;
-    int totalDeliveringOrder;
-    int totalInstalledOrder;
     int totalProductType;
     int totalProductTypeActive;
     int totalProductTypeUsingAI;
@@ -34,7 +29,4 @@ public class StaffDashboardResponse {
     int totalContractorActive;
     int totalContactorInternal;
     int totalContractorExternal;
-    long totalRevenue;
-    long totalPayOSPayment;
-    long totalCastPayment;
 }

@@ -27,11 +27,9 @@ public interface PaymentsRepository extends JpaRepository<Payments, String> {
 
     List<Payments> findByStatusAndMethod(PaymentStatus status, PaymentMethod method);
 
-    List<Payments> findByStatus(PaymentStatus status);
+    int countByCreatedAtBetween(LocalDateTime createdAtStart, LocalDateTime createdAtEnd);
 
-    List<Payments> findByTypeInAndStatus(Collection<PaymentType> types, PaymentStatus status);
-
-    int countByStatus(PaymentStatus status);
+    int countByStatusAndUpdatedAtBetween(PaymentStatus status, LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
 
     List<Payments> findByStatusAndUpdatedAtBetween(PaymentStatus status, LocalDateTime updatedAtStart, LocalDateTime updatedAtEnd);
 

@@ -88,6 +88,7 @@ public class AuthServiceImpl implements AuthService {
                         .avatar(userInfo.getPicture())
                         .roles(roles)
                         .isActive(true)
+                        .isBanned(false)
                         .build()));
 
         if (user.getIsBanned()) {
