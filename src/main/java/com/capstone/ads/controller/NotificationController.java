@@ -5,6 +5,7 @@ import com.capstone.ads.dto.ApiResponse;
 import com.capstone.ads.dto.notification.NotificationDTO;
 import com.capstone.ads.service.NotificationService;
 import com.capstone.ads.utils.ApiResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -89,5 +90,18 @@ public class NotificationController {
     public ApiResponse<Void> markNotificationAsRead(@PathVariable Long notificationId) {
         notificationService.markNotificationAsRead(notificationId);
         return ApiResponseBuilder.buildSuccessResponse("Notification marked as read", null);
+    }
+
+    @PostMapping("/mark-all-read")
+    @Operation(summary = "Đánh dấu tất cả thông báo đã đọc")
+    public ApiResponse<Void> markAllNotificationsAsRead() {
+        notificationService.markAllNotificationsAsRead();
+        return ApiResponseBuilder.buildSuccessResponse("All notification marked as read", null);
+    }
+
+    @PostMapping("/new-order")
+    public ApiResponse<Void> newOrder(@RequestParam String orderCode) {
+        notificationService.sendNewOrderNotification(orderCode);
+        return ApiResponseBuilder.buildSuccessResponse("New order notification", null);
     }
 }

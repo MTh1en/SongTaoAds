@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface NotificationStatusRepository extends JpaRepository<NotificationStatus, Long> {
     Optional<NotificationStatus> findByNotificationAndUsers(Notification notification, Users user);
 
+    List<NotificationStatus> findByUsers(Users users);
+
     Page<NotificationStatus> findByUsersAndIsReadAndNotification_TypeOrderByNotification_CreatedAtDesc(
             Users users, boolean isRead, String type, Pageable pageable
     );

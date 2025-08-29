@@ -17,4 +17,8 @@ public interface NotificationService {
     Page<NotificationDTO> getAllUserNotificationsForUser(int page, int size);
 
     void markNotificationAsRead(Long notificationId);
+
+    void markAllNotificationsAsRead();
+
+    void sendNewOrderNotification(String orderCode);
 }

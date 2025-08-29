@@ -1,5 +1,6 @@
 package com.capstone.ads.service.impl;
 
+import com.capstone.ads.constaint.PredefinedRole;
 import com.capstone.ads.dto.notification.NotificationDTO;
 import com.capstone.ads.dto.notification.NotificationEvent;
 import com.capstone.ads.event.RoleNotificationEvent;
@@ -25,13 +26,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -179,6 +180,30 @@ public class NotificationServiceImpl implements NotificationService {
         status.setIsRead(true);
         status.setReadAt(LocalDateTime.now());
         notificationStatusRepository.save(status);
+    }
+
+    @Override
+    @Transactional
+    public void markAllNotificationsAsRead() {
+        Users user = securityContextUtils.getCurrentUser();
+        List<NotificationStatus> statusList = notificationStatusRepository.findByUsers(user).stream()
+                .peek(notification -> {
+                    notification.setIsRead(true);
+                    notification.setReadAt(LocalDateTime.now());
+                }).toList();
+        notificationStatusRepository.saveAll(statusList);
+    }
+
+    @Override
+    @Transactional
+    public void sendNewOrderNotification(String orderCode) {
+        String message;
+        if (Objects.nonNull(orderCode)) {
+            message = String.format("Có 1 đơn hàng mới với mã: %s", orderCode);
+        } else {
+            message = "Có 1 đơn hàng mới";
+        }
+        sendNotificationToRole(PredefinedRole.SALE_ROLE, message);
     }
 
     //INTERNAL FUNCTION
