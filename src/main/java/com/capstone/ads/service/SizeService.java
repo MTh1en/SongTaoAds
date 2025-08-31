@@ -14,7 +14,7 @@ public interface SizeService {
 
     SizeDTO findSizeById(String id);
 
-    Page<SizeDTO> findAllSize(int page, int size);
+    Page<SizeDTO> findAllSize(Boolean isActive, int page, int size);
 
     void hardDeleteSize(String id);
 

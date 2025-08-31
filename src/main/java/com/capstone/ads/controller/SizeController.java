@@ -48,9 +48,10 @@ public class SizeController {
     @GetMapping
     @Operation(summary = "Xem tất cả kích thước")
     public ApiPagingResponse<SizeDTO> findAllSize(
+            @RequestParam(required = false) Boolean isActive,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
-        var response = service.findAllSize(page, size);
+        var response = service.findAllSize(isActive, page, size);
         return ApiResponseBuilder.buildPagingSuccessResponse("Xem tất cả kích thước thành công", response, page);
     }
 

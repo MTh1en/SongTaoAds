@@ -18,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -51,10 +53,16 @@ public class SizesServiceImpl implements SizeService {
     }
 
     @Override
-    public Page<SizeDTO> findAllSize(int page, int size) {
+    public Page<SizeDTO> findAllSize(Boolean isActive, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
-        return sizesRepository.findAll(pageable)
-                .map(sizesMapper::toDTO);
+
+        if (Objects.nonNull(isActive)) {
+            return sizesRepository.findByIsAvailable(isActive, pageable)
+                    .map(sizesMapper::toDTO);
+        } else {
+            return sizesRepository.findAll(pageable)
+                    .map(sizesMapper::toDTO);
+        }
     }
 
     @Override
