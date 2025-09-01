@@ -1,7 +1,7 @@
 name: SongTaoAds
 services:
   redis:
-    image: redis:7.2-alpine
+    image: redis:8.0.1
     container_name: redis
     hostname: redis
     ports:
@@ -13,7 +13,7 @@ services:
     restart: unless-stopped
 
   postgres:
-    image: postgres:17.5-alpine3.21
+    image: postgres:17.5
     container_name: postgres
     hostname: postgres
     environment:
@@ -35,6 +35,8 @@ services:
       - "8080:8080"
       - "8888:8888"
     env_file: .env
+    environment:
+      - JAVA_OPTS=-Duser.timezone=Asia/Ho_Chi_Minh
     depends_on:
       redis:
         condition: service_started
