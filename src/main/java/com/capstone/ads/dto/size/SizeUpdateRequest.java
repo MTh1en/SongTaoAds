@@ -12,7 +12,6 @@ import lombok.experimental.FieldDefaults;
 public class SizeUpdateRequest {
     @NotBlank(message = "Size Name must is Required")
     String name;
-    @NotBlank(message = "Product Type Calculate Formula is Required")
     String description;
     Boolean isAvailable;
 }
