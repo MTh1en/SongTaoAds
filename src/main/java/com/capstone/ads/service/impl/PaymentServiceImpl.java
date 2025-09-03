@@ -272,7 +272,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .description("SongTaoAds")
                 .amount(amount)
                 .expiredAt(expiredInSeconds)
-                .returnUrl(BASE_URL + "/api/payments/success")
+                .returnUrl("https://songtaoads.io.vn/order-history")
                 .cancelUrl(BASE_URL + "/api/payments/fail/" + paymentCode)
                 .build();
         return payOS.createPaymentLink(paymentData);
