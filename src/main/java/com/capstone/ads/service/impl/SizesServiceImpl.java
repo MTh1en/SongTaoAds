@@ -47,8 +47,7 @@ public class SizesServiceImpl implements SizeService {
 
     @Override
     public SizeDTO findSizeById(String id) {
-        Sizes sizes = sizesRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.SIZE_NOT_FOUND));
+        Sizes sizes = getSizeById(id);
         return sizesMapper.toDTO(sizes);
     }
 
@@ -77,6 +76,12 @@ public class SizesServiceImpl implements SizeService {
     @Override
     public Sizes getSizeByIdAndIsAvailable(String sizeId) {
         return sizesRepository.findByIdAndIsAvailable(sizeId, true)
+                .orElseThrow(() -> new AppException(ErrorCode.SIZE_NOT_FOUND));
+    }
+
+    @Override
+    public Sizes getSizeById(String id) {
+        return sizesRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.SIZE_NOT_FOUND));
     }
 }

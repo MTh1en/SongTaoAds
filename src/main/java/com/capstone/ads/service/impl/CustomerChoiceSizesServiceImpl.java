@@ -43,7 +43,7 @@ public class CustomerChoiceSizesServiceImpl implements CustomerChoiceSizesServic
     @Transactional
     public CustomerChoicesSizeDTO createCustomerChoiceSize(String customerChoicesId, String sizeId, CustomerChoicesSizeCreateRequest request) {
         CustomerChoices customerChoice = customerChoicesService.getCustomerChoiceById(customerChoicesId);
-        Sizes sizes = sizeService.getSizeByIdAndIsAvailable(sizeId);
+        Sizes sizes = sizeService.getSizeById(sizeId);
         String productTypeId = customerChoice.getProductTypes().getId();
 
         productTypeSizesService.validateProductTypeSizeExist(productTypeId, sizeId);

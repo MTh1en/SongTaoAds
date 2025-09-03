@@ -20,4 +20,6 @@ public interface SizeService {
 
     //INTERNAL FUNCTION
     Sizes getSizeByIdAndIsAvailable(String id);
+
+    Sizes getSizeById(String id);
 }

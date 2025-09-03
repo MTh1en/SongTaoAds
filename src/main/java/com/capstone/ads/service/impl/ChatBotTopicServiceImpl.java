@@ -15,7 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -78,24 +81,34 @@ public class ChatBotTopicServiceImpl implements ChatBotTopicService {
     @Override
     @Transactional
     public List<ChatBotTopicResponse> addTopicsFromOldModel(String modelChatBotId) {
-
         ModelChatBot newModel = modelChatService.getModelChatBotById(modelChatBotId);
-        String oldModelId = modelChatService.getModelChatBotByName(newModel.getPreviousModelName()).getId();
 
-        List<ChatBotTopic> oldTopics = chatBotTopicRepository.findByModelChatBot_Id(oldModelId);
+        String prevName = newModel.getPreviousModelName();
 
-        List<ChatBotTopic> newTopics = oldTopics.stream()
-                .map(old -> ChatBotTopic.builder()
+        ModelChatBot oldModel = modelChatService.getModelChatBotByName(prevName);
+
+        List<ChatBotTopic> oldLinks = chatBotTopicRepository.findByModelChatBot_Id(oldModel.getId());
+
+        Set<String> existedTopicIds = chatBotTopicRepository.findByModelChatBot_Id(newModel.getId())
+                .stream()
+                .map(link -> link.getTopic().getId())
+                .collect(Collectors.toSet());
+
+        List<ChatBotTopic> toSave = oldLinks.stream()
+                .map(ChatBotTopic::getTopic)
+                .filter(t -> !existedTopicIds.contains(t.getId()))
+                .map(t -> ChatBotTopic.builder()
                         .modelChatBot(newModel)
-                        .topic(old.getTopic())
+                        .topic(t)
                         .build())
-                .toList();
+                .collect(Collectors.toList());
 
-        List<ChatBotTopic> savedTopics = chatBotTopicRepository.saveAll(newTopics);
+        if (toSave.isEmpty()) return Collections.emptyList();
 
-        return savedTopics.stream()
+        return chatBotTopicRepository.saveAll(toSave)
+                .stream()
                 .map(mapper::toResponse)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     public ChatBotTopic findChatBotTopicById(String chatBotTopicId){
