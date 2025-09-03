@@ -55,9 +55,11 @@ public class CostTypesServiceImpl implements CostTypesService {
     @Override
     @Transactional
     public CostTypeDTO updateCostTypeInformation(String costTypeId, CostTypeUpdateRequest request) {
-        CostTypes costTypes = getCostTypeByIdAndIsAvailable(costTypeId);
+        CostTypes costTypes = getCostTypeById(costTypeId);
         CostTypes existedCoreCost = getCoreCostTypeExistedInProductType(costTypes.getProductTypes().getId());
-        checkNameCostTypeExistedInProductType(costTypes.getProductTypes().getId(), request.getName());
+        if (!request.getName().equals(costTypes.getName())) {
+            checkNameCostTypeExistedInProductType(costTypes.getProductTypes().getId(), request.getName());
+        }
         if (request.getIsCore()) {
             if (!costTypes.getId().equals(existedCoreCost.getId())) {
                 throw new AppException(ErrorCode.CORE_COST_TYPE_EXISTED);
@@ -100,6 +102,11 @@ public class CostTypesServiceImpl implements CostTypesService {
     @Override
     public CostTypes getCostTypeByIdAndIsAvailable(String costTypeId) {
         return costTypesRepository.findByIdAndIsAvailable(costTypeId, true)
+                .orElseThrow(() -> new AppException(ErrorCode.COST_TYPE_NOT_FOUND));
+    }
+
+    public CostTypes getCostTypeById(String costTypeId) {
+        return costTypesRepository.findById(costTypeId)
                 .orElseThrow(() -> new AppException(ErrorCode.COST_TYPE_NOT_FOUND));
     }
 
