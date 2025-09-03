@@ -37,6 +37,7 @@ public class CustomDesignRequestStateValidator {
 
         validTransitions.put(CustomDesignRequestStatus.REJECTED_PRICING, Set.of(
                 CustomDesignRequestStatus.PRICING_NOTIFIED,
+                CustomDesignRequestStatus.APPROVED_PRICING,
                 CustomDesignRequestStatus.CANCELLED
         ));
 
