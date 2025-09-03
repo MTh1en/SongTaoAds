@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,5 +69,10 @@ public class TopicServiceImpl implements TopicService {
     public Topic getTopicById(String topicId) {
         return topicRepository.findById(topicId)
                 .orElseThrow(() -> new AppException(ErrorCode.TOPIC_NOT_FOUND));
+    }
+
+    @Override
+    public List<Topic> getAllTopics() {
+        return new ArrayList<>(topicRepository.findAll());
     }
 }

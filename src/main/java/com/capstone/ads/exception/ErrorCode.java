@@ -102,7 +102,7 @@ public enum ErrorCode {
     TOPIC_NOT_FOUND("Không tìm thấy chủ đề", HttpStatus.NOT_FOUND),
     QUESTION_NOT_FOUND("Không tìm thấy câu hỏi", HttpStatus.NOT_FOUND),
     CHAT_BOT_TOPIC_NOT_FOUND("Không tìm thấy chủ đề của model chat bot", HttpStatus.NOT_FOUND),
-
+    CHATBOT_TOPIC_ALREADY_EXISTS("Chủ đề đã được thêm vào model", HttpStatus.BAD_REQUEST),
     // ============  NOTIFICATION ============
     NOTIFICATION_NOT_FOUND("Không tìm thấy thông báo", HttpStatus.NOT_FOUND),
     ;

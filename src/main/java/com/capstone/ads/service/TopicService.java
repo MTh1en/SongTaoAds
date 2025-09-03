@@ -20,4 +20,5 @@ public interface TopicService {
 
     //INTERNAL FUNCTION
     Topic getTopicById(String id);
+    List<Topic> getAllTopics();
 }
